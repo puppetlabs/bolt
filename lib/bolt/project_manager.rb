@@ -195,7 +195,7 @@ module Bolt
 
       migrator.migrate(
         @config.project,
-        @config.modulepath
+        @config.modulepath[0...-1]
       )
     end
   end

@@ -232,24 +232,4 @@ describe Bolt::Project do
       Bolt::Project.create_project('myproject', 'user')
     end
   end
-
-  describe '#modulepath' do
-    context 'with modules set' do
-      let(:project_config) { { 'modules' => [] } }
-
-      it 'returns the new default modulepath' do
-        expect(project.modulepath).to match_array([(project.path + 'modules').to_s])
-      end
-    end
-
-    context 'without modules set' do
-      it 'returns the old default modulepath if modules is not set' do
-        expect(project.modulepath).to match_array([
-                                                    (project.path + 'modules').to_s,
-                                                    (project.path + 'site-modules').to_s,
-                                                    (project.path + 'site').to_s
-                                                  ])
-      end
-    end
-  end
 end

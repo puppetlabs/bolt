@@ -2435,7 +2435,7 @@ describe "Bolt::CLI" do
     it 'reads modulepath' do
       cli = Bolt::CLI.new(%w[command run uptime] + config_flags)
       cli.parse
-      expect(cli.config.modulepath).to eq(modulepath)
+      expect(cli.config.modulepath).to include(*modulepath)
     end
 
     it 'reads concurrency' do
