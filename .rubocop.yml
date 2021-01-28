@@ -2,6 +2,7 @@ require:
   - rubocop-rake
 
 AllCops:
+  NewCops: enable
   Exclude:
     - Boltdir/**/*
     - vendor/**/*

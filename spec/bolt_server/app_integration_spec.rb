@@ -29,7 +29,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
       it 'runs an echo task with a password' do
         body = build_task_request('sample::echo',
                                   conn_target('ssh', include_password: true),
-                                  "message": "Hello!")
+                                  message: "Hello!")
 
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
         expect(last_response).to be_ok
@@ -45,7 +45,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
         target = conn_target('ssh', options: { 'private-key' => { 'key-data' => private_key_content } })
         body = build_task_request('sample::echo',
                                   target,
-                                  "message": "Hello!")
+                                  message: "Hello!")
 
         post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
         expect(last_response).to be_ok
