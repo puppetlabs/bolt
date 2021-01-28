@@ -2,7 +2,11 @@
 
 require 'bolt/util'
 
-# Wait until all targets accept connections.
+# Wait until all targets accept connections. This function allows a plan execution to wait for a customizable
+# amount of time via the `wait_time` option until a target connection can be reestablished. The plan proceeds
+# to the next step if the connection fails to reconnect in the time specified (default: 120 seconds). A typical
+# use case for this function is if your plan reboots a remote host and the plan needs to wait for the host to reconnect
+# before it continues to the next step.
 #
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:wait_until_available) do
@@ -10,8 +14,8 @@ Puppet::Functions.create_function(:wait_until_available) do
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param options A hash of additional options.
   # @option options [String] description A description for logging. (default: 'wait until available')
-  # @option options [Numeric] wait_time The time to wait. (default: 120)
-  # @option options [Numeric] retry_interval The interval to wait before retrying. (default: 1)
+  # @option options [Numeric] wait_time The time to wait, in seconds. (default: 120)
+  # @option options [Numeric] retry_interval The interval to wait before retrying, in seconds. (default: 1)
   # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @return A list of results, one entry per target. Successful results have no value.
   # @example Wait for targets
