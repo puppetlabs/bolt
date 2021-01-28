@@ -21,7 +21,7 @@ module Bolt
             type: [TrueClass, FalseClass],
             _plugin: false,
             _example: true,
-            _default: false
+            _default: true
           },
           "cacert" => {
             type: String,

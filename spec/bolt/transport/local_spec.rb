@@ -73,10 +73,10 @@ describe Bolt::Transport::Local do
         }] } # This has so many brackets it might be March Madness
       }
 
-      it 'prefers user-defined target-level config over defaults' do
+      it 'does not apply local defaults' do
         expect(@conn.target.transport).to eq('ssh')
         expect(@conn.target.options['interpreters']).to include('.rb' => '/foo/ruby')
-        expect(@conn.target.features).to include('puppet-agent')
+        expect(@conn.target.features).not_to include('puppet-agent')
       end
     end
   end
@@ -85,10 +85,7 @@ describe Bolt::Transport::Local do
     let(:uri) { 'local://127.0.0.1' }
 
     context 'with bundled-ruby' do
-      let(:data) {
-        { 'targets' => [uri],
-          'config' => { 'local' => { 'bundled-ruby' => true } } }
-      }
+      let(:data) { { 'targets' => [uri] } }
 
       it 'adds local config options' do
         expect(@conn.target.transport).to eq('local')
@@ -102,7 +99,6 @@ describe Bolt::Transport::Local do
         { 'targets' => [uri],
           'config' => {
             'local' => {
-              'bundled-ruby' => true,
               'interpreters' => { '.rb' => '/foo/ruby' }
             }
           },
@@ -122,7 +118,6 @@ describe Bolt::Transport::Local do
           'config' => {
             'transport' => 'local',
             'local' => {
-              'bundled-ruby' => true,
               'interpreters' => { '.rb' => '/foo/ruby' }
             }
           }
@@ -133,22 +128,6 @@ describe Bolt::Transport::Local do
         expect(@conn.target.options['interpreters']).to include('.rb' => '/foo/ruby')
         expect(@conn.target.features).to include('puppet-agent')
       end
-    end
-  end
-
-  context 'without bundled-ruby' do
-    let(:uri) { 'local://127.0.0.1' }
-    let(:data) { { 'targets' => [uri] } }
-
-    it 'does not use default config' do
-      expect(@conn.target.options).not_to include('interpreters')
-      expect(@conn.target.features).not_to include('puppet-agent')
-    end
-
-    it 'warns that default config will be added in 3.0' do
-      expect(Bolt::Logger).to receive(:warn_once)
-        .with(anything, /The local transport will default/)
-      subject.with_connection(get_target(inventory, uri)) do |conn|; end
     end
   end
 
