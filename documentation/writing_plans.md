@@ -789,7 +789,7 @@ plan create_targets(
   $target2 = get_target('2hostname2handle')
 
   # Create an array of Target objects
-  $target_list = get_targets('host1', 'host2', 'hostred', 'hostblue')
+  $target_list = get_targets(['host1', 'host2', 'hostred', 'hostblue'])
   # This also accepts TargetSpec objects
   $listy_list = get_targets($targetspecs)
   # And inventory group names
