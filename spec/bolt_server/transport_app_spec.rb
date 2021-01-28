@@ -86,7 +86,7 @@ describe "BoltServer::TransportApp" do
       }
     end
     let(:action) { 'run_task' }
-    let(:result) { double(Bolt::Result, to_data: { 'status': 'test_status' }) }
+    let(:result) { double(Bolt::Result, to_data: { status: 'test_status' }) }
 
     before(:each) do
       allow_any_instance_of(BoltServer::TransportApp)
@@ -462,11 +462,11 @@ describe "BoltServer::TransportApp" do
       end
 
       it 'performs the action when using a password and scrubs any stack traces' do
-        body = { 'target': {
-          'hostname': target[:host],
-          'user': target[:user],
-          'password': target[:password],
-          'port': target[:port]
+        body = { target: {
+          hostname: target[:host],
+          user: target[:user],
+          password: target[:password],
+          port: target[:port]
         } }
 
         expect_any_instance_of(BoltServer::TransportApp)
@@ -482,11 +482,11 @@ describe "BoltServer::TransportApp" do
         private_key = ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0]
         private_key_content = File.read(private_key)
 
-        body = { 'target': {
-          'hostname': target[:host],
-          'user': target[:user],
+        body = { target: {
+          hostname: target[:host],
+          user: target[:user],
           'private-key-content': private_key_content,
-          'port': target[:port]
+          port: target[:port]
         } }
 
         expect_any_instance_of(BoltServer::TransportApp)
