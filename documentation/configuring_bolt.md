@@ -129,8 +129,7 @@ to lead to errors where content from another project is loaded.
 **Windows Filepath:** `%PROGRAMDATA%\PuppetLabs\bolt\etc\bolt-defaults.yaml`
 
 The defaults configuration file supports most of Bolt's configuration options,
-with the exception of options that are project-specific such as `inventoryfile`
-and `modulepath`.
+with the exception of options that are project-specific such as `modulepath`.
 
 You can view a full list of the available options in [`bolt-defaults.yaml`
 options](bolt_defaults_reference.md).
