@@ -95,38 +95,38 @@ module Bolt
       end
 
       def print_puppetfile_result(success, puppetfile, moduledir)
-        @stream.puts({ "success": success,
-                       "puppetfile": puppetfile,
-                       "moduledir": moduledir.to_s }.to_json)
+        @stream.puts({ success: success,
+                       puppetfile: puppetfile,
+                       moduledir: moduledir.to_s }.to_json)
       end
 
       def print_targets(target_list, inventoryfile)
         @stream.puts ::JSON.pretty_generate(
-          "inventory": {
-            "targets": target_list[:inventory].map(&:name),
-            "count": target_list[:inventory].count,
-            "file": inventoryfile.to_s
+          inventory: {
+            targets: target_list[:inventory].map(&:name),
+            count: target_list[:inventory].count,
+            file: inventoryfile.to_s
           },
-          "adhoc": {
-            "targets": target_list[:adhoc].map(&:name),
-            "count": target_list[:adhoc].count
+          adhoc: {
+            targets: target_list[:adhoc].map(&:name),
+            count: target_list[:adhoc].count
           },
-          "targets": target_list.values.flatten.map(&:name),
-          "count": target_list.values.flatten.count
+          targets: target_list.values.flatten.map(&:name),
+          count: target_list.values.flatten.count
         )
       end
 
       def print_target_info(targets)
         @stream.puts ::JSON.pretty_generate(
-          "targets": targets.map(&:detail),
-          "count": targets.count
+          targets: targets.map(&:detail),
+          count: targets.count
         )
       end
 
       def print_groups(groups)
         count = groups.count
-        @stream.puts({ "groups": groups,
-                       "count": count }.to_json)
+        @stream.puts({ groups: groups,
+                       count: count }.to_json)
       end
 
       def fatal_error(err)

@@ -352,7 +352,7 @@ module BoltServer
     end
 
     def allowed_helper(metadata, allowlist)
-      allowed = allowlist.nil? || allowlist.include?(metadata['name']) ? true : false
+      allowed = allowlist.nil? || allowlist.include?(metadata['name'])
       metadata.merge({ 'allowed' => allowed })
     end
 
