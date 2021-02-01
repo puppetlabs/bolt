@@ -14,12 +14,12 @@ limitations](#manifest-block-limitations).
   the core modules required to use the `puppet apply` command. These modules are
   listed in the [Bolt GitHub
   repository](https://github.com/puppetlabs/bolt/blob/main/Puppetfile) and you
-  can install them using a Puppetfile.
+  can install them using the [module management workflow](modules.md#dependency-management).
 
 📖 **Related information**  
 
 - [Configure Bolt to download and install modules](bolt_installing_modules.md#)
-- [Puppetfile example](https://github.com/puppetlabs/bolt/blob/main/Puppetfile)
+- [Modules overview](modules.md)
 - [Puppet Forge](https://forge.puppet.com/)
 
 ## Applying manifest blocks from the command line
@@ -403,97 +403,94 @@ Create a manifest that sets up a web server with nginx, and run it as a plan.
 - [Bolt Projects](projects.md)
 
 
-### Create a sample manifest for IIS on Windows
+### Create a Bolt plan for IIS on Windows
 
 Create a manifest that sets up a web server with IIS and run it as a plan.
 
-1.  Go to the `site-modules` directory in the default Bolt project directory:
-    `~/.puppetlabs/bolt/site-modules`
+1. Create a directory to use as your Bolt project or use an existing directory. 
+1. Convert the directory into a Bolt project named 'profiles' by running `bolt project init
+   profiles`, or `New-BoltProject -Name profiles` if you're using PowerShell.
+1. Add the `puppetlabs-iis` module to your `bolt-project.yaml` under the `modules` key:
+   ```
+   modules:
+     - name: puppetlabs-iis
+       version_requirement: 4.3.2
+   ```
+1. Run `bolt module install` or `Install-BoltModule` if you're using PowerShell.
+1. Create a new Puppet language Bolt plan inside your project by running
+   `bolt plan new profiles` or `New-BoltPlan -Name profiles -Pp` on PowerShell. This creates a `plans/`
+   directory in your Bolt project, and a file named `init.pp` inside that directory with some basic
+   commands.
+1. Replace the contents of `<PROJECT DIRECTORY>/plans/init.pp` with this Bolt plan: 
+   ```puppet
+   plan profiles(
+        TargetSpec $targets,
+        String $site_content = 'hello!',
+   ) {
 
-1.  Create a module named profiles.
-    -   If you use the Puppet Development Kit: `pdk new module profiles`
-    -   Otherwise create `~/.puppetlabs/bolt/site-modules/profiles`
+     # Install the puppet-agent package if Puppet is not detected. 
+     # Copy over custom facts from the Bolt modulepath.
+     # Run the `facter` command line tool to gather target information.
+     $targets.apply_prep
 
-1.  Add a `plans` directory to the profiles module.
+     # Compile the manifest block into a catalog
+     return apply($targets, '_catch_errors' => true) {
+       $iis_features = ['Web-WebServer','Web-Scripting-Tools']
 
-1.  Install the IIS dependencies.
-    1.  Add the following code to `~/.puppetlabs/bolt/Puppetfile`
-
-        ```ruby
-        forge 'http://forge.puppetlabs.com'
-        mod 'puppetlabs-iis', '4.3.2'
-        mod 'profiles', local: true
-        ```
-
-    1.  Run `bolt puppetfile install`
-
-1.  In the plans directory, create a manifest file called `iis_install.pp` and
-    add the following code:
-
-    ```puppet
-    plan profiles::iis_install(
-         TargetSpec $targets,
-         String $site_content = 'hello!',
-       ) {
-
-         # Install the puppet-agent package if Puppet is not detected. 
-         # Copy over custom facts from the Bolt modulepath.
-         # Run the `facter` command line tool to gather target information.
-         $targets.apply_prep
-
-         # Compile the manifest block into a catalog
-         return apply($targets, '_catch_errors' => true) {
-           $iis_features = ['Web-WebServer','Web-Scripting-Tools']
-
-           iis_feature { $iis_features:
-             ensure => 'present',
-           }
-
-           # Delete the default website to prevent a port binding conflict.
-           iis_site {'Default Web Site':
-             ensure  => absent,
-             require => Iis_feature['Web-WebServer'],
-           }
-
-           iis_site { 'minimal':
-             ensure          => 'started',
-             physicalpath    => 'c:\\inetpub\\minimal',
-             applicationpool => 'DefaultAppPool',
-             require         => [
-               File['minimal'],
-               Iis_site['Default Web Site']
-             ],
-           }
-
-           file { 'minimal':
-             ensure => 'directory',
-             path   => 'c:\\inetpub\\minimal',
-           }
-
-           file { 'content':
-             ensure  => 'file',
-             path    => 'c:\\inetpub\\minimal\\index.html',
-             content => $site_content,
-           }
-         }
+       iis_feature { $iis_features:
+         ensure => 'present',
        }
-    ```
-1.  Run the plan on a target:
 
-    ```shell
-    bolt plan run profiles::iis_install --targets mytarget.mydomain --transport winrm
-    ```
+       # Delete the default website to prevent a port binding conflict.
+       iis_site {'Default Web Site':
+         ensure  => absent,
+         require => Iis_feature['Web-WebServer'],
+       }
+
+       iis_site { 'minimal':
+         ensure          => 'started',
+         physicalpath    => 'c:\\inetpub\\minimal',
+         applicationpool => 'DefaultAppPool',
+         require         => [
+           File['minimal'],
+           Iis_site['Default Web Site']
+         ],
+       }
+
+       file { 'minimal':
+         ensure => 'directory',
+         path   => 'c:\\inetpub\\minimal',
+       }
+
+       file { 'content':
+         ensure  => 'file',
+         path    => 'c:\\inetpub\\minimal\\index.html',
+         content => $site_content,
+       }
+     }
+   }
+   ```
+   This plan uses the `apply` function to apply a manifest to targets. The manifest uses the 
+   [puppetlabs-iis module](https://forge.puppet.com/modules/puppetlabs/iis) to set up an IIS 
+   server on the targets.
+1. Run the plan on a target:
+   _\*nix shell command_
+   ```shell
+   bolt plan run profiles --targets winrm://mytarget.mydomain
+   ```
+   _PowerShell cmdlet_
+   ```shell
+   Invoke-BoltPlan -Name profiles -Targets winrm://mytarget.mydomain
+   ```
 
 1.  In a web browser, open `mytarget.mydomain`. The page displays the text
     `hello!`
 
 📖 **Related information**  
-
 - [IIS](https://www.iis.net)
 - [Specify targets](running_bolt_commands.md#adding-options-to-bolt-commands)
 - [Bolt projects](projects.md)
-
-📖 **Related information**
+- [Puppet language Bolt plans](writing_plans.md)
 - For information on how Bolt loads the modulepath, see [Modules overview](modules.md#modulepath).
 - To learn more about using Puppet device modules, see [Running Bolt on network
   devices](running_bolt_network.md#-using-puppet-device-modules-from-an-apply-block)
