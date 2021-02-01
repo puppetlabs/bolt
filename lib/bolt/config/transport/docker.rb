@@ -13,6 +13,7 @@ module Bolt
           interpreters
           service-url
           shell-command
+          stream
           tmpdir
           tty
         ].freeze

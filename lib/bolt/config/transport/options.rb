@@ -349,6 +349,13 @@ module Bolt
             _default: true,
             _example: false
           },
+          "stream" => {
+            type: [TrueClass, FalseClass],
+            description: "Whether to stream output from scripts and commands to the console.",
+            _plugin: true,
+            _default: false,
+            _example: true
+          },
           "sudo-executable" => {
             type: String,
             description: "The executable to use when escalating to the configured `run-as` user. This is useful "\

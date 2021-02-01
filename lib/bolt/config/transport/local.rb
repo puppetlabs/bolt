@@ -14,7 +14,7 @@ module Bolt
           tmpdir
         ].freeze
 
-        OPTIONS = WINDOWS_OPTIONS.dup.concat(RUN_AS_OPTIONS).sort.freeze
+        OPTIONS = WINDOWS_OPTIONS.dup.concat(RUN_AS_OPTIONS).concat(%w[stream]).sort.freeze
 
         DEFAULTS = {
           'bundled-ruby' => true,

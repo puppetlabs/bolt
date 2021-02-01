@@ -12,6 +12,18 @@ module Bolt
         super
 
         @run_as = nil
+        if target.transport_config['stream']
+          @stream_logger = Bolt::Logger.logger(:stream)
+          # Don't send stream messages to the parent logger
+          @stream_logger.additive = false
+
+          # Log stream messages without any other data or color
+          pattern = Logging.layouts.pattern(pattern: '%m\n')
+          @stream_logger.appenders = Logging.appenders.stdout(
+            'console',
+            layout: pattern
+          )
+        end
 
         @sudo_id = SecureRandom.uuid
         @sudo_password = @target.options['sudo-password'] || @target.password
@@ -385,14 +397,20 @@ module Bolt
           # See if we can read from out or err, or write to in
           ready_read, ready_write, = select(read_streams.keys, write_stream, nil, timeout)
 
-          # Read from out and err
           ready_read&.each do |stream|
+            stream_name = stream == out ? 'out' : 'err'
             # Check for sudo prompt
-            read_streams[stream] << if use_sudo
-                                      check_sudo(stream, inp, options[:stdin])
-                                    else
-                                      stream.readpartial(CHUNK_SIZE)
-                                    end
+            to_print = if use_sudo
+                         check_sudo(stream, inp, options[:stdin])
+                       else
+                         stream.readpartial(CHUNK_SIZE)
+                       end
+
+            if !to_print.chomp.empty? && @stream_logger
+              @stream_logger.warn("[#{@target.name}] #{stream_name}: #{to_print.chomp}")
+            end
+
+            read_streams[stream] << to_print
           rescue EOFError
           end
 

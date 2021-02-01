@@ -27,6 +27,7 @@ module Bolt
           private-key
           proxyjump
           script-dir
+          stream
           tmpdir
           tty
           user
