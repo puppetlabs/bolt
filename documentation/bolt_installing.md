@@ -22,7 +22,7 @@ Use one of the supported Windows installation methods to install Bolt.
 
 Use the MSI installer package to install Bolt on Windows:
 1.  Download the [Bolt installer
-    package](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi).
+    package](https://downloads.puppet.com/windows/puppet-tools/puppet-bolt-x64-latest.msi).
 1.  Double-click the MSI file and run the installer.
 1.  Open PowerShell and run a Bolt command.
     ```
@@ -189,9 +189,9 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS.
     > () menu in the corner of your screen and choose **About This Mac**.
 
     - 10.14 (Mojave)
-      [https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
+      [https://downloads.puppet.com/mac/puppet-tools/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet-tools/10.14/x86_64/puppet-bolt-latest.dmg)
     - 10.15 (Catalina)
-      [https://downloads.puppet.com/mac/puppet/10.15/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.15/x86_64/puppet-bolt-latest.dmg)
+      [https://downloads.puppet.com/mac/puppet-tools/10.15/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet-tools/10.15/x86_64/puppet-bolt-latest.dmg)
 1.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then
     double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
 1.  Open Terminal and run a Bolt command and get started.

@@ -41,13 +41,9 @@ Bolt loads project-level configuration files from the root of your [Bolt project
 directory](projects.md). If it can't find a project directory,
 Bolt uses the default project directory: `~/.puppetlabs/bolt/`.
 
-You can set project-level configuration in two files: 
+Set project-level configuration in these files: 
 - For Bolt configuration, use `bolt-project.yaml`.
 - For inventory configuration, use `inventory.yaml`.
-
-The preferred method for setting project-level configuration is to use a
-combination of `bolt-project.yaml` and `inventory.yaml` files. This maintains
-a clear distinction between Bolt configuration and inventory configuration.
 
 ### `bolt-project.yaml`
 
@@ -89,14 +85,14 @@ fields](bolt_inventory_reference.md).
 
 Use this level to set configuration that should apply to all projects for a
 particular user. Options that you might set at the user-level include paths to
-private keys, credentials for a plugin,
-or default inventory configuration that is common to all of your projects.
-You can set most configurable options in Bolt at the user level.
+private keys, credentials for a plugin, or default inventory configuration that
+is common to all of your projects. You can set most configurable options in Bolt
+at the user level.
 
-The preferred method for setting user-level configuration is to use a
-`bolt-defaults.yaml` file. This file does not allow you to set project-specific
-configuration, such as the path to an inventory file, and is less likely
-to lead to errors where Bolt loads content from another project.
+To set configuration at the user level, use a `bolt-defaults.yaml` file. This
+file does not allow you to set project-specific configuration, such as the modulepath,
+and is less likely to lead to errors where Bolt loads
+content from another project.
 
 ### `bolt-defaults.yaml`
 
@@ -117,10 +113,10 @@ proxy, the number of threads Bolt should use when connecting to targets, or
 setting credentials for connecting to PuppetDB. You can set most configurable
 Bolt options at the system level.
 
-The preferred method for setting user-level configuration is to use a
-`bolt-defaults.yaml` file. This file does not allow you to set project-specific
-configuration, such as the path to an inventory file, and is less likely
-to lead to errors where content from another project is loaded.
+To set configuration at the user level, use a `bolt-defaults.yaml` file. This
+file does not allow you to set project-specific configuration, such as the modulepath,
+and is less likely to lead to errors where content from
+another project is loaded.
 
 ### `bolt-defaults.yaml`
 
@@ -285,5 +281,7 @@ disable-warnings:
 - [bolt-project.yaml options](bolt_project_reference.md)
 - [inventory.yaml fields](bolt_inventory_reference.md)
 - [Transport configuration options](bolt_transports_reference.md)
-- For information on using configuring Bolt for Puppet Enterprise, see [Using Bolt with Puppet Enterprise](bolt_configure_orchestrator.md)
-- For information on connecting Bolt to PuppetDB, see [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
+- For information on configuring Bolt for Puppet Enterprise, see [Using
+  Bolt with Puppet Enterprise](bolt_configure_orchestrator.md)
+- For information on connecting Bolt to PuppetDB, see [Connecting Bolt to
+  PuppetDB](bolt_connect_puppetdb.md)
