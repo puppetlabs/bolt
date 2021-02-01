@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 ARG BOLT_PASSWORD=bolt
-ARG RUBY_VERSION=2.5.5
+ARG RUBY_VERSION=2.7.1
 # NOTE: Only designed to be set at build time, not at run time!
 ENV BOLT_PASSWORD=${BOLT_PASSWORD}
 ENV KRB5_REALM=

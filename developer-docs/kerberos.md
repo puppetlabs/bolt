@@ -259,7 +259,7 @@ This will:
 * Join the Samba domain just like OMI server
 * Verify pwsh can use all authentication mechanisms against OMI
 * Expose port 422 on the Docker host for SSH access
-* Install vim, git, rbenv / ruby 2.55 / bundler
+* Install vim, git, rbenv / ruby 2.7.1 / bundler
 * Clone the Bolt source to ~/bolt
 * Install all gems with bundler including pry-byebug and pry-stackexplorer
 * Provide a test script `/bolt-kerberos-test.sh` that can be used for simple test reproductions using Kerberos, noting that some failures that result are currently expected given incompatibilities between winrm gem and OMI server

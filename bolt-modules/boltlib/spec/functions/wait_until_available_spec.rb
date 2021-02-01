@@ -45,7 +45,7 @@ describe 'wait_until_available' do
     it 'errors on unknown parameters' do
       inventory.expects(:get_targets).with(target).returns([target])
       is_expected.to run.with_params(target, 'foo' => true)
-                        .and_raise_error(/unknown keyword: foo/)
+                        .and_raise_error(/unknown keyword: :foo/)
     end
   end
 
