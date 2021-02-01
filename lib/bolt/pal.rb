@@ -449,7 +449,7 @@ module Bolt
           else
             Bolt::Logger.warn(
               "missing_plan_parameter",
-              "The documented parameter '#{name}' does not exist in plan signature"
+              "The documented parameter '#{name}' does not exist in signature for plan '#{plan.name}'"
             )
           end
         end

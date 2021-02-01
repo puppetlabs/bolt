@@ -1591,7 +1591,7 @@ describe "Bolt::CLI" do
               }
             }
           )
-          expected_log = /The documented parameter 'not_oops' does not exist in plan signature/m
+          expected_log = /parameter 'not_oops' does not exist.*sample::documented_param_typo/m
           expect(@log_output.readlines.join).to match(expected_log)
         end
 
