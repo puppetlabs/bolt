@@ -8,6 +8,28 @@ API may change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
+## Streaming output
+
+This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-310-2021-3-08).
+
+You can set the new `stream` output option in `bolt-project.yaml` or `bolt-defaults.yaml`, or
+specify the option on the command line as `--stream`. Bolt streams results back to the console as
+they are received, with the target's safe name (the URI without the password included) and the
+stream (either 'out' or 'err') appended to the message, like so:
+```
+Started on docker://puppet_6_node...
+Started on docker://puppet_7_node...
+[docker://puppet_7_node] out: Hello!
+[docker://puppet_6_node] out: Hello!
+Finished on docker://puppet_7_node:
+  Hello!
+Finished on docker://puppet_6_node:
+  Hello!
+```
+
+As you can see, when you configure output to stream, Bolt might print to the console twice:
+once as the actions are running, and again after Bolt prints the results.
+
 ## LXD Transport
 
 This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-310-2021-3-08).

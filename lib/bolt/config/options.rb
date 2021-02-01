@@ -425,7 +425,14 @@ module Bolt
           _example: false,
           _default: true
         },
-
+        "stream" => {
+          description: "Whether to stream output from scripts and commands to the console. "\
+                       "**This option is experimental**.",
+          type: [TrueClass, FalseClass],
+          _plugin: false,
+          _default: false,
+          _example: true
+        },
         "tasks" => {
           description: "A list of task names and glob patterns to filter the project's tasks by. This option is used "\
                        "to limit the visibility of tasks for users of the project. For example, project authors "\
@@ -539,6 +546,7 @@ module Bolt
         puppetdb
         save-rerun
         spinner
+        stream
       ].freeze
 
       # Options that are available in a bolt-project.yaml file
@@ -562,6 +570,7 @@ module Bolt
         puppetdb
         save-rerun
         spinner
+        stream
         tasks
         trusted-external-command
       ].freeze

@@ -61,6 +61,9 @@
     "spinner": {
       "$ref": "#/definitions/spinner"
     },
+    "stream": {
+      "$ref": "#/definitions/stream"
+    },
     "tasks": {
       "$ref": "#/definitions/tasks"
     },
@@ -438,6 +441,10 @@
     },
     "spinner": {
       "description": "Whether to print a spinner to the console for long-running Bolt operations.",
+      "type": "boolean"
+    },
+    "stream": {
+      "description": "Whether to stream output from scripts and commands to the console. **This option is experimental**.",
       "type": "boolean"
     },
     "tasks": {

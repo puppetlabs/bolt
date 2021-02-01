@@ -1,0 +1,7 @@
+{
+  "description": "Write a multiline string to the console",
+  "implementations": [
+    {"name": "multiline.ps1", "requirements": ["powershell"]},
+    {"name": "multiline.sh", "requirements": ["shell"]}
+  ]
+}
