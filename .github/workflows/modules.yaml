@@ -22,7 +22,7 @@ jobs:
       - name: Setup Ruby
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.5.x'
+          ruby-version: '2.7.x'
       - name: Install bundler
         run: |
           gem install bundler
@@ -53,7 +53,7 @@ jobs:
       - name: Setup Ruby
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: 2.5.x
+          ruby-version: 2.7.x
       - name: Install bundler
         run: |
           gem install bundler
