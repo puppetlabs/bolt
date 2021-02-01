@@ -69,7 +69,7 @@ begin
       filepath = File.expand_path('../documentation/bolt_cmdlet_reference.md', __dir__)
       template = File.expand_path('../documentation/templates/bolt_cmdlet_reference.md.erb', __dir__)
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generate PowerShell cmdlet reference at:\n\t#{filepath}"
@@ -107,7 +107,7 @@ begin
         }
       end
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generated packaged modules at:\n\t#{filepath}"
@@ -156,7 +156,7 @@ begin
       # We could get around this by sorting the COMMANDS hash in the CLI
       @commands = @commands.sort.to_h
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generated shell command reference at:\n\t#{filepath}"
@@ -190,7 +190,7 @@ begin
       # Add inventory examples to 'inventory-config'
       @yaml['inventory-config'] = inventory_yaml
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generated bolt-defaults.yaml reference at:\n\t#{filepath}"
@@ -343,7 +343,7 @@ begin
       @functions << apply
       @functions.sort! { |a, b| a['name'] <=> b['name'] }
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generated function reference at:\n\t#{filepath}"
@@ -373,7 +373,7 @@ begin
         }
       end
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generated privilege escalation doc at:\n\t#{filepath}"
@@ -401,7 +401,7 @@ begin
       # Generate YAML file examples
       @yaml = generate_yaml_file(@opts)
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generated bolt-project.yaml reference at:\n\t#{filepath}"
@@ -443,7 +443,7 @@ begin
       # Generate YAML file examples
       @yaml = generate_yaml_file(@opts)
 
-      renderer = ERB.new(File.read(template), nil, '-')
+      renderer = ERB.new(File.read(template), trim_mode: '-')
       File.write(filepath, renderer.result)
 
       $stdout.puts "Generated transports configuration reference at:\n\t#{filepath}"
