@@ -102,7 +102,7 @@ $ bolt plan show
 myproject::myplan
 
 MODULEPATH:
-/PATH/TO/BOLT_PROJECT/site
+/PATH/TO/BOLT_PROJECT/.modules
 
 Use `bolt plan show <plan-name>` to view details and parameters for a specific plan.
 ```
@@ -141,7 +141,7 @@ The following are common files and directories found in a Bolt project.
 |Directory/File|Description|
 |---------|-----------|
 |[`bolt-project.yaml`](bolt_project_reference.md)|Contains configuration options for Bolt and  Bolt projects. This file must exist for Bolt to find any of the other files or directories in this list.|
-|[`inventory.yaml`](inventory_file_v2.md)|Contains a list of known targets and target specific data.|
+|[`inventory.yaml`](inventory_files.md)|Contains a list of known targets and target specific data.|
 |[`plans/`](plans.md)|A directory for storing your plans.|
 |[`tasks/`](tasks.md)|A directory for storing your tasks.|
 |`files/`|A directory for storing content consumed by your tasks and plans, such as scripts.|
@@ -151,7 +151,6 @@ The following are common files and directories found in a Bolt project.
 |`hiera.yaml`|Contains the Hiera config to use for target-specific data when using `apply`.|
 |`data/`|The standard path to store static Hiera data files.|
 |`bolt-debug.log`|Contains debug log output for the most recent Bolt command.|
-|[`bolt.yaml`](bolt_configuration_reference.md)|Contains configuration options for Bolt. ⛔ **`bolt.yaml` is deprecated; use `bolt-project.yaml` instead.**|
 | `.modules/` |The directory where Bolt installs modules. Avoid committing this directory to source control.| 
 
 > **Remember:** A directory must have a `bolt-project.yaml` file before Bolt
@@ -284,7 +283,7 @@ allows you to update old Bolt projects so that you can use them with the latest
 Bolt release.
 
 Currently, the `migrate` command:
-- Updates inventory files from Bolt version 1.
+- Updates inventory files from version 1.
 - Updates projects to use `bolt-project.yaml` and `inventory.yaml` instead of `bolt.yaml`.
 - Updates projects to implement module dependency management. Dependency
   management was introduced in Bolt 2.30.0.
@@ -455,4 +454,4 @@ following:
 📖 **Related information**
 
 - [Modules overview](modules.md)
-- [Inventory files](inventory_file_v2.md)
+- [Inventory files](inventory_files.md)

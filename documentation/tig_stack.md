@@ -21,7 +21,7 @@ infrastructure. TIG stands for:
 >  to host the stack, which requires [Vagrant](https://www.vagrantup.com/docs/installation) and a hypervisor like 
 >  [VirtualBox](https://www.virtualbox.org/). If you'd prefer to use your own
 >  targets, you can skip the directions for provisioning targets and go straight
->  to [installing the TIG modules](#install-the-tig-modules-from-a-puppetfile).
+>  to [installing the TIG modules](#install-the-tig-modules).
 
 To deploy your TIG stack, you'll use a Bolt plan that leverages existing Puppet
 Modules. You can find all the files you need in the
@@ -100,34 +100,47 @@ To provision your targets:
       
 Next, install the Puppet modules for the different components of the TIG stack. 
 
-## Install the TIG modules from a Puppetfile
+## Install the TIG modules
 
-Before you can use Bolt to install modules, you must create a Puppetfile. A
-Puppetfile is a formatted text file that contains a list of modules and their
-versions. It can include modules from the Puppet Forge or a git repository.
+Before you can use Bolt to install modules, you must install the relevant
+modules. The modules you need are all listed in the `bolt-project.yaml` file
+under the `modules` key: 
 
-The `bolt_tig` directory contains the following `Puppetfile`:
-```puppet
-mod 'puppet-grafana', '6.0.0'
-mod 'quadriq-influxdb', '0.2.1'
-mod 'puppetlabs-stdlib', '5.2.0'
-mod 'puppet-telegraf', '2.1.0'
+```yaml
+name: tig
+plans: 
+  - tig 
+
+modules:
+  - puppet-grafana
+  - quadriq-influxdb
+  - puppet-telegraf
 ```
 
-To install the modules for the TIG stack:
-1. Install the modules using the following command:
-    ```shell
-    bolt puppetfile install
-    ```
+To install the modules and their dependencies, run the
+following command:
 
-2. Install the `toml-rb` gem, which is required by the `puppet-telegraf` module:
-    ```shell
-    /opt/puppetlabs/bolt/bin/gem install toml-rb
-    ```
+_\*nix shell command_
 
-    > **Note:** If you're using a version manager like RVM, set your Ruby
-    > environment to `system` before you install the `toml-rb` gem. For example,
-    > `rvm use system`.
+```shell
+bolt module install
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Install-BoltModule
+```
+
+The `puppet-telegraf` module requires the `toml-rb` Ruby gem. To install the gem, run the following command:
+
+```shell
+/opt/puppetlabs/bolt/bin/gem install toml-rb
+```
+
+> **Note:** If you're using a version manager like RVM, set your Ruby
+> environment to `system` before you install the `toml-rb` gem. For example,
+> `rvm use system`.
 
 Next, create an inventory file to specify which targets to use as part of the plan.
 
@@ -331,8 +344,17 @@ Next, run the plan.
 ## Run the plan
 
 To run the plan, use the following command
+
+_\*nix shell command_
+
 ```shell
 bolt plan run tig
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltPlan -Name tig
 ```
 
 Your output should look similar to this:

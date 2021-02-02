@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/logger'
 require 'bolt/task'
 
 # Installs the `puppet-agent` package on targets if needed, then collects facts,
@@ -131,10 +132,20 @@ Puppet::Functions.create_function(:apply_prep) do
         task = applicator.custom_facts_task
         arguments = { 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins) }
         results = executor.run_task(targets, task, arguments)
+
         # TODO: Standardize RunFailure type with error above
         raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
 
         results.each do |result|
+          # Log a warning if the client version is < 6
+          if unsupported_puppet?(result['clientversion'])
+            Bolt::Logger.deprecate(
+              "unsupported_puppet",
+              "Detected unsupported Puppet agent version #{result['clientversion']} on target "\
+              "#{result.target}. Bolt supports Puppet agent 6.0.0 and higher."
+            )
+          end
+
           inventory.add_facts(result.target, result.value)
         end
       end
@@ -142,5 +153,19 @@ Puppet::Functions.create_function(:apply_prep) do
 
     # Return nothing
     nil
+  end
+
+  # Returns true if the client's major version is < 6.
+  #
+  private def unsupported_puppet?(client_version)
+    if client_version.nil?
+      false
+    else
+      begin
+        Integer(client_version.split('.').first) < 6
+      rescue StandardError
+        false
+      end
+    end
   end
 end

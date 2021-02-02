@@ -6,19 +6,20 @@ module Bolt
   class ProjectManager
     class ModuleMigrator < Migrator
       def migrate(project, configured_modulepath)
-        return true unless project.modules.nil?
+        return true if project.managed_moduledir.exist?
 
         @outputter.print_message "Migrating project modules\n\n"
 
         config            = project.project_file
         puppetfile        = project.puppetfile
         managed_moduledir = project.managed_moduledir
-        modulepath        = [(project.path + 'modules').to_s,
+        new_modulepath    = [(project.path + 'modules').to_s]
+        old_modulepath    = [(project.path + 'modules').to_s,
                              (project.path + 'site-modules').to_s,
                              (project.path + 'site').to_s]
 
         # Notify user to manually migrate modules if using non-default modulepath
-        if configured_modulepath != modulepath
+        if configured_modulepath != new_modulepath && configured_modulepath != old_modulepath
           @outputter.print_action_step(
             "Project has a non-default configured modulepath, unable to automatically "\
             "migrate project modules. To migrate project modules manually, see "\
@@ -27,10 +28,10 @@ module Bolt
           true
         # Migrate modules from Puppetfile
         elsif File.exist?(puppetfile)
-          migrate_modules_from_puppetfile(config, puppetfile, managed_moduledir, modulepath)
+          migrate_modules_from_puppetfile(config, puppetfile, managed_moduledir, old_modulepath)
         # Migrate modules to updated modulepath
         else
-          consolidate_modules(modulepath)
+          consolidate_modules(old_modulepath)
           update_project_config([], config)
         end
       end

@@ -14,7 +14,7 @@
     <topicref href="getting_started_with_bolt.md" format="markdown"/>
     <topichead navtitle="Configuring Bolt">
         <topicref href="projects.md" format="markdown"/>
-        <topicref href="inventory_file_v2.md" format="markdown"/>
+        <topicref href="inventory_files.md" format="markdown"/>
         <topicref href="configuring_bolt.md" format="markdown"/>
         <topicref href="logs.md" format="markdown"/>
         <topicref href="privilege_escalation.md" format="markdown"/>
@@ -109,7 +109,6 @@
         <topicref href="bolt_defaults_reference.md" format="markdown"/>
         <topicref href="bolt_project_reference.md" format="markdown"/>
         <topicref href="bolt_inventory_reference.md" format="markdown"/>
-        <topicref href="bolt_configuration_reference.md" format="markdown"/>
     </topichead>
     <topicref href="troubleshooting.md" format="markdown"/>
 </map>

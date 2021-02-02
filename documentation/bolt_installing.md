@@ -22,7 +22,7 @@ Use one of the supported Windows installation methods to install Bolt.
 
 Use the MSI installer package to install Bolt on Windows:
 1.  Download the [Bolt installer
-    package](https://downloads.puppet.com/windows/puppet6/puppet-bolt-x64-latest.msi).
+    package](https://downloads.puppet.com/windows/puppet-tools/puppet-bolt-x64-latest.msi).
 1.  Double-click the MSI file and run the installer.
 1.  Open PowerShell and run a Bolt command.
     ```
@@ -189,9 +189,9 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS.
     > () menu in the corner of your screen and choose **About This Mac**.
 
     - 10.14 (Mojave)
-      [https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.14/x86_64/puppet-bolt-latest.dmg)
+      [https://downloads.puppet.com/mac/puppet-tools/10.14/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet-tools/10.14/x86_64/puppet-bolt-latest.dmg)
     - 10.15 (Catalina)
-      [https://downloads.puppet.com/mac/puppet/10.15/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet6/10.15/x86_64/puppet-bolt-latest.dmg)
+      [https://downloads.puppet.com/mac/puppet-tools/10.15/x86_64/puppet-bolt-latest.dmg](https://downloads.puppet.com/mac/puppet-tools/10.15/x86_64/puppet-bolt-latest.dmg)
 1.  Double-click the `puppet-bolt-latest.dmg` file to mount it and then
     double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
 1.  Open Terminal and run a Bolt command and get started.
@@ -220,24 +220,15 @@ Use one of the supported *nix installation methods to install Bolt.
 
 ### Install Bolt on Debian or Ubuntu
 
-Packaged versions of Bolt are available for Debian 8-10 and Ubuntu 16.04 and
-18.04.
-
 The Puppet Tools repository for the APT package management system is
 [https://apt.puppet.com](https://apt.puppet.com). Packages are named using the
 convention `puppet-tools-release-<VERSION CODE NAME>.deb`. For example, the
-release package for Puppet Tools on Debian 8 “Jessie” is
-`puppet-tools-release-jessie.deb`.
+release package for Puppet Tools on Debian 9 “Stretch” is
+`puppet-tools-release-stretch.deb`.
 
+To install Bolt on Ubuntu or Debian:
 1.  Download and install the software and its dependencies. Use the commands
     appropriate to your system:
-    -   Debian 8
-        ```shell script
-        wget https://apt.puppet.com/puppet-tools-release-jessie.deb
-        sudo dpkg -i puppet-tools-release-jessie.deb
-        sudo apt-get update 
-        sudo apt-get install puppet-bolt
-        ```
     -   Debian 9
         ```shell script
         wget https://apt.puppet.com/puppet-tools-release-stretch.deb

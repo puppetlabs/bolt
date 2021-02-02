@@ -9,8 +9,7 @@ describe Bolt::Config do
 
   let(:system_path)    { Bolt::Config.system_path }
   let(:user_path)      { Bolt::Config.user_path }
-  let(:config_name)    { Bolt::Config::BOLT_CONFIG_NAME }
-  let(:defaults_name)  { Bolt::Config::BOLT_DEFAULTS_NAME }
+  let(:defaults_name)  { Bolt::Config::DEFAULTS_NAME }
   let(:logfile)        { 'bolt.log' }
   let(:project_config) { nil }
   let(:project)        { @project }
@@ -42,13 +41,13 @@ describe Bolt::Config do
     it "treats relative modulepath as relative to project" do
       module_dirs = %w[site modules]
       config = Bolt::Config.new(project, 'modulepath' => module_dirs.join(File::PATH_SEPARATOR))
-      expect(config.modulepath).to eq(module_dirs.map { |dir| (project.path + dir).to_s })
+      expect(config.modulepath).to include(*module_dirs.map { |dir| (project.path + dir).to_s })
     end
 
     it "accepts an array for modulepath" do
       module_dirs = %w[site modules]
       config = Bolt::Config.new(project, 'modulepath' => module_dirs)
-      expect(config.modulepath).to eq(module_dirs.map { |dir| (project.path + dir).to_s })
+      expect(config.modulepath).to include(*module_dirs.map { |dir| (project.path + dir).to_s })
     end
 
     it 'modifies concurrency if ulimit is low', :ssh do
@@ -65,13 +64,6 @@ describe Bolt::Config do
   end
 
   describe "::from_project" do
-    it "loads from the project config file if present" do
-      allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash).with(project.config_file, 'config')
-
-      Bolt::Config.from_project(project)
-    end
-
     context "when loading user level config fails" do
       let(:user_path) do
         Pathname.new(File.expand_path(['~', '.puppetlabs', 'etc', 'bolt', 'bolt-defaults.yaml'].join(File::SEPARATOR)))
@@ -85,93 +77,24 @@ describe Bolt::Config do
         Bolt::Config.from_project(project)
       end
     end
-
-    it 'prefers bolt-project.yaml to bolt.yaml with config' do
-      File.write(File.join(tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
-      File.write(File.join(tmpdir, 'bolt-project.yaml'), { 'format' => 'human' }.to_yaml)
-
-      config = Bolt::Config.from_project(Bolt::Project.create_project(tmpdir))
-      expect(config.data['format']).to eq('human')
-      expect(config.project.config_file.to_s).to eq(File.join(tmpdir, 'bolt-project.yaml'))
-    end
-
-    # This should be removed when bolt.yaml deprecation is removed
-    it 'prefers bolt.yaml to bolt-project.yaml with no config' do
-      File.write(File.join(tmpdir, 'bolt.yaml'), { 'format' => 'json' }.to_yaml)
-      File.write(File.join(tmpdir, 'bolt-project.yaml'), { 'name' => 'human' }.to_yaml)
-
-      config = Bolt::Config.from_project(Bolt::Project.create_project(tmpdir))
-      expect(config.data['format']).to eq('json')
-      expect(config.project.config_file.to_s).to eq(File.join(tmpdir, 'bolt.yaml'))
-    end
-  end
-
-  describe "::from_file" do
-    let(:path) { File.expand_path('/path/to/config.yaml') }
-    let(:dir) { Bolt::Util.windows? ? "D:/path/to" : "/path/to" }
-    let(:proj_path) { File.join(dir, "bolt-project.yaml") }
-
-    it 'loads from the specified config file' do
-      allow(File).to receive(:directory?).with(Pathname.new(dir)).and_return(true)
-      allow(Bolt::Util).to receive(:read_optional_yaml_hash).and_return({})
-      allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
-      expect(Bolt::Util).to receive(:read_yaml_hash)
-        .with(path, 'config')
-        .and_return({})
-      expect(Bolt::Util).to receive(:read_optional_yaml_hash)
-        .with(proj_path, "project")
-        .and_return({})
-
-      Bolt::Config.from_file(path)
-    end
-
-    it "fails if the config file doesn't exist" do
-      allow(File).to receive(:directory?).with(Pathname.new(dir)).and_return(true)
-      expect(File).to receive(:open).with(path, anything).and_raise(Errno::ENOENT)
-
-      expect do
-        Bolt::Config.from_file(path)
-      end.to raise_error(Bolt::FileError)
-    end
   end
 
   describe '::load_defaults' do
     shared_examples 'config defaults' do
-      it 'defaults to bolt.yaml' do
-        allow(File).to receive(:exist?)
-        allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
-        allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
-        allow(File).to receive(:exist?).with(path + config_name).and_return(true)
-        expect(Bolt::Util).to receive(:read_yaml_hash).with(path + config_name, 'config')
-
-        Bolt::Config.load_defaults(project)
-      end
-
-      it 'warns when using bolt.yaml' do
-        allow(File).to receive(:exist?)
-        allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
-        allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
-        allow(File).to receive(:exist?).with(path + config_name).and_return(true)
-
-        expect(Bolt::Logger).to receive(:deprecate).with(anything, /bolt.yaml is deprecated/)
-
-        Bolt::Config.load_defaults(project)
-      end
-
       it 'loads bolt-defaults.yaml if present' do
         allow(File).to receive(:exist?)
         allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
         allow(File).to receive(:exist?).with(path + defaults_name).and_return(true)
         expect(Bolt::Util).to receive(:read_yaml_hash).with(path + defaults_name, 'config')
 
-        Bolt::Config.load_defaults(project)
+        Bolt::Config.load_defaults
       end
 
-      it 'loads nothing when bolt.yaml and bolt-defaults.yaml are not present' do
+      it 'loads nothing when bolt-defaults.yaml is not present' do
         allow(File).to receive(:exist?).and_return(false)
         expect(Bolt::Util).not_to receive(:read_yaml_hash)
 
-        Bolt::Config.load_defaults(project)
+        Bolt::Config.load_defaults
       end
     end
 
@@ -179,16 +102,6 @@ describe Bolt::Config do
       let(:path) { system_path }
 
       include_examples 'config defaults'
-
-      it 'does not load bolt.yaml if already loaded by project' do
-        allow(File).to receive(:exist?)
-        allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
-        allow(File).to receive(:exist?).with(path + defaults_name).and_return(false)
-        allow(project).to receive(:config_file).and_return(path + config_name)
-        expect(Bolt::Util).not_to receive(:read_yaml_hash).with(path + config_name, 'config')
-
-        Bolt::Config.load_defaults(project)
-      end
     end
 
     context 'user-level config' do
@@ -200,16 +113,6 @@ describe Bolt::Config do
 
   describe '::load_bolt_defaults_yaml' do
     let(:path) { user_path }
-
-    it 'warns when bolt.yaml is also present' do
-      allow(File).to receive(:exist?)
-      allow(Bolt::Util).to receive(:read_yaml_hash).and_return({})
-      allow(File).to receive(:exist?).with(path + config_name).and_return(true)
-
-      expect(Bolt::Logger).to receive(:warn).with(anything, /Detected multiple configuration files/)
-
-      Bolt::Config.load_bolt_defaults_yaml(path)
-    end
 
     it 'warns when inventory config keys are present' do
       allow(File).to receive(:exist?)
@@ -270,67 +173,6 @@ describe Bolt::Config do
         Bolt::FileError,
         /The inventoryfile .* does not exist/
       )
-    end
-
-    context 'puppetfile config' do
-      let(:data) do
-        {
-          'puppetfile' => {
-            'proxy' => 'https://proxy.example.com'
-          },
-          'module-install' => {
-            'proxy' => 'https://proxy.example.com'
-          }
-        }
-      end
-
-      let(:config) { Bolt::Config.new(project, data) }
-
-      context 'with modules configured' do
-        let(:project_config) { { 'modules' => [] } }
-
-        it 'warns when puppetfile is configured but not module-install' do
-          data.delete('module-install')
-
-          expect(Bolt::Logger).to receive(:warn).with(
-            anything,
-            /Detected configuration for 'puppetfile'.*'modules' is configured/
-          )
-
-          config
-        end
-
-        it 'warns when both puppetfile and module-install are configured' do
-          expect(Bolt::Logger).to receive(:warn).with(
-            anything,
-            /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is also configured/
-          )
-
-          config
-        end
-      end
-
-      context 'without modules configured' do
-        it 'warns when module-install is configured but not puppetfile' do
-          data.delete('puppetfile')
-
-          expect(Bolt::Logger).to receive(:warn).with(
-            anything,
-            /Detected configuration for 'module-install'.*'modules' is not configured/
-          )
-
-          config
-        end
-
-        it 'warns when both puppetfile and module-install are configured' do
-          expect(Bolt::Logger).to receive(:warn).with(
-            anything,
-            /Detected configuration for 'puppetfile' and 'module-install'.*'modules' is not configured/
-          )
-
-          config
-        end
-      end
     end
   end
 
@@ -508,7 +350,7 @@ describe Bolt::Config do
     let(:overrides) { { 'modulepath' => project.managed_moduledir.to_s } }
 
     context 'with modules configured' do
-      let(:project_config) { { 'modules' => [] } }
+      let(:project_config) { { 'modules' => ['puppetlabs-yaml'] } }
 
       it 'appends the managed moduledir to the modulepath' do
         expect(config.modulepath[-1]).to eq(project.managed_moduledir.to_s)
@@ -516,18 +358,6 @@ describe Bolt::Config do
 
       it 'errors if the user configures the managed moduledir' do
         expect { Bolt::Config.from_project(project, overrides) }.to raise_error(Bolt::ValidationError)
-      end
-    end
-
-    context 'with modules not configured' do
-      let(:project_config) { nil }
-
-      it 'does not append the managed moduledir to the modulepath' do
-        expect(config.modulepath).not_to include(project.managed_moduledir.to_s)
-      end
-
-      it 'does not error if the user configured the managed moduledir' do
-        expect { Bolt::Config.from_project(project, overrides) }.not_to raise_error
       end
     end
   end

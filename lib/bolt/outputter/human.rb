@@ -392,7 +392,7 @@ module Bolt
 
       def print_target_info(targets)
         @stream.puts ::JSON.pretty_generate(
-          "targets": targets.map(&:detail)
+          targets: targets.map(&:detail)
         )
         count = "#{targets.count} target#{'s' unless targets.count == 1}"
         @stream.puts colorize(:green, count)

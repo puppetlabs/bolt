@@ -9,10 +9,6 @@ test_name "bolt apply should apply manifest block on remote hosts via ssh and wi
   ssh_nodes = select_hosts(roles: ['ssh'])
   winrm_nodes = select_hosts(roles: ['winrm'])
   targets = ssh_nodes + winrm_nodes
-
-  # the puppet_agent::install task does not support osx1015 yet, so skip those hosts if present
-  targets -= select_hosts(platform: [/debian-8/])
-
   skip_test('no applicable nodes to test on') if targets.empty?
 
   def check_result(result, targets)

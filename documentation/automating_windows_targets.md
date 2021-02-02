@@ -56,7 +56,7 @@ First, we’ll use Bolt to run the script as-is on a single target.
 
 To run Bolt commands against multiple targets at once, you need to provide
 information about the environment by creating an [inventory
-file](inventory_file_v2.md). The inventory file is a YAML file that contains a
+file](inventory_files.md). The inventory file is a YAML file that contains a
 list of targets and target specific data.
 
 1.  Inside the `bolt-guide` directory, use a text editor to create an
@@ -83,7 +83,7 @@ list of targets and target specific data.
     **Note:** To have Bolt securely prompt for a password, use the
     `--password-prompt` command-line option without supplying any value. This
     prevents the password from appearing in a process listing or on the console.
-    Alternatively you can use the [``prompt` plugin`](inventory_file_v2.md#) to
+    Alternatively you can use the [`prompt` plugin](supported_plugins.md#prompt) to
     set configuration values via a prompt.
 
     You now have an inventory file where you can store information about your
@@ -278,7 +278,7 @@ targets together and dramatically simplifies Bolt commands.
 📖 **Related information**
 
 - [Bolt projects](projects.md)
-- [Inventory files](inventory_file_v2.md)
+- [Inventory files](inventory_files.md)
 - [Applying Puppet code](applying_manifest_blocks.md)
 
 Do you have a real-world use case for Bolt that you'd like to share? Reach out to us in the #bolt

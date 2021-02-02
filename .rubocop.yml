@@ -2,6 +2,7 @@ require:
   - rubocop-rake
 
 AllCops:
+  NewCops: enable
   Exclude:
     - Boltdir/**/*
     - vendor/**/*
@@ -12,7 +13,7 @@ AllCops:
     - site-modules/**/*
     - tasks/**/*
   SuggestExtensions: false
-  TargetRubyVersion: 2.5
+  TargetRubyVersion: 2.7
 
 # Layout cops
 # https://docs.rubocop.org/rubocop/cops_layout.html

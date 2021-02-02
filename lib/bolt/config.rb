@@ -22,8 +22,7 @@ module Bolt
 
     attr_reader :config_files, :data, :transports, :project, :modified_concurrency
 
-    BOLT_CONFIG_NAME = 'bolt.yaml'
-    BOLT_DEFAULTS_NAME = 'bolt-defaults.yaml'
+    DEFAULTS_NAME = 'bolt-defaults.yaml'
 
     # The default concurrency value that is used when the ulimit is not low (i.e. < 700)
     DEFAULT_DEFAULT_CONCURRENCY = 100
@@ -33,57 +32,9 @@ module Bolt
     end
 
     def self.from_project(project, overrides = {})
-      conf = if project.project_file == project.config_file
-               project.data
-             else
-               c = Bolt::Util.read_optional_yaml_hash(project.config_file, 'config')
-
-               # Validate the config against the schema. This will raise a single error
-               # with all validation errors.
-               Bolt::Validator.new.tap do |validator|
-                 validator.validate(c, bolt_schema, project.config_file.to_s)
-                 validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
-                 validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
-               end
-
-               if File.exist?(project.config_file)
-                 Bolt::Logger.debug("Loaded configuration from #{project.config_file}")
-               end
-               c
-             end
-
-      data = load_defaults(project).push(
-        filepath: project.config_file,
-        data: conf
-      )
-
-      new(project, data, overrides)
-    end
-
-    def self.from_file(configfile, overrides = {})
-      project = Bolt::Project.create_project(Pathname.new(configfile).expand_path.dirname)
-
-      conf = if project.project_file == project.config_file
-               project.data
-             else
-               c = Bolt::Util.read_yaml_hash(configfile, 'config')
-
-               # Validate the config against the schema. This will raise a single error
-               # with all validation errors.
-               Bolt::Validator.new.tap do |validator|
-                 validator.validate(c, bolt_schema, project.config_file.to_s)
-                 validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
-                 validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
-               end
-
-               Bolt::Logger.debug("Loaded configuration from #{configfile}")
-
-               c
-             end
-
-      data = load_defaults(project).push(
-        filepath: configfile,
-        data: conf
+      data = load_defaults.push(
+        filepath: project.project_file,
+        data: project.data
       )
 
       new(project, data, overrides)
@@ -102,23 +53,13 @@ module Bolt
     def self.defaults_schema
       schema = {
         type:        Hash,
-        properties:  BOLT_DEFAULTS_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
+        properties:  DEFAULTS_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
         definitions: OPTIONS.merge(transport_definitions)
       }
 
       schema[:definitions]['inventory-config'][:properties] = transport_definitions
 
       schema
-    end
-
-    # Builds the schema for bolt.yaml used by the validator.
-    #
-    def self.bolt_schema
-      {
-        type:        Hash,
-        properties:  (BOLT_OPTIONS + INVENTORY_OPTIONS.keys).map { |opt| [opt, _ref: opt] }.to_h,
-        definitions: OPTIONS.merge(transport_definitions)
-      }
     end
 
     def self.system_path
@@ -136,22 +77,13 @@ module Bolt
     end
 
     # Loads a 'bolt-defaults.yaml' file, which contains default configuration that applies to all
-    # projects. This file does not allow project-specific configuration such as 'hiera-config' and
-    # 'inventoryfile', and nests all default inventory configuration under an 'inventory-config' key.
+    # projects. This file does not allow project-specific configuration such as 'hiera-config'
+    # and nests all default inventory configuration under an 'inventory-config' key.
     def self.load_bolt_defaults_yaml(dir)
-      filepath     = dir + BOLT_DEFAULTS_NAME
+      filepath     = dir + DEFAULTS_NAME
       data         = Bolt::Util.read_yaml_hash(filepath, 'config')
 
       Bolt::Logger.debug("Loaded configuration from #{filepath}")
-
-      # Warn if 'bolt.yaml' detected in same directory.
-      if File.exist?(bolt_yaml = dir + BOLT_CONFIG_NAME)
-        Bolt::Logger.warn(
-          "multiple_config_files",
-          "Detected multiple configuration files: ['#{bolt_yaml}', '#{filepath}']. '#{bolt_yaml}' "\
-          "will be ignored."
-        )
-      end
 
       # Validate the config against the schema. This will raise a single error
       # with all validation errors.
@@ -162,7 +94,7 @@ module Bolt
       end
 
       # Remove project-specific config such as hiera-config, etc.
-      project_config = data.slice(*(BOLT_PROJECT_OPTIONS - BOLT_DEFAULTS_OPTIONS))
+      project_config = data.slice(*(PROJECT_OPTIONS - DEFAULTS_OPTIONS))
 
       if project_config.any?
         data.reject! { |key, _| project_config.include?(key) }
@@ -210,52 +142,17 @@ module Bolt
       { filepath: filepath, data: data }
     end
 
-    # Loads a 'bolt.yaml' file, the legacy configuration file. There's no special munging needed
-    # here since Bolt::Config will just ignore any invalid keys.
-    def self.load_bolt_yaml(dir)
-      filepath     = dir + BOLT_CONFIG_NAME
-      data         = Bolt::Util.read_yaml_hash(filepath, 'config')
-
-      Bolt::Logger.debug("Loaded configuration from #{filepath}")
-
-      Bolt::Logger.deprecate(
-        "bolt_yaml",
-        "Configuration file #{filepath} is deprecated and will be removed in Bolt 3.0. "\
-        "See https://pup.pt/update-bolt-config for how to update to the latest Bolt practices."
-      )
-
-      # Validate the config against the schema. This will raise a single error
-      # with all validation errors.
-      Bolt::Validator.new.tap do |validator|
-        validator.validate(data, bolt_schema, filepath)
-        validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
-        validator.deprecations.each { |dep| Bolt::Logger.deprecate(dep[:id], dep[:msg]) }
-      end
-
-      { filepath: filepath, data: data }
-    end
-
-    def self.load_defaults(project)
+    def self.load_defaults
       confs = []
 
-      # Load system-level config. Prefer a 'bolt-defaults.yaml' file, but fall back to the
-      # legacy 'bolt.yaml' file. If the project-level config file is also the system-level
-      # config file, don't load it a second time.
-      if File.exist?(system_path + BOLT_DEFAULTS_NAME)
+      # Load system-level config.
+      if File.exist?(system_path + DEFAULTS_NAME)
         confs << load_bolt_defaults_yaml(system_path)
-      elsif File.exist?(system_path + BOLT_CONFIG_NAME) &&
-            (system_path + BOLT_CONFIG_NAME) != project.config_file
-        confs << load_bolt_yaml(system_path)
       end
 
-      # Load user-level config if there is a homedir. Prefer a 'bolt-defaults.yaml' file, but
-      # fall back to the legacy 'bolt.yaml' file.
-      if user_path
-        if File.exist?(user_path + BOLT_DEFAULTS_NAME)
-          confs << load_bolt_defaults_yaml(user_path)
-        elsif File.exist?(user_path + BOLT_CONFIG_NAME)
-          confs << load_bolt_yaml(user_path)
-        end
+      # Load user-level config if there is a homedir.
+      if user_path && File.exist?(user_path + DEFAULTS_NAME)
+        confs << load_bolt_defaults_yaml(user_path)
       end
 
       confs
@@ -263,7 +160,7 @@ module Bolt
 
     def initialize(project, config_data, overrides = {})
       unless config_data.is_a?(Array)
-        config_data = [{ filepath: project.config_file, data: config_data }]
+        config_data = [{ filepath: project.project_file, data: config_data }]
       end
 
       @logger       = Bolt::Logger.logger(self)
@@ -273,7 +170,6 @@ module Bolt
 
       default_data = {
         'apply-settings'      => {},
-        'apply_settings'      => {},
         'color'               => true,
         'compile-concurrency' => Etc.nprocessors,
         'concurrency'         => default_concurrency,
@@ -282,10 +178,8 @@ module Bolt
         'log'                 => { 'console' => {} },
         'module-install'      => {},
         'plugin-hooks'        => {},
-        'plugin_hooks'        => {},
         'plugins'             => {},
         'puppetdb'            => {},
-        'puppetfile'          => {},
         'save-rerun'          => true,
         'spinner'             => true,
         'transport'           => 'ssh'
@@ -328,28 +222,25 @@ module Bolt
     def normalize_overrides(options)
       opts = options.transform_keys(&:to_s)
 
-      # Pull out config options. We need to add 'transport' as it's not part of the
-      # OPTIONS hash but is a valid option that can be set with the --transport CLI option
-      overrides = opts.slice(*OPTIONS.keys, 'transport')
+      # Pull out config options. We need to add 'transport' and 'inventoryfile' as they're
+      # not part of the OPTIONS hash but are valid options that can be set with CLI options
+      overrides = opts.slice(*OPTIONS.keys, 'inventoryfile', 'transport')
 
       # Pull out transport config options
       TRANSPORT_CONFIG.each do |transport, config|
         overrides[transport] = opts.slice(*config.options)
       end
 
-      # Set console log to debug if in debug mode
-      if options[:debug]
-        overrides['log'] = { 'console' => { 'level' => 'debug' } }
-      end
-
-      if options[:puppetfile_path]
-        @puppetfile = options[:puppetfile_path]
-      end
-
       overrides['trace'] = opts['trace'] if opts.key?('trace')
 
-      # Validate the overrides
-      Bolt::Validator.new.validate(overrides, self.class.bolt_schema, 'command line')
+      # Validate the overrides that can have arbitrary values
+      schema = {
+        type:        Hash,
+        properties:  CLI_OPTIONS.map { |opt| [opt, _ref: opt] }.to_h,
+        definitions: OPTIONS.merge(INVENTORY_OPTIONS)
+      }
+
+      Bolt::Validator.new.validate(overrides.slice(*CLI_OPTIONS), schema, 'command line')
 
       overrides
     end
@@ -367,7 +258,7 @@ module Bolt
           when *TRANSPORT_CONFIG.keys
             Bolt::Util.deep_merge(val1, val2)
           # Hash values are shallow merged
-          when 'puppetdb', 'plugin-hooks', 'plugin_hooks', 'apply-settings', 'apply_settings', 'log'
+          when 'apply-settings', 'log', 'plugin-hooks', 'puppetdb'
             val1.merge(val2)
           # Disabled warnings are concatenated
           when 'disable-warnings'
@@ -407,7 +298,7 @@ module Bolt
       end
 
       # Filter hashes to only include valid options
-      %w[apply-settings apply_settings module-install puppetfile].each do |opt|
+      %w[apply-settings module-install].each do |opt|
         @data[opt] = @data[opt].slice(*OPTIONS.dig(opt, :properties).keys)
       end
     end
@@ -433,13 +324,6 @@ module Bolt
 
         name = normalize_log(key)
         acc[name] = val.slice('append', 'level').transform_keys(&:to_sym)
-
-        next unless acc[name][:level] == 'notice'
-
-        Bolt::Logger.deprecate(
-          "notice_log_level",
-          "Log level 'notice' is deprecated and will be removed in Bolt 3.0. Use 'info' instead."
-        )
       end
     end
 
@@ -451,7 +335,7 @@ module Bolt
         )
       end
 
-      if @project.modules && @data['modulepath']&.include?(@project.managed_moduledir.to_s)
+      if @data['modulepath']&.include?(@project.managed_moduledir.to_s)
         raise Bolt::ValidationError,
               "Found invalid path in modulepath: #{@project.managed_moduledir}. This path "\
               "is automatically appended to the modulepath and cannot be configured."
@@ -469,37 +353,6 @@ module Bolt
       if File.exist?(default_inventoryfile)
         Bolt::Util.validate_file('inventory file', default_inventoryfile)
       end
-
-      # Warn the user how they should be using the 'puppetfile' or
-      # 'module-install' config options. We don't error here since these
-      # settings can be set at the user or system level.
-      if @project.modules && puppetfile_config.any? && module_install.empty?
-        command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
-        Bolt::Logger.warn(
-          "module_install_config",
-          "Detected configuration for 'puppetfile'. This setting is not "\
-          "used when 'modules' is configured. Use 'module-install' instead. "\
-          "To automatically update your project configuration, run '#{command}'."
-        )
-      elsif @project.modules.nil? && puppetfile_config.empty? && module_install.any?
-        Bolt::Logger.warn(
-          "module_install_config",
-          "Detected configuration for 'module-install'. This setting is not "\
-          "used when 'modules' is not configured. Use 'puppetfile' instead."
-        )
-      elsif @project.modules && puppetfile_config.any? && module_install.any?
-        Bolt::Logger.warn(
-          "module_install_config",
-          "Detected configuration for 'puppetfile' and 'module-install'. Using "\
-          "configuration for 'module-install' because 'modules' is also configured."
-        )
-      elsif @project.modules.nil? && puppetfile_config.any? && module_install.any?
-        Bolt::Logger.warn(
-          "module_install_config",
-          "Detected configuration for 'puppetfile' and 'module-install'. Using "\
-          "configuration for 'puppetfile' because 'modules' is not configured."
-        )
-      end
     end
 
     def default_inventoryfile
@@ -515,21 +368,15 @@ module Bolt
     end
 
     def puppetfile
-      @puppetfile || @project.puppetfile
+      @project.puppetfile
     end
 
     def modulepath
-      path = @data['modulepath'] || @project.modulepath
-
-      if @project.modules
-        path + [@project.managed_moduledir.to_s]
-      else
-        path
-      end
+      (@data['modulepath'] || @project.modulepath) + [@project.managed_moduledir.to_s]
     end
 
     def modulepath=(value)
-      @data['modulepath'] = value
+      @data['modulepath'] = Array(value)
     end
 
     def plugin_cache
@@ -580,27 +427,12 @@ module Bolt
       @data['compile-concurrency']
     end
 
-    def puppetfile_config
-      @data['puppetfile']
-    end
-
     def plugins
       @data['plugins']
     end
 
     def plugin_hooks
-      if @data['plugin-hooks'].any? && @data['plugin_hooks'].any?
-        Bolt::Logger.warn_once(
-          "plugin_hooks_conflict",
-          "Detected configuration for 'plugin-hooks' and 'plugin_hooks'. Bolt will ignore 'plugin_hooks'."
-        )
-
-        @data['plugin-hooks']
-      elsif @data['plugin-hooks'].any?
-        @data['plugin-hooks']
-      else
-        @data['plugin_hooks']
-      end
+      @data['plugin-hooks']
     end
 
     def trusted_external
@@ -608,18 +440,7 @@ module Bolt
     end
 
     def apply_settings
-      if @data['apply-settings'].any? && @data['apply_settings'].any?
-        Bolt::Logger.warn_once(
-          "apply_settings_conflict",
-          "Detected configuration for 'apply-settings' and 'apply_settings'. Bolt will ignore 'apply_settings'."
-        )
-
-        @data['apply-settings']
-      elsif @data['apply-settings'].any?
-        @data['apply-settings']
-      else
-        @data['apply_settings']
-      end
+      @data['apply-settings']
     end
 
     def transport

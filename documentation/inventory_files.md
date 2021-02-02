@@ -7,10 +7,13 @@ instead of having to reference each target individually.
 An inventory file is part of a Bolt project and must exist alongside a
 `bolt-project.yaml` file. For more information, see [Bolt projects](projects.md).
 
-> **Note**: Version 1 inventory files are deprecated. If you're using version 1
-> inventory files, make sure to migrate them to version 2. For more information
-> on migrating to version 2, see [Migrating your inventory files to version
-> 2](./migrating_inventory_files.md).
+## Inventory file versioning
+
+This page documents version 2 inventory files. Version 1 inventory files are
+deprecated and lack features like plugins. If you're using Bolt 2.0 or later,
+use version 2 inventory files. If you need to migrate your inventory files from
+version 1, you can use the `migrate` command documented at [Migrate a Bolt
+project](projects.md#migrate-a-bolt-project).
 
 ## Inventory file structure
 
@@ -19,12 +22,11 @@ An inventory file is part of a Bolt project and must exist alongside a
 The top level of an inventory file acts as the implicit `all` group and has
 similar fields as a `groups` object.
 
-The following fields are available at the top level of a version 2 inventory
-file:
+The following fields are available at the top level of an inventory file:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the `all` group. Optional. For more information see [Bolt configuration options](bolt_configuration_reference.md).  | `Hash` |
+| `config` | The configuration for the `all` group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml).  | `Hash` |
 | `facts` | The facts for the `all` group. Optional. | `Hash` |
 | `features` | The features for the `all` group. Optional. | `Array[String]`
 | `groups` | A list of targets and groups and their associated configuration. Optional. | `Array[Group]` |
@@ -38,7 +40,7 @@ configuration. Each group is a map that can contain any of the following fields:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the group. Optional. For more information see [Bolt configuration options](bolt_configuration_reference.md). | `Hash` |
+| `config` | The configuration for the group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml). | `Hash` |
 | `facts` | The facts for the group. Optional. | `Hash` |
 | `features` | The features for the group. Optional. | `Array[String]`
 | `groups` | A list of groups and their associated configuration. Optional. | `Array[Group]` |
@@ -257,8 +259,6 @@ either ship with Bolt, or are installed as Puppet modules that have the same
 name as the plugin. The plugin framework is based on a set of plugin hooks that
 are implemented by plugin authors and called by Bolt.
 
-> **Note:** Plugins are only available in version 2 inventory files.
-
 📖 **Related information**
 
 - For more information on plugins that ship with Bolt, see [Supported
@@ -451,5 +451,4 @@ plugins:
 
 📖 **Related information**
 
-- For more information on configuration options, see [Bolt configuration
-  options](bolt_configuration_reference.md).
+- For more information on configuration options, see [Configuring Bolt](configuring_bolt.md).

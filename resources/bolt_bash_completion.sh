@@ -12,11 +12,11 @@ _bolt() {
 	[[ ${#COMP_WORDS[@]} -gt 2 ]] && local prevprev=${COMP_WORDS[COMP_CWORD - 2]}
 	local next=""
 
-	local all_options="--cleanup --color -c --concurrency --configfile --connect-timeout --debug --description --format -h --help --host-key-check -i --inventoryfile --log-level -m --modulepath --no-cleanup --no-color --no-host-key-check --no-ssl --no-ssl-verify --no-tty --noop -p --password --password-prompt --private-key --project -q --query --run-as --ssl --ssl-verify --sudo-executable --sudo-password --sudo-password-prompt --tmpdir --trace --transport --tty -u --user -v --verbose --version"
+	local all_options="--cleanup --color -c --concurrency --connect-timeout --format -h --help --host-key-check -i --inventoryfile --log-level -m --modulepath --no-cleanup --no-color --no-host-key-check --no-ssl --no-ssl-verify --no-tty --noop -p --password --password-prompt --private-key --project -q --query --run-as --ssl --ssl-verify --sudo-executable --sudo-password --sudo-password-prompt --tmpdir --trace --transport --tty -u --user -v --verbose --version"
 
-	local general_opts="-h --help --debug --format --version"
+	local general_opts="-h --help --format --version"
 	local targeting_opts="-t --targets -q --query --rerun --save-rerun --no-save-rerun"
-	local project_config_opts="--project --configfile"
+	local project_config_opts="--project"
 
 	local inventory_list_cache_file="/tmp/bolt_inventory_cache_list.$$.tmp"
 
@@ -34,7 +34,7 @@ _bolt() {
 
 	case $prev in
 	*bolt)
-		next="command file task plan project group inventory puppetfile secret script apply"
+		next="command file task plan project group inventory secret script apply"
 		;;
 	command | script)
 		next="run"
@@ -58,11 +58,11 @@ _bolt() {
 		next="-m --modulepath --plugin ${project_config_opts}"
 		[[ $prev == "createkeys" ]] && next="${next} --force"
 		;;
-	puppetfile)
-		next="install show-modules generate-types"
+	module)
+		next="install show generate-types"
 		;;
 	install)
-		next="--log-level -m --modulepath --puppetfile ${project_config_opts}"
+		next="--log-level -m --modulepath ${project_config_opts}"
 		;;
 	show-modules | generate-types)
 		next="--log-level -m --modulepath ${project_config_opts}"
@@ -74,7 +74,7 @@ _bolt() {
 		if [ "$prevprev" == "group" ]; then
 			next="${project_config_opts} -i --inventoryfile --log-level"
 		elif [ "$prevprev" == "inventory" ]; then
-			next="${targeting_opts} ${project_config_opts} --detail --description -i --inventoryfile --log-level"
+			next="${targeting_opts} ${project_config_opts} --detail -i --inventoryfile --log-level"
 		elif [ "$prevprev" == "plan" ] || [ "$prevprev" == "task" ]; then
 			next="${general_opts} ${project_config_opts} -m --modulepath --filter --format"
 		fi
@@ -124,7 +124,7 @@ _bolt() {
 	--rerun)
 		next="failure success"
 		;;
-	--query | -q | --description | --params | --user | -u | -p | --password | --private-key | --run-as | --sudo-password | --concurrency | -c | --modulepath | --configfile | --inventoryfile | --transport | --connect-timeout | --tmpdir | --format)
+	--query | -q | --params | --user | -u | -p | --password | --private-key | --run-as | --sudo-password | --concurrency | -c | --modulepath | --inventoryfile | --transport | --connect-timeout | --tmpdir | --format)
 		next=""
 		;;
 	*)

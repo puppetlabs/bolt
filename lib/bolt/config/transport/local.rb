@@ -17,6 +17,7 @@ module Bolt
         OPTIONS = WINDOWS_OPTIONS.dup.concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {
+          'bundled-ruby' => true,
           'cleanup' => true
         }.freeze
 

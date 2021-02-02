@@ -120,7 +120,7 @@ This is a basic [project configuration](configuring_bolt.md) file.
 ```yaml
 log:
   console:
-    level: notice
+    level: info
 ```
 
 **`inventory.yaml`**

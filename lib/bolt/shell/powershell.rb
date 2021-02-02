@@ -23,8 +23,7 @@ module Bolt
           # This lets us know how many targets have Powershell 2, and lets the
           # user know how many targets they have with PS2
           msg = "Detected PowerShell 2 on one or more targets.\nPowerShell 2 "\
-            "is deprecated, and support will be removed in Bolt 3.0. See "\
-            "bolt-debug.log or run with '--log-level debug' to see the full "\
+            "is unsupported. See bolt-debug.log or run with '--log-level debug' to see the full "\
             "list of targets with PowerShell 2."
 
           Bolt::Logger.deprecate_once("powershell_2", msg)

@@ -166,10 +166,11 @@ module Bolt
     # Migrates the project-level configuration file to the latest version.
     #
     private def migrate_config
-      migrator = ConfigMigrator.new(@outputter)
+      migrator   = ConfigMigrator.new(@outputter)
+      configfile = @config.project.path + 'bolt.yaml'
 
       migrator.migrate(
-        @config.project.config_file,
+        configfile,
         @config.project.project_file,
         @config.inventoryfile || @config.project.inventory_file,
         @config.project.backup_dir
@@ -194,7 +195,7 @@ module Bolt
 
       migrator.migrate(
         @config.project,
-        @config.modulepath
+        @config.modulepath[0...-1]
       )
     end
   end

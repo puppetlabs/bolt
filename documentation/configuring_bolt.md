@@ -16,10 +16,12 @@ project's needs. In general, Bolt configuration falls into four categories:
 - **Inventory data:** Group and configure the targets that you connect to and
   run commands on with Bolt.
 
-Each type of configuration can be set in a different file. You can configure
-Bolt's options and features at a project level, a user level, or a system-wide
-level. Unless your use case requires setting user-specific or system-wide
-configurations, configure Bolt at the project level.
+You can configure Bolt's options and features at a project level, a user level,
+or a system-wide level. At the project level, you set Bolt configuration in the
+`bolt-project.yaml` and `inventory.yaml` files. At the user and system-wide
+levels, set your configuration in the `bolt-defaults.yaml` file. Unless your use
+case requires setting user-specific or system-wide configurations, configure
+Bolt at the project level.
 
 | Type of Configuration | [inventory.yaml](bolt_inventory_reference.md) | [bolt-project.yaml](bolt_project_reference.md) | [bolt-defaults.yaml](bolt_defaults_reference.md) |
 | --- | :-: | :-: | :-: |
@@ -33,19 +35,15 @@ configurations, configure Bolt at the project level.
 
 Most of the time, you'll only need to set configuration at the project level. 
 You can set all configurable options in Bolt at the project level, and any options
-you set within a project only apply to that project. 
+you set within a project only apply to that project.
 
 Bolt loads project-level configuration files from the root of your [Bolt project
 directory](projects.md). If it can't find a project directory,
 Bolt uses the default project directory: `~/.puppetlabs/bolt/`.
 
-You can set project-level configuration in two files: 
+Set project-level configuration in these files: 
 - For Bolt configuration, use `bolt-project.yaml`.
 - For inventory configuration, use `inventory.yaml`.
-
-The preferred method for setting project-level configuration is to use a
-combination of `bolt-project.yaml` and `inventory.yaml` files. This maintains
-a clear distinction between Bolt configuration and inventory configuration.
 
 ### `bolt-project.yaml`
 
@@ -58,10 +56,6 @@ such as a list of plans and tasks that are visible to the user. Any directory
 containing a `bolt-project.yaml` file is automatically considered a [Project
 directory](projects.md).
 
-Project configuration files take precedence over `bolt.yaml` files. If a
-project directory contains both files, Bolt will only load and read
-configuration from `bolt-project.yaml`.
-
 You can view a full list of the available options in [`bolt-project.yaml`
 options](bolt_project_reference.md).
 
@@ -71,7 +65,7 @@ options](bolt_project_reference.md).
 
 The inventory file is a structured data file that contains groups of targets
 that you can run Bolt commands on, as well as configuration for the transports
-used to connect to the targets. Most projects will include an inventory file.
+used to connect to the targets. Most projects include an inventory file.
 
 Inventory configuration can be set at multiple levels in an inventory file
 under a `config` option. You can set the following options under `config`:
@@ -87,42 +81,18 @@ under a `config` option. You can set the following options under `config`:
 You can view a full list of the available options in [`inventory.yaml`
 fields](bolt_inventory_reference.md).
 
-### ⛔ `bolt.yaml`
-
-⛔ The `bolt.yaml` file is deprecated and will be removed in a
-future version of Bolt. Use `bolt-project.yaml` and `inventory.yaml` files
-instead.
-
-**Filepath:** `<PROJECT DIRECTORY>/bolt.yaml`
-
-The Bolt configuration file can be used to set all available configuration
-options, including default inventory configuration options. Any directory
-containing a `bolt.yaml` file is automatically considered a [Project
-directory](projects.md).
-
-You can view a full list of the available options in [`bolt.yaml`
-options](bolt_configuration_reference.md).
-
 ## User-level configuration
 
 Use this level to set configuration that should apply to all projects for a
 particular user. Options that you might set at the user-level include paths to
-private keys, credentials for a plugin,
-or default inventory configuration that is common to all of your projects.
-You can set most configurable options in Bolt at the user level. 
+private keys, credentials for a plugin, or default inventory configuration that
+is common to all of your projects. You can set most configurable options in Bolt
+at the user level.
 
-
-You can set user-level configuration in two files:
-- Use `bolt-defaults.yaml` for configuration that is
-not project-specific.
-- You can set all configuration in a `bolt.yaml` file. **The user-level
-  `bolt.yaml` file is deprecated and will be removed in a future version of
-  Bolt. Use `bolt-defaults.yaml` instead.**
-
-The preferred method for setting user-level configuration is to use a
-`bolt-defaults.yaml` file. This file does not allow you to set project-specific
-configuration, such as the path to an inventory file, and is less likely
-to lead to errors where Bolt loads content from another project.
+To set configuration at the user level, use a `bolt-defaults.yaml` file. This
+file does not allow you to set project-specific configuration, such as the modulepath,
+and is less likely to lead to errors where Bolt loads
+content from another project.
 
 ### `bolt-defaults.yaml`
 
@@ -132,25 +102,8 @@ The defaults configuration file supports most of Bolt's configuration options,
 with the exception of options that are project-specific such as `modules` and
 `modulepath`.
 
-The `bolt-defaults.yaml` file takes precedence over a `bolt.yaml` file in the
-same directory. If the directory contains both files, Bolt will only load and 
-read configuration from `bolt-defaults.yaml`.
-
 You can view a full list of the available options in [`bolt-defaults.yaml`
 options](bolt_defaults_reference.md).
-
-### ⛔ `bolt.yaml`
-
-⛔ The user-level `bolt.yaml` file is deprecated and will be removed
-in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
-
-**Filepath:** `~/.puppetlabs/etc/bolt/bolt.yaml`
-
-The Bolt configuration file can be used to set all available configuration
-options, including project-specific configuration options.
-
-You can view a full list of the available options in [`bolt.yaml`
-options](bolt_configuration_reference.md).
 
 ## System-wide configuration
 
@@ -158,18 +111,12 @@ Use this level to set configuration that applies to all users and all projects.
 This might include configuration for connecting to an organization's Forge
 proxy, the number of threads Bolt should use when connecting to targets, or
 setting credentials for connecting to PuppetDB. You can set most configurable
-Bolt options at the system level. 
+Bolt options at the system level.
 
-System-wide configuration can be set in two files.
-- Use `bolt-defaults.yaml` for configuration that is not project-specific.
-- You can set all configuration in a `bolt.yaml` file. ⛔ **The system-level
-  `bolt.yaml` file is deprecated and will be removed in a future version of
-  Bolt. Use `bolt-defaults.yaml` instead.** 
-
-The preferred method for setting user-level configuration is to use a
-`bolt-defaults.yaml` file. This file does not allow you to set project-specific
-configuration, such as the path to an inventory file, and is less likely
-to lead to errors where content from another project is loaded.
+To set configuration at the user level, use a `bolt-defaults.yaml` file. This
+file does not allow you to set project-specific configuration, such as the modulepath,
+and is less likely to lead to errors where content from
+another project is loaded.
 
 ### `bolt-defaults.yaml`
 
@@ -178,30 +125,10 @@ to lead to errors where content from another project is loaded.
 **Windows Filepath:** `%PROGRAMDATA%\PuppetLabs\bolt\etc\bolt-defaults.yaml`
 
 The defaults configuration file supports most of Bolt's configuration options,
-with the exception of options that are project-specific such as `inventoryfile`
-and `modulepath`.
-
-The `bolt-defaults.yaml` file takes precedence over a `bolt.yaml` file in the
-same directory. If the directory contains both files, Bolt will only load and 
-read configuration from `bolt-defaults.yaml`.
+with the exception of options that are project-specific such as `modulepath`.
 
 You can view a full list of the available options in [`bolt-defaults.yaml`
 options](bolt_defaults_reference.md).
-
-### ⛔ `bolt.yaml`
-
-⛔ The system-wide `bolt.yaml` file is deprecated and will be removed
-in a future version of Bolt. Use a `bolt-defaults.yaml` file instead.
-
-**\*nix Filepath:** `/etc/puppetlabs/bolt/bolt.yaml`
-
-**Windows Filepath:** `%PROGRAMDATA%\PuppetLabs\bolt\etc\bolt.yaml`
-
-You can set all available configuration
-options in `bolt.yaml`, including project-specific configuration options.
-
-You can view a full list of the available options in [`bolt.yaml`
-options](bolt_configuration_reference.md).
 
 ## Configuration precedence
 
@@ -210,7 +137,7 @@ from highest precedence to lowest:
 
   - Configuration specifications from the target's URI. For example, `ssh://user:password@hostname:port`.
   - [Plan function](plan_functions.md) options that modify configuration, such as `_run_as`.
-  - [Inventory file](inventory_file_v2.md) configuration options.
+  - [Inventory file](inventory_files.md) configuration options.
   - [Command-line options](bolt_command_reference.md) that modify configuration.
   - Options from the project-level configuration file, `bolt-project.yaml`. 
   - Options from the user-level configuration file, `~/.puppetlabs/etc/bolt/bolt-defaults.yaml`.
@@ -350,10 +277,11 @@ disable-warnings:
 📖 **Related information**
 
 - [Bolt projects](projects.md)
-- [bolt.yaml options](bolt_configuration_reference.md)
 - [bolt-defaults.yaml options](bolt_defaults_reference.md)
 - [bolt-project.yaml options](bolt_project_reference.md)
 - [inventory.yaml fields](bolt_inventory_reference.md)
 - [Transport configuration options](bolt_transports_reference.md)
-- For information on using configuring Bolt for Puppet Enterprise, see [Using Bolt with Puppet Enterprise](bolt_configure_orchestrator.md)
-- For information on connecting Bolt to PuppetDB, see [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
+- For information on configuring Bolt for Puppet Enterprise, see [Using
+  Bolt with Puppet Enterprise](bolt_configure_orchestrator.md)
+- For information on connecting Bolt to PuppetDB, see [Connecting Bolt to
+  PuppetDB](bolt_connect_puppetdb.md)

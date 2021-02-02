@@ -33,8 +33,8 @@ Describe "test bolt module" {
     }
 
     it "has the correct number of exported functions" {
-      # should count of pwsh functions plus legacy `bolt` function
-      @($commands).Count | Should -Be 26
+      # should count of pwsh functions
+      @($commands).Count | Should -Be 22
     }
   }
 }
@@ -55,7 +55,7 @@ Describe "test bolt command syntax" {
     It "has correct number of parameters" {
       ($command.Parameters.Values | Where-Object {
           $_.name -notin $common
-      } | measure-object).Count | Should -Be 39
+      } | measure-object).Count | Should -Be 36
     }
   }
 
@@ -73,7 +73,7 @@ Describe "test bolt command syntax" {
     It "has correct number of parameters" {
       ($command.Parameters.Values | Where-Object {
         $_.name -notin $common
-      } | measure-object).Count | Should -Be 36
+      } | measure-object).Count | Should -Be 33
     }
   }
 
@@ -95,7 +95,7 @@ Describe "test bolt command syntax" {
     It "has correct number of parameters" {
       ($command.Parameters.Values | Where-Object {
         $_.name -notin $common
-      } | measure-object).Count | Should -Be 37
+      } | measure-object).Count | Should -Be 34
     }
   }
 
@@ -107,7 +107,7 @@ Describe "test bolt command syntax" {
     It "has correct number of parameters" {
       ($command.Parameters.Values | Where-Object {
         $_.name -notin $common
-      } | measure-object).Count | Should -Be 12
+      } | measure-object).Count | Should -Be 9
     }
 
   }
@@ -222,21 +222,6 @@ Describe "test all bolt command examples" {
     It "bolt project init --modules puppetlabs-apt,puppetlabs-ntp" {
       $result = New-BoltProject -modules 'puppetlabs-apt,puppetlabs-ntp'
       $result | Should -Be "bolt project init --modules puppetlabs-apt,puppetlabs-ntp"
-    }
-  }
-
-  Context "bolt puppetfile" {
-    It "bolt puppetfile generate-types" {
-      $result = Register-BoltPuppetfileTypes
-      $result | Should -Be 'bolt puppetfile generate-types'
-    }
-    It "bolt puppetfile install" {
-      $result = Install-BoltPuppetfile
-      $result | Should -Be 'bolt puppetfile install'
-    }
-    It "bolt puppetfile show-modules" {
-      $result = Get-BoltPuppetfileModules
-      $result | Should -Be 'bolt puppetfile show-modules'
     }
   }
 

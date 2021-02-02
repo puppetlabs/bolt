@@ -87,10 +87,10 @@ describe Bolt::Applicator do
     expect(applicator.compile(target, input)).to eq({})
     expect(@log_output.readlines).to eq(
       [
-        " DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
-        " DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
-        " TRACE  Bolt::Applicator : #{target.uri}: A message\n",
-        " DEBUG  Bolt::Applicator : #{target.uri}: Stuff happened\n"
+        "DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
+        "DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
+        "TRACE  Bolt::Applicator : #{target.uri}: A message\n",
+        "DEBUG  Bolt::Applicator : #{target.uri}: Stuff happened\n"
       ]
     )
   end
@@ -120,7 +120,7 @@ describe Bolt::Applicator do
       before do
         allow(Logging).to receive(:logger).and_return(mock_logger)
         allow(mock_logger).to receive(:[]).and_return(mock_logger)
-        allow(mock_logger).to receive(:'level=').with(any_args)
+        allow(mock_logger).to receive(:level=).with(any_args)
         allow(mock_logger).to receive(:debug).with(any_args)
         allow(mock_logger).to receive(:trace).with(any_args)
       end
@@ -148,7 +148,7 @@ describe Bolt::Applicator do
       before do
         allow(Logging).to receive(:logger).and_return(mock_logger)
         allow(mock_logger).to receive(:[]).and_return(mock_logger)
-        allow(mock_logger).to receive(:'level=').with(any_args)
+        allow(mock_logger).to receive(:level=).with(any_args)
         allow(mock_logger).to receive(:debug).with(any_args)
       end
 
