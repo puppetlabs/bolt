@@ -28,7 +28,7 @@ mod 'puppetlabs-python_task_helper', '0.5.0'
 mod 'puppetlabs-reboot', '3.2.0'
 mod 'puppetlabs-ruby_task_helper', '0.6.0'
 mod 'puppetlabs-ruby_plugin_helper', '0.2.0'
-mod 'puppetlabs-stdlib', '6.5.0'
+mod 'puppetlabs-stdlib', '6.6.0'
 
 # Plugin modules
 mod 'puppetlabs-aws_inventory', '0.6.0'
