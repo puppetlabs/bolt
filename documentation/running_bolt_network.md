@@ -16,7 +16,7 @@ device:
 
 ```
 config wireless-controller vap
-    edit WMI
+    edit VAP-STAFF
     set fast-roaming enable
     set external-fast-roaming disable
     set max-client 0
@@ -24,7 +24,7 @@ config wireless-controller vap
     set fast-bss-transition enable
     set broadcast-suppression dhcp-up dhcp-down dhcp-starvation arp-known arp-unknown arp-reply arp-poison arp-proxy netbios-ns netbios-ds ipv6 all-other-bc
 next
-    edit WM-GUEST
+    edit VAP-GUEST
     set fast-roaming enable
     set external-fast-roaming disable
     set max-client 0
