@@ -1,5 +1,127 @@
 # Changelog
 
+## Bolt 3.0.0 (2021-02-03)
+
+### New features
+
+* **Ship with Puppet 7**
+  ([#2547](https://github.com/puppetlabs/bolt/issues/2547))
+
+  The Bolt gem and Bolt packages now ship with Puppet 7.
+
+* **Use `bolt.bat` for execution on Windows**
+  ([#2551](https://github.com/puppetlabs/bolt/issues/2551))
+
+   This removes the `bolt` PowerShell function and instead relies on a new
+   `bolt.bat` file that is included in Bolt packages.
+
+* **Update default modulepath**
+  ([#2549](https://github.com/puppetlabs/bolt/issues/2549))
+
+  Bolt's default modulepath is now `['modules']` instead of `['modules', 'site',
+  'site-modules']`. Bolt will also automatically append the project's
+  `.modules/` directory to all modulepaths, whether a project uses the default
+  modulepath or a configured modulepath.
+
+* **Improve bolt powershell task error message**
+  ([#2509](https://github.com/puppetlabs/bolt/issues/2509))
+
+  Format the exception powershell type tasks throw to make it easier for a user
+  to read the error message.
+
+* **Local transport's `bundled-ruby` option defaults to true**
+  ([#2552](https://github.com/puppetlabs/bolt/issues/2552))
+
+  The local transport's `bundled-ruby` configuration option, which determines
+  whether to use the Ruby bundled with Bolt packages for local targets, now
+  defaults to 'true' instead of 'false'. The option can still be configured as
+  before.
+
+* **Ship with puppetlabs/stdlib 6.6.0**
+  ([#2606](https://github.com/puppetlabs/bolt/pull/2606))
+
+  Bolt packages now ship with the latest version of the puppetlabs/stdlib
+  module.
+
+### Bug fixes
+
+* **Include plan name in `missing_plan_parameter` warnings**
+  ([#2588](https://github.com/puppetlabs/bolt/issues/2588))
+
+  The `missing_plan_parameter` warning now includes the name of the plan
+  that the message was logged for.
+
+### Removals
+
+* **Remove support for the `bolt.yaml` configuration file**
+  ([#2557](https://github.com/puppetlabs/bolt/issues/2557))
+
+  The `bolt.yaml` configuration file is no longer supported by Bolt. Use
+  `bolt-project.yaml` and `bolt-defaults.yaml` instead.
+
+* **Remove support for Debian 8**
+  ([#2556](https://github.com/puppetlabs/bolt/issues/2556))
+
+  Bolt no longer builds or tests packages for the Debian 8 platform.
+
+* **Remove support for puppet-agent < 6.0.0**
+  ([#2422](https://github.com/puppetlabs/bolt/issues/2422))
+
+  Bolt no longer supports puppet-agent versions earlier than 6.0.0.
+  While applying Puppet code to targets with earlier versions of the
+  puppet-agent package installed may still succeed, Bolt no longer
+  guarantees compatibility.
+
+* **Remove support for PowerShell 2.0**
+  ([#2561](https://github.com/puppetlabs/bolt/issues/2561))
+
+  Bolt no longer supports PowerShell 2.0 on the controller or on
+  targets. While running commands and tasks in PowerShell 2.0 may
+  still succeed, Bolt no longer guarantees compatibility.
+
+* **Remove deprecated command-line options**
+  ([#2559](https://github.com/puppetlabs/bolt/issues/2559))
+
+  The `--boltdir`, `--configfile`, `--debug`, `--description`, and
+  `--puppetfile` command-line options have been removed.
+
+* **Remove deprecated configuration options**
+  ([#2553](https://github.com/puppetlabs/bolt/issues/2553))
+
+  The `apply_settings`, `inventoryfile`, `plugin_hooks`, and
+  `puppetfile` configuration options have been removed.
+
+* **Remove `notice` log level**
+  ([#2560](https://github.com/puppetlabs/bolt/issues/2560))
+
+  Bolt no longer accepts `notice` as a log level, via the command line
+  or configuration. Use `info` instead.
+
+* **Remove `bolt puppetfile` subcommand**
+  ([#2558](https://github.com/puppetlabs/bolt/issues/2558))
+
+  Removes the `bolt puppetfile *` and `*-BoltPuppetfile` subcommands. Use
+  the `bolt module *` and `*-BoltModule` subcommands instead.
+
+* **Remove support for `private-key`, `public-key` parameters in pkcs7 plugin**
+  ([#2555](https://github.com/puppetlabs/bolt/issues/2555))
+
+  Support for the `private-key` and `public-key` parameters in the pkcs7
+  plugin has been removed. Use the `private_key` and `public_key`
+  parameters instead.
+
+* **Remove `source` and `target` YAML plan step keys**
+  ([#2554](https://github.com/puppetlabs/bolt/issues/2554))
+
+  Support for the `source` and `target` keys in YAML plans has been
+  removed. Use `upload` and `targets` instead.
+
+* **Remove `aggregate::nodes` plan**
+  ([#2565](https://github.com/puppetlabs/bolt/issues/2565))
+
+  Bolt no longer ships with the `aggregate::nodes` plan. Use the
+  `aggregate::targets` plan instead.
+
 ## Bolt 2.44.0 (2021-01-27)
 
 ### New features
