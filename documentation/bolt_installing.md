@@ -150,7 +150,9 @@ To change your script execution policy:
 
 ## Installing Bolt on macOS
 
-Use one of the supported macOS installation methods to install Bolt.
+Use one of the supported macOS installation methods to install Bolt. Newer versions of Bolt after
+2.0.0 support only macOS 10.14 and 10.15. If you're using an earlier version of the Mac operating
+system, [download and install Bolt 2.0.0](https://downloads.puppet.com/mac/puppet-tools/).
 
 ### Install Bolt with Homebrew
 
