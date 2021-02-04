@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
 module Bolt
-  VERSION = '2.44.0'
+  VERSION = '3.0.0'
 end
