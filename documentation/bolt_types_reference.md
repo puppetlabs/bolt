@@ -23,7 +23,7 @@ The following functions are available to `ApplyResult` objects.
 | `error` | `Error` | An object constructed from the `_error` field of the result's value. |
 | `message` | `String` | The `_output` field of the result's value. |
 | `ok` | `Boolean` | Whether the result was successful. |
-| `report` | `Hash` | The Puppet report from the apply action. Equivalent to calling `$apply_result.value['report']`. |
+| `report` | `Hash` | The Puppet report from the apply action. Equivalent to calling `$apply_result.value['report']`. The report is a hash representation of the [`Puppet::Transaction::Report` object](https://puppet.com/docs/puppet/7.0/format_report.html), where each property corresponds to a key in the report hash. For more information, see [Result keys](applying_manifest_blocks.md#result-keys). |
 | `target` | `Target` | The target the result is from. |
 | `to_data` | `Hash` | A serialized representation of `ApplyResult`. |
 | `value` | `Hash` | A hash including the Puppet report from the apply action under a `report` key. |

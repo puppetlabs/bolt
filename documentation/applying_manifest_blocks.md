@@ -223,6 +223,57 @@ $results.each |$result| {
 }
 ```
 
+### Report keys
+
+The [`ApplyResult` object](bolt_types_reference.md#applyresult) includes a
+`report` method that returns a hash representation of the
+[`Puppet::Transaction::Report`](https://puppet.com/docs/puppet/7.3/format_report.html)
+object. Each property on the object corresponds to a key with the same name in
+the report hash. However, not every property is presented in the hash for every
+result. Only properties that have a value from the apply are present in the
+hash.
+
+For example, to access and print the logs from a report in your plan, you can
+access the `logs` key in the report hash:
+
+```puppet
+plan example (
+  TargetSpec $targets
+) {
+  # Install the puppet-agent package and gather facts
+  $targets.apply_prep
+
+  # Apply Puppet code
+  $apply_results = apply($targets) {
+    file { '/etc/puppetlabs': 
+      ensure => present
+    }
+  }
+
+  # Print log messages from the report
+  $apply_results.each |$result| {
+    $result.report['logs'].each |$log| {
+      out::message("${log['level'].upcase}: ${log['message']}")
+    }
+  }
+}
+```
+
+Running the above plan prints output similar to this:
+
+```shell
+$ bolt plan run example --targets server
+Starting: plan example
+Starting: install puppet and gather facts on server
+Finished: install puppet and gather facts with 0 failures in 4.01 sec
+Starting: apply catalog on server
+Finished: apply catalog with 0 failures in 4.59 sec
+INFO: Applying configuration version '1612480754'
+INFO: Creating state file /tmp/d20210204-3818-1az3s99/var/state/state.yaml
+NOTICE: Applied catalog in 0.01 seconds
+Finished: plan example in 8.64 sec
+```
+
 ## Configuring concurrency
 
 Each target requires a separate catalog be compiled with its unique `facts` and
