@@ -5,6 +5,20 @@ require 'bolt_setup_helper'
 test_name "Configure Windows Profile" do
   extend Acceptance::BoltSetupHelper
 
+  step "Configure PATH environment variable" do
+    if bolt['platform'] =~ /windows/
+      execute_powershell_script_on(bolt, <<-PS)
+$boltpath = Join-Path $env:ProgramFiles "Puppet Labs" "Bolt" "bin"
+$envpath = $boltpath + ";" + $env:Path
+[System.Environment]::SetEnvironmentVariable(
+  'PATH',
+  $envpath,
+  [System.EnvironmentVariableTarget]::Machine
+)
+PS
+    end
+  end
+
   step "Configure a Windows Profile that contains will write to a file every time it is loaded" do
     if bolt['platform'] =~ /windows/
       execute_powershell_script_on(bolt, <<-PS)
