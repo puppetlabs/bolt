@@ -10,7 +10,6 @@
   CompanyName       = "Puppet, Inc"
   Copyright         = '(c) 2017 Puppet, Inc. All rights reserved'
   FunctionsToExport = @(
-    'bolt',
     '<%= @commands.sort_by { |cmd| cmd[:cmdlet] }.map{|cmd| cmd[:cmdlet] }.join("',\n    '") %>'
   )
   CmdletsToExport   = @()
