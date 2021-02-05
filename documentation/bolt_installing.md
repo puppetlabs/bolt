@@ -160,7 +160,7 @@ manager](https://brew.sh/) installed.
 Download and install the Bolt package:
     
 ```
-brew install --cask puppet-bolt
+brew install --cask puppetlabs/puppet/puppet-bolt
 ```
 
 #### Upgrading Bolt with Homebrew
@@ -168,7 +168,7 @@ brew install --cask puppet-bolt
 To upgrade Bolt, use the following command:
 
 ```
-brew upgrade --cask puppet-bolt
+brew upgrade --cask puppetlabs/puppet/puppet-bolt
 ```
 
 #### Uninstalling Bolt with Homebrew
@@ -176,7 +176,7 @@ brew upgrade --cask puppet-bolt
 To uninstall Bolt with homebrew, use the following command: 
 
 ```
-brew uninstall --cask puppet-bolt
+brew uninstall --cask puppetlabs/puppet/puppet-bolt
 ```
 
 ### Install Bolt with macOS installer 
