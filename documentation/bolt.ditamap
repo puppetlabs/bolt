@@ -84,6 +84,7 @@
     </topichead>
     <topichead navtitle="Using Bolt with Puppet">
         <topicref href="applying_manifest_blocks.md" format="markdown"/>
+        <topicref href="hiera.md" format="markdown"/>
         <topicref href="bolt_configure_orchestrator.md" format="markdown"/>
         <topicref href="bolt_connect_puppetdb.md" format="markdown"/>
     </topichead>
