@@ -1,9 +1,6 @@
 function Invoke-BoltCommandline {
   [CmdletBinding()]
   param($params)
-  $script:BOLT_BASEDIR = (Get-ItemProperty -Path "HKLM:\Software\Puppet Labs\Bolt").RememberedInstallDir
-  
-  $env:PATH = "$($script:BOLT_BASEDIR)\bin;" + $env:PATH
 
   Write-Verbose "Executing bolt $($params -join ' ')"
 

@@ -3,14 +3,15 @@
   version = Bolt::VERSION
 -%>
 @{
-  ModuleToProcess   = 'PuppetBolt.psm1'
+  RootModule        = 'PuppetBolt.psm1'
   ModuleVersion     = '<%= version %>'
   GUID              = 'CF5DDF2B-F69B-4A2B-B7E4-B9A981D7415D'
   Author            = "Puppet, Inc"
   CompanyName       = "Puppet, Inc"
+  Description       = "Puppet Bolt is an open source task runner that executes ad hoc tasks, scripts, and commands across your infrastructure and applications"
   Copyright         = '(c) 2017 Puppet, Inc. All rights reserved'
+  PowerShellVersion = '3.0'
   FunctionsToExport = @(
-    'bolt',
     '<%= @commands.sort_by { |cmd| cmd[:cmdlet] }.map{|cmd| cmd[:cmdlet] }.join("',\n    '") %>'
   )
   CmdletsToExport   = @()
@@ -18,7 +19,12 @@
   AliasesToExport   = @()
   PrivateData       = @{
     PSData = @{
-      # Tags = @()
+      Tags = @(
+        'Puppet',
+        'bolt',
+        'PSEdition_Desktop',
+        'Windows'
+      )
       LicenseUri   = 'https://github.com/puppetlabs/bolt/blob/main/LICENSE'
       ProjectUri   = 'https://github.com/puppetlabs/bolt'
       # IconUri = ''
