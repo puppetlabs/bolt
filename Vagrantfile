@@ -103,10 +103,6 @@ Vagrant.configure('2') do |config|
       linux.vm.provision 'file', source: 'spec/fixtures/keys/id_rsa.pub', destination: 'id_rsa.pub'
       linux.vm.provision 'shell', inline: linux_provision
       linux.vm.provision 'shell', inline: lxd_provision
-      # linux.vm.box = 'bento/centos-6.7'
-      # linux.vm.network :forwarded_port, guest: 22, host: 20022, host_ip: '127.0.0.1', id: 'ssh'
-      # linux.vm.provision 'file', source: 'spec/fixtures/keys/id_rsa.pub', destination: 'id_rsa.pub'
-      # linux.vm.provision 'shell', inline: linux_provision
     end
   end
 end
