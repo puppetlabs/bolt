@@ -99,7 +99,7 @@ Vagrant.configure('2') do |config|
   if ENV['BOLT_TEST_USE_VAGRANT']
     config.vm.define :linux do |linux|
       linux.vm.box = 'generic/ubuntu2004'
-      linux.vm.network :forwarded_port, guest: 22, host: 20023, host_ip: '127.0.0.1', id: 'ssh'
+      linux.vm.network :forwarded_port, guest: 22, host: 20026, host_ip: '127.0.0.1', id: 'ssh'
       linux.vm.provision 'file', source: 'spec/fixtures/keys/id_rsa.pub', destination: 'id_rsa.pub'
       linux.vm.provision 'shell', inline: linux_provision
       linux.vm.provision 'shell', inline: lxd_provision
