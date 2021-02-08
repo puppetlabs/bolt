@@ -183,6 +183,19 @@ plugin-hooks:
     task: <plugin name>
 ```
 
+The following example demonstrates using the `package` task as a `puppet_library`
+plugin to install the Puppet Agent directly via the package manager without setting
+up a repository (as is default with the `puppet_agent::install` task).
+
+```yaml
+plugin-hooks:
+  puppet_library:
+    plugin: task
+    task: package
+    parameters:
+      name: puppet-agent
+      action: install
+```
 
 ## Configuring plugins
 
