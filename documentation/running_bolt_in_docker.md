@@ -1,8 +1,8 @@
-# Running Bolt from a Docker image
+# Run Bolt from a Docker image
 
 Bolt is available on Docker Hub, as an image called `puppet-bolt`.
 
-## Downloading the image
+## Download the image
 
 Docker Hub contains different versions of Bolt, with tags corresponding to Bolt
 system package and Rubygem versions. The newest version has a `latest` tag.
@@ -12,7 +12,7 @@ You can download the latest image with this command:
 docker pull puppet/puppet-bolt
 ```
 
-## Running Bolt from a Docker image
+## Run Bolt from a Docker image
 
 When running Bolt from a Docker image, Docker creates a container and executes
 the Bolt command within that container. Running Bolt in this way is simple:
@@ -167,7 +167,7 @@ The `--mount` command-line option maps the Bolt project directory on the Docker
 host to `/Boltdir` in the container. The container is tagged as `puppet-bolt`
 and the rest of the command is all native to Bolt.
 
-## Building on top of the `puppet-bolt` Docker image
+## Build on top of the `puppet-bolt` Docker image
 
 You can also extend the `puppet-bolt` image and copy in data that will always be
 available for that image.
