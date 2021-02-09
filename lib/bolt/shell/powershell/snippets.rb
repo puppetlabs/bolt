@@ -67,6 +67,12 @@ module Bolt
             PS
           end
 
+          def append_ps_module_path(directory)
+            <<~PS
+            $env:PSModulePath += ";#{directory}"
+            PS
+          end
+
           def ps_task(path, arguments)
             <<~PS
             $private:tempArgs = Get-ContentAsJson (

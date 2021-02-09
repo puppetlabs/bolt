@@ -274,7 +274,12 @@ module Bolt
                               []
                             end
 
-          output = execute([Snippets.shell_init, *env_assignments, command].join("\n"))
+          output = execute([
+            Snippets.shell_init,
+            Snippets.append_ps_module_path(dir),
+            *env_assignments,
+            command
+          ].join("\n"))
 
           Bolt::Result.for_task(target, output.stdout.string,
                                 output.stderr.string,
