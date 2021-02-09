@@ -185,6 +185,18 @@ If your task must receive parameters only in a certain way, such as only
 `input_method`. For more information on `input_method`, see [Task metadata
 reference](#task-metadata-fields).
 
+### Task parameter constraints
+
+There are a couple important constraints to keep in mind when defining your
+task's parameters:
+
+- Task parameter names must begin with a lowercase letter, and can only include
+  lowercase letters (`a-z`), digits (`0-9`), and underscores (`_`).
+  
+- Task parameter types must be a sub-type of the `Data` data type. For more
+  information about this abstract data type, see [the `Data` data
+  type](https://puppet.com/docs/puppet/latest/lang_data_abstract.html#the-data-data-type).
+
 ### Defining parameters in Windows
 
 For Windows tasks, you can pass parameters as environment variables, but it's
