@@ -12,6 +12,7 @@
   Copyright         = '(c) 2017 Puppet, Inc. All rights reserved'
   PowerShellVersion = '3.0'
   FunctionsToExport = @(
+    'Get-BoltVersion',
     '<%= @commands.sort_by { |cmd| cmd[:cmdlet] }.map{|cmd| cmd[:cmdlet] }.join("',\n    '") %>'
   )
   CmdletsToExport   = @()
