@@ -108,7 +108,7 @@ steps:
 
 By writing a plan bolt can document the script for users. Show the plan documentation with
 
-````
+```
 bolt plan show my_project::hello`
 ```
 
