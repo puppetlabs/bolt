@@ -42,7 +42,21 @@ function Get-BoltCommandline {
       Write-Verbose "Parsing $($kvp.key) as hashtable parameter"
       $v = ConvertTo-Json -InputObject $pwshValue -Compress
       $params += "--$($rubyParameter)"
-      $params += "'$($v)'"
+      # $IsLinux/IsMacOS are an automatic variables from powershellcore:
+      # https://docs.microsoft.com/en-us/powershell/module/microsoft.powershell.core/about/about_automatic_variables?view=powershell-7.1#islinux
+      $IsLinuxEnv = (Get-Variable -Name "IsLinux" -ErrorAction Ignore) -and $IsLinux
+      $IsMacOSEnv = (Get-Variable -Name "IsMacOS" -ErrorAction Ignore) -and $IsMacOS
+      $IsWinEnv = !$IsLinuxEnv -and !$IsMacOSEnv
+      if($IsWinEnv){
+        $params += "'$($v)'"
+      } else {
+        # Commands run on Linux/Mac platforms will fail because the
+        # the interpolation of the command from powershell -> .NET -> Ruby
+        # will end up stripping out quotes that aren't baskslash-escaped.
+        #
+        # See https://github.com/MicrosoftDocs/PowerShell-Docs/issues/2361
+        $params += $v -replace '"', '\"'
+      }
     }
     elseif ($pwshValue.GetType().Name -eq 'List`1') {
       Write-Verbose "Parsing $($kvp.key) as array parameter"
