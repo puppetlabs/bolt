@@ -21,6 +21,8 @@ jobs:
         with:
           ruby-version: '2.7.x'
       - name: Install rubocop
-        run: gem install rubocop rubocop-rake
+        run: |
+          gem install rubocop --version 1.9.1
+          gem install rubocop-rake
       - name: Run rubocop
         run: rubocop --display-cop-names --display-style-guide --parallel
