@@ -709,9 +709,11 @@ module Bolt
     def install_project_modules(project, config, force, resolve)
       assert_project_file(project)
 
-      unless project.modules.any?
-        outputter.print_message "Project configuration file #{project.project_file} does not "\
-                                "specify any module dependencies. Nothing to do."
+      if project.modules.empty? && resolve != false
+        outputter.print_message(
+          "Project configuration file #{project.project_file} does not "\
+          "specify any module dependencies. Nothing to do."
+        )
         return 0
       end
 

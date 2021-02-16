@@ -438,15 +438,6 @@ manually manage your project's Puppetfile.
 To manually manage a project's Puppetfile and install modules without resolving
 dependencies, follow these steps:
 
-1. Set the `modules` configuration option in your `bolt-project.yaml` file to an
-   empty array. For example:
-
-   ```yaml
-   # bolt-project.yaml
-   name: myproject
-   modules: []
-   ```
-
 1. Create a file named `Puppetfile` in your project directory and add the
    modules you want to install, including each module's dependencies, to
    the Puppetfile. For example:
