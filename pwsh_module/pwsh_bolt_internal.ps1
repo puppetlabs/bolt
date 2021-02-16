@@ -68,3 +68,11 @@ function Get-BoltCommandline {
 
   Write-Output $params
 }
+
+function Get-BoltVersion{
+  [CmdletBinding()]
+  param()
+
+  $module = Get-Module -Name PuppetBolt
+  Write-Output [string]($module.Version)
+}

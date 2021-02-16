@@ -76,8 +76,7 @@ end
   )
 <% if pwsh_command[:verb] == 'Get' %>
   if($version){
-    $boltBasedir = (Get-ItemProperty -Path "HKLM:\Software\Puppet Labs\Bolt").RememberedInstallDir
-    return (Get-Content -Path $boltBasedir\misc\versions.txt)[0].split(" ")[1]
+    return Get-BoltVersion
   }
 <% end -%>
 
