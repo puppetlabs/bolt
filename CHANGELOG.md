@@ -1,5 +1,20 @@
 # Changelog
 
+## Bolt 3.0.1 (2021-02-16)
+
+### Bug fixes
+
+* **Install Puppetfile without `modules` configured**
+
+  Bolt now correctly installs a Puppetfile with `bolt module install
+  --no-resolve` and `Install-BoltModule -NoResolve` even if the
+  `modules` key is not configured or is an empty array.
+
+* **Fix PowerShell Cmdlet Version detection** ([#2636](https://github.com/puppetlabs/bolt/pull/2636))
+
+  PowerShell users can now run `Get-BoltVersion` to list the Bolt version. This, and `bolt
+  --version` should both load more quickly.
+
 ## Bolt 3.0.0 (2021-02-03)
 
 ### New features
