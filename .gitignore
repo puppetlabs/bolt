@@ -44,36 +44,12 @@ project.yaml
 
 acceptance/hosts.yaml
 
-modules/apply
-modules/facts
-modules/package
-modules/puppet_agent
-modules/puppet_conf
-modules/python_task_helper
-modules/reboot
-modules/ruby_task_helper
-modules/service
-modules/stdlib
-
-modules/augeas_core/
-modules/cron_core/
-modules/host_core/
-modules/mount_core/
-modules/scheduled_task/
-modules/selinux_core/
-modules/sshkeys_core/
-modules/vault/
-modules/yumrepo_core/
-modules/zfs_core/
-modules/zone_core/
-
-modules/terraform
-modules/azure_inventory
-modules/aws_inventory
-modules/gcloud_inventory/
-modules/pkcs7/
-modules/ruby_plugin_helper/
-modules/yaml/
+# Ignore all modules except for built-in modules
+modules/*
+!modules/aggregate
+!modules/canary
+!modules/puppet_connect
+!modules/puppetdb_fact
 
 .sass-cache/
 locales/
