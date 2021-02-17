@@ -1,19 +1,12 @@
 # Inventory files
 
-Use an inventory file to store information about your targets and arrange them
-into groups. Grouping your targets lets you aim your Bolt commands at the group
-instead of having to reference each target individually.
+Use an inventory file to store information about your targets, control how Bolt
+connects to them, and arrange them into groups. Grouping your targets lets you
+aim your Bolt commands at the group instead of having to reference each target
+individually.
 
 An inventory file is part of a Bolt project and must exist alongside a
 `bolt-project.yaml` file. For more information, see [Bolt projects](projects.md).
-
-## Inventory file versioning
-
-This page documents version 2 inventory files. Version 1 inventory files are
-deprecated and lack features like plugins. If you're using Bolt 2.0 or later,
-use version 2 inventory files. If you need to migrate your inventory files from
-version 1, you can use the `migrate` command documented at [Migrate a Bolt
-project](projects.md#migrate-a-bolt-project).
 
 ## Inventory file structure
 
@@ -26,7 +19,7 @@ The following fields are available at the top level of an inventory file:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the `all` group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml).  | `Hash` |
+| `config` | The transport configuration for the `all` group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml).  | `Hash` |
 | `facts` | The facts for the `all` group. Optional. | `Hash` |
 | `features` | The features for the `all` group. Optional. | `Array[String]`
 | `groups` | A list of targets and groups and their associated configuration. Optional. | `Array[Group]` |
@@ -40,7 +33,7 @@ configuration. Each group is a map that can contain any of the following fields:
 
 | Key | Description | Type |
 | --- | ----------- | ---- |
-| `config` | The configuration for the group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml). | `Hash` |
+| `config` | The transport configuration for the group. Optional. For more information see [Configuring Bolt](configuring_bolt.md#inventoryyaml). | `Hash` |
 | `facts` | The facts for the group. Optional. | `Hash` |
 | `features` | The features for the group. Optional. | `Array[String]`
 | `groups` | A list of groups and their associated configuration. Optional. | `Array[Group]` |
@@ -146,6 +139,24 @@ Targets specified with a hash accept the following fields:
 | `name` | A human-readable name for a target.<br> **Required** when specifying a target using a hash. Optional if using `uri`. If you don't specify a `name`, Bolt uses the `uri` as the target name. | `String` |
 | `uri` | The URI of the target. Bolt uses the `uri` to establish a connection to the target. <br> **Required** when specifying a target using a hash, unless you specify a `name` **and** configure a hostname using `host` in the target's transport configuration.| `String` |
 | `vars` | The variables for the target. Optional. | `Hash` |
+
+## Transport configuration
+
+Use the `config` field to configure the transports that Bolt uses to connect to
+targets in your inventory file. For example, you can use this section to specify
+a transport like SSH, configure authentication options like passwords or the
+path to your private key file, or specify a proxy. 
+
+You can configure the transport at multiple levels of your inventory file:
+- Put `config` at the top (`all` group) level to configure settings that apply
+  to all targets in the inventory file.
+- Put `config` at the `groups` level to configure settings that apply to all
+  targets in a group.
+- Put `config` at the `target` level to configure settings that apply to a
+  specific target.
+
+For a full list of the available transports and fields, see [Transport
+  configuration options](bolt_transports_reference.md).
 
 ## Showing inventory
 
@@ -265,6 +276,14 @@ are implemented by plugin authors and called by Bolt.
   plugins](supported_plugins.md).
 - For more information about how plugins work, see [Using
   plugins](./using_plugins.md).
+
+## Inventory file versioning
+
+This page documents version 2 inventory files. Version 1 inventory files are
+deprecated and lack features like plugins. If you're using Bolt 2.0 or later,
+use version 2 inventory files. If you need to migrate your inventory files from
+version 1, you can use the `migrate` command documented at [Migrate a Bolt
+project](projects.md#migrate-a-bolt-project).
 
 ## Inventory file examples
 
@@ -451,4 +470,9 @@ plugins:
 
 📖 **Related information**
 
-- For more information on configuration options, see [Configuring Bolt](configuring_bolt.md).
+- For more information on configuration options, see [Configuring
+  Bolt](configuring_bolt.md).
+- For a comprehensive list of inventory fields and their descriptions, see
+  [inventory.yaml fields](bolt_inventory_reference.md).
+- For more information on transport options, see [Transport configuration
+  options](bolt_transports_reference.md).
