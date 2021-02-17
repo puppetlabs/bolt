@@ -9,17 +9,12 @@ module Bolt
       class LXD < Base
         OPTIONS = %w[
           cleanup
-          remote
+          tmpdir
         ].freeze
 
         DEFAULTS = {
           'cleanup' => true
         }.freeze
-
-        private def validate
-          super
-          # TODO
-        end
       end
     end
   end

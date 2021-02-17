@@ -531,15 +531,25 @@
       ]
     },
     "lxd": {
-      "description": "A map of configuraiton options for the LXD transport",
+      "description": "A map of configuration options for the LXD transport. The LXD transport is experimental and might include breaking changes between minor versions.",
       "oneOf": [
         {
           "type": "object",
           "properties": {
-            "remote": {
+            "cleanup": {
               "oneOf": [
                 {
-                  "$ref": "#/transport_definitions/remote"
+                  "$ref": "#/transport_definitions/cleanup"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "tmpdir": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tmpdir"
                 },
                 {
                   "$ref": "#/definitions/_plugin"

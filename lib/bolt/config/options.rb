@@ -478,10 +478,11 @@ module Bolt
           _example: { "cleanup" => false, "tmpdir" => "/tmp/bolt" }
         },
         "lxd" => {
-          description: "A map of configuraiton options for the LXD transport",
+          description: "A map of configuration options for the LXD transport. The LXD transport is "\
+                       "experimental and might include breaking changes between minor versions.",
           type: Hash,
           _plugin: true,
-          _example: {}
+          _example: { cleanup: false }
         },
         "pcp" => {
           description: "A map of configuration options for the pcp transport.",

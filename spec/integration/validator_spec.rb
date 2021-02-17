@@ -356,7 +356,7 @@ describe 'validating config' do
           /Value at 'groups.0.facts' must be of type Hash/,
           /Value at 'groups.0.features' must be of type Array/,
           /Value at 'groups.1.groups' must be of type Array/,
-          /Value at 'config.transport' must be one of ssh, winrm, pcp, local, docker, remote/,
+          /Value at 'config.transport' must be one of ssh, winrm, pcp, local, lxd, docker, remote/,
           /Value at 'config.ssh.host-key-check' must be of type Boolean/,
           /Value at 'config.winrm.password' must be of type String/
         )

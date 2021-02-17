@@ -10,160 +10,88 @@ module Bolt
         attr_reader :user, :target
 
         def initialize(target, options)
+          raise Bolt::ValidationError, "Target #{target.safe_name} does not have a host" unless target.host
+
           @target = target
           @user = ENV['USER'] || Etc.getlogin
           @options = options
-          @lxd_remote = @target.config.dig('lxd', 'remote') || default_remote
           @logger = Bolt::Logger.logger(target.safe_name)
-        end
-
-        def connect
-          # TODO: check container is running
-          # TODO: get info about container, store on self
-          # @container_info = get_info
-          true
-        rescue StandardError => e
-          raise Bolt::Node::ConnectError.new(
-            "Failed to connect to #{@target.safe_name}: #{e.message}",
-            'CONNECT_ERROR'
-          )
-        end
-
-        def download_file(source, destination)
-          container = @target.uri
-          remote = @lxd_remote
-          puts "DOWNLOAD #{remote}:#{container}#{source}"
-          out, err, status = Open3.capture3('lxc', 'file', 'pull',
-                                            "#{remote}:#{container}#{source}", destination)
-          [out, err, status]
+          @logger.trace("Initializing LXD connection to #{target.safe_name}")
         end
 
         def shell
           Bolt::Shell::Bash.new(target, self)
         end
 
-        def execute(command)
-          container = @target.uri
-          remote = @lxd_remote
-          env_vars = []
-          if command.start_with?("PT_")
-            parts = Shellwords.split(command)
-            env_vars, command = parts.partition { |p| p.start_with?("PT_") }
-            command = Shellwords.shelljoin(command)
-          end
-
-          command_options = []
-          # See `lxc exec --help` for information on flags`
-          env_vars.each do |env_var|
-            command_options += %W[--env #{env_var}]
-          end
-
-          lxc_command = Shellwords.split(command)
-
-          @logger.info { "Executing: exec #{command_options}" }
-          capture_options = { binmode: true }
-          # capture_options[:stdin_data] = options[:stdin] unless options[:stdin].nil?
-          out, err, status = Open3.capture3('lxc', 'exec', *command_options, "#{remote}:#{container}",
-                                            '--', *lxc_command, capture_options)
-          [out, err, status]
+        def container_id
+          "local:#{@target.host}"
         end
 
-        def upload(source, destination)
-          if File.directory?(source)
-            write_remote_directory(source, destination)
-          else
-            write_remote_file(source, destination)
-          end
-          Bolt::Result.for_upload(@target, source, destination)
-        end
-
-        def download(source, destination, _download)
-          download = File.join(destination, Bolt::Util.unix_basename(source))
-          _stdout_str, stderr_str, status = download_file(source, destination)
+        def connect
+          out, err, status = execute_local_command(%w[list --format json])
           unless status.exitstatus.zero?
-            raise "Error downloading content from container #{@target}: #{stderr_str}"
+            raise "Error listing available containers: #{err}"
           end
-          Bolt::Result.for_download(target, source, destination, download)
+          containers = JSON.parse(out).map { |c| c['name'] }
+          unless containers.include?(@target.host)
+            raise "Could not find a container with name or ID matching '#{@target.host}'"
+          end
+          @logger.trace("Opened session")
+          true
+        rescue StandardError => e
+          raise Bolt::Node::ConnectError.new(
+            "Failed to connect to #{container_id}: #{e.message}",
+            'CONNECT_ERROR'
+          )
         end
 
-        def write_remote_directory(source, destination)
-          container = @target.uri
-          remote = @lxd_remote
-          # TODO: check dest is absolute path
-          capture_options = { binmode: true }
-          _out, _err, _status = Open3.capture3('lxc', 'file', 'push', source,
-                                               "#{remote}:#{container}#{destination}",
-                                               "--recursive", capture_options)
-        end
-
-        def write_remote_file(source, destination)
-          container = @target.uri
-          remote = @lxd_remote
-          # TODO: check dest is absolute path
-          capture_options = { binmode: true }
-          Open3.capture3('lxc', 'file', 'push', source,
-                         "#{remote}:#{container}#{destination}", capture_options)
-        end
-
-        def container_tmpdir
-          '/tmp'
-        end
-
-        def default_remote
-          capture_options = { binmode: true }
-          out, _err, _status = Open3.capture3('lxc', 'remote', 'get-default', capture_options)
-          out.strip
-        end
-
-        def with_remote_tmpdir
-          dir = make_tmpdir
-          yield dir
-        ensure
-          if dir
-            if @target.options['cleanup']
-              _, stderr, exitcode = execute('rm', '-rf', dir, {})
-              if exitcode != 0
-                @logger.warn("Failed to clean up tmpdir '#{dir}': #{stderr}")
-              end
-            else
-              @logger.warn("Skipping cleanup of tmpdir '#{dir}'")
-            end
+        def add_env_vars(env_vars)
+          @env_vars = env_vars.each_with_object([]) do |env_var, acc|
+            acc << "--env"
+            acc << "#{env_var[0]}=#{Shellwords.shellescape(env_var[1])}"
           end
         end
 
-        def write_remote_executable(dir, file, filename = nil)
-          filename ||= File.basename(file)
-          remote_path = File.join(dir.to_s, filename)
-          write_remote_file(file, remote_path)
-          make_executable(remote_path)
-          remote_path
+        def execute(command)
+          lxc_command = %w[lxc exec]
+          lxc_command += @env_vars if @env_vars
+          lxc_command += %W[#{container_id} -- sh -c #{Shellwords.shellescape(command)}]
+
+          @logger.trace { "Executing: #{lxc_command.join(' ')}" }
+          Open3.popen3(lxc_command.join(' '))
         end
 
-        def make_executable(path)
-          _, stderr, exitcode = execute('chmod', 'u+x', path, {})
-          if exitcode != 0
-            message = "Could not make file '#{path}' executable: #{stderr}"
-            raise Bolt::Node::FileError.new(message, 'CHMOD_ERROR')
-          end
+        private def execute_local_command(command)
+          Open3.capture3('lxc', *command, { binmode: true })
         end
 
-        def mkdirs(dirs)
-          _, stderr, exitcode = execute('mkdir', '-p', *dirs, {})
-          if exitcode != 0
-            message = "Could not create directories: #{stderr}"
-            raise Bolt::Node::FileError.new(message, 'MKDIR_ERROR')
+        def upload_file(source, destination)
+          @logger.trace { "Uploading #{source} to #{destination}" }
+          args = %w[--create-dirs]
+          if File.directory?(source)
+            args << '--recursive'
+            # If we don't do this, LXD will upload to
+            # /tmp/d2020-11/d2020-11/dir instead of /tmp/d2020-11/dir
+            destination = Pathname.new(destination).dirname.to_s
           end
+          cmd = %w[file push] + args + %W[#{source} #{container_id}#{destination}]
+          _out, err, stat = execute_local_command(cmd)
+          unless stat.exitstatus.zero?
+            raise "Error writing to #{container_id}: #{err}"
+          end
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
 
-        def make_tmpdir
-          tmpdir = @target.options.fetch('tmpdir', container_tmpdir)
-          tmppath = "#{tmpdir}/#{SecureRandom.uuid}"
-
-          stdout, stderr, exitcode = execute('mkdir', '-m', '700', tmppath, {})
-          if exitcode != 0
-            raise Bolt::Node::FileError.new("Could not make tmpdir: #{stderr}", 'TMPDIR_ERROR')
+        def download_file(source, destination, _download)
+          @logger.trace { "Downloading #{source} to #{destination}" }
+          FileUtils.mkdir_p(destination)
+          _out, err, stat = execute_local_command(%W[file pull --recursive #{container_id}#{source} #{destination}])
+          unless stat.exitstatus.zero?
+            raise "Error downloading content from container #{container_id}: #{err}"
           end
-          tmppath || stdout.first
+        rescue StandardError => e
+          raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
         end
       end
     end
