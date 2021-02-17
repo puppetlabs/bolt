@@ -899,7 +899,8 @@ module Bolt
     # Gem installs include the aggregate, canary, and puppetdb_fact modules, while
     # package installs include modules listed in the Bolt repo Puppetfile
     def incomplete_install?
-      (Dir.children(Bolt::Config::Modulepath::MODULES_PATH) - %w[aggregate canary puppetdb_fact secure_env_vars]).empty?
+      builtin_module_list = %w[aggregate canary puppetdb_fact secure_env_vars puppet_connect]
+      (Dir.children(Bolt::Config::Modulepath::MODULES_PATH) - builtin_module_list).empty?
     end
 
     # Mimicks the output from Outputter::Human#fatal_error. This should be used to print
