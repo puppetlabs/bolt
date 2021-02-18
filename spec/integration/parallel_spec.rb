@@ -81,7 +81,7 @@ describe 'plans' do
       expected_err = { "kind" => "bolt/parallel-failure",
                        "msg" => "Plan aborted: parallel block failed on 1 target" }
       expected_details = { "action" => "parallelize",
-                           "failed_indices" => [2] }
+                           "failed_indices" => [1] }
       expected_results = [[{ "target" => 'ubuntu_node',
                              "action" => "task",
                              "object" => "parallel",

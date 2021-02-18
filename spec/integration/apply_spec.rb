@@ -9,7 +9,6 @@ require 'bolt_spec/puppet_agent'
 require 'bolt_spec/run'
 
 TEST_VERSIONS = [
-  [5, 'puppet5'],
   [6, 'puppet6'],
   [7, 'puppet']
 ].freeze
@@ -121,6 +120,16 @@ describe 'apply', expensive: true do
           user = conn_info('ssh')[:user]
           logs = run_cli_json(%W[plan run basic::run_as_apply user=#{user} -t nix_agents], project: project)
           expect(logs.first['message']).to eq(conn_info('ssh')[:user])
+        end
+
+        it 'can reference project files with Puppet file syntax' do
+          FileUtils.mkdir_p(project.path + 'files')
+          FileUtils.touch(project.path + 'files' + 'testfile')
+
+          result = run_cli_json(%W[plan run basic::project_files -t nix_agents project_name=#{project.name}],
+                                project: project)
+
+          expect(result.first).to include('status' => 'success')
         end
 
         context 'with show_diff configured' do
