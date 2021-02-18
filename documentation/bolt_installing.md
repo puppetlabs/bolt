@@ -161,6 +161,12 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS:
 1. Double-click the `puppet-bolt-latest.dmg` file to mount the installer and
    then double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
 
+If you get a message that the installer "can't be opened because Apple cannot check it for malicious software:"
+1. Click **** > **System Preferences** > **Security & Privacy**.
+1. From the **General** tab, click the lock icon to allow changes to your security settings and enter your macOS password.
+1. Look for a message that says the Bolt installer "was blocked from use because it is not from an identified developer" and click "Open Anyway".
+1. Click the lock icon again to lock your security settings.
+
 **Upgrade Bolt**
 
 To upgrade Bolt to the latest version, download the DMG again and repeat the
