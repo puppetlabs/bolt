@@ -92,7 +92,7 @@ begin
         end
       end
       # Test modules
-      %w[canary aggregate puppetdb_fact].each do |mod|
+      %w[canary aggregate puppetdb_fact puppet_connect].each do |mod|
         Dir.chdir("#{__dir__}/../modules/#{mod}") do
           sh 'rake spec' do |ok, _|
             success = false unless ok
