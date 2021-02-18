@@ -34,7 +34,7 @@ services:
       - "20025:22"
 
   postgres:
-    image: postgres:9.6
+    image: postgres:11.11
     environment:
       - POSTGRES_PASSWORD=puppetdb
       - POSTGRES_USER=puppetdb

@@ -5,6 +5,27 @@ require 'bolt/puppetdb/config'
 
 module BoltSpec
   module PuppetDB
+    def wait_until_pdb_available(timeout:, interval:)
+      start = Time.now
+
+      until pdb_healthy?
+        if (Time.now - start).to_i >= timeout
+          raise "Timed out waiting for puppetdb to start accepting requests"
+        end
+
+        sleep interval
+      end
+    end
+
+    def pdb_healthy?
+      client = pdb_client
+      url = "#{client.uri}/status/v1/services/puppetdb-status"
+      response = client.http_client.get(url)
+      response.status == 200 && JSON.parse(response.body).fetch('state', nil) == 'running'
+    rescue Errno::ECONNREFUSED
+      false
+    end
+
     def pdb_conf
       spec_dir = File.join(__dir__, '..', '..')
       ssl_dir = File.join(spec_dir, 'fixtures', 'ssl')

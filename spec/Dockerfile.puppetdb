@@ -1,4 +1,4 @@
-FROM puppet/puppetdb:6.13.1
+FROM puppet/puppetdb
 
 # Use our own certs so this doesn't have to wait for puppetserver startup
 COPY fixtures/ssl/ca.pem /opt/puppetlabs/server/data/puppetdb/certs/certs/ca.pem
