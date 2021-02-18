@@ -275,15 +275,19 @@ module BoltServer
       Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
     end
 
+    def pal_from_project_bolt_config(bolt_config)
+      modulepath_object = Bolt::Config::Modulepath.new(
+        bolt_config.modulepath,
+        boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH],
+        builtin_content_path: @config['builtin-content-dir']
+      )
+      Bolt::PAL.new(modulepath_object, nil, nil, nil, nil, nil, bolt_config.project)
+    end
+
     def in_bolt_project(versioned_project)
       @pal_mutex.synchronize do
         bolt_config = config_from_project(versioned_project)
-        modulepath_object = Bolt::Config::Modulepath.new(
-          bolt_config.modulepath,
-          boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH],
-          builtin_content_path: @config['builtin-content-dir']
-        )
-        pal = Bolt::PAL.new(modulepath_object, nil, nil, nil, nil, nil, bolt_config.project)
+        pal = pal_from_project_bolt_config(bolt_config)
         context = {
           pal: pal,
           config: bolt_config
@@ -366,20 +370,26 @@ module BoltServer
       plans.map { |plan_name| { 'name' => plan_name } }
     end
 
-    def file_metadatas(pal, module_name, file)
-      pal.in_bolt_compiler do
-        mod = Puppet.lookup(:current_environment).module(module_name)
-        raise ArgumentError, "`module_name`: #{module_name} does not exist" unless mod
-        abs_file_path = mod.file(file)
-        raise ArgumentError, "`file`: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
-        fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
-        Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
-          metadata = Puppet::FileServing::Metadata.new(base_path, relative_path: relative_file_path)
-          metadata.checksum_type = 'sha256'
-          metadata.links = 'follow'
-          metadata.collect
-          metadata.to_data_hash
+    def file_metadatas(versioned_project, module_name, file)
+      abs_file_path = @pal_mutex.synchronize do
+        bolt_config = config_from_project(versioned_project)
+        pal = pal_from_project_bolt_config(bolt_config)
+        pal.in_bolt_compiler do
+          mod = Puppet.lookup(:current_environment).module(module_name)
+          raise ArgumentError, "`module_name`: #{module_name} does not exist" unless mod
+          mod.file(file)
         end
+      end
+
+      raise ArgumentError, "`file`: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
+
+      fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
+      Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
+        metadata = Puppet::FileServing::Metadata.new(base_path, relative_path: relative_file_path)
+        metadata.checksum_type = 'sha256'
+        metadata.links = 'follow'
+        metadata.collect
+        metadata.to_data_hash
       end
     end
 
@@ -642,12 +652,11 @@ module BoltServer
     #
     # @param versioned_project [String] the versioned_project to fetch the file metadatas from
     get '/project_file_metadatas/:module_name/*' do
-      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
-      in_bolt_project(params['versioned_project']) do |context|
-        file = params[:splat].first
-        metadatas = file_metadatas(context[:pal], params[:module_name], file)
-        [200, metadatas.to_json]
-      end
+      versioned_project = params['versioned_project']
+      return MISSING_VERSIONED_PROJECT_RESPONSE if versioned_project.nil?
+      file = params[:splat].first
+      metadatas = file_metadatas(versioned_project, params[:module_name], file)
+      [200, metadatas.to_json]
     rescue Bolt::Error => e
       [400, e.to_json]
     rescue ArgumentError => e
