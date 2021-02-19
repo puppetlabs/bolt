@@ -967,6 +967,91 @@ Successful on 1 target: localhost
 Ran on 1 target in 0.12 seconds
 ```
 
+### PowerShell example
+
+Create task and metadata in your project at
+`<PROJECT DIRECTORY>/tasks/mytask.{json,ps1}`.
+
+**Metadata**
+
+```json
+{
+  "files": [
+    "powershell_task_helper/files/BoltPwshHelper/"
+  ],
+  "input_method": "powershell",
+  "parameters": {
+    "name": {
+      "description": "Name of user to run command",
+      "type": "String"
+    }
+  }
+}
+```
+
+**Task**
+
+```powershell
+#!/usr/bin/env pwsh
+[CmdletBinding()]
+Param(
+  [Parameter(Mandatory = $True)]
+  [String]
+  $Name
+)
+
+<#
+If using PowerShell 3.0, you will need to add an import statement here:
+Import-Module BoltPwshHelper
+#>
+​
+<#
+Handle unhandled exceptions using the `trap` keyword
+#>
+trap {
+  Write-BoltError -Message "Generic trap handler" -Exception $_
+}
+
+<#
+A example of a custom error messages based on a specific use case
+#>
+if ($name -eq 'Robert') {
+  Write-BoltError -Message "User ${name} not allowed"
+}
+else {
+  # TODO
+}
+
+<#
+An exmaple of returning a full exception stacktrace in Bolt formatted json
+You can add a `-Message` if you want
+#>
+try {
+  Write-Output (@{ "greeting" = "Hi, my name is ${name}"} | ConvertTo-JSON)
+}
+catch {
+  Write-BoltError -Exception $_
+}
+```
+
+> **Note**: If you're using a version of PowerShell more recent than 3.0, 
+  you don't have to write an import statement to load your PowerShell module. 
+  Bolt automatically loads the module by adding your task directory to 
+  `$env:PSModulePath`.
+
+**Output**
+
+```console
+$ bolt task run mymodule::mytask -n localhost name="Robert'); DROP TABLE Students;--"
+Started on localhost...
+Finished on localhost:
+  {
+    "greeting": "Hi, my name is Robert'); DROP TABLE Students;--"
+  }
+Successful on 1 target: localhost
+Ran on 1 target in 0.12 seconds
+```
+
 ## Secure coding practices for tasks
 
 Use secure coding practices when you write tasks and help protect your system.
