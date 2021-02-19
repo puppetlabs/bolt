@@ -191,7 +191,14 @@ Describe "test all bolt command examples" {
     It "bolt plan run canary --targets target1,target2 command=hostname" {
       Write-Warning 'requires params to not be positionl...is that a problem'
       $result = Invoke-BoltPlan -name 'canary' -targets 'target1,target2' -params @{ 'command' = 'hostname' }
-      $result | Should -Be "bolt plan run canary --targets target1,target2 --params '{`"command`":`"hostname`"}'"
+      # Linux platforms and windows platforms will format the param strings differently:
+      # on windows the format is wrapped in single qoutes with no backslash, while linux
+      # variants require backslash escaped quotes and no single quote wrapping
+      if ($IsWindows) {
+        $result | Should -Be "bolt plan run canary --targets target1,target2 --params '{`"command`":`"hostname`"}'"
+      } else {
+        $result | Should -Be "bolt plan run canary --targets target1,target2 --params {\`"command\`":\`"hostname\`"}"
+      }
     }
     It "bolt plan new myproject::myplan" {
       $result = New-BoltPlan -name 'myproject::myplan'
@@ -274,11 +281,20 @@ Describe "test all bolt command examples" {
       $results | Should -Be "bolt task run package --targets target1,target2 --params '{`"name`":`"bash`",`"action`":`"status`"}'"
 
       $results = Invoke-BoltTask -name 'package' -targets 'target1,target2' -params @{ 'name' = 'bash'; 'action' = 'status' }
-      # We don't care about the order of JSON keys, and they might become out
-      # of order due to ConvertToJson
-      $results | Should -BeIn @("bolt task run package --targets target1,target2 --params '{`"name`":`"bash`",`"action`":`"status`"}'",
-        "bolt task run package --targets target1,target2 --params '{`"action`":`"status`",`"name`":`"bash`"}'")
-
+      # Linux platforms and windows platforms will format the param strings differently:
+      # on windows the format is wrapped in single qoutes with no backslash, while linux
+      # variants require backslash escaped quotes and no single quote wrapping
+      if ($IsWindows) {
+        # We don't care about the order of JSON keys, and they might become out
+        # of order due to ConvertToJson
+        $results | Should -BeIn @("bolt task run package --targets target1,target2 --params '{`"name`":`"bash`",`"action`":`"status`"}'",
+          "bolt task run package --targets target1,target2 --params '{`"action`":`"status`",`"name`":`"bash`"}'")
+      } else {
+        # We don't care about the order of JSON keys, and they might become out
+        # of order due to ConvertToJson
+        $results | Should -BeIn @("bolt task run package --targets target1,target2 --params {\`"name\`":\`"bash\`",\`"action\`":\`"status\`"}",
+          "bolt task run package --targets target1,target2 --params {\`"action\`":\`"status\`",\`"name\`":\`"bash\`"}")
+      }
     }
     It "bolt task show" {
       $results = Get-BoltTask
