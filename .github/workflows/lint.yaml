@@ -1,28 +1,28 @@
-name: Linting
+# name: Linting
 
-on:
-  push:
-    branches: [main]
-    paths-ignore: ['**.md', '**.erb', 'schemas/*']
-  pull_request:
-    type: [opened, reopened, edited]
-    paths-ignore: ['**.md', '**.erb', 'schemas/*']
+# on:
+#   push:
+#     branches: [main]
+#     paths-ignore: ['**.md', '**.erb', 'schemas/*']
+#   pull_request:
+#     type: [opened, reopened, edited]
+#     paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
-jobs:
+# jobs:
 
-  rubocop:
-    name: Rubocop
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Setup Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.7.x'
-      - name: Install rubocop
-        run: |
-          gem install rubocop --version 1.9.1
-          gem install rubocop-rake
-      - name: Run rubocop
-        run: rubocop --display-cop-names --display-style-guide --parallel
+#   rubocop:
+#     name: Rubocop
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+#       - name: Setup Ruby
+#         uses: actions/setup-ruby@v1
+#         with:
+#           ruby-version: '2.7.x'
+#       - name: Install rubocop
+#         run: |
+#           gem install rubocop --version 1.9.1
+#           gem install rubocop-rake
+#       - name: Run rubocop
+#         run: rubocop --display-cop-names --display-style-guide --parallel

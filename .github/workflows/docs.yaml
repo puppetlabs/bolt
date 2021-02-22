@@ -1,40 +1,40 @@
-name: Docs
+# name: Docs
 
-on:
-  push:
-    branches: [main]
-    paths-ignore: ['**.md', 'schemas/*']
-  pull_request:
-    type: [opened, reopened, edited]
-    paths-ignore: ['**.md', 'schemas/*']
+# on:
+#   push:
+#     branches: [main]
+#     paths-ignore: ['**.md', 'schemas/*']
+#   pull_request:
+#     type: [opened, reopened, edited]
+#     paths-ignore: ['**.md', 'schemas/*']
 
-jobs:
+# jobs:
 
-  docs:
-    name: Docs
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Setup Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.7.x'
-      - name: Install bundler
-        run: |
-          gem install bundler
-          bundle config path vendor/bundle
-      - name: Cache gems
-        id: cache
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
-      - name: Install gems
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: bundle install --jobs 4 --retry 3
-      - name: Update gems
-        if: steps.cache.outputs.cache-hit == 'true'
-        run: bundle update
-      - name: Generate docs
-        run: bundle exec rake docs:all
+#   docs:
+#     name: Docs
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+#       - name: Setup Ruby
+#         uses: actions/setup-ruby@v1
+#         with:
+#           ruby-version: '2.7.x'
+#       - name: Install bundler
+#         run: |
+#           gem install bundler
+#           bundle config path vendor/bundle
+#       - name: Cache gems
+#         id: cache
+#         uses: actions/cache@v1
+#         with:
+#           path: vendor/bundle
+#           key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
+#       - name: Install gems
+#         if: steps.cache.outputs.cache-hit != 'true'
+#         run: bundle install --jobs 4 --retry 3
+#       - name: Update gems
+#         if: steps.cache.outputs.cache-hit == 'true'
+#         run: bundle update
+#       - name: Generate docs
+#         run: bundle exec rake docs:all

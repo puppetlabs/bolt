@@ -1,30 +1,30 @@
-name: Release Notes
+# name: Release Notes
 
-on:
-  pull_request:
-    type: [opened, reopened, edited]
-    paths-ignore: 
-      - '*.md'
-      - '**.md'
-      - '**.erb'
-      - 'lib/bolt_server/**'
-      - 'spec/**'
-      - 'acceptance/**'
-      - 'bolt_spec_spec/**'
-      - 'config/**'
-      - '.github/**'
-      - 'rakelib/**'
-      - 'Dockerfile.bolt-server'
+# on:
+#   pull_request:
+#     type: [opened, reopened, edited]
+#     paths-ignore: 
+#       - '*.md'
+#       - '**.md'
+#       - '**.erb'
+#       - 'lib/bolt_server/**'
+#       - 'spec/**'
+#       - 'acceptance/**'
+#       - 'bolt_spec_spec/**'
+#       - 'config/**'
+#       - '.github/**'
+#       - 'rakelib/**'
+#       - 'Dockerfile.bolt-server'
 
-jobs:
+# jobs:
 
-  release-notes:
-    name: Release Notes
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Check for release notes
-        uses: rulesets/rulesets@v1.0.0-beta
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+#   release-notes:
+#     name: Release Notes
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout repository
+#         uses: actions/checkout@v2
+#       - name: Check for release notes
+#         uses: rulesets/rulesets@v1.0.0-beta
+#         with:
+#           token: ${{ secrets.GITHUB_TOKEN }}

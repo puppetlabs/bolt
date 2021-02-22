@@ -158,6 +158,7 @@ describe Bolt::PuppetDB::Client do
 
     before(:all) do
       wait_until_available(timeout: 30, interval: 1)
+      sleep(120)
       push_facts(facts_hash)
     end
 
