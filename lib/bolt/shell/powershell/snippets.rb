@@ -61,8 +61,8 @@ module Bolt
             }
             catch
             {
-              Write-Error $_.Exception
-              exit 1
+              $Host.UI.WriteErrorLine("[$($_.FullyQualifiedErrorId)] Exception $($_.InvocationInfo.PositionMessage).`n$($_.Exception.Message)");
+              exit 1;
             }
             PS
           end
@@ -144,7 +144,7 @@ module Bolt
               [Parameter(Mandatory = $true)] $Text,
               [Parameter(Mandatory = $false)] [Text.Encoding] $Encoding = [Text.Encoding]::UTF8
             )
-          
+
             $Text | ConvertFrom-Json | ConvertFrom-PSCustomObject
             }
             PS
