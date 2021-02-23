@@ -66,4 +66,19 @@ describe Bolt::Transport::Docker, docker: true do
       expect { docker.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
     end
   end
+
+  context 'with shell-command specified' do
+    let(:target_data) {
+      { 'uri' => uri,
+        'config' => {
+          'docker' => { 'shell-command' => '/bin/bash -c' }
+        } }
+    }
+    let(:target) { Bolt::Target.from_hash(target_data, inventory) }
+
+    it 'uses the specified shell' do
+      result = docker.run_command(target, 'echo $SHELL')
+      expect(result.value['stdout'].strip).to eq('/bin/bash')
+    end
+  end
 end

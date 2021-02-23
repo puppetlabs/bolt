@@ -331,10 +331,15 @@ module Bolt
         # together multiple commands into a single sh invocation
         commands = [inject_interpreter(options[:interpreter], command)]
 
+        # Let the transport handle adding environment variables if it's custom.
         if options[:environment]
-          env_decl = options[:environment].map do |env, val|
-            "#{env}=#{Shellwords.shellescape(val)}"
-          end.join(' ')
+          if defined? conn.add_env_vars
+            conn.add_env_vars(options[:environment])
+          else
+            env_decl = options[:environment].map do |env, val|
+              "#{env}=#{Shellwords.shellescape(val)}"
+            end.join(' ')
+          end
         end
 
         if escalate
