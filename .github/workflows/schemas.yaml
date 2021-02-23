@@ -9,7 +9,7 @@ on:
       - 'lib/bolt/config/options.rb'
       - 'lib/bolt/config/transport/options.rb'
   pull_request:
-    type: [opened, reopened, edited]
+    types: [opened, reopened, edited, synchronize]
     paths:
       - 'rakelib/schemas.rake'
       - 'schemas/*.json'
@@ -25,24 +25,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby
-        uses: actions/setup-ruby@v1
+        uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7.x'
-      - name: Install bundler
-        run: |
-          gem install bundler
-          bundle config path vendor/bundle
-      - name: Cache gems
-        id: cache
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('lib/bolt/version.rb') }}-${{ hashFiles('Gemfile') }}-${{ hashFiles('bolt.gemspec') }}
-      - name: Install gems
-        if: steps.cache.outputs.cache-hit != 'true'
-        run: bundle install --jobs 4 --retry 3
+          ruby-version: 2.7
+          bundler-cache: true
       - name: Update gems
-        if: steps.cache.outputs.cache-hit == 'true'
         run: bundle update
       - name: Generate schemas
         run: bundle exec rake schemas:all
@@ -56,4 +43,3 @@ jobs:
             bundle exec rake schemas:all'
             exit 1
           fi
-

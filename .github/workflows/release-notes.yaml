@@ -2,7 +2,7 @@ name: Release Notes
 
 on:
   pull_request:
-    type: [opened, reopened, edited]
+    types: [opened, reopened, edited, synchronize]
     paths-ignore: 
       - '*.md'
       - '**.md'

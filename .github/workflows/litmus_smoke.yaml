@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
   pull_request:
-    type: [opened, reopened, edited]
+    types: [opened, reopened, edited, synchronize]
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
 jobs:
