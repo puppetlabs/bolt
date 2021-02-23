@@ -789,6 +789,41 @@ describe "BoltServer::TransportApp" do
             .to match(%r{The property '#/' contains additional properties \[\\"targets\\"\]})
         end
       end
+
+      describe 'sensitive task output', :ssh do
+        let(:task_template) {
+          {
+            task: { name: 'sample::sensitive_task_output',
+                    metadata: {},
+                    files: [{ filename: "sensitive_task_output.sh", sha256: "foo",
+                              uri: { path: 'foo', params: { environment: 'foo' } } }] }
+          }
+        }
+
+        it "unwraps the Sensitive value under the output's _sensitive key", :ssh do
+          task = task_template.merge('parameters' => { 'include_sensitive' => 'true' })
+          post_over_transport('ssh', 'run_task', task)
+
+          expect(last_response).to be_ok
+          expect(last_response.status).to eq(200)
+
+          result = JSON.parse(last_response.body)
+          expect(result).to include('status' => 'success')
+          expect(result['value']).to eql('user' => 'someone', '_sensitive' => { 'password' => 'secretpassword' })
+        end
+
+        it "noops if the output does not contain a _sensitive key", :ssh do
+          task = task_template
+          post_over_transport('ssh', 'run_task', task)
+
+          expect(last_response).to be_ok
+          expect(last_response.status).to eq(200)
+
+          result = JSON.parse(last_response.body)
+          expect(result).to include('status' => 'success')
+          expect(result['value']).to eql('user' => 'someone')
+        end
+      end
     end
 
     describe '/project_inventory_targets' do

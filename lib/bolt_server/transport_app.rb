@@ -133,7 +133,14 @@ module BoltServer
       task_data = body['task']
       task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
       parameters = body['parameters'] || {}
-      [@executor.run_task(target, task, parameters), nil]
+      task_result = @executor.run_task(target, task, parameters)
+      task_result.each do |result|
+        value = result.value
+        next unless value.is_a?(Hash)
+        next unless value.key?('_sensitive')
+        value['_sensitive'] = value['_sensitive'].unwrap
+      end
+      [task_result, nil]
     end
 
     def run_command(target, body)
