@@ -3,6 +3,7 @@
 require 'spec_helper'
 require 'json'
 require 'bolt'
+require 'bolt/target'
 require 'bolt/result'
 
 describe Bolt::Result do
@@ -115,6 +116,13 @@ describe Bolt::Result do
       result = Bolt::Result.for_task(target, obj.to_json, '', 0, 'atask', [])
       expect(result.sensitive).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
       expect(result.sensitive.unwrap).to eq('password' => 'sosecretive')
+    end
+
+    it 'to_data serializes _sensitve output' do
+      obj = { "user" => "someone", "_sensitive" => { "password" => "sosecretive" } }
+      result = Bolt::Result.for_task(Bolt::Target.new('foo'), obj.to_json, '', 0, 'atask', [])
+      serialzed = result.to_data
+      expect(serialzed['value']['_sensitive']).to eq("Sensitive [value redacted]")
     end
 
     it 'excludes _output and _error from generic_value' do
