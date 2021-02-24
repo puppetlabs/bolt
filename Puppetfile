@@ -23,6 +23,7 @@ mod 'puppetlabs-zone_core', '1.0.3'
 
 # Useful additional modules
 mod 'puppetlabs-package', '1.4.0'
+mod 'puppetlabs-powershell_task_helper', '0.1.0'
 mod 'puppetlabs-puppet_conf', '0.8.0'
 mod 'puppetlabs-python_task_helper', '0.5.0'
 mod 'puppetlabs-reboot', '3.2.0'
