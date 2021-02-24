@@ -941,7 +941,7 @@ describe "Bolt::CLI" do
     end
 
     it "distinguishes subcommands" do
-      cli = Bolt::CLI.new(%w[script run --targets foo])
+      cli = Bolt::CLI.new(%w[script run script.sh --targets foo])
       expect(cli.parse).to include(subcommand: 'script')
     end
 
@@ -1045,6 +1045,65 @@ describe "Bolt::CLI" do
         expect(result[:task_options]).to eq('kj' => '2hv',
                                             'iuhg' => 'iube',
                                             '2whf' => 'lcv')
+      end
+    end
+
+    describe '#find_file' do
+      let(:cli)          { Bolt::CLI.new([]) }
+      let(:config)       { Bolt::Config.from_project(project) }
+      let(:project)      { @project }
+      let(:module_name)  { 'test' }
+      let(:file_name)    { 'script.sh' }
+      let(:local_file)   { project.path + file_name }
+      let(:project_file) { project.path + 'files' + file_name }
+      let(:module_file)  { project.path + 'modules' + module_name + 'files' + file_name }
+
+      around(:each) do |example|
+        in_project do |project|
+          @project = project
+
+          # Create local file
+          FileUtils.touch(local_file)
+
+          # Create project file
+          FileUtils.mkdir_p(project_file.parent)
+          FileUtils.touch(project_file)
+
+          # Create module file
+          FileUtils.mkdir_p(module_file.parent)
+          FileUtils.touch(module_file)
+
+          example.run
+        end
+      end
+
+      before(:each) do
+        allow(cli).to receive(:config).and_return(config)
+      end
+
+      it 'locates a file at an absolute path' do
+        expect(cli.find_file(local_file.to_s)).to eq(local_file.to_s)
+      end
+
+      it 'locates a file at a relative path' do
+        expect(cli.find_file(file_name)).to eq(file_name)
+      end
+
+      it 'locates a file in a module' do
+        expect(cli.find_file(File.join(module_name, file_name))).to eq(module_file.to_s)
+      end
+
+      it 'locates a file in a project' do
+        expect(cli.find_file(File.join(project.name, file_name))).to eq(project_file.to_s)
+      end
+
+      it 'prefers a file path over a Puppet path' do
+        FileUtils.mkdir_p(project.path + module_name)
+        FileUtils.touch(project.path + module_name + file_name)
+
+        path = [module_name, file_name].join(File::SEPARATOR)
+
+        expect(cli.find_file(path)).to eq(path)
       end
     end
 
