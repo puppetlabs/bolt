@@ -77,40 +77,37 @@ Each plan name segment must begin with a lowercase letter and:
 
 ## Plan structure
 
-YAML plans contain a list of steps with optional parameters and results.
+YAML plans contain a list of steps and can include additional optional keys.
+The following top-level keys are available:
 
-YAML maps accept these keys:
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `description` | `String` | The plan description. Appears in `bolt plan show <PLAN NAME>` and `Get-BoltPlan <PLAN NAME>` output. | |
+| `parameters` | `Hash` | A hash of plan parameters. Each key is the name of the parameter and the value is the parameter definition. | |
+| `private` | `Boolean` | Whether the plan should appear in `bolt plan show` and `Get-BoltPlan` output. | |
+| `return` | `Array`, `Boolean`, `Hash`, `Number`, `String` | The value to return from the plan. Must evaluate to a valid [PlanResult](bolt_types_reference.md#planresult). | |
+| `steps` | `Array` | The list of steps to run. | ✓ |
 
--   `steps`: The list of steps to perform
--   `parameters`: (Optional) The parameters accepted by the plan
--   `return`: (Optional) The value to return from the plan
-
-### Steps key
+## Steps
 
 The `steps` key is an array of step objects, each of which corresponds to a
 specific action to take.
 
-When the plan runs, each step is executed in order. If a step fails, the plan
-halts execution and raises an error containing the result of the step that
-failed.
+When the plan runs, each step is executed in order. By default, if a step fails
+the plan halts execution and raises an error containing the result of the step
+that failed.
 
-Steps use these fields:
-
--   `name`: (Optional) A unique name that can be used to refer to the result of
-    the step later.
--   `description`: (Optional) An explanation of what the step is doing.
-
-Other available keys depend on the type of step.
-
-#### Message step
+### Message step
 
 Use a `message` step to print a message. This will print a message to standard
 out (stdout) when using the `human` output format, and print to standard error
 (stderr) when using the `json` output format. 
 
-Message steps use a single field:
+Message steps support the following keys:
 
-- `message`: The message to print
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `message` | `String` | The message to print. | ✓ |
 
 For example:
 
@@ -127,17 +124,23 @@ prints the object as a string.
 For information on printing a step result with `message`, see [Debugging
 plans](#debugging-plans).
 
-#### Command step
+### Command step
 
 Use a `command` step to run a single command on a list of targets and save the
-results, containing stdout, stderr, and exit code.
+results, containing stdout, stderr, and exit code. The step fails if the exit
+code of any command is non-zero.
 
-The step fails if the exit code of any command is non-zero.
+Command steps support the following keys:
 
-Command steps use these fields:
-
--   `command`: The command to run
--   `targets`: A target or list of targets to run the command on
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `command` | `String` | The command to run. | ✓ |
+| `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
+| `env_vars` | `Hash` | A map of environment variables to set on the target when running the command. | |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `run_as` | `String` | The user to run as when running the command on the target. Only applies to targets using a transport that supports `run-as` configuration. | |
+| `targets` | `Array`, `String` | A target or list of targets to run the command on. | ✓ |
 
 For example:
 
@@ -151,15 +154,22 @@ steps:
     description: "Get the webserver hostnames"
 ```
 
-#### Task step
+### Task step
 
 Use a `task` step to run a Bolt task on a list of targets and save the results.
 
-Task steps use these fields:
+Task steps support the following keys:
 
--   `task`: The task to run
--   `targets`: A target or list of targets to run the task on
--   `parameters`: (Optional) A map of parameter values to pass to the task
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `noop` | `Boolean` | Whether to run in no-operation mode, if available. | |
+| `parameters` | `Hash` | A map of parameters to pass to the task. | |
+| `run_as` | `String` | The user to run as when running the task on the target. Only applies to targets using a transport that supports `run-as` configuration. | |
+| `targets` | `Array`, `String` | A target or list of targets to run the task on. | ✓ |
+| `task` | `String` | The task to run. | ✓ |
 
 For example:
 
@@ -176,7 +186,7 @@ steps:
       name: openssl
 ```
 
-#### Script step
+### Script step
 
 Use a `script` step to run a script on a list of targets and save the results.
 
@@ -184,12 +194,18 @@ The script must be in the `files/` directory of a module. The name of the script
 must be specified as `<modulename>/path/to/script`, omitting the `files`
 directory from the path.
 
-Script steps use these fields:
+Script steps support the following keys:
 
--   `script`: The script to run
--   `targets`: A target or list of targets to run the script on
--   `arguments`: (Optional) An array of command-line arguments to pass to the
-    script
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `arguments` | `Array` | An array of command-line arguments to pass to the script. | |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
+| `env_vars` | `Hash` | A map of environment variables to set on the target when running the script. | |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `run_as` | `String` | The user to run as when running the script on the target. Only applies to targets using a transport that supports `run-as` configuration. | |
+| `script` | `String` | The script to run. | ✓ |
+| `targets` | `Array`, `String` | A target or list of targets to run the script on. | ✓ |
 
 For example:
 
@@ -206,7 +222,7 @@ steps:
       - 60
 ```
 
-#### File download step
+### File download step
 
 Use a file download step to download a file or directory from a list of targets
 to a destination directory on the local host.
@@ -216,11 +232,17 @@ subdirectory matching the target's URL-encoded safe name. If the destination
 directory is a relative path, it will expand relative to the project's
 downloads directory, `<PROJECT DIRECTORY>/downloads`.
 
-File download steps use these fields:
+File download steps support the following keys:
 
-- `download`: The location of the remote file to download
-- `destination`: The destination directory to download the file to
-- `targets`: A target or list of targets to download the file from
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
+| `destination` | `String` | The destination directory to download the file to. | ✓ |
+| `download` | `String` | The location of the remote file to download. | ✓ |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `run_as` | `String` | The user to run as when downloading the file from the target. Only applies to targets using a transport that supports `run-as` configuration. | |
+| `targets` | `Array`, `String` | A target or list of targets to download the file from. | ✓ |
 
 For example:
 
@@ -248,7 +270,7 @@ target's safe name is URL encoded to ensure it's a valid directory name.
 > 🔩 **Tip:** To avoid URL encoding the target's safe name, give the target a
 > simple, human-readable name in your inventory file.
 
-#### File upload step
+### File upload step
 
 Use a file upload step to upload a file to a specific location on a list of
 targets.
@@ -257,7 +279,17 @@ The file to upload must be in the `files/` directory of a Puppet module. The
 source for the file must be specified as `<modulename>/path/to/file`, omitting
 the `files` directory from the path.
 
-File upload steps use these fields:
+File upload steps support the following keys:
+
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
+| `destination` | `String` | The remote location to upload the file to. | ✓ |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `run_as` | `String` | The user to run as when uploading the file to the target. Only applies to targets using a transport that supports `run-as` configuration. | |
+| `targets` | `Array`, `String` | A target or list of targets to upload the file to. | ✓ |
+| `upload` | `String` | The location of the local file to upload. | ✓ |
 
 -   `upload`: The location of the local file to be uploaded
 -   `destination`: The remote location to upload the file to
@@ -276,14 +308,21 @@ steps:
     description: "Upload motd to the webservers"
 ```
 
-#### Plan step
+### Plan step
 
 Use a `plan` step to run another plan and save its result.
 
-Plan steps use these fields:
+Plan steps support the following keys:
 
--   `plan`: The name of the plan to run
--   `parameters`: (Optional) A map of parameter values to pass to the plan
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `parameters` | `Hash` | A map of parameters to pass to the plan. | |
+| `plan` | `String` | The plan to run. | ✓ |
+| `run_as` | `String` | The user to run as when connecting to targets. This is set for all steps or functions in the plan that connect to targets. Only applies to targets using a transport that supports `run-as` configuration. | |
+| `targets` | `Array`, `String` | A target or list of targets. Passed to the plan under the `targets` parameter. | |
 
 For example:
 
@@ -298,7 +337,7 @@ steps:
         - web3.example.com
 ```
 
-#### Resources step
+### Resources step
 
 Use a `resources` step to apply a list of Puppet resources. A resource defines
 the desired state for part of a target. Bolt ensures each resource is in its
@@ -310,10 +349,13 @@ the targets specified with the `targets` field. For more information about
 `apply_prep` see the [Applying manifest blocks](applying_manifest_blocks.md#)
 section.
 
-Resources steps use these fields:
+Resources steps support the following keys:
 
--   `resources`: An array of resources to apply
--   `targets`: A target or list of targets to apply the resources on
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `resources` | `Array` | An array of resources to apply. | ✓ |
+| `targets` | `Array`, `String` | A target or list of targets to run the script on. | ✓ |
 
 Each resource is a YAML map with a type and title, and optionally a `parameters`
 key. The resource type and title can either be specified separately with the
@@ -341,7 +383,7 @@ steps:
     description: "Set up nginx on the webservers"
 ```
 
-### Parameters key
+## Parameters
 
 Plans accept parameters with the `parameters` key. The value of `parameters` is
 a map, where each key is the name of a parameter and the value is a map
@@ -375,7 +417,7 @@ parameters:
     description: "The new application version to deploy"
 ```
 
-### Private key
+## Private plans
 
 As a plan author, you may not want users to run your plan directly or know it exists. This is useful
 for plans that are used by other plans 'under the hood', but aren't designed to be run by a human.
@@ -407,7 +449,7 @@ If you manually edit a plan that is located outside of the `<PROJECT DIRECTORY>/
 still appears in the output of `bolt plan show` and `Get-BoltPlan`, clear the metadata cache by
 running with the `--clear-cache` flag.
 
-### How strings are evaluated
+## How strings are evaluated
 
 The behavior of strings is defined by how they're written in the plan.
 

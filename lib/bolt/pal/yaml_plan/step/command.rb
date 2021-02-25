@@ -5,30 +5,30 @@ module Bolt
     class YamlPlan
       class Step
         class Command < Step
-          def self.allowed_keys
-            super + Set['command']
+          def self.option_keys
+            Set['catch_errors', 'env_vars', 'run_as']
           end
 
           def self.required_keys
-            Set['targets']
+            Set['command', 'targets']
           end
 
-          def initialize(step_body)
-            super
-            @command = step_body['command']
+          # Returns an array of arguments to pass to the step's function call
+          #
+          private def format_args(body)
+            opts = format_options(body)
+
+            args = [body['command'], body['targets']]
+            args << body['description'] if body['description']
+            args << opts if opts.any?
+
+            args
           end
 
-          def transpile
-            code = String.new("  ")
-            code << "$#{@name} = " if @name
-
-            fn = 'run_command'
-            args = [@command, @targets]
-            args << @description if @description
-
-            code << function_call(fn, args)
-
-            code << "\n"
+          # Returns the function corresponding to the step
+          #
+          private def function
+            'run_command'
           end
         end
       end
