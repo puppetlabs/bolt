@@ -48,15 +48,26 @@ describe 'puppet_connect::test_input_data' do
     end
   end
 
-  it 'sets load-config to false for ssh targets' do
+  it 'maintains configuration parity with Puppet Connect for ssh targets' do
     allow_command('echo Connected')
       .always_return({})
 
-    winrm_config_before = winrm_target.config
     run_plan('puppet_connect::test_input_data', {})
 
-    expect(ssh_target.config).to include('ssh' => { 'load-config' => false })
-    expect(winrm_target.config).to eql(winrm_config_before)
+    expect(ssh_target.config).to include('ssh')
+    ssh_config = ssh_target.config['ssh'] 
+    expect(ssh_config).to include('load-config' => false, 'host-key-check' => false)
+  end
+
+  it 'maintains configuration parity with Puppet Connect for winrm targets' do
+    allow_command('echo Connected')
+      .always_return({})
+
+    run_plan('puppet_connect::test_input_data', {})
+
+    expect(winrm_target.config).to include('winrm')
+    winrm_config = winrm_target.config['winrm'] 
+    expect(winrm_config).to include('ssl' => false, 'ssl-verify' => false)
   end
 
   it 'checks if the targets are connectable' do

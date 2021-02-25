@@ -14,14 +14,24 @@
 plan puppet_connect::test_input_data(TargetSpec $targets = 'all') {
   $targs = get_targets($targets)
   $targs.each |$target| {
-    if $target.transport != 'ssh' and $target.transport != 'winrm' {
-      fail_plan("Inventory contains target ${target} with unsupported transport, must be ssh or winrm")
-    }
-    if $target.transport == 'ssh' {
-      # Disable SSH autoloading to prevent false positive results
-      # (input data is wrong but target is still connectable due
-      # to autoloaded config)
-      set_config($target, ['ssh', 'load-config'], false)
+    case $target.transport {
+      'ssh': {
+        # Disable SSH autoloading to prevent false positive results
+        # (input data is wrong but target is still connectable due
+        # to autoloaded config)
+        set_config($target, ['ssh', 'load-config'], false)
+        # Maintain configuration parity with Puppet Connect to improve
+        # the reliability of our test
+        set_config($target, ['ssh', 'host-key-check'], false)
+      }
+      'winrm': {
+        # Maintain configuration parity with Puppet Connect
+        set_config($target, ['winrm', 'ssl'], false)
+        set_config($target, ['winrm', 'ssl-verify'], false)
+      }
+      default: {
+        fail_plan("Inventory contains target ${target} with unsupported transport, must be ssh or winrm")
+      }
     }
   }
   # The SSH/WinRM transports will report an 'unknown host' error for targets where
