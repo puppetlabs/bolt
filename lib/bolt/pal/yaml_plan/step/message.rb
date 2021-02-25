@@ -13,14 +13,17 @@ module Bolt
             Set['message']
           end
 
-          def initialize(step_body)
-            super
-            @message = step_body['message']
+          # Returns an array of arguments to pass to the step's function call
+          #
+          def args
+            [@body['message']]
           end
 
+          # Transpiles the step into the plan language
+          #
           def transpile
             code = String.new("  ")
-            code << function_call('out::message', [@message])
+            code << function_call('out::message', args)
             code << "\n"
           end
         end

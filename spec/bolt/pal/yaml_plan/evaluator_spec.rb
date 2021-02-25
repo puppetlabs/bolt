@@ -11,6 +11,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   # static loader and global scope
   let(:loader) { Puppet.lookup(:loaders).static_loader }
   let(:scope) { Puppet.lookup(:global_scope) }
+  let(:step) { Bolt::PAL::YamlPlan::Step.create(step_body, 1) }
 
   around :each do |example|
     pal.in_bolt_compiler do
@@ -183,7 +184,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#message_step" do
-    let(:step) do
+    let(:step_body) do
       {
         'message' => 'hello world'
       }
@@ -196,7 +197,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#task_step" do
-    let(:step) do
+    let(:step_body) do
       { 'task' => 'package',
         'targets' => 'foo.example.com',
         'parameters' => { 'action' => 'status',
@@ -204,21 +205,21 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'succeeds if no parameters are specified' do
-      step.delete('parameters')
+      step_body.delete('parameters')
 
-      expect(scope).to receive(:call_function).with('run_task', ['package', 'foo.example.com', {}])
+      expect(scope).to receive(:call_function).with('run_task', ['package', 'foo.example.com'])
       subject.task_step(scope, step)
     end
 
-    it 'succeeds if nil parameters are specified' do
-      step['parameters'] = nil
+    it 'succeeds if empty parameters are specified' do
+      step_body['parameters'] = {}
 
-      expect(scope).to receive(:call_function).with('run_task', ['package', 'foo.example.com', {}])
+      expect(scope).to receive(:call_function).with('run_task', ['package', 'foo.example.com'])
       subject.task_step(scope, step)
     end
 
     it 'supports a description' do
-      step['description'] = 'run the thing'
+      step_body['description'] = 'run the thing'
 
       args = ['package', 'foo.example.com', 'run the thing', { 'action' => 'status', 'name' => 'openssl' }]
       expect(scope).to receive(:call_function).with('run_task', args)
@@ -228,7 +229,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#plan_step" do
-    let(:step) do
+    let(:step_body) do
       { 'plan' => 'testplan',
         'parameters' => { 'message' => 'hello',
                           'count' => 5 } }
@@ -241,29 +242,30 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'succeeds if no parameters are specified' do
-      step.delete('parameters')
+      step_body.delete('parameters')
 
-      expect(scope).to receive(:call_function).with('run_plan', ['testplan', {}])
+      expect(scope).to receive(:call_function).with('run_plan', ['testplan'])
 
       subject.plan_step(scope, step)
     end
-    it 'succeeds if nil parameters are specified' do
-      step['parameters'] = nil
 
-      expect(scope).to receive(:call_function).with('run_plan', ['testplan', {}])
+    it 'succeeds if empty parameters are specified' do
+      step_body['parameters'] = {}
+
+      expect(scope).to receive(:call_function).with('run_plan', ['testplan'])
 
       subject.plan_step(scope, step)
     end
   end
 
   describe "#command_step" do
-    let(:step) do
+    let(:step_body) do
       { 'command' => 'hostname -f',
         'targets' => 'foo.example.com' }
     end
 
     it 'supports a description' do
-      step['description'] = 'run the thing'
+      step_body['description'] = 'run the thing'
 
       expect(scope).to receive(:call_function).with('run_command', ['hostname -f', 'foo.example.com', 'run the thing'])
       subject.command_step(scope, step)
@@ -271,7 +273,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#script_step" do
-    let(:step) do
+    let(:step_body) do
       { 'script' => 'mymodule/myscript.sh',
         'targets' => 'foo.example.com',
         'arguments' => %w[a b c] }
@@ -285,16 +287,16 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'succeeds if no arguments are specified' do
-      step.delete('arguments')
+      step_body.delete('arguments')
 
-      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
+      args = ['mymodule/myscript.sh', 'foo.example.com']
       expect(scope).to receive(:call_function).with('run_script', args)
 
       subject.script_step(scope, step)
     end
 
     it 'succeeds if empty arguments are specified' do
-      step['arguments'] = []
+      step_body['arguments'] = []
 
       args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
       expect(scope).to receive(:call_function).with('run_script', args)
@@ -303,7 +305,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'succeeds if nil arguments are specified' do
-      step['arguments'] = nil
+      step_body['arguments'] = nil
 
       args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
       expect(scope).to receive(:call_function).with('run_script', args)
@@ -312,7 +314,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'supports a description' do
-      step['description'] = 'run the script'
+      step_body['description'] = 'run the script'
 
       args = ['mymodule/myscript.sh', 'foo.example.com', 'run the script', 'arguments' => %w[a b c]]
       expect(scope).to receive(:call_function).with('run_script', args)
@@ -322,7 +324,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#upload_step" do
-    let(:step) do
+    let(:step_body) do
       { 'upload' => 'mymodule/file.txt',
         'destination' => '/path/to/file.txt',
         'targets' => 'foo.example.com' }
@@ -336,7 +338,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'supports a description' do
-      step['description'] = 'upload the file'
+      step_body['description'] = 'upload the file'
 
       args = ['mymodule/file.txt', '/path/to/file.txt', 'foo.example.com', 'upload the file']
       expect(scope).to receive(:call_function).with('upload_file', args)
@@ -350,7 +352,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     let(:destination) { 'downloads' }
     let(:target)      { 'foo.example.com' }
 
-    let(:step) do
+    let(:step_body) do
       {
         'download'    => source,
         'destination' => destination,
@@ -366,7 +368,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
 
     it 'supports a description' do
-      step['description'] = 'download the file'
+      step_body['description'] = 'download the file'
 
       args = [source, destination, target, 'download the file']
       expect(scope).to receive(:call_function).with('download_file', args)
@@ -376,7 +378,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#eval_step" do
-    let(:step) do
+    let(:step_body) do
       { 'eval' => 55 }
     end
 
@@ -386,7 +388,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
   end
 
   describe "#resources_step" do
-    let(:step) do
+    let(:step_body) do
       { 'resources' => resources,
         'targets' => target }
     end
@@ -410,7 +412,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
 
     it 'builds and applies a manifest' do
       # We need to normalize the resources by creating a step instance
-      step_body = Bolt::PAL::YamlPlan::Step::Resources.new(step).body
+      step = Bolt::PAL::YamlPlan::Step::Resources.new(step_body)
 
       expected = [{ 'type' => 'package', 'title' => 'nginx', 'parameters' => {} },
                   { 'type' => 'service', 'title' => 'nginx', 'parameters' => {} }]
@@ -418,7 +420,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
       expect(subject).to receive(:generate_manifest).with(expected).and_return('mymanifest')
       expect(subject).to receive(:apply_manifest).with(scope, target, 'mymanifest')
 
-      subject.resources_step(scope, step_body)
+      subject.resources_step(scope, step)
     end
 
     it 'succeeds if no resources are specified' do

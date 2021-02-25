@@ -5,18 +5,13 @@ module Bolt
     class YamlPlan
       class Step
         class Resources < Step
-          def self.allowed_keys
-            super + Set['resources']
-          end
-
           def self.required_keys
-            Set['targets']
+            Set['resources', 'targets']
           end
 
-          def initialize(step_body)
+          def initialize(body)
             super
-            @resources = step_body['resources']
-            @normalized_resources = normalize_resources(@resources)
+            @body['resources'] = normalize_resources(@body['resources'])
           end
 
           def self.validate(body, step_number)
@@ -26,19 +21,19 @@ module Bolt
               if resource['type'] || resource['title']
                 if !resource['type']
                   err = "Resource declaration must include type key if title key is set"
-                  raise step_error(err, body['name'], step_number)
+                  raise StepError.new(err, body['name'], step_number)
                 elsif !resource['title']
                   err = "Resource declaration must include title key if type key is set"
-                  raise step_error(err, body['name'], step_number)
+                  raise StepError.new(err, body['name'], step_number)
                 end
               else
                 type_keys = (resource.keys - ['parameters'])
                 if type_keys.empty?
                   err = "Resource declaration is missing a type"
-                  raise step_error(err, body['name'], step_number)
+                  raise StepError.new(err, body['name'], step_number)
                 elsif type_keys.length > 1
                   err = "Resource declaration has ambiguous type: could be #{type_keys.join(' or ')}"
-                  raise step_error(err, body['name'], step_number)
+                  raise StepError.new(err, body['name'], step_number)
                 end
               end
             end
@@ -59,25 +54,19 @@ module Bolt
             end
           end
 
-          def body
-            @body.merge('resources' => @normalized_resources)
-          end
-
           def transpile
             code = StringIO.new
 
             code.print "  "
-            fn = 'apply_prep'
-            args = [@targets]
-            code << function_call(fn, args)
+            code << function_call('apply_prep', [@body['targets']])
             code.print "\n"
 
             code.print "  "
-            code.print "$#{@name} = " if @name
+            code.print "$#{@body['name']} = " if @body['name']
 
-            code.puts "apply(#{Bolt::Util.to_code(@targets)}) {"
+            code.puts "apply(#{Bolt::Util.to_code(@body['targets'])}) {"
 
-            declarations = @normalized_resources.map do |resource|
+            declarations = @body['resources'].map do |resource|
               type = resource['type'].is_a?(EvaluableString) ? resource['type'].value : resource['type']
               title = Bolt::Util.to_code(resource['title'])
               parameters = resource['parameters'].transform_values do |val|

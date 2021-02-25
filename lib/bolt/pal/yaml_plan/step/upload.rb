@@ -5,30 +5,30 @@ module Bolt
     class YamlPlan
       class Step
         class Upload < Step
-          def self.allowed_keys
-            super + Set['destination', 'upload']
+          def self.option_keys
+            Set['catch_errors', 'run_as']
           end
 
           def self.required_keys
-            Set['upload', 'destination', 'targets']
+            Set['destination', 'targets', 'upload']
           end
 
-          def initialize(step_body)
-            super
-            @source = step_body['upload']
-            @destination = step_body['destination']
+          # Returns an array of arguments to pass to the step's function call
+          #
+          def args
+            args = [@body['upload'], @body['destination'], @body['targets']]
+            args << @body['description'] if @body['description']
+            args << options if options.any?
+
+            args
           end
 
+          # Transpiles the step into the plan language
+          #
           def transpile
             code = String.new("  ")
-            code << "$#{@name} = " if @name
-
-            fn = 'upload_file'
-            args = [@source, @destination, @targets]
-            args << @description if @description
-
-            code << function_call(fn, args)
-
+            code << "$#{@body['name']} = " if @body['name']
+            code << function_call('upload_file', args)
             code << "\n"
           end
         end

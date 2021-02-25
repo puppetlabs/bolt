@@ -13,103 +13,55 @@ module Bolt
         end
 
         def dispatch_step(scope, step)
-          step_body = evaluate_code_blocks(scope, step.body)
+          step.body = evaluate_code_blocks(scope, step.body)
 
           # Dispatch based on the step class name
           step_type = step.class.name.split('::').last.downcase
           method = "#{step_type}_step"
 
-          send(method, scope, step_body)
+          send(method, scope, step)
         end
 
         def task_step(scope, step)
-          task = step['task']
-          targets = step['targets']
-          description = step['description']
-          params = step['parameters'] || {}
-
-          args = if description
-                   [task, targets, description, params]
-                 else
-                   [task, targets, params]
-                 end
-
-          scope.call_function('run_task', args)
+          scope.call_function('run_task', step.args)
         end
 
         def plan_step(scope, step)
-          plan = step['plan']
-          parameters = step['parameters'] || {}
-
-          args = [plan, parameters]
-
-          scope.call_function('run_plan', args)
+          scope.call_function('run_plan', step.args)
         end
 
         def script_step(scope, step)
-          script = step['script']
-          targets = step['targets']
-          description = step['description']
-          arguments = step['arguments'] || []
-
-          options = { 'arguments' => arguments }
-          args = if description
-                   [script, targets, description, options]
-                 else
-                   [script, targets, options]
-                 end
-
-          scope.call_function('run_script', args)
+          scope.call_function('run_script', step.args)
         end
 
         def command_step(scope, step)
-          command = step['command']
-          targets = step['targets']
-          description = step['description']
-
-          args = [command, targets]
-          args << description if description
-          scope.call_function('run_command', args)
+          scope.call_function('run_command', step.args)
         end
 
         def upload_step(scope, step)
-          source = step['upload']
-          destination = step['destination']
-          targets = step['targets']
-          description = step['description']
-
-          args = [source, destination, targets]
-          args << description if description
-          scope.call_function('upload_file', args)
+          scope.call_function('upload_file', step.args)
         end
 
         def download_step(scope, step)
-          source = step['download']
-          destination = step['destination']
-          targets = step['targets']
-          description = step['description']
-
-          args = [source, destination, targets]
-          args << description if description
-          scope.call_function('download_file', args)
+          scope.call_function('download_file', step.args)
         end
 
         def eval_step(_scope, step)
-          step['eval']
+          step.body['eval']
         end
 
         def resources_step(scope, step)
-          targets = step['targets']
+          targets = step.body['targets']
 
           # TODO: Only call apply_prep when needed
           scope.call_function('apply_prep', targets)
-          manifest = generate_manifest(step['resources'])
+          manifest = generate_manifest(step.body['resources'])
 
           apply_manifest(scope, targets, manifest)
         end
 
         def message_step(scope, step)
-          scope.call_function('out::message', [step['message']])
+          scope.call_function('out::message', step.args)
         end
 
         def generate_manifest(resources)
@@ -158,7 +110,7 @@ module Bolt
             plan.steps.each do |step|
               step_result = dispatch_step(scope, step)
 
-              scope.setvar(step.name, step_result) if step.name
+              scope.setvar(step.body['name'], step_result) if step.body['name']
             end
 
             evaluate_code_blocks(scope, plan.return)

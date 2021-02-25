@@ -6,30 +6,35 @@ module Bolt
       class Step
         class Task < Step
           def self.allowed_keys
-            super + Set['task', 'parameters']
+            super + Set['parameters']
+          end
+
+          def self.option_keys
+            Set['catch_errors', 'noop', 'run_as']
           end
 
           def self.required_keys
-            Set['targets']
+            Set['targets', 'task']
           end
 
-          def initialize(step_body)
-            super
-            @task = step_body['task']
-            @parameters = step_body.fetch('parameters', {})
+          # Returns an array of arguments to pass to the step's function call
+          #
+          def args
+            params = (@body['parameters'] || {}).merge(options)
+
+            args = [@body['task'], @body['targets']]
+            args << @body['description'] if @body['description']
+            args << params if params.any?
+
+            args
           end
 
+          # Transpiles the step into the plan language
+          #
           def transpile
             code = String.new("  ")
-            code << "$#{@name} = " if @name
-
-            fn = 'run_task'
-            args = [@task, @targets]
-            args << @description if @description
-            args << @parameters unless @parameters.empty?
-
-            code << function_call(fn, args)
-
+            code << "$#{@body['name']} = " if @body['name']
+            code << function_call('run_task', args)
             code << "\n"
           end
         end
