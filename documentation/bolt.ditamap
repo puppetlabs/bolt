@@ -62,7 +62,8 @@
             <topicmeta>
                 <shortdesc>Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.</shortdesc>
             </topicmeta>
-        </topicref>       
+        </topicref>
+        <topicref href="testing_plans.md" format="markdown"/>
     </topicref>    
     <topicref href="tasks.md" format="markdown" navtitle="Tasks" locktitle="yes">
         <topicref href="inspecting_tasks.md" format="markdown">
@@ -120,6 +121,7 @@
         <topicref href="bolt_defaults_reference.md" format="markdown"/>
         <topicref href="bolt_project_reference.md" format="markdown"/>
         <topicref href="bolt_inventory_reference.md" format="markdown"/>
+        <topicref href="boltspec_reference.md" format="markdown"/>
     </topichead>
     <topicref href="troubleshooting.md" format="markdown"/>
 </map>

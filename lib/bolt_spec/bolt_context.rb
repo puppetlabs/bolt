@@ -130,8 +130,13 @@ module BoltSpec
       @executor ||= BoltSpec::Plans::MockExecutor.new(modulepath)
     end
 
-    # Override in your tests
+    # Overrides inventory for tests.
     def inventory_data
+      {}
+    end
+
+    # Overrides configuration for tests.
+    def config_data
       {}
     end
 
@@ -142,7 +147,7 @@ module BoltSpec
     # Override in your tests
     def config
       @config ||= begin
-        conf = Bolt::Config.default
+        conf = Bolt::Config.new(Bolt::Project.default_project, config_data)
         conf.modulepath = [modulepath].flatten
         conf
       end
@@ -161,7 +166,7 @@ module BoltSpec
     BoltSpec::Plans::MOCKED_ACTIONS.each do |action|
       # Allowed action stubs can be called up to be_called_times number of times
       define_method :"allow_#{action}" do |object|
-        executor.send(:"stub_#{action}", object).add_stub
+        executor.send(:"stub_#{action}", object).add_stub(inventory)
       end
 
       # Expected action stubs must be called exactly the expected number of times
@@ -172,7 +177,7 @@ module BoltSpec
 
       # This stub will catch any action call if there are no stubs specifically for that task
       define_method :"allow_any_#{action}" do
-        executor.send(:"stub_#{action}", :default).add_stub
+        executor.send(:"stub_#{action}", :default).add_stub(inventory)
       end
     end
 
