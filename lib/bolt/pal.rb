@@ -215,6 +215,7 @@ module Bolt
     def with_bolt_executor(executor, inventory, pdb_client = nil, applicator = nil, &block)
       setup
       opts = {
+        bolt_project: @project,
         bolt_executor: executor,
         bolt_inventory: inventory,
         bolt_pdb_client: pdb_client,
