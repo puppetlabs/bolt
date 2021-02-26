@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE map PUBLIC "-//OASIS//DTD DITA Map//EN" "map.dtd">
 <map id="boltmap" title="Bolt">
+    <topicmeta>
+        <prodinfo>
+            <prodname>bolt</prodname>
+            <vrmlist>
+                <vrm version="latest"/>
+            </vrmlist>
+        </prodinfo>
+    </topicmeta>
     <topicref href="bolt.md" format="markdown" linking="targetonly">
         <topicref href="developer_updates.md" format="markdown"/>
         <topicref navtitle="Changelog" href="https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md" format="html" scope="external" />
