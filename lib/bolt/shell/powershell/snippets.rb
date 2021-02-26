@@ -72,7 +72,7 @@ module Bolt
             }
 
             if([string]::IsNullOrEmpty($invokeArgs.ScriptBlock)){
-              $Host.UI.WriteErrorLine("Error: Failed to obtain scriptblock from '#{script_path}'. Running scripts may be disabled on this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170");
+              $Host.UI.WriteErrorLine("Error: Failed to obtain scriptblock from '#{script_path}'. Running scripts might be disabled on this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170");
               exit 1;
             }
 
