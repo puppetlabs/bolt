@@ -362,8 +362,8 @@ module BoltServer
       }
     end
 
-    def allowed_helper(metadata, allowlist)
-      allowed = allowlist.nil? || allowlist.include?(metadata['name'])
+    def allowed_helper(pal, metadata, allowlist)
+      allowed = !pal.filter_content([metadata['name']], allowlist).empty?
       metadata.merge({ 'allowed' => allowed })
     end
 
@@ -537,7 +537,7 @@ module BoltServer
       return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
       in_bolt_project(params['versioned_project']) do |context|
         plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
-        plan_info = allowed_helper(plan_info, context[:config].project.plans)
+        plan_info = allowed_helper(context[:pal], plan_info, context[:config].project.plans)
         [200, plan_info.to_json]
       end
     rescue Bolt::Error => e
@@ -567,7 +567,7 @@ module BoltServer
           'versioned_project' => params['versioned_project']
         }
         task_info = pe_task_info(context[:pal], params[:module_name], params[:task_name], ps_parameters)
-        task_info = allowed_helper(task_info, context[:config].project.tasks)
+        task_info = allowed_helper(context[:pal], task_info, context[:config].project.tasks)
         [200, task_info.to_json]
       end
     rescue Bolt::Error => e
@@ -607,7 +607,7 @@ module BoltServer
         plans_response = plan_list(context[:pal])
 
         # Dig in context for the allowlist of plans from project object
-        plans_response.map! { |metadata| allowed_helper(metadata, context[:config].project.plans) }
+        plans_response.map! { |metadata| allowed_helper(context[:pal], metadata, context[:config].project.plans) }
 
         # We structure this array of plans to be an array of hashes so that it matches the structure
         # returned by the puppetserver API that serves data like this. Structuring the output this way
@@ -643,7 +643,7 @@ module BoltServer
         tasks_response = task_list(context[:pal])
 
         # Dig in context for the allowlist of tasks from project object
-        tasks_response.map! { |metadata| allowed_helper(metadata, context[:config].project.tasks) }
+        tasks_response.map! { |metadata| allowed_helper(context[:pal], metadata, context[:config].project.tasks) }
 
         # We structure this array of tasks to be an array of hashes so that it matches the structure
         # returned by the puppetserver API that serves data like this. Structuring the output this way
