@@ -5,6 +5,10 @@ module Bolt
     class YamlPlan
       class Step
         class Resources < Step
+          def self.option_keys
+            Set['catch_errors', 'description', 'noop', 'run_as']
+          end
+
           def self.required_keys
             Set['resources', 'targets']
           end
@@ -14,13 +18,25 @@ module Bolt
             @body['resources'] = normalize_resources(@body['resources'])
           end
 
+          # Returns an array of arguments to pass to the apply function call
+          #
+          private def format_args(body)
+            opts = format_options(body)
+
+            args = [body['targets']]
+            args << opts if opts.any?
+
+            args
+          end
+
           def evaluate(scope, evaluator)
             evaluated = evaluator.evaluate_code_blocks(scope, body)
 
             scope.call_function('apply_prep', evaluated['targets'])
 
-            manifest = generate_manifest(evaluated['resources'])
-            apply_manifest(scope, evaluated['targets'], manifest)
+            apply_args = format_args(evaluated)
+            manifest   = generate_manifest(evaluated['resources'])
+            apply_manifest(scope, apply_args, manifest)
           end
 
           # Generates a manifest from the resources
@@ -59,11 +75,11 @@ module Bolt
 
           # Applies the manifest block on the targets
           #
-          private def apply_manifest(scope, targets, manifest)
+          private def apply_manifest(scope, args, manifest)
             ast = self.class.parse_code_string(manifest)
             apply_block = ast.body.body
             applicator = Puppet.lookup(:apply_executor)
-            applicator.apply([targets], apply_block, scope)
+            applicator.apply(args, apply_block, scope)
           end
 
           def self.validate(body, step_number)
@@ -112,15 +128,17 @@ module Bolt
             code = StringIO.new
 
             code.print "  "
-            code << function_call('apply_prep', [@body['targets']])
+            code << function_call('apply_prep', [body['targets']])
             code.print "\n"
 
             code.print "  "
-            code.print "$#{@body['name']} = " if @body['name']
+            code.print "$#{body['name']} = " if body['name']
 
-            code.puts "apply(#{Bolt::Util.to_code(@body['targets'])}) {"
+            code << function_call('apply', format_args(body))
 
-            declarations = @body['resources'].map do |resource|
+            code.print " {\n"
+
+            declarations = body['resources'].map do |resource|
               type = resource['type'].is_a?(EvaluableString) ? resource['type'].value : resource['type']
               title = Bolt::Util.to_code(resource['title'])
               parameters = resource['parameters'].transform_values do |val|

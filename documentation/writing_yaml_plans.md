@@ -77,7 +77,7 @@ Each plan name segment must begin with a lowercase letter and:
 
 ## Plan structure
 
-YAML plans contain a list of steps and can include additional optional keys.
+YAML plans contain a list of steps and can include optional top-level keys.
 The following top-level keys are available:
 
 | Key | Type | Description | Required |
@@ -93,14 +93,14 @@ The following top-level keys are available:
 The `steps` key is an array of step objects, each of which corresponds to a
 specific action to take.
 
-When the plan runs, each step is executed in order. By default, if a step fails
-the plan halts execution and raises an error containing the result of the step
-that failed.
+When the plan runs, each step is executed in order. If a step fails the plan
+halts execution and raises an error containing the result of the step that
+failed.
 
 ### Message step
 
-Use a `message` step to print a message. This will print a message to standard
-out (stdout) when using the `human` output format, and print to standard error
+Use a `message` step to print a message. The step prints a message to standard
+out (stdout) when using the `human` output format, and prints to standard error
 (stderr) when using the `json` output format. 
 
 Message steps support the following keys:
@@ -134,7 +134,7 @@ Command steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
 | `command` | `String` | The command to run. | ✓ |
 | `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `env_vars` | `Hash` | A map of environment variables to set on the target when running the command. | |
@@ -162,7 +162,7 @@ Task steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
 | `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `name` | `String` | The name of the variable to save the step result to. | |
 | `noop` | `Boolean` | Whether to run in no-operation mode, if available. | |
@@ -199,7 +199,7 @@ Script steps support the following keys:
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
 | `arguments` | `Array` | An array of command-line arguments to pass to the script. | |
-| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
 | `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `env_vars` | `Hash` | A map of environment variables to set on the target when running the script. | |
 | `name` | `String` | The name of the variable to save the step result to. | |
@@ -236,7 +236,7 @@ File download steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
 | `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `destination` | `String` | The destination directory to download the file to. | ✓ |
 | `download` | `String` | The location of the remote file to download. | ✓ |
@@ -283,7 +283,7 @@ File upload steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
 | `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `destination` | `String` | The remote location to upload the file to. | ✓ |
 | `name` | `String` | The name of the variable to save the step result to. | |
@@ -316,7 +316,7 @@ Plan steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan will continue execution if the step fails. | |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
 | `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `name` | `String` | The name of the variable to save the step result to. | |
 | `parameters` | `Hash` | A map of parameters to pass to the plan. | |
@@ -353,8 +353,12 @@ Resources steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
+| `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
+| `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `name` | `String` | The name of the variable to save the step result to. | |
+| `noop` | `Boolean` | Whether to run in no-operation mode. If set to true, applies the resources in Puppet no-operation mode, returning a report of the changes it would make while taking no action. | |
 | `resources` | `Array` | An array of resources to apply. | ✓ |
+| `run_as` | `String` | The user to run as when connecting to targets. Only applies to targets using a transport that supports `run-as` configuration. | |
 | `targets` | `Array`, `String` | A target or list of targets to run the script on. | ✓ |
 
 Each resource is a YAML map with a type and title, and optionally a `parameters`
@@ -381,6 +385,34 @@ steps:
       - web2.example.com
       - web3.example.com
     description: "Set up nginx on the webservers"
+```
+
+### Eval step
+
+The `eval` step evaluates an expression and saves the result in a variable. This
+is useful to compute a variable to use multiple times later.
+
+Eval steps support the following keys:
+
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `eval` | `Array`, `Boolean`, `Hash`, `Number`, `String` | The expression to evaluate. | ✓ |
+| `name` | `String` | The name of the variable to save the step result to. | |
+
+For example:
+
+```yaml
+parameters:
+  count:
+    type: Integer
+
+steps:
+  - name: double_count
+    eval: $count * 2
+  - task: echo
+    targets: web1.example.com
+    parameters:
+      message: "The count is ${count}, and twice the count is ${double_count}"
 ```
 
 ## Parameters
@@ -611,25 +643,6 @@ steps:
   - task: echo
     parameters:
       message: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }.join(',')
-```
-
-### `eval` step
-
-The `eval` step evaluates an expression and saves the result in a variable. This
-is useful to compute a variable to use multiple times later.
-
-```yaml
-parameters:
-  count:
-    type: Integer
-
-steps:
-  - name: double_count
-    eval: $count * 2
-  - task: echo
-    targets: web1.example.com
-    parameters:
-      message: "The count is ${count}, and twice the count is ${double_count}"
 ```
 
 ## Returning results

@@ -414,7 +414,7 @@ describe Bolt::PAL::YamlPlan::Evaluator do
 
       allow(step).to receive(:apply_manifest)
       expect(step).to receive(:generate_manifest).with(expected).and_return('mymanifest')
-      expect(step).to receive(:apply_manifest).with(scope, target, 'mymanifest')
+      expect(step).to receive(:apply_manifest).with(scope, [target], 'mymanifest')
 
       step.evaluate(scope, subject)
     end

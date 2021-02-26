@@ -86,7 +86,7 @@ module Bolt
         # Formats a list of args from the provided body
         #
         private def format_args(_body)
-          raise NotImplementedError, "Step class #{self.class} does not implement #args"
+          raise NotImplementedError, "Step class #{self.class} does not implement #format_args"
         end
 
         # Returns the step's corresponding Puppet language function call
