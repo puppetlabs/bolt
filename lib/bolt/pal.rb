@@ -385,7 +385,7 @@ module Bolt
           plan_cache[plan_name] = info
         end
 
-        list << [plan_name] unless info['private']
+        list << [plan_name, info['description']] unless info['private']
       end
 
       File.write(@project.plan_cache_file, plan_cache.to_json) if updated
