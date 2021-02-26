@@ -210,6 +210,25 @@ describe "BoltServer::TransportApp" do
         end
       end
 
+      context 'allowlist contains a glob' do
+        let(:plan) do
+          "/project_plans/bolt_server_test_project/allowlist_glob?versioned_project=bolt_server_test_project"
+        end
+        let(:expected_response) {
+          {
+            'name' => 'bolt_server_test_project::allowlist_glob',
+            'description' => 'Project plan testing',
+            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
+            'allowed' => true
+          }
+        }
+        it 'properly filters allowed and disallowed plans' do
+          get(plan)
+          resp = JSON.parse(last_response.body)
+          expect(resp).to eq(expected_response)
+        end
+      end
+
       context 'with non-existant plan' do
         let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
         it 'returns 400 if an unknown plan error is thrown' do
@@ -228,7 +247,8 @@ describe "BoltServer::TransportApp" do
             metadata = JSON.parse(last_response.body)
             expect(metadata).to include(
               { 'name' => 'bolt_server_test_project', 'allowed' => true },
-              { 'name' => 'bolt_server_test_project::simple_plan', 'allowed' => false }
+              { 'name' => 'bolt_server_test_project::simple_plan', 'allowed' => false },
+              { 'name' => 'bolt_server_test_project::allowlist_glob', 'allowed' => true }
             )
           end
         end
@@ -272,7 +292,8 @@ describe "BoltServer::TransportApp" do
           metadata = JSON.parse(last_response.body)
           expect(metadata).to include(
             { 'name' => 'bolt_server_test_project', 'allowed' => true },
-            { 'name' => 'bolt_server_test_project::hidden', 'allowed' => false }
+            { 'name' => 'bolt_server_test_project::hidden', 'allowed' => false },
+            { 'name' => 'bolt_server_test_project::allowlist_glob', 'allowed' => true }
           )
         end
       end
