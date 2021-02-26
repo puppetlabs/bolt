@@ -19,7 +19,7 @@ plan puppet_connect::test_input_data(TargetSpec $targets = 'all') {
         $private_key_config = dig($target.config, 'ssh', 'private-key')
         if $private_key_config =~ String {
           $msg = @("END")
-            The SSH private key of the ${$target.name} target points to a filepath on disk,
+            The SSH private key of the ${$target} target points to a filepath on disk,
             which is not allowed in Puppet Connect. Instead, the private key contents must
             be specified and this should be done via the PuppetConnectData plugin. Below is
             an example of a Puppet Connect-compatible specification of the private-key. First,
@@ -39,7 +39,7 @@ plan puppet_connect::test_input_data(TargetSpec $targets = 'all') {
             | END
 
           out::message($msg)
-          fail_plan("The SSH private key of the ${$target.name} target points to a filepath on disk")
+          fail_plan("The SSH private key of the ${$target} target points to a filepath on disk")
         }
 
         # Disable SSH autoloading to prevent false positive results
