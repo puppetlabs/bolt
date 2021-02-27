@@ -229,7 +229,7 @@ module Bolt
         @stream.puts total_msg
       end
 
-      def format_table(results, padding_left = 0, padding_right = 3)
+      def format_table(results, padding_left = 0, padding_right = 3, separators: false)
         # lazy-load expensive gem code
         require 'terminal-table'
 
@@ -242,7 +242,8 @@ module Bolt
             padding_left: padding_left,
             padding_right: padding_right,
             border_top: false,
-            border_bottom: false
+            border_bottom: false,
+            all_separators: separators
           }
         )
       end
@@ -269,78 +270,109 @@ module Bolt
 
       # @param [Hash] task A hash representing the task
       def print_task_info(task)
-        # Building lots of strings...
-        pretty_params = +""
-        task_info = +""
+        params = []
+
         usage = if Bolt::Util.powershell?
                   +"Invoke-BoltTask -Name #{task.name} -Targets <targets>"
                 else
                   +"bolt task run #{task.name} --targets <targets>"
                 end
 
-        task.parameters&.each do |k, v|
-          pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
-          pretty_params << "    Default: #{v['default'].inspect}\n" if v.key?('default')
-          pretty_params << "    #{v['description']}\n" if v['description']
-          usage << if v['type'].start_with?("Optional")
-                     " [#{k}=<value>]"
-                   else
-                     " #{k}=<value>"
-                   end
-        end
+        module_path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
+        module_path = 'built-in module' if module_path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
 
         if task.supports_noop
           usage << Bolt::Util.powershell? ? '[-Noop]' : '[--noop]'
         end
 
-        task_info << "\n#{task.name}"
-        task_info << " - #{task.description}" if task.description
-        task_info << "\n\n"
-        task_info << "USAGE:\n#{usage}\n\n"
-        task_info << "PARAMETERS:\n#{pretty_params}\n" unless pretty_params.empty?
-        task_info << "MODULE:\n"
+        task.parameters&.each do |name, info|
+          type = info['type'] || 'Any'
 
-        path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
-        task_info << if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
-                       "built-in module"
-                     else
-                       path
-                     end
-        @stream.puts(task_info)
+          description = +""
+          description << wrap(info['description']) if info['description']
+          description << "\n#{type}"
+          description << "\nDefault: #{info['default'].inspect}" if info.key?('default')
+
+          params << [name, description.strip]
+          usage << if info.key?('default') || info['type'].start_with?('Optional')
+                     " [#{name}=<value>]"
+                   else
+                     " #{name}=<value>"
+                   end
+        end
+
+        # Format the info
+        info = +""
+        info << colorize(:cyan, task.name)
+        info << "\n"
+        info << indent(2, wrap(task.description || 'No description available'))
+        info << "\n"
+        info << colorize(:cyan, 'Usage')
+        info << "\n"
+        info << indent(2, wrap(usage))
+        info << "\n"
+
+        if params.any?
+          info << colorize(:cyan, 'Parameters')
+          info << "\n"
+          info << format_table(params, 2, separators: true).to_s
+          info << "\n"
+        end
+
+        info << colorize(:cyan, 'Module')
+        info << "\n"
+        info << indent(2, module_path)
+
+        @stream.puts info
       end
 
       # @param [Hash] plan A hash representing the plan
       def print_plan_info(plan)
-        # Building lots of strings...
-        pretty_params = +""
-        plan_info = +""
+        params = []
+
         usage = if Bolt::Util.powershell?
                   +"Invoke-BoltPlan -Name #{plan['name']}"
                 else
                   +"bolt plan run #{plan['name']}"
                 end
 
-        plan['parameters'].each do |name, p|
-          pretty_params << "- #{name}: #{p['type']}\n"
-          pretty_params << "    Default: #{p['default_value']}\n" unless p['default_value'].nil?
-          pretty_params << "    #{p['description']}\n" if p['description']
-          usage << (p.include?('default_value') ? " [#{name}=<value>]" : " #{name}=<value>")
+        module_path = if plan['module'].start_with?(Bolt::Config::Modulepath::MODULES_PATH)
+                        'built-in module'
+                      else
+                        plan['module']
+                      end
+
+        plan['parameters'].each do |name, info|
+          description = +""
+          description << wrap(info['description']) if info['description']
+          description << "\n#{info['type']}"
+          description << "\nDefault: #{info['default_value']}" if info.key?('default_value')
+          params << [name, description.strip]
+          usage << (info.include?('default_value') ? " [#{name}=<value>]" : " #{name}=<value>")
         end
 
-        plan_info << "\n#{plan['name']}"
-        plan_info << " - #{plan['description']}" if plan['description']
-        plan_info << "\n\n"
-        plan_info << "USAGE:\n#{usage}\n\n"
-        plan_info << "PARAMETERS:\n#{pretty_params}\n" unless plan['parameters'].empty?
-        plan_info << "MODULE:\n"
+        info = +""
+        info << colorize(:cyan, plan['name'])
+        info << "\n"
+        info << indent(2, wrap(plan['description'] || 'No description available'))
+        info << "\n"
+        info << colorize(:cyan, 'Usage')
+        info << "\n"
+        info << indent(2, wrap(usage))
+        info << "\n"
 
-        path = plan['module']
-        plan_info << if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
-                       "built-in module"
-                     else
-                       path
-                     end
-        @stream.puts(plan_info)
+        if params.any?
+          info << colorize(:cyan, 'Parameters')
+          info << "\n"
+          info << format_table(params, 2, separators: true).to_s
+          info << "\n"
+        end
+
+        info << colorize(:cyan, 'Module')
+        info << "\n"
+        info << indent(2, module_path)
+
+        @stream.puts info
       end
 
       def print_plans(plans, modulepath)
