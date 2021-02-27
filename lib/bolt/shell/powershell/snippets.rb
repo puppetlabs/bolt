@@ -55,14 +55,35 @@ module Bolt
             }
             #{build_arg_list}
 
+            switch -regex ( Get-ExecutionPolicy )
+            {
+              '^AllSigned'
+              {
+                if ((Get-AuthenticodeSignature -File "#{script_path}").Status -ne 'Valid') {
+                  $Host.UI.WriteErrorLine("Error: Target host Powershell ExecutionPolicy is set to ${_} and script '#{script_path}' does not contain a valid signature.")
+                  exit 1;
+                }
+              }
+              '^Restricted'
+              {
+                $Host.UI.WriteErrorLine("Error: Target host Powershell ExecutionPolicy is set to ${_} which denies running any scripts on the target.")
+                exit 1;
+              }
+            }
+
+            if([string]::IsNullOrEmpty($invokeArgs.ScriptBlock)){
+              $Host.UI.WriteErrorLine("Error: Failed to obtain scriptblock from '#{script_path}'. Running scripts might be disabled on this system. For more information, see about_Execution_Policies at https:/go.microsoft.com/fwlink/?LinkID=135170");
+              exit 1;
+            }
+
             try
             {
               Invoke-Command @invokeArgs
             }
             catch
             {
-              Write-Error $_.Exception
-              exit 1
+              $Host.UI.WriteErrorLine("[$($_.FullyQualifiedErrorId)] Exception $($_.InvocationInfo.PositionMessage).`n$($_.Exception.Message)");
+              exit 1;
             }
             PS
           end
@@ -144,7 +165,7 @@ module Bolt
               [Parameter(Mandatory = $true)] $Text,
               [Parameter(Mandatory = $false)] [Text.Encoding] $Encoding = [Text.Encoding]::UTF8
             )
-          
+
             $Text | ConvertFrom-Json | ConvertFrom-PSCustomObject
             }
             PS
