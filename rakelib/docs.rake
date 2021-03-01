@@ -103,7 +103,7 @@ begin
         {
           name:        mod.first,
           description: match[:desc].strip,
-          url:         "https://github.com/puppetlabs/bolt/main/modules/#{mod.first}"
+          url:         "https://github.com/puppetlabs/bolt/tree/main/modules/#{mod.first}"
         }
       end
 
