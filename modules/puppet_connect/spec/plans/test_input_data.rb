@@ -48,15 +48,41 @@ describe 'puppet_connect::test_input_data' do
     end
   end
 
-  it 'sets load-config to false for ssh targets' do
+  context 'when the inventory specifies a filepath for the private key of an SSH target' do
+    let(:inventory_data) do
+      sup = super()
+      sup['targets'].first['config']['ssh']['private-key'] = '/path/to/foo_private_key'
+      sup
+    end
+
+    it 'prints a message to the user and returns an error result' do
+      expect_out_message
+      result = run_plan('puppet_connect::test_input_data', {})
+      expect(result.ok?).to be(false)
+      expect(result.value.msg).to match(%r{ssh_target})
+    end
+  end
+
+  it 'maintains configuration parity with Puppet Connect for ssh targets' do
     allow_command('echo Connected')
       .always_return({})
 
-    winrm_config_before = winrm_target.config
     run_plan('puppet_connect::test_input_data', {})
 
-    expect(ssh_target.config).to include('ssh' => { 'load-config' => false })
-    expect(winrm_target.config).to eql(winrm_config_before)
+    expect(ssh_target.config).to include('ssh')
+    ssh_config = ssh_target.config['ssh'] 
+    expect(ssh_config).to include('load-config' => false, 'host-key-check' => false)
+  end
+
+  it 'maintains configuration parity with Puppet Connect for winrm targets' do
+    allow_command('echo Connected')
+      .always_return({})
+
+    run_plan('puppet_connect::test_input_data', {})
+
+    expect(winrm_target.config).to include('winrm')
+    winrm_config = winrm_target.config['winrm'] 
+    expect(winrm_config).to include('ssl' => false, 'ssl-verify' => false)
   end
 
   it 'checks if the targets are connectable' do
@@ -78,5 +104,19 @@ describe 'puppet_connect::test_input_data' do
     winrm_result = result[1]
     expect(ssh_result.value).to include('stdout' => 'Connected')
     expect(winrm_result.value).to include('stdout' => 'Connected')
+  end
+
+  context 'when the inventory specifies the contents of the private key for an SSH target' do
+    let(:inventory_data) do
+      sup = super()
+      sup['targets'].first['config']['ssh']['private-key'] = { 'key-data' => 'foo_private_key' }
+      sup
+    end
+
+    it 'still works' do
+      allow_command('echo Connected')
+      result = run_plan('puppet_connect::test_input_data', {}).value
+      expect(result.ok).to be(true)
+    end
   end
 end

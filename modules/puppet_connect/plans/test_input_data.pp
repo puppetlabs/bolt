@@ -14,14 +14,50 @@
 plan puppet_connect::test_input_data(TargetSpec $targets = 'all') {
   $targs = get_targets($targets)
   $targs.each |$target| {
-    if $target.transport != 'ssh' and $target.transport != 'winrm' {
-      fail_plan("Inventory contains target ${target} with unsupported transport, must be ssh or winrm")
-    }
-    if $target.transport == 'ssh' {
-      # Disable SSH autoloading to prevent false positive results
-      # (input data is wrong but target is still connectable due
-      # to autoloaded config)
-      set_config($target, ['ssh', 'load-config'], false)
+    case $target.transport {
+      'ssh': {
+        $private_key_config = dig($target.config, 'ssh', 'private-key')
+        if $private_key_config =~ String {
+          $msg = @("END")
+            The SSH private key of the ${$target} target points to a filepath on disk,
+            which is not allowed in Puppet Connect. Instead, the private key contents must
+            be specified and this should be done via the PuppetConnectData plugin. Below is
+            an example of a Puppet Connect-compatible specification of the private-key. First,
+            we start with the inventory file:
+              ...
+              private-key:
+                _plugin: puppet_connect_data
+                key: ssh_private_key
+              ...
+
+            Next is the corresponding entry in the input data file:
+              ...
+              ssh_private_key:
+                key-data:
+                  <private_key_contents>
+              ...
+            | END
+
+          out::message($msg)
+          fail_plan("The SSH private key of the ${$target} target points to a filepath on disk")
+        }
+
+        # Disable SSH autoloading to prevent false positive results
+        # (input data is wrong but target is still connectable due
+        # to autoloaded config)
+        set_config($target, ['ssh', 'load-config'], false)
+        # Maintain configuration parity with Puppet Connect to improve
+        # the reliability of our test
+        set_config($target, ['ssh', 'host-key-check'], false)
+      }
+      'winrm': {
+        # Maintain configuration parity with Puppet Connect
+        set_config($target, ['winrm', 'ssl'], false)
+        set_config($target, ['winrm', 'ssl-verify'], false)
+      }
+      default: {
+        fail_plan("Inventory contains target ${target} with unsupported transport, must be ssh or winrm")
+      }
     }
   }
   # The SSH/WinRM transports will report an 'unknown host' error for targets where
