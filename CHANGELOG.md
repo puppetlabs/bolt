@@ -1,5 +1,57 @@
 # Changelog
 
+## Bolt 3.1.0 (2021-03-01)
+
+### New features
+
+* **Add Bolt Task directory to PSModulePath**
+  ([#2633](https://github.com/puppetlabs/bolt/pull/2633))
+
+  Add the bolt task target directory to the PSModulePath to allow Bolt tasks to
+  ship powershell modules that can be automatically imported
+
+* **Ship with `puppetlabs/powershell_task_helper` module**
+  ([#2639](https://github.com/puppetlabs/bolt/issues/2639))
+
+  Bolt now ships with the `puppetlabs/powershell_task_helper` module, which
+  includes helpers for writing tasks in PowerShell.
+
+* **Added `config_data` helper to `BoltSpec` library**
+  ([#2615](https://github.com/puppetlabs/bolt/issues/2615))
+
+  The `BoltSpec` library includes a new `config_data` helper which can be used
+  to set Bolt configuration in your plan unit tests.
+
+### Bug fixes
+
+* **Support Puppet file syntax for files in a Bolt project**
+  ([#2504](https://github.com/puppetlabs/bolt/issues/2504))
+
+  Bolt now supports Puppet file syntax (`puppet:///modules/<MODULE>/<FILE>`) in
+  apply blocks for files in a Bolt projec. Previously, apply blocks would not
+  compile if using this syntax for files in a Bolt project.
+
+* **Serialize Sensitive task output for `Result.to_data` method**
+  ([#2633](https://github.com/puppetlabs/bolt/pull/2663))
+
+  Previously, the `to_data` method on a `Result` object did not transform
+  `Sensitive` task output. Now, the `to_data` method serializes the output by
+  calling the `to_s` method on `Sensitive` output, which will simply print a
+  "value redacted" message.
+
+* **Improve error messages for `bolt script` in PowerShell**
+  ([#2659](https://github.com/puppetlabs/bolt/issues/2659))
+
+  Errors raised from running scripts in PowerShell on targets with an execution
+  policy of `Restricted` or `AllSigned` now include clearer messages.
+
+* **Expose inventory to `BoltSpec` stubs and mocks**
+  ([#2615](https://github.com/puppetlabs/bolt/issues/2615))
+
+  Stubs and mocks that use the `return_from_targets` modifier now have access to
+  Bolt's inventory. Previously, the inventory was not exposed to these stubs and
+  mocks, resulting in 'Undefined method' errors.
+
 ## Bolt 3.0.1 (2021-02-16)
 
 ### Bug fixes
