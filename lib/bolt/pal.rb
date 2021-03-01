@@ -446,7 +446,7 @@ module Bolt
             params[name] = { 'type' => param.types.first }
             params[name]['sensitive'] = param.types.first =~ /\ASensitive(\[.*\])?\z/ ? true : false
             params[name]['default_value'] = defaults[name] if defaults.key?(name)
-            params[name]['description'] = param.text unless param.text.empty?
+            params[name]['description'] = param.text if param.text && !param.text.empty?
           else
             Bolt::Logger.warn(
               "missing_plan_parameter",
