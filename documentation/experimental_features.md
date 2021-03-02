@@ -8,6 +8,23 @@ API may change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
+## LXD Transport
+
+This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-310-2021-3-08).
+
+The LXD transport supports connecting to Linux containers on the local system. Similar to the Docker
+transport, The LXD transport accepts the name of the container as the URI, and connects to the
+container by shelling out to the `lxc` command. The example inventory file below demonstrates
+connecting to a Linux container target named `ubuntuone`.
+
+```
+targets:
+  - uri: lxd://ubuntuone
+    config:
+      lxd:
+        tmpdir: /root/tmp
+```
+
 ## Plugin caching
 
 This feature was introduced in [Bolt

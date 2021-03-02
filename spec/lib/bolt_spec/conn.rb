@@ -27,8 +27,10 @@ module BoltSpec
         default_user     = ''
         default_password = ''
         default_host     = 'ubuntu_node'
+      when 'lxd'
+        default_host     = 'testlxd'
       else
-        raise Error, "The transport must be either 'ssh' or 'winrm'"
+        raise Error, "The transport must be either 'ssh', 'winrm', 'docker', or 'lxd'."
       end
 
       additional_config.merge(

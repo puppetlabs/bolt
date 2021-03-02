@@ -168,7 +168,7 @@ shared_examples 'transport api' do
       runner.run_command(target, "#{os_context[:rm_cmd]} #{remote_path}")
     end
 
-    it 'can download a diretory from a host' do
+    it 'can download a directory from a host' do
       Dir.mktmpdir(nil, Dir.pwd) do |tmp|
         dir_path = File.join(tmp, dir)
         subdir_path = File.join(dir_path, subdir)

@@ -45,6 +45,7 @@
                     "winrm",
                     "pcp",
                     "local",
+                    "lxd",
                     "docker",
                     "remote"
                   ]
@@ -237,6 +238,41 @@
                       "oneOf": [
                         {
                           "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "tmpdir": {
+                      "description": "The directory to upload and execute temporary files on the target.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "lxd": {
+              "description": "A map of configuration options for the LXD transport. The LXD transport is experimental and might include breaking changes between minor versions.",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "cleanup": {
+                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt may create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+                      "oneOf": [
+                        {
+                          "type": "boolean"
                         },
                         {
                           "$ref": "#/definitions/_plugin"

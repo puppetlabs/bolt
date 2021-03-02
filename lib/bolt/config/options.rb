@@ -4,6 +4,7 @@ require 'bolt/config/transport/ssh'
 require 'bolt/config/transport/winrm'
 require 'bolt/config/transport/orch'
 require 'bolt/config/transport/local'
+require 'bolt/config/transport/lxd'
 require 'bolt/config/transport/docker'
 require 'bolt/config/transport/remote'
 
@@ -17,6 +18,7 @@ module Bolt
         'winrm'  => Bolt::Config::Transport::WinRM,
         'pcp'    => Bolt::Config::Transport::Orch,
         'local'  => Bolt::Config::Transport::Local,
+        'lxd'    => Bolt::Config::Transport::LXD,
         'docker' => Bolt::Config::Transport::Docker,
         'remote' => Bolt::Config::Transport::Remote
       }.freeze
@@ -474,6 +476,13 @@ module Bolt
           type: Hash,
           _plugin: true,
           _example: { "cleanup" => false, "tmpdir" => "/tmp/bolt" }
+        },
+        "lxd" => {
+          description: "A map of configuration options for the LXD transport. The LXD transport is "\
+                       "experimental and might include breaking changes between minor versions.",
+          type: Hash,
+          _plugin: true,
+          _example: { cleanup: false }
         },
         "pcp" => {
           description: "A map of configuration options for the pcp transport.",

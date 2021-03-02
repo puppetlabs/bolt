@@ -91,6 +91,9 @@
         "local": {
           "$ref": "#/definitions/local"
         },
+        "lxd": {
+          "$ref": "#/definitions/lxd"
+        },
         "pcp": {
           "$ref": "#/definitions/pcp"
         },
@@ -341,6 +344,7 @@
             "winrm",
             "pcp",
             "local",
+            "lxd",
             "docker",
             "remote"
           ]
@@ -503,6 +507,39 @@
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/sudo-password"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "tmpdir": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tmpdir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "lxd": {
+      "description": "A map of configuration options for the LXD transport. The LXD transport is experimental and might include breaking changes between minor versions.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cleanup": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cleanup"
                 },
                 {
                   "$ref": "#/definitions/_plugin"

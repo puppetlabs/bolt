@@ -32,6 +32,17 @@ chown -R bolt:bolt /home/bolt/.ssh
 chmod 600 /home/bolt/.ssh/authorized_keys
 SCRIPT
 
+lxd_provision = <<LXD
+# This installs Ruby 2.7
+sudo apt install -y ruby-full
+sudo snap install lxd
+sudo gem install bundler
+sudo usermod -aG lxd vagrant
+sg lxd
+cat /home/vagrant/bolt/spec/lxd_config.yaml | lxd init --preseed
+lxc launch ubuntu:focal testlxd -c security.privileged=true
+LXD
+
 Vagrant.configure('2') do |config|
   config.vm.define :windows do |windows|
     windows.vm.box = 'mwrock/WindowsNano'
@@ -69,5 +80,11 @@ Vagrant.configure('2') do |config|
       linux.vm.provision 'file', source: 'spec/fixtures/keys/id_rsa.pub', destination: 'id_rsa.pub'
       linux.vm.provision 'shell', inline: linux_provision
     end
+  end
+
+  config.vm.define :lxd do |lxd|
+    lxd.vm.box = 'generic/ubuntu2004'
+    lxd.vm.synced_folder ".", "/home/vagrant/bolt", create: true, owner: 'vagrant'
+    lxd.vm.provision 'shell', inline: lxd_provision
   end
 end
