@@ -6,7 +6,7 @@ module Bolt
       class Step
         class Script < Step
           def self.allowed_keys
-            super + Set['arguments']
+            super + Set['arguments', 'pwsh_params']
           end
 
           def self.option_keys
@@ -17,11 +17,27 @@ module Bolt
             Set['script', 'targets']
           end
 
+          def self.validate_step_keys(body, number)
+            super
+
+            if body.key?('arguments') && !body['arguments'].nil? && !body['arguments'].is_a?(Array)
+              raise StepError.new('arguments key must be an array', body['name'], number)
+            end
+
+            if body.key?('pwsh_params') && !body['pwsh_params'].nil? && !body['pwsh_params'].is_a?(Hash)
+              raise StepError.new('pwsh_params key must be a hash', body['name'], number)
+            end
+          end
+
           # Returns an array of arguments to pass to the step's function call
           #
           private def format_args(body)
+            args        = body['arguments'] || []
+            pwsh_params = body['pwsh_params'] || {}
+
             opts = format_options(body)
-            opts = opts.merge('arguments' => body['arguments'] || []) if body.key?('arguments')
+            opts = opts.merge('arguments' => args) if args.any?
+            opts = opts.merge('pwsh_params' => pwsh_params) if pwsh_params.any?
 
             args = [body['script'], body['targets']]
             args << body['description'] if body['description']

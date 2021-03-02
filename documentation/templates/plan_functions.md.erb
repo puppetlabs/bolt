@@ -19,7 +19,6 @@ functions](https://puppet.com/docs/puppet/latest/writing_custom_functions.html).
 <%= sig['desc'].lines.drop(1).join %>
 <% end -%>
 
-
 ```
 <%= sig['signature'] %>
 ```
@@ -41,7 +40,7 @@ This function<%= func['signatures'].count == 1 ? '' : ' signature' %> accepts th
 | --- | --- | --- |
 <% sig['options'].each do |name, data| -%>
 | `<%= name %>` | `<%= data['type'] %>` | <%= data['desc'] %> |
-<% end -%>
+<% end %>
 <% end -%>
 <% end -%>
 

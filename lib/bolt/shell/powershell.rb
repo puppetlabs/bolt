@@ -208,16 +208,21 @@ module Bolt
         arguments = unwrap_sensitive_args(arguments)
         with_tmpdir do |dir|
           script_path = write_executable(dir, script)
-          command = if powershell_file?(script_path)
+          command = if powershell_file?(script_path) && options[:pwsh_params]
+                      # Scripts run with pwsh_params can be run like tasks
+                      Snippets.ps_task(script_path, options[:pwsh_params])
+                    elsif powershell_file?(script_path)
                       Snippets.run_script(arguments, script_path)
                     else
                       path, args = *process_from_extension(script_path)
                       args += escape_arguments(arguments)
                       execute_process(path, args)
                     end
-          command = [*env_declarations(options[:env_vars]), command].join("\r\n") if options[:env_vars]
+          env_assignments = options[:env_vars] ? env_declarations(options[:env_vars]) : []
+          shell_init = options[:pwsh_params] ? Snippets.shell_init : ''
 
-          output = execute(command)
+          output = execute([shell_init, *env_assignments, command].join("\r\n"))
+
           Bolt::Result.for_command(target,
                                    output.stdout.string,
                                    output.stderr.string,

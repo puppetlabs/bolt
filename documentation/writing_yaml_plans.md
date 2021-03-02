@@ -198,11 +198,12 @@ Script steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `arguments` | `Array` | An array of command-line arguments to pass to the script. | |
+| `arguments` | `Array` | An array of command-line arguments to pass to the script. Cannot be used with `pwsh_params`. | |
 | `catch_errors` | `Boolean` | Whether to catch raised errors. If set to true, the plan continues execution if the step fails. | |
 | `description` | `String` | The step's description. Logged by Bolt when the step is run. | |
 | `env_vars` | `Hash` | A map of environment variables to set on the target when running the script. | |
 | `name` | `String` | The name of the variable to save the step result to. | |
+| `pwsh_params` | `Hash` | A map of named parameters to pass to a PowerShell script. Cannot be used with `arguments`. | |
 | `run_as` | `String` | The user to run as when running the script on the target. Only applies to targets using a transport that supports `run-as` configuration. | |
 | `script` | `String` | The script to run. | ✓ |
 | `targets` | `Array`, `String` | A target or list of targets to run the script on. | ✓ |
