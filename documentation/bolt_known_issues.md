@@ -3,7 +3,7 @@
 ## `facts` task fails on Windows targets with Facter 3 installed
 
 When running the `facts` task on a Windows target that has Facter 3 installed,
-the task will fail but still return facts for the target. Output may look
+the task will fail but still return facts for the target. Output might look
 similar to the following:
 
 ```shell

@@ -16,7 +16,7 @@ Daemonizing OMI server
 EOF
 
 /opt/omi/bin/omiserver -d
-# there is a race here which may cause the log to not be created yet
+# there is a race here which might cause the log to not be created yet
 sync
 
 ./omi-enable-kerberos-auth.sh

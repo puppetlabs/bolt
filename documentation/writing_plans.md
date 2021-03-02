@@ -1033,7 +1033,7 @@ MODULE:
 
 ## Making plans private
 
-As a plan author, you may not want users to run your plan directly or know it exists. This is useful
+As a plan author, you might not want users to run your plan directly or know it exists. This is useful
 for plans that are used by other plans 'under the hood', but aren't designed to be run by a human.
 You can hide plans from `bolt plan show` and `Get-BoltPlan` output by specifying the `# @private
 true` Puppet strings tag. Private plans are still viewable with `bolt plan show <PLAN NAME>` and

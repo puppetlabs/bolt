@@ -36,7 +36,7 @@ module Bolt
           raise Bolt::ValidationError, <<~MSG
             Unable to parse Puppetfile #{path}:
             #{parsed.validation_errors.join("\n\n")}.
-            This may not be a Puppetfile managed by Bolt.
+            This Puppetfile might not be managed by Bolt.
           MSG
         end
 
@@ -106,7 +106,7 @@ module Bolt
 
           #{unsatisfied_specs.map(&:to_hash).to_yaml.lines.drop(1).join.chomp}
           
-          This may not be a Puppetfile managed by Bolt. To forcibly overwrite the
+          This Puppetfile might not be managed by Bolt. To forcibly overwrite the
           Puppetfile, run '#{command}'.
         MESSAGE
 

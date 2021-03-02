@@ -16,7 +16,7 @@ We only use two kinds of requests: `event` and `screen_view`.
 ### Events
 
 An event is the simplest request in GA. It represents that _something_ happened
-and is defined by a `category` and an `action`. It may optionally have a
+and is defined by a `category` and an `action`. It can optionally have a
 `label` and a `value`. As a general rule, do not use `value` as GA doesn't
 provide useful mechanisms to process it.
 

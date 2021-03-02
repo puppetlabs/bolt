@@ -62,7 +62,7 @@
                   "type": "object",
                   "properties": {
                     "cleanup": {
-                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt may create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt might create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
                       "oneOf": [
                         {
                           "type": "boolean"
@@ -163,7 +163,7 @@
                       "type": "boolean"
                     },
                     "cleanup": {
-                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt may create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt might create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
                       "oneOf": [
                         {
                           "type": "boolean"
@@ -269,7 +269,7 @@
                   "type": "object",
                   "properties": {
                     "cleanup": {
-                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt may create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt might create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
                       "oneOf": [
                         {
                           "type": "boolean"
@@ -435,7 +435,7 @@
                   "type": "object",
                   "properties": {
                     "cleanup": {
-                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt may create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt might create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
                       "oneOf": [
                         {
                           "type": "boolean"
@@ -906,7 +906,7 @@
                       ]
                     },
                     "cleanup": {
-                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt may create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt might create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
                       "oneOf": [
                         {
                           "type": "boolean"

@@ -286,7 +286,7 @@ hand, uses the Bolt default thread pool controlled by the `concurrency` option.
 ## Using Hiera data in a manifest block
 
 Use [Hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html) to separate
-configuration from context-specific data, where context may be fact-based or the
+configuration from context-specific data, where context might be fact-based or the
 name of a target.
 
 > **Note:** Only Hiera version 5 is supported in Bolt.

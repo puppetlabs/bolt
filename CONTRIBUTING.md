@@ -191,7 +191,7 @@ without installing LXD locally.
 For Windows tests, execute `vagrant up` from the root of the Bolt repo to bring these up with the
 provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.
 
-Additional tests may run in a local environment and require certain shell
+Additional tests might run in a local environment and require certain shell
 capabilities. For example, tests that require a Bash-like environment are tagged
 with `:bash` in rspec.
 

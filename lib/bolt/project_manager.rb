@@ -143,7 +143,7 @@ module Bolt
       @outputter.print_message("Migrating project #{@config.project.path}\n\n")
 
       @outputter.print_action_step(
-        "Migrating a Bolt project may make irreversible changes to the project's "\
+        "Migrating a Bolt project might make irreversible changes to the project's "\
         "configuration and inventory files. Before continuing, make sure the "\
         "project has a backup or uses a version control system."
       )

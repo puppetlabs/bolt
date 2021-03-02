@@ -25,7 +25,7 @@ $ bundle exec rake docs:all
 ```
 
 Here are each of the documenation pages that are generated, the files
-that you may need to modify to make changes to the generated documentation,
+that you might need to modify to make changes to the generated documentation,
 and the rake task used to generate the documentation.
 
 ### *nix shell commands

@@ -442,8 +442,8 @@ module Bolt
         },
         "trusted-external-command" => {
           description: "The path to an executable on the Bolt controller that can produce external trusted facts. "\
-                       "**External trusted facts are experimental in both Puppet and Bolt and this API may change or "\
-                       "be removed.**",
+                       "**External trusted facts are experimental in both Puppet and Bolt and this API might "\
+                       "change or be removed.**",
           type: String,
           _plugin: false,
           _example: "/etc/puppetlabs/facts/trusted_external.sh"

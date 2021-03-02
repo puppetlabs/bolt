@@ -6,7 +6,7 @@
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFunction) do
   # Run a script.
-  # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
+  # @param script Path to a script to run on target. Can be an absolute path or a modulename/filename selector for a
   #               file in $MODULEROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param options A hash of additional options.
@@ -28,7 +28,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   end
 
   # Run a script, logging the provided description.
-  # @param script Path to a script to run on target. May be an absolute path or a modulename/filename selector for a
+  # @param script Path to a script to run on target. Can be an absolute path or a modulename/filename selector for a
   #               file in $MODULEROOT/files.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
   # @param description A description to be output when calling this function.

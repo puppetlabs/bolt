@@ -148,7 +148,7 @@ module Bolt
 
       if unknown_keys.any?
         msg = "Metadata for task '#{@name}' contains unknown keys: #{unknown_keys.join(', ')}."
-        msg += " This could be a typo in the task metadata or may result in incorrect behavior."
+        msg += " This could be a typo in the task metadata or might result in incorrect behavior."
         Bolt::Logger.warn("unknown_task_metadata_keys", msg)
       end
     end

@@ -28,7 +28,7 @@ project](./projects.md#migrate-a-bolt-project).
 
 ## My task fails with a "permission denied" error (`noexec` issue)
 
-If your task fails with the following error, the issue may be that your temporary directory (tmpdir)
+If your task fails with the following error, the issue might be that your temporary directory (tmpdir)
 is [mounted with noexec](https://superuser.com/questions/728127/what-does-noexec-flag-mean-when-mounting-directories-on-rhel).
 
 ```
@@ -110,7 +110,7 @@ By default, Bolt tries to connect over SSH. Make sure you've specified the
   ```
 If you're still getting "connection refused" messages, try disabling SSL. By
 default, Bolt connects to targets over WinRM using the HTTPS port 5986. Your
-target may not be set up to connect over HTTPS. If you disable SSL, Bolt
+target might not be set up to connect over HTTPS. If you disable SSL, Bolt
 connects to the target using the HTTP port 5985. You can disable SSL in one of
 the following ways:
 

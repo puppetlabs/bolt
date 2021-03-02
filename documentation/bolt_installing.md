@@ -19,7 +19,7 @@ and Microsoft Windows.
 | Ubuntu                    | 16.04, 18.04, 20.04 |
 
 > **Note:** Windows packages are automatically tested on the versions listed
-> above, but may be installable on other versions.
+> above, but might be installable on other versions.
 
 ## Install Bolt on Debian
 

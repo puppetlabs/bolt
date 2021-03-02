@@ -4,7 +4,7 @@ Most larger Bolt features are released initially in an experimental or unstable
 state. This allows the Bolt team to gather feedback from real users quickly
 while iterating on new functionality. Almost all experimental features are
 eventually stabilized in future releases. While a feature is experimental, its
-API may change, requiring the user to update their code or configuration. The
+API might change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
@@ -118,8 +118,8 @@ plan myplan(TargetSpec $targets) {
 Here, if `target3` completes running `hostname` before `target1` or `target2`, it can continue directly to
 running `whoami`.
 
-This functionality is particularly useful for plan functions that may take a long time on certain
-targets but not on others, or for plans where some long running process may fail on a target but the
+This functionality is particularly useful for plan functions that might take a long time on certain
+targets but not on others, or for plans where some long running process might fail on a target but the
 plan author wants the plan to be able to continue quickly on successful targets.
 
 Within the parallelize block, only the following functions can run in parallel: 
@@ -487,7 +487,7 @@ To encrypt SSH connections using the unsupported algorithm
    ```
 
 > **Note**: While some OpenSSH config options are supported in net-ssh, such as Ciphers, the specific
-> algorithms you want to use may not be supported and you will still need to use the `ssh-command`
+> algorithms you want to use might not be supported and you will still need to use the `ssh-command`
 > option to shell out to SSH. See [the net-ssh
 > README](https://github.com/net-ssh/net-ssh/#supported-algorithms) for a list of supported
 > algorithms.

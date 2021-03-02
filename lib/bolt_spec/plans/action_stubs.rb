@@ -177,7 +177,7 @@ module BoltSpec
         if data['msg'] && data['kind'] && (data.keys - %w[msg kind details issue_code]).empty?
           @data[:default] = clazz.new(data['msg'], data['kind'], data['details'], data['issue_code'])
         else
-          $stderr.puts "In the future 'error_with()' may require msg and kind, and " \
+          $stderr.puts "In the future 'error_with()' might require msg and kind, and " \
                       "optionally accept only details and issue_code."
           @data[:default] = data
         end

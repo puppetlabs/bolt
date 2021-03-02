@@ -41,7 +41,7 @@ roles](https://github.com/puppetlabs/beaker/blob/master/docs/concepts/roles_what
 * `winrm`: Nodes defined with this role will be used to test bolt's WinRM
  connection protocol. Any number of nodes can be defined with this role.
 
-You may also need to specify nodes for
+You might also need to specify nodes for
 [beaker-hostgenerator](https://github.com/puppetlabs/beaker-hostgenerator) to
 use to test bolt on. You can see all of the available
 operatingsystem-architecture nodes by running

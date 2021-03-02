@@ -400,7 +400,7 @@ included in the message.
 
 An error object includes the following keys:
 -   `msg` - A human readable string that appears in the UI.
--   `kind` - A standard string for machines to handle. You may share kinds
+-   `kind` - A standard string for machines to handle. You can share kinds
     between your modules or namespace kinds per module.
 -   `details` - An object of structured data about the tasks.
 
@@ -1241,7 +1241,7 @@ on every target you want to debug the task on.
 
 > 🔩 **Tip:** In most cases, you can debug tasks by only running them on
 > `localhost` instead of a list of remote targets. This avoids the need to
-> establish a connection with a target, which may be difficult if your target
+> establish a connection with a target, which might be difficult if your target
 > restricts incoming connections.
 
 You can install the `rpdb` library using `pip`:
@@ -1279,7 +1279,7 @@ on.
 
 > 🔩 **Tip:** In most cases, you can debug tasks by only running them on
 > `localhost` instead of a list of remote targets. This avoids the need to
-> establish a connection with a target, which may be difficult if your target
+> establish a connection with a target, which might be difficult if your target
 > restricts incoming connections.
 
 If you are running the task on remote targets, you can install the `pry-remote`

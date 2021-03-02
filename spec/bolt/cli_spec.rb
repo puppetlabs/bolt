@@ -79,7 +79,7 @@ describe "Bolt::CLI" do
       cli.execute(cli.parse)
 
       output = @log_output.readlines.join
-      expect(output).to match(/Bolt may be installed as a gem/)
+      expect(output).to match(/Bolt might be installed as a gem/)
     end
 
     it 'does not display a warning when BOLT_GEM is set' do
@@ -90,7 +90,7 @@ describe "Bolt::CLI" do
       cli.execute(cli.parse)
 
       output = @log_output.readlines.join
-      expect(output).not_to match(/Bolt may be installed as a gem/)
+      expect(output).not_to match(/Bolt might be installed as a gem/)
     end
   end
 
@@ -957,7 +957,7 @@ describe "Bolt::CLI" do
         it "fails with --env-var" do
           cli = Bolt::CLI.new(%w[file upload -t foo --env-var POP=ROCKS])
           expect { cli.parse }
-            .to raise_error(Bolt::CLIError, /Option '--env-var' may only be specified when running a command or script/)
+            .to raise_error(Bolt::CLIError, /Option '--env-var' can only be specified when running a command or script/)
         end
       end
 
@@ -1064,7 +1064,7 @@ describe "Bolt::CLI" do
       end
 
       it "fails show with --noop" do
-        expected = "Option '--noop' may only be specified when running a task or applying manifest code"
+        expected = "Option '--noop' can only be specified when running a task or applying manifest code"
         expect {
           cli = Bolt::CLI.new(%w[task show foo --targets bar --noop])
           cli.parse
@@ -1106,7 +1106,7 @@ describe "Bolt::CLI" do
       end
 
       it "fails with --noop" do
-        expected = "Option '--noop' may only be specified when running a task or applying manifest code"
+        expected = "Option '--noop' can only be specified when running a task or applying manifest code"
         expect {
           cli = Bolt::CLI.new(%w[plan run foo --targets bar --noop])
           cli.parse
@@ -1990,14 +1990,14 @@ describe "Bolt::CLI" do
         it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
           options[:targets] = targets.map(&:host)
           options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
-          regex = /A plan's 'targets' parameter may be specified using the --targets option/
+          regex = /A plan's 'targets' parameter can be specified using the --targets option/
           expect { cli.execute(options) }.to raise_error(regex)
         end
 
         it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
           options[:targets] = targets.map(&:host)
           options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
-          regex = /A plan's 'targets' parameter may be specified using the --targets option/
+          regex = /A plan's 'targets' parameter can be specified using the --targets option/
           expect { cli.execute(options) }.to raise_error(regex)
         end
 
@@ -2609,7 +2609,7 @@ describe "Bolt::CLI" do
       end
 
       expect(@log_output.readlines)
-        .not_to include(/CLI arguments \[\\"password\\"\] may be overridden by Inventory/)
+        .not_to include(/CLI arguments \[\\"password\\"\] might be overridden by Inventory/)
     end
 
     context 'when BOLT_INVENTORY is set' do
@@ -2620,7 +2620,7 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%w[command run whoami -t foo --password bar])
         cli.parse
         expect(@log_output.readlines.join)
-          .to match(/CLI arguments \["password"\] may be overridden by Inventory: BOLT_INVENTORY/)
+          .to match(/CLI arguments \["password"\] might be overridden by Inventory: BOLT_INVENTORY/)
       end
     end
 
@@ -2630,7 +2630,7 @@ describe "Bolt::CLI" do
         cli = Bolt::CLI.new(%W[command run whoami -t foo --password bar --inventoryfile #{inventoryfile}])
         cli.parse
         expect(@log_output.readlines.join)
-          .to match(/CLI arguments \["password"\] may be overridden by Inventory:/)
+          .to match(/CLI arguments \["password"\] might be overridden by Inventory:/)
       end
     end
   end

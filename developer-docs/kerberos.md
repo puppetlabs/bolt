@@ -6,7 +6,7 @@ Bolt supports using Kerberos as an authentication mechanism, in lieu of a userna
 
 While Linux **does** support a standalone Kerberos KDC (Key Distribution Center), the [`winrm`](https://github.com/WinRb/WinRM) gem that provides connectivity support from Bolt has only been written for and tested against Active Directory.
 
-In the future, it's possible other transports like SSH may be able to authenticate and authorize with just a KDC, but for now, the primary use case for Kerberos is in conjunction with WinRM.
+In the future, it's possible other transports like SSH might be able to authenticate and authorize with just a KDC, but for now, the primary use case for Kerberos is in conjunction with WinRM.
 
 ### Kerberos Implementations
 
@@ -74,7 +74,7 @@ winrm:
 ```
 
 - `kinit -C Administrator@domain.com` to acquire a TGT (ticket granting ticket)
-- `bolt command run 'whoami' --targets winrm://dc.domain.com` to connect over HTTPS (`--no-ssl-verify` may be required if the target uses a self-signed certificate)
+- `bolt command run 'whoami' --targets winrm://dc.domain.com` to connect over HTTPS (`--no-ssl-verify` might be required if the target uses a self-signed certificate)
 - `bolt command run 'whoami' --targets winrm://dc.domain.com --no-ssl` to connect over HTTP
 
 ### Testing with Docker
@@ -136,7 +136,7 @@ An Ubuntu container running OMI server and listening on both the HTTP and HTTPS 
 
 On startup, the container is automatically domain joined to the Samba active directory and is reachable inside the UDN as `omiserver.bolt.test`. As with the Samba container, add an entry to `/etc/hosts` to be able to access it via DNS name from the Docker host environment.
 
-On startup, the Docker entrypoint script waits for the domain to be resolved via DNS and accessible before attempting to perform a domain join with `realm join` followed by `net ads join` (after configuring local Kerberos and Samba clients). The [`sssd`](https://docs.pagure.org/SSSD.sssd/) service is setup to use the [`ad provider`](https://docs.pagure.org/SSSD.sssd/users/ad_provider.html) so that it may look up domain accounts locally.
+On startup, the Docker entrypoint script waits for the domain to be resolved via DNS and accessible before attempting to perform a domain join with `realm join` followed by `net ads join` (after configuring local Kerberos and Samba clients). The [`sssd`](https://docs.pagure.org/SSSD.sssd/) service is setup to use the [`ad provider`](https://docs.pagure.org/SSSD.sssd/users/ad_provider.html) so that it can look up domain accounts locally.
 
 To configure OMI server the `HTTP` service SPN is added to the `OMISERVER$` computer account in Active Directory, and the `sssd` service is restarted. The [OMI setup documentation](https://github.com/Microsoft/omi/blob/master/Unix/doc/setup-kerberos-omi.md#on-the-server-add-the-http-principal) covers this, but the actual scripts vary a bit since Samba is being used rather than Active Directory.
 
@@ -219,7 +219,7 @@ To remove the ticket, use:
 
 #### Building OMI server from source
 
-When debugging interoperability problems between the winrm gem and OMI server, it may be necessary to build OMI server from source, rather than consuming packages. This makes it easy to modify OMI server code, rebuild and start using it immediately. When starting the containers, add the build arg `BUILD_OMI=true` like:
+When debugging interoperability problems between the winrm gem and OMI server, it might be necessary to build OMI server from source, rather than consuming packages. This makes it easy to modify OMI server code, rebuild and start using it immediately. When starting the containers, add the build arg `BUILD_OMI=true` like:
 
 > docker-compose -f spec/docker-compose.yml build --build-arg BUILD_OMI=true samba-ad omiserver
 > docker-compose -f spec/docker-compose.yml up -d --build samba-ad omiserver

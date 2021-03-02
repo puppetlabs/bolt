@@ -212,7 +212,7 @@ module Bolt
       target_opts = options.keys.select { |opt| %i[query rerun targets].include?(opt) }
       target_string = "'--targets', '--rerun', or '--query'"
       if target_opts.length > 1
-        raise Bolt::CLIError, "Only one targeting option #{target_string} may be specified"
+        raise Bolt::CLIError, "Only one targeting option #{target_string} can be specified"
       elsif target_opts.empty? && options[:subcommand] != 'plan'
         raise Bolt::CLIError, "Command requires a targeting option: #{target_string}"
       end
@@ -301,13 +301,13 @@ module Bolt
       if options[:noop] &&
          !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
         raise Bolt::CLIError,
-              "Option '--noop' may only be specified when running a task or applying manifest code"
+              "Option '--noop' can only be specified when running a task or applying manifest code"
       end
 
       if options[:env_vars]
         unless %w[command script].include?(options[:subcommand]) && options[:action] == 'run'
           raise Bolt::CLIError,
-                "Option '--env-var' may only be specified when running a command or script"
+                "Option '--env-var' can only be specified when running a command or script"
         end
       end
     end
@@ -354,7 +354,7 @@ module Bolt
       if inventory_source && conflicting_options.any?
         Bolt::Logger.warn(
           "cli_overrides",
-          "CLI arguments #{conflicting_options.to_a} may be overridden by Inventory: #{inventory_source}"
+          "CLI arguments #{conflicting_options.to_a} might be overridden by Inventory: #{inventory_source}"
         )
       end
     end
@@ -432,7 +432,7 @@ module Bolt
         return 0
       end
 
-      message = 'There may be processes left executing on some nodes.'
+      message = 'There might be processes left executing on some nodes.'
 
       if %w[task plan].include?(options[:subcommand]) && options[:task_options] && !options[:params_parsed] && pal
         options[:task_options] = pal.parse_params(options[:subcommand], options[:object], options[:task_options])
@@ -610,7 +610,7 @@ module Bolt
         if plan_arguments['nodes'] || plan_arguments['targets']
           key = plan_arguments.include?('nodes') ? 'nodes' : 'targets'
           raise Bolt::CLIError,
-                "A plan's '#{key}' parameter may be specified using the --#{key} option, but in that " \
+                "A plan's '#{key}' parameter can be specified using the --#{key} option, but in that " \
                 "case it must not be specified as a separate #{key}=<value> parameter nor included " \
                 "in the JSON data passed in the --params option"
         end
@@ -868,7 +868,7 @@ module Bolt
       # If the bundled content directory is empty, Bolt is likely installed as a gem.
       if ENV['BOLT_GEM'].nil? && incomplete_install?
         msg = <<~MSG.chomp
-          Bolt may be installed as a gem. To use Bolt reliably and with all of its
+          Bolt might be installed as a gem. To use Bolt reliably and with all of its
           dependencies, uninstall the 'bolt' gem and install Bolt as a package:
           https://puppet.com/docs/bolt/latest/bolt_installing.html
 
