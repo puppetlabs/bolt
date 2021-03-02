@@ -51,7 +51,8 @@ describe "When loading content", ssh: true do
 
   it "loads embedded plans from a project specified with --project" do
     result = run_cli_json(%W[plan show --project #{embedded}])
-    expect(result['plans']).to include(['embedded'])
+    plans = result['plans'].map(&:first)
+    expect(plans).to include('embedded')
   end
 
   it "project level content can reference other modules" do

@@ -1470,11 +1470,11 @@ describe "Bolt::CLI" do
           cli.execute(options)
           plan_list = JSON.parse(output.string)['plans']
           [
-            ['sample'],
-            ['sample::single_task'],
-            ['sample::three_tasks'],
-            ['sample::two_tasks'],
-            ['sample::yaml']
+            ['sample', anything],
+            ['sample::single_task', anything],
+            ['sample::three_tasks', anything],
+            ['sample::two_tasks', anything],
+            ['sample::yaml', anything]
           ].each do |plan|
             expect(plan_list).to include(plan)
           end
@@ -1607,13 +1607,13 @@ describe "Bolt::CLI" do
 
           cli.execute(options)
           json = JSON.parse(output.string)['plans']
-          expect(json).to include(["aggregate::count"],
-                                  ["aggregate::targets"],
-                                  ["canary"],
-                                  ["facts"],
-                                  ["facts::info"],
-                                  ["puppetdb_fact"],
-                                  ["sample::ok"])
+          expect(json).to include(["aggregate::count", anything],
+                                  ["aggregate::targets", anything],
+                                  ["canary", anything],
+                                  ["facts", anything],
+                                  ["facts::info", anything],
+                                  ["puppetdb_fact", anything],
+                                  ["sample::ok", anything])
 
           expect(@log_output.readlines.join).to match(/Syntax error at.*single_task.pp/m)
         end

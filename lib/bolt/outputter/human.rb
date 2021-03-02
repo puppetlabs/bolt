@@ -53,8 +53,19 @@ module Bolt
         string.sub(/\s\z/, '')
       end
 
+      # Wraps a string to the specified width. Lines only wrap
+      # at whitespace.
+      #
       def wrap(string, width = 80)
+        return string unless string.is_a?(String)
         string.gsub(/(.{1,#{width}})(\s+|\Z)/, "\\1\n")
+      end
+
+      # Trims a string to a specified width, adding an ellipsis if it's longer.
+      #
+      def truncate(string, width = 80)
+        return string unless string.is_a?(String) && string.length > width
+        string.lines.first[0...width].gsub(/\s\w+\s*$/, '...')
       end
 
       def handle_event(event)
@@ -218,11 +229,11 @@ module Bolt
         @stream.puts total_msg
       end
 
-      def print_table(results, padding_left = 0, padding_right = 3)
+      def format_table(results, padding_left = 0, padding_right = 3)
         # lazy-load expensive gem code
         require 'terminal-table'
 
-        @stream.puts Terminal::Table.new(
+        Terminal::Table.new(
           rows: results,
           style: {
             border_x: '',
@@ -238,10 +249,22 @@ module Bolt
 
       def print_tasks(tasks, modulepath)
         command = Bolt::Util.powershell? ? 'Get-BoltTask -Task <TASK NAME>' : 'bolt task show <TASK NAME>'
-        tasks.any? ? print_table(tasks) : print_message('No available tasks')
-        print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
-                        "\nUse '#{command}' to view "\
-                        "details and parameters for a specific task.")
+
+        tasks = tasks.map do |name, description|
+          description = truncate(description, 72)
+          [name, description]
+        end
+
+        @stream.puts colorize(:cyan, 'Tasks')
+        @stream.puts tasks.any? ? format_table(tasks, 2) : indent(2, 'No available tasks')
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Modulepath')
+        @stream.puts indent(2, modulepath.join(File::PATH_SEPARATOR))
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Additional information')
+        @stream.puts indent(2, "Use '#{command}' to view details and parameters for a specific task.")
       end
 
       # @param [Hash] task A hash representing the task
@@ -322,10 +345,22 @@ module Bolt
 
       def print_plans(plans, modulepath)
         command = Bolt::Util.powershell? ? 'Get-BoltPlan -Name <PLAN NAME>' : 'bolt plan show <PLAN NAME>'
-        plans.any? ? print_table(plans) : print_message('No available plans')
-        print_message("\nMODULEPATH:\n#{modulepath.join(File::PATH_SEPARATOR)}\n"\
-                        "\nUse '#{command}' to view "\
-                        "details and parameters for a specific plan.")
+
+        plans = plans.map do |name, description|
+          description = truncate(description, 72)
+          [name, description]
+        end
+
+        @stream.puts colorize(:cyan, 'Plans')
+        @stream.puts plans.any? ? format_table(plans, 2) : indent(2, 'No available plans')
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Modulepath')
+        @stream.puts indent(2, modulepath.join(File::PATH_SEPARATOR))
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Additional information')
+        @stream.puts indent(2, "Use '#{command}' to view details and parameters for a specific plan.")
       end
 
       def print_topics(topics)
@@ -359,7 +394,7 @@ module Bolt
               [m[:name], version]
             end
 
-            print_table(module_info, 2, 1)
+            @stream.puts format_table(module_info, 2, 1)
           end
 
           @stream.write("\n")
@@ -374,7 +409,7 @@ module Bolt
         targets += target_list[:adhoc].map { |target| [target.name, adhoc] }
 
         if targets.any?
-          print_table(targets, 0, 2)
+          @stream.puts format_table(targets, 0, 2)
           @stream.puts
         end
 

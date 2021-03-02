@@ -23,8 +23,9 @@ describe "with private plans" do
   context 'with a private YAML plan' do
     it 'does not show the private plan in plan show output' do
       result = run_cli_json(%W[plan show -m #{modulepath}])
-      expect(result['plans']).to include(["facts"])
-      expect(result['plans']).not_to include(["private::yaml"])
+      plans = result['plans'].map(&:first)
+      expect(plans).to include('facts')
+      expect(plans).not_to include('private::yaml')
     end
 
     it 'shows the private plan in plan show <plan> output' do
@@ -107,8 +108,9 @@ describe "with private plans" do
   context 'with a private Puppet plan' do
     it 'does not show the private plan in plan show output' do
       result = run_cli_json(%W[plan show -m #{modulepath}])
-      expect(result['plans']).to include(["facts"])
-      expect(result['plans']).not_to include(["private::puppet"])
+      plans = result['plans'].map(&:first)
+      expect(plans).to include('facts')
+      expect(plans).not_to include('private::puppet')
     end
 
     it 'shows the private plan in plan show <plan> output' do

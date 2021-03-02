@@ -85,8 +85,8 @@ describe "Bolt::Outputter::Human" do
   end
 
   it "formats a table" do
-    outputter.print_table([%w[a b], %w[c1 d]])
-    expect(output.string).to eq(<<~TABLE)
+    output = outputter.format_table([%w[a b], %w[c1 d]])
+    expect(output.to_s).to eq(<<~TABLE.chomp)
       a    b
       c1   d
     TABLE
