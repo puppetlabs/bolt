@@ -17,6 +17,8 @@ jobs:
     name: Linux
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel stale jobs
+        uses: fkirc/skip-duplicate-actions@master
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby
@@ -35,6 +37,8 @@ jobs:
     env:
       BOLT_WINDOWS: true
     steps:
+      - name: Cancel stale jobs
+        uses: fkirc/skip-duplicate-actions@master
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby

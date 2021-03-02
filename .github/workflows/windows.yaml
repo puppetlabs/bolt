@@ -27,6 +27,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Cancel stale jobs
+        uses: technote-space/auto-cancel-redundant-workflow@v1
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
@@ -60,6 +62,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+      - name: Cancel stale jobs
+        uses: technote-space/auto-cancel-redundant-workflow@v1
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:

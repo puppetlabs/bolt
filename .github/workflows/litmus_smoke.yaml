@@ -16,6 +16,8 @@ jobs:
         os: [ubuntu-latest, windows-latest]
 
     steps:
+      - name: Cancel stale jobs
+        uses: fkirc/skip-duplicate-actions@v3.3.0
       - name: Setup Ruby
         uses: actions/setup-ruby@v1
         with:

@@ -18,6 +18,8 @@ jobs:
     name: Fast
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel stale jobs
+        uses: fkirc/skip-duplicate-actions@v3.3.0
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby
@@ -43,6 +45,8 @@ jobs:
     name: Slow
     runs-on: ubuntu-latest
     steps:
+      - name: Cancel stale jobs
+        uses: fkirc/skip-duplicate-actions@v3.3.0
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby
