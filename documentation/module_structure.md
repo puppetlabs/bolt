@@ -14,7 +14,7 @@ module you downloaded from the Forge.
 
 Modules have a specific directory structure outlined in the [Puppet
 documentation](https://puppet.com/docs/puppet/latest/modules_fundamentals.html#module_structure).
-However, a typical module for use with Bolt may contain these files and directories:
+However, a typical module for use with Bolt might contain these files and directories:
 
 |Directory/File|Contents|
 |---------|--------|

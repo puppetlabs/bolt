@@ -22,7 +22,7 @@ module Bolt
           Invalid plan name '#{plan_name}'. Plan names are composed of one or more name segments
           separated by double colons '::'.
 
-          Each name segment must begin with a lowercase letter, and may only include lowercase
+          Each name segment must begin with a lowercase letter, and can only include lowercase
           letters, digits, and underscores.
 
           Examples of valid plan names:

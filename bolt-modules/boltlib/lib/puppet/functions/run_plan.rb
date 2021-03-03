@@ -256,7 +256,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     if nodes_param
       if params['nodes']
         raise ArgumentError,
-              "A plan's 'nodes' parameter may be specified as the second positional argument to " \
+              "A plan's 'nodes' parameter can be specified as the second positional argument to " \
               "run_plan(), but in that case 'nodes' must not be specified in the named arguments " \
               "hash."
       end
@@ -265,7 +265,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     elsif targets_param
       if params['targets']
         raise ArgumentError,
-              "A plan's 'targets' parameter may be specified as the second positional argument to " \
+              "A plan's 'targets' parameter can be specified as the second positional argument to " \
               "run_plan(), but in that case 'targets' must not be specified in the named arguments " \
               "hash."
       end

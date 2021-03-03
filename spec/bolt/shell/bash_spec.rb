@@ -182,7 +182,7 @@ describe Bolt::Shell::Bash do
       expect(connection).to receive(:execute).and_return(execute_result)
 
       result = shell.execute('my cool command')
-      expect(result.stderr.string).to include("This may be caused by the default tmpdir being mounted")
+      expect(result.stderr.string).to include("This might be caused by the default tmpdir being mounted")
     end
   end
 

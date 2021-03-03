@@ -164,7 +164,7 @@ describe Bolt::Transport::WinRM do
 
       expect_node_error(
         Bolt::Error, nil,
-        /Too many open files. This may be resolved by increasing your user limit with 'ulimit -n 1024'/
+        /Too many open files. This might be resolved by increasing your user limit with 'ulimit -n 1024'/
       ) do
         winrm.run_command(target, 'ls')
       end

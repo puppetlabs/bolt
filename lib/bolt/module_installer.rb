@@ -45,7 +45,7 @@ module Bolt
       # specss. If that fails, fall back to resolving from project specs.
       # This prevents Bolt from modifying installed modules unless there is
       # a version conflict.
-      @outputter.print_action_step("Resolving module dependencies, this may take a moment")
+      @outputter.print_action_step("Resolving module dependencies, this might take a moment")
 
       @outputter.start_spin
       begin
@@ -156,7 +156,7 @@ module Bolt
         # If forcibly installing or if there is no Puppetfile, resolve
         # and write a Puppetfile.
         if force || !path.exist?
-          @outputter.print_action_step("Resolving module dependencies, this may take a moment")
+          @outputter.print_action_step("Resolving module dependencies, this might take a moment")
 
           # This doesn't use the block as it's more testable to just mock *_spin
           @outputter.start_spin

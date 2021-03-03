@@ -32,7 +32,7 @@ module Bolt
           "cleanup" => {
             type: [TrueClass, FalseClass],
             description: "Whether to clean up temporary files created on targets. When running commands on a target, "\
-                         "Bolt may create temporary files. After completing the command, these files are "\
+                         "Bolt might create temporary files. After completing the command, these files are "\
                          "automatically deleted. This value can be set to 'false' if you wish to leave these "\
                          "temporary files on the target.",
             _plugin: true,

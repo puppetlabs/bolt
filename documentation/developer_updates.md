@@ -18,7 +18,7 @@ compiled a list of expected changes and removals.
 - **Ship with Puppet 7**
 
   Bolt packages will ship with Puppet 7. This change should not impact most
-  users, but changes to the Puppet language may require updating your Bolt
+  users, but changes to the Puppet language might require updating your Bolt
   plans.
 
   To read more about the changes in Puppet 7, see the [Puppet 7 release
@@ -29,7 +29,7 @@ compiled a list of expected changes and removals.
   Bolt packages will ship with Ruby 2.7 instead of Ruby 2.5.1. This change will
   not affect most users who install the Bolt package, as Bolt packages ship with
   their own Ruby. However, gem installs will require Ruby 2.7 or higher, and
-  users who install gems with Bolt's Ruby may also need to update their gems.
+  users who install gems with Bolt's Ruby might also need to update their gems.
 
 - **New default modulepath**
 

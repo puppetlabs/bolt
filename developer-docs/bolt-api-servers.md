@@ -198,7 +198,7 @@ For example, the following runs "echo 'hi'" on localhost:
         - `params`: Object, *required* - The parameters to supply the endpoint.
     - `sha256`: String, *required* - The SHA256 value for the file.
     - `kind`: String, *required* - Whether the file is a `file` or `directory`.
-- `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files may be returned.
+- `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files might be returned.
 - `destination`: String, *required* - Where to put the files on the target machine.
 
 For example, the following uploads file 'abc' on linux_target.net:
@@ -234,7 +234,7 @@ For example, the following uploads file 'abc' on linux_target.net:
         - `params`: Object, *required* - The parameters to supply the endpoint.
     - `sha256`: String, *required* - The SHA256 value for the file.
     - `kind`: String, *required* - Whether the file is a `file` or `directory`.
-- `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files may be returned.
+- `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files might be returned.
 - `destination`: String, *required* - Where to put the files on the target machine.
 
 For example, the following uploads file 'abc' on windows_target.net:

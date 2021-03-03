@@ -454,7 +454,7 @@ module Bolt
       DESCRIPTION
           Convert a YAML plan to a Puppet language plan and print the converted plan to stdout.
 
-          Converting a YAML plan may result in a plan that is syntactically
+          Converting a YAML plan might result in a plan that is syntactically
           correct but has different behavior. Always verify a converted plan's
           functionality. Note that the converted plan is not written to a file.
 
@@ -707,7 +707,7 @@ module Bolt
              "Or read a target list from an input file '@<file>' or stdin '-'.",
              'Example: --targets localhost,target_group,ssh://nix.com:23,winrm://windows.puppet.com',
              'URI format is [protocol://]host[:port]',
-             "SSH is the default protocol; may be #{TRANSPORTS.keys.join(', ')}",
+             "SSH is the default protocol; can be #{TRANSPORTS.keys.join(', ')}",
              'For Windows targets, specify the winrm:// protocol if it has not be configured',
              'For SSH, port defaults to `22`',
              'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting') do |targets|

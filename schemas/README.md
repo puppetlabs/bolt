@@ -9,7 +9,7 @@ Bolt](../documentation/vscode_and_bolt.md).
 
 ## Generating schemas
 
-Changes made to Bolt's source code may require regenerating the schemas. Bolt
+Changes made to Bolt's source code might require regenerating the schemas. Bolt
 includes a Rake task for generating the schemas from Bolt's source code.
 
 To regenerate the schemas, run the following command:

@@ -86,7 +86,7 @@ project's `.modules` directory.
 
 When Bolt adds a new module to the project and resolves its dependencies, it
 attempts to keep all installed modules on the same versions. If Bolt encounters
-a version conflict, it may update installed modules to newer versions.
+a version conflict, it might update installed modules to newer versions.
 
 📖 **Related information** 
 - If you receive an error telling you to "update your project configuration to
@@ -127,7 +127,7 @@ satisfy the following specifications:
 
 - name: puppetlabs-ruby-task-helper
 
-This may not be a Puppetfile managed by Bolt. To forcibly overwrite the
+This might not be a Puppetfile managed by Bolt. To forcibly overwrite the
 Puppetfile, run 'bolt module install --force'.
 ```
 

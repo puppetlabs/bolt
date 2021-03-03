@@ -150,7 +150,7 @@ describe Bolt::Transport::SSH, ssh: true do
 
       expect_node_error(
         Bolt::Error, nil,
-        /Too many open files. This may be resolved by increasing your user limit with 'ulimit -n 1024'/
+        /Too many open files. This might be resolved by increasing your user limit with 'ulimit -n 1024'/
       ) { ssh.run_command(target, 'ls') }
     end
   end

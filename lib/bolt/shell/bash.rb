@@ -445,7 +445,7 @@ module Bolt
         when 0
           @logger.trace { "Command `#{command_str}` returned successfully" }
         when 126
-          msg = "\n\nThis may be caused by the default tmpdir being mounted "\
+          msg = "\n\nThis might be caused by the default tmpdir being mounted "\
             "using 'noexec'. See http://pup.pt/task-failure for details and workarounds."
           result_output.stderr << msg
           @logger.trace { "Command #{command_str} failed with exit code #{result_output.exit_code}" }

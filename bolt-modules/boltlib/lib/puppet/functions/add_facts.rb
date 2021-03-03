@@ -7,7 +7,7 @@ require 'bolt/error'
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:add_facts) do
   # @param target A target.
-  # @param facts A hash of fact names to values that may include structured facts.
+  # @param facts A hash of fact names to values that can include structured facts.
   # @return A `Target` object.
   # @example Adding facts to a target
   #   add_facts($target, { 'os' => { 'family' => 'windows', 'name' => 'windows' } })

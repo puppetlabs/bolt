@@ -219,12 +219,12 @@ a `secret_decrypt` plugin as a `resolve_reference` plugin:
 ## Plugin input
 
 Plugins can accept structured input. For example, a plugin that retrieves a list
-of targets from a service may need credentials to authenticate with the service,
-while a plugin that decrypts a value may need a path to a key pair.
+of targets from a service might need credentials to authenticate with the service,
+while a plugin that decrypts a value might need a path to a key pair.
 
 Because plugins are written as tasks, you can pass input to a plugin by defining
 parameters in the task metadata file and then specifying the parameters when you
-use the plugin. A simple plugin that loads a YAML file may include a single
+use the plugin. A simple plugin that loads a YAML file might include a single
 `filepath` parameter in the task metadata:
 
 ```json
@@ -419,7 +419,7 @@ groups:
   _plugin: inventory_plugin
 ```
 
-The output from the plugin may look similar to this:
+The output from the plugin might look similar to this:
 
 ```json
 {
@@ -463,7 +463,7 @@ the plugin. If something does go wrong, your plugin should return an error
 object, which is the standard way of returning errors from tasks.
 
 Error objects include a single `_error` key, which accepts an object that must
-include a `msg` key. For example, a minimal error object may look like this:
+include a `msg` key. For example, a minimal error object might look like this:
 
 ```json
 {

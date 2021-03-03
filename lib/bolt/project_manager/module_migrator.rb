@@ -66,7 +66,7 @@ module Bolt
         # Attempt to resolve dependencies
         begin
           @outputter.print_message('')
-          @outputter.print_action_step("Resolving module dependencies, this may take a moment")
+          @outputter.print_action_step("Resolving module dependencies, this might take a moment")
           puppetfile = Bolt::ModuleInstaller::Resolver.new.resolve(specs)
         rescue Bolt::Error => e
           @outputter.print_action_error("#{e.message}\nSkipping module migration.")
