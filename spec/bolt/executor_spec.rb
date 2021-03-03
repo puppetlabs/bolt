@@ -742,6 +742,22 @@ describe "Bolt::Executor" do
         executor.report_bundled_content('Task', 'facts')
       end
     end
+
+    context "#report_file_source" do
+      let(:executor) { Bolt::Executor.new(2, analytics) }
+
+      it 'reports when a file path is absolute' do
+        expect(analytics).to receive(:event).with('Plan', 'run_script', label: 'absolute')
+
+        executor.report_file_source('run_script', '/foo/bar')
+      end
+
+      it 'reports when a file path is module' do
+        expect(analytics).to receive(:event).with('Plan', 'run_script', label: 'module')
+
+        executor.report_file_source('run_script', 'my_module/my_file')
+      end
+    end
   end
 
   context "When running a plan" do

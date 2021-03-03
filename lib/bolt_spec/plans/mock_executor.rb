@@ -214,6 +214,8 @@ module BoltSpec
 
       def report_bundled_content(_mode, _name); end
 
+      def report_file_source(_plan_function, _source); end
+
       def report_apply(_statements, _resources); end
 
       def publish_event(event)

@@ -4,6 +4,7 @@
 require 'English'
 require 'json'
 require 'logging'
+require 'pathname'
 require 'set'
 require 'bolt/analytics'
 require 'bolt/result'
@@ -230,6 +231,11 @@ module Bolt
 
     def report_bundled_content(mode, name)
       @analytics.report_bundled_content(mode, name)
+    end
+
+    def report_file_source(plan_function, source)
+      label = Pathname.new(source).absolute? ? 'absolute' : 'module'
+      @analytics&.event('Plan', plan_function, label: label)
     end
 
     def report_apply(statement_count, resource_counts)
