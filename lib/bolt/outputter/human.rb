@@ -282,7 +282,7 @@ module Bolt
         module_path = 'built-in module' if module_path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
 
         if task.supports_noop
-          usage << Bolt::Util.powershell? ? '[-Noop]' : '[--noop]'
+          usage << (Bolt::Util.powershell? ? ' [-Noop]' : ' [--noop]')
         end
 
         task.parameters&.each do |name, info|
