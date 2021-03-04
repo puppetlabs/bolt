@@ -22,7 +22,7 @@ module Bolt
             code = String.new("  ")
             code << "$#{body['name']} = " if body['name']
 
-            code_body = Bolt::Util.to_code(body['eval'])
+            code_body = Bolt::Util.to_code(body['eval']) || 'undef'
 
             # If we're trying to assign the result of a multi-line eval to a name
             # variable, we need to wrap it in `with()`.
