@@ -14,8 +14,8 @@ module Bolt
           end
         end
 
-        def transpile(relative_path)
-          @plan_path = File.expand_path(relative_path)
+        def transpile(plan_path)
+          @plan_path = plan_path
           @modulename = Bolt::Util.module_name(@plan_path)
           @filename = @plan_path.split(File::SEPARATOR)[-1]
           validate_path

@@ -47,9 +47,15 @@ describe "transpiling YAML plans" do
   }
   PLAN
 
-  it 'transpiles a yaml plan' do
+  it 'transpiles a YAML plan from a path' do
     expect {
       run_cli(%W[plan convert #{plan_path}])
+    }.to output(output_plan).to_stdout
+  end
+
+  it 'transpiles a YAML plan from a plan name' do
+    expect {
+      run_cli(%W[plan convert yaml::conversion -m #{modulepath}])
     }.to output(output_plan).to_stdout
   end
 
