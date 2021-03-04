@@ -216,6 +216,8 @@ module BoltSpec
 
       def report_apply(_statements, _resources); end
 
+      def report_yaml_plan(_plan); end
+
       def publish_event(event)
         if event[:type] == :message
           unless @stub_out_message

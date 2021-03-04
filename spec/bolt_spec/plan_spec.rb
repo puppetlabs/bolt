@@ -59,6 +59,11 @@ describe "BoltSpec::Plans" do
     expect(result.value).to eq(nil)
   end
 
+  it 'runs yaml plans' do
+    expect_out_message.with_params("I'm a YAML plan")
+    expect { run_plan('plans::yaml', {}) }.not_to raise_error
+  end
+
   context 'with commands' do
     let(:plan_name) { 'plans::command' }
     let(:return_expects) { { command: 'echo hello', params: {} } }
