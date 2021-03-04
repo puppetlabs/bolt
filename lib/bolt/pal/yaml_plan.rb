@@ -73,8 +73,7 @@ module Bolt
       def duplicate_check(used_names, name, step_number)
         if used_names.include?(name)
           error_message = "Duplicate step name or parameter detected: #{name.inspect}"
-          err = Step.step_error(error_message, name, step_number)
-          raise Bolt::Error.new(err, "bolt/invalid-plan")
+          raise Step::StepError.new(error_message, name, step_number)
         end
       end
 

@@ -6,11 +6,7 @@ module Bolt
   class PAL
     class YamlPlan
       class Step
-        attr_reader :name, :type, :body, :targets
-
-        def self.allowed_keys
-          Set['name', 'description', 'targets']
-        end
+        attr_reader :body
 
         STEP_KEYS = %w[
           command
@@ -24,15 +20,42 @@ module Bolt
           upload
         ].freeze
 
+        class StepError < Bolt::Error
+          def initialize(message, name, step_number)
+            identifier = name ? name.inspect : "number #{step_number}"
+            error      = "Parse error in step #{identifier}: \n #{message}"
+
+            super(error, 'bolt/invalid-plan')
+          end
+        end
+
+        # Keys that are allowed for the step
+        #
+        def self.allowed_keys
+          required_keys + option_keys + Set['name', 'description', 'targets']
+        end
+
+        # Keys that translate to metaparameters for the plan step's function call
+        #
+        def self.option_keys
+          Set.new
+        end
+
+        # Keys that are required for the step
+        #
+        def self.required_keys
+          Set.new
+        end
+
         def self.create(step_body, step_number)
           type_keys = (STEP_KEYS & step_body.keys)
           case type_keys.length
           when 0
-            raise step_error("No valid action detected", step_body['name'], step_number)
+            raise StepError.new("No valid action detected", step_body['name'], step_number)
           when 1
             type = type_keys.first
           else
-            raise step_error("Multiple action keys detected: #{type_keys.inspect}", step_body['name'], step_number)
+            raise StepError.new("Multiple action keys detected: #{type_keys.inspect}", step_body['name'], step_number)
           end
 
           step_class = const_get("Bolt::PAL::YamlPlan::Step::#{type.capitalize}")
@@ -40,15 +63,49 @@ module Bolt
           step_class.new(step_body)
         end
 
-        def initialize(step_body)
-          @name = step_body['name']
-          @description = step_body['description']
-          @targets = step_body['targets']
-          @body = step_body
+        def initialize(body)
+          @body = body
         end
 
+        # Transpiles the step into the plan language
+        #
         def transpile
-          raise NotImplementedError, "Step #{@name} does not supported conversion to Puppet plan language"
+          code = String.new("  ")
+          code << "$#{body['name']} = " if body['name']
+          code << function_call(function, format_args(body))
+          code << "\n"
+        end
+
+        # Evaluates the step
+        #
+        def evaluate(scope, evaluator)
+          evaluated = evaluator.evaluate_code_blocks(scope, body)
+          scope.call_function(function, format_args(evaluated))
+        end
+
+        # Formats a list of args from the provided body
+        #
+        private def format_args(_body)
+          raise NotImplementedError, "Step class #{self.class} does not implement #format_args"
+        end
+
+        # Returns the step's corresponding Puppet language function call
+        #
+        private def function_call(function, args)
+          code_args = args.map { |arg| Bolt::Util.to_code(arg) }
+          "#{function}(#{code_args.join(', ')})"
+        end
+
+        # The function that corresponds to the step
+        #
+        private def function
+          raise NotImplementedError, "Step class #{self.class} does not implement #function"
+        end
+
+        # Returns a hash of options formatted for function calls
+        #
+        private def format_options(body)
+          body.slice(*self.class.option_keys).transform_keys { |key| "_#{key}" }
         end
 
         def self.validate(body, step_number)
@@ -57,19 +114,35 @@ module Bolt
           begin
             body.each { |k, v| validate_puppet_code(k, v) }
           rescue Bolt::Error => e
-            raise step_error(e.msg, body['name'], step_number)
+            raise StepError.new(e.msg, body['name'], step_number)
+          end
+
+          if body.key?('parameters')
+            unless body['parameters'].is_a?(Hash)
+              raise StepError.new("Parameters key must be a hash", body['name'], step_number)
+            end
+
+            metaparams = option_keys.map { |key| "_#{key}" }
+
+            if (dups = body['parameters'].keys & metaparams).any?
+              raise StepError.new(
+                "Cannot specify metaparameters when using top-level keys with same name: #{dups.join(', ')}",
+                body['name'],
+                step_number
+              )
+            end
           end
 
           unless body.fetch('parameters', {}).is_a?(Hash)
             msg = "Parameters key must be a hash"
-            raise step_error(msg, body['name'], step_number)
+            raise StepError.new(msg, body['name'], step_number)
           end
 
           if body.key?('name')
             name = body['name']
             unless name.is_a?(String) && name.match?(Bolt::PAL::YamlPlan::VAR_NAME_PATTERN)
               error_message = "Invalid step name: #{name.inspect}"
-              raise step_error(error_message, body['name'], step_number)
+              raise StepError.new(error_message, body['name'], step_number)
             end
           end
         end
@@ -81,8 +154,7 @@ module Bolt
           illegal_keys = body.keys.to_set - allowed_keys
           if illegal_keys.any?
             error_message = "The #{step_type.inspect} step does not support: #{illegal_keys.to_a.inspect} key(s)"
-            err = step_error(error_message, body['name'], step_number)
-            raise Bolt::Error.new(err, "bolt/invalid-plan")
+            raise StepError.new(error_message, body['name'], step_number)
           end
 
           # Ensure all required keys are present
@@ -90,8 +162,7 @@ module Bolt
 
           if missing_keys.any?
             error_message = "The #{step_type.inspect} step requires: #{missing_keys.to_a.inspect} key(s)"
-            err = step_error(error_message, body['name'], step_number)
-            raise Bolt::Error.new(err, "bolt/invalid-plan")
+            raise StepError.new(error_message, body['name'], step_number)
           end
         end
 
@@ -123,12 +194,6 @@ module Bolt
           raise Bolt::Error.new("Error parsing #{step_key.inspect}: #{e.basic_message}", "bolt/invalid-plan")
         end
 
-        def self.step_error(message, name, step_number)
-          identifier = name ? name.inspect : "number #{step_number}"
-          error = "Parse error in step #{identifier}: \n #{message}"
-          Bolt::Error.new(error, 'bolt/invalid-plan')
-        end
-
         # Parses the an evaluable string, optionally quote it before parsing
         def self.parse_code_string(code, quote = false)
           if quote
@@ -137,11 +202,6 @@ module Bolt
           else
             Puppet::Pops::Parser::EvaluatingParser.new.parse_string(code)
           end
-        end
-
-        def function_call(function, args)
-          code_args = args.map { |arg| Bolt::Util.to_code(arg) }
-          "#{function}(#{code_args.join(', ')})"
         end
       end
     end

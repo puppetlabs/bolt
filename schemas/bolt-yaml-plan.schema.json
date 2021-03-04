@@ -77,6 +77,9 @@
       "additionalProperties": false,
       "required": ["command", "targets"],
       "properties": {
+        "catch_errors": {
+          "$ref": "#/definitions/catch_errors"
+        },
         "command": {
           "description": "The command to run.",
           "type": "string"
@@ -84,8 +87,14 @@
         "description": {
           "$ref": "#/definitions/description"
         },
+        "env_vars": {
+          "$ref": "#/definitions/env_vars"
+        },
         "name": {
           "$ref": "#/definitions/name"
+        },
+        "run_as": {
+          "$ref": "#/definitions/run_as"
         },
         "targets": {
           "$ref": "#/definitions/targets"
@@ -98,6 +107,9 @@
       "additionalProperties": false,
       "required": ["destination", "download", "targets"],
       "properties": {
+        "catch_errors": {
+          "$ref": "#/definitions/catch_errors"
+        },
         "description": {
           "$ref": "#/definitions/description"
         },
@@ -111,6 +123,9 @@
         },
         "name": {
           "$ref": "#/definitions/name"
+        },
+        "run_as": {
+          "$ref": "#/definitions/run_as"
         },
         "targets": {
           "$ref": "#/definitions/targets"
@@ -140,6 +155,9 @@
       "additionalProperties": false,
       "required": ["plan"],
       "properties": {
+        "catch_errors": {
+          "$ref": "#/definitions/catch_errors"
+        },
         "description": {
           "$ref": "#/definitions/description"
         },
@@ -153,6 +171,9 @@
         "plan": {
           "description": "The name of the plan to run.",
           "type": "string"
+        },
+        "run_as": {
+          "$ref": "#/definitions/run_as"
         },
         "targets": {
           "$ref": "#/definitions/targets"
@@ -211,11 +232,20 @@
             "type": "string"
           }
         },
+        "catch_errors": {
+          "$ref": "#/definitions/catch_errors"
+        },
         "description": {
           "$ref": "#/definitions/description"
         },
+        "env_vars": {
+          "$ref": "#/definitions/env_vars"
+        },
         "name": {
           "$ref": "#/definitions/name"
+        },
+        "run_as": {
+          "$ref": "#/definitions/run_as"
         },
         "script": {
           "description": "The script to run. Scripts must be in the files/ directory of a module, and the name of the script must be specified as <modulename>/path/to/script, ommitting the files/ directory from the path.",
@@ -232,15 +262,24 @@
       "additionalProperties": false,
       "required": ["task", "targets"],
       "properties": {
+        "catch_errors": {
+          "$ref": "#/definitions/catch_errors"
+        },
         "description": {
           "$ref": "#/definitions/description"
         },
         "name": {
           "$ref": "#/definitions/name"
         },
+        "noop": {
+          "$ref": "#/definitions/noop"
+        },
         "parameters": {
           "description": "A map of parameters to pass to the task.",
           "type": "object"
+        },
+        "run_as": {
+          "$ref": "#/definitions/run_as"
         },
         "task": {
           "description": "The task to run.",
@@ -257,6 +296,9 @@
       "additionalProperties": false,
       "required": ["destination", "targets", "upload"],
       "properties": {
+        "catch_errors": {
+          "$ref": "#/definitions/catch_errors"
+        },
         "description": {
           "$ref": "#/definitions/description"
         },
@@ -266,6 +308,9 @@
         },
         "name": {
           "$ref": "#/definitions/name"
+        },
+        "run_as": {
+          "$ref": "#/definitions/run_as"
         },
         "targets": {
           "$ref": "#/definitions/targets"
@@ -278,12 +323,28 @@
     }
   },
   "definitions": {
+    "catch_errors": {
+      "description": "Wehther to catch raised errors. If set to true, the plan continues execution if the step fails.",
+      "type": "boolean"
+    },
     "description": {
       "description": "A description of the step. Used by Bolt to describe which step is being executed in plan output.",
       "type": "string"
     },
+    "env_vars": {
+      "description": "A map of environment variables to set on the target when running the step.",
+      "type": "object"
+    },
     "name": {
       "description": "A unique name that can be used to refer to the result of the step later in the plan.",
+      "type": "string"
+    },
+    "noop": {
+      "description": "Whether to run the step in no-operation mode, if available.",
+      "type": "boolean"
+    },
+    "run_as": {
+      "description": "The user to run as on the target with privilege escalation. Only applies to targets using a transport that supports the 'run-as' configuration option.",
       "type": "string"
     },
     "targets": {

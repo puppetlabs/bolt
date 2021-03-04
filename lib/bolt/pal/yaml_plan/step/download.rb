@@ -5,31 +5,30 @@ module Bolt
     class YamlPlan
       class Step
         class Download < Step
-          def self.allowed_keys
-            super + Set['download', 'destination']
+          def self.option_keys
+            Set['catch_errors', 'run_as']
           end
 
           def self.required_keys
             Set['download', 'destination', 'targets']
           end
 
-          def initialize(step_body)
-            super
-            @source = step_body['download']
-            @destination = step_body['destination']
+          # Returns an array of arguments to pass to the step's function call
+          #
+          private def format_args(body)
+            opts = format_options(body)
+
+            args = [body['download'], body['destination'], body['targets']]
+            args << body['description'] if body['description']
+            args << opts if opts.any?
+
+            args
           end
 
-          def transpile
-            code = String.new("  ")
-            code << "$#{@name} = " if @name
-
-            fn = 'download_file'
-            args = [@source, @destination, @targets]
-            args << @description if @description
-
-            code << function_call(fn, args)
-
-            code << "\n"
+          # Returns the function corresponding to the step
+          #
+          private def function
+            'download_file'
           end
         end
       end
