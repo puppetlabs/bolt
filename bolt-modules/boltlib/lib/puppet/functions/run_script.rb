@@ -80,7 +80,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
         Puppet::Pops::Issues::NOT_A_FILE, file: script
       )
     end
-
+    executor.report_file_source(self.class.name, script)
     # Ensure that given targets are all Target instances)
     targets = inventory.get_targets(targets)
 

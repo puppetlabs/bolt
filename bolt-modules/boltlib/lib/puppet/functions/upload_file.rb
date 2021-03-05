@@ -76,7 +76,7 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
         Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, file: source
       )
     end
-
+    executor.report_file_source(self.class.name, source)
     # Ensure that that given targets are all Target instances
     targets = inventory.get_targets(targets)
     if targets.empty?
