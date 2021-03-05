@@ -249,11 +249,14 @@ module Bolt
         end
       end
 
-      if %w[task plan].include?(options[:subcommand]) && options[:action] == 'run'
+      if %w[task plan script].include?(options[:subcommand]) && options[:action] == 'run'
         if options[:object].nil?
           raise Bolt::CLIError, "Must specify a #{options[:subcommand]} to run"
         end
-        # This may mean that we parsed a parameter as the object
+      end
+
+      # This may mean that we parsed a parameter as the object
+      if %w[task plan].include?(options[:subcommand]) && options[:action] == 'run'
         unless options[:object] =~ /\A([a-z][a-z0-9_]*)?(::[a-z][a-z0-9_]*)*\Z/
           raise Bolt::CLIError,
                 "Invalid #{options[:subcommand]} '#{options[:object]}'"
@@ -501,9 +504,8 @@ module Bolt
             when 'command'
               executor.run_command(targets, options[:object], executor_opts)
             when 'script'
-              script = options[:object]
-              validate_file('script', script)
-              executor.run_script(targets, script, options[:leftovers], executor_opts)
+              script_path = find_file(options[:object])
+              executor.run_script(targets, script_path, options[:leftovers], executor_opts)
             when 'task'
               pal.run_task(options[:object],
                            targets,
@@ -838,6 +840,28 @@ module Bolt
       end
 
       Bolt::Util.validate_file(type, path, allow_dir)
+    end
+
+    # Returns the path to a file. If the path is an absolute or relative to
+    # a file, and the file exists, returns the path as-is. Otherwise, checks if
+    # the path is a Puppet file path and looks for the file in a module's files
+    # directory.
+    #
+    def find_file(path)
+      unless File.exist?(path) || Pathname.new(path).absolute?
+        modulepath = Bolt::Config::Modulepath.new(config.modulepath)
+        modules    = Bolt::Module.discover(modulepath.full_modulepath, config.project)
+        mod, file = path.split(File::SEPARATOR, 2)
+
+        if modules[mod]
+          @logger.debug("Did not find file at #{File.expand_path(path)}, checking in module '#{mod}'")
+          path = File.join(modules[mod].path, 'files', file)
+        end
+      end
+
+      Bolt::Util.validate_file('script', path)
+
+      path
     end
 
     def rerun
