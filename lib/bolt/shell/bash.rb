@@ -53,19 +53,35 @@ module Bolt
 
       def download(source, destination, options = {})
         running_as(options[:run_as]) do
-          # Target OS may be either Unix or Windows. Without knowing the target OS before-hand
-          # we can't assume whether the path separator is '/' or '\'. Assume we're connecting
-          # to a target with Unix and then check if the path exists after downloading.
           download = File.join(destination, Bolt::Util.unix_basename(source))
 
-          conn.download_file(source, destination, download)
+          # If using run-as, the file is copied to a tmpdir and chowned to the
+          # connecting user. This is a workaround for limitations in net-ssh that
+          # only allow for downloading files as the connecting user, which is a
+          # problem for users who cannot connect to targets as the root user.
+          # This temporary copy should *always* be deleted.
+          if run_as
+            with_tmpdir(force_cleanup: true) do |dir|
+              tmpfile = File.join(dir.to_s, Bolt::Util.unix_basename(source))
 
-          # If the download path doesn't exist, then the file was likely downloaded from Windows
-          # using a source path with backslashes (e.g. 'C:\Users\Administrator\foo'). The file
-          # should be saved to the expected location, so update the download path assuming a
-          # Windows basename so the result shows the correct local path.
-          unless File.exist?(download)
-            download = File.join(destination, Bolt::Util.windows_basename(source))
+              result = execute(['cp', '-r', source, dir.to_s], sudoable: true)
+
+              if result.exit_code != 0
+                message = "Could not copy file '#{source}' to temporary directory '#{dir}': #{result.stderr.string}"
+                raise Bolt::Node::FileError.new(message, 'CP_ERROR')
+              end
+
+              # We need to force the chown, otherwise this will just return
+              # without doing anything since the chown user is the same as the
+              # connecting user.
+              dir.chown(conn.user, force: true)
+
+              conn.download_file(tmpfile, destination, download)
+            end
+          # If not using run-as, we can skip creating a temporary copy and just
+          # download the file directly.
+          else
+            conn.download_file(source, destination, download)
           end
 
           Bolt::Result.for_download(target, source, destination, download)
@@ -290,12 +306,12 @@ module Bolt
 
       # A helper to create and delete a tmpdir on the remote system. Yields the
       # directory name.
-      def with_tmpdir
+      def with_tmpdir(force_cleanup: false)
         dir = make_tmpdir
         yield dir
       ensure
         if dir
-          if target.options['cleanup']
+          if target.options['cleanup'] || force_cleanup
             dir.delete
           else
             Bolt::Logger.warn("skip_cleanup", "Skipping cleanup of tmpdir #{dir}")

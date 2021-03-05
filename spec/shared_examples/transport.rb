@@ -681,6 +681,36 @@ SHELL
       runner.run_command(target, "rm #{dest}", sudoable: true, run_as: 'root')
     end
 
+    it "can download a file as root" do
+      contents = "download file test as root content"
+      filename = 'test.txt'
+      source   = "/root/#{filename}"
+
+      expect(runner.run_command(target, "echo '#{contents}' > #{source}").ok?).to be
+      expect(runner.run_command(target, "cat #{source}")['stdout']).to match(/#{contents}/)
+      expect(runner.run_command(target, "stat -c %U #{source}")['stdout'].chomp).to eq('root')
+      expect(runner.run_command(target, "stat -c %G #{source}")['stdout'].chomp).to eq('root')
+
+      Dir.mktmpdir(nil, Dir.pwd) do |destination|
+        expect(
+          runner.download(target, source, destination).value
+        ).to eq(
+          '_output' => "Downloaded '#{target.host}:#{source}' to '#{destination}'",
+          'path'    => File.expand_path(filename, destination)
+        )
+
+        expect(
+          File.exist?(File.expand_path(filename, destination))
+        ).to eq(true)
+
+        expect(
+          File.read(File.expand_path(filename, destination))
+        ).to match(/#{contents}/)
+      end
+
+      runner.run_command(target, "rm #{source}")
+    end
+
     context "with an incorrect password" do
       let(:transport_config) do
         {
