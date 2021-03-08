@@ -5,14 +5,14 @@ forge "http://forge.puppetlabs.com"
 moduledir File.join(File.dirname(__FILE__), 'modules')
 
 # Core modules used by 'apply'
-mod 'puppetlabs-service', '1.4.0'
+mod 'puppetlabs-service', '2.0.0'
 mod 'puppetlabs-puppet_agent', '4.4.0'
 mod 'puppetlabs-facts', '1.4.0'
 
 # Core types and providers for Puppet 6
-mod 'puppetlabs-augeas_core', '1.1.1'
+mod 'puppetlabs-augeas_core', '1.1.2'
 mod 'puppetlabs-host_core', '1.0.3'
-mod 'puppetlabs-scheduled_task', '2.3.1'
+mod 'puppetlabs-scheduled_task', '3.0.0'
 mod 'puppetlabs-sshkeys_core', '2.2.0'
 mod 'puppetlabs-zfs_core', '1.2.0'
 mod 'puppetlabs-cron_core', '1.0.5'
@@ -22,14 +22,14 @@ mod 'puppetlabs-yumrepo_core', '1.0.7'
 mod 'puppetlabs-zone_core', '1.0.3'
 
 # Useful additional modules
-mod 'puppetlabs-package', '1.4.0'
+mod 'puppetlabs-package', '2.0.0'
 mod 'puppetlabs-powershell_task_helper', '0.1.0'
-mod 'puppetlabs-puppet_conf', '0.8.0'
+mod 'puppetlabs-puppet_conf', '1.0.0'
 mod 'puppetlabs-python_task_helper', '0.5.0'
-mod 'puppetlabs-reboot', '3.2.0'
+mod 'puppetlabs-reboot', '4.0.0'
 mod 'puppetlabs-ruby_task_helper', '0.6.0'
 mod 'puppetlabs-ruby_plugin_helper', '0.2.0'
-mod 'puppetlabs-stdlib', '6.6.0'
+mod 'puppetlabs-stdlib', '7.0.0'
 
 # Plugin modules
 mod 'puppetlabs-aws_inventory', '0.6.0'
