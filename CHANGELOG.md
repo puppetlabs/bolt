@@ -1,5 +1,88 @@
 # Changelog
 
+## Bolt 3.2.0 (2021-03-08)
+
+### New features
+
+* **Add LXD transport**
+  ([#2311](https://github.com/puppetlabs/bolt/issues/2311))
+
+  Bolt now includes a new LXD transport to use when connecting with containers
+  managed with LXD. See the [transport configuration
+  reference](https://puppet.com/docs/bolt/latest/bolt_transports_reference.html#lxd)
+  for configuration options. _This feature is experimental and might change
+  between minor versions._ 
+
+  _Contributed by [Coleman McFarland](https://github.com/dontlaugh)_
+
+* **Stream output from targets**
+  ([#102](https://github.com/puppetlabs/bolt/issues/102))
+
+  You can now stream output from a target as actions are running using the
+  `stream` configuration option or the `--stream` command-line option. For more
+  information, see [the
+  documentation](https://puppet.com/docs/bolt/latest/experimental_features.html#streaming-output).
+  _This feature is experimental and might change between minor versions._
+
+* **Support metaparameters as top-level keys in YAML plan steps**
+  ([#2629](https://github.com/puppetlabs/bolt/issues/2629))
+
+  YAML plan steps now support metaparameters as top-level keys. For
+  example, the `script` step supports an `env_vars` key which accepts a
+  hash of environment variables to set on the target when running the
+  script.
+
+* **Show plan descriptions in plan list**
+  ([#2678](https://github.com/puppetlabs/bolt/pull/2678))
+
+  Plan descriptions now appear in `bolt plan show` and `Get-BoltPlan`
+  output.
+
+* **Support Puppet paths when running scripts from the CLI**
+  ([#2652](https://github.com/puppetlabs/bolt/issues/2652))
+
+  You can now use Puppet paths (`<MODULE NAME>/<FILE NAME>`) to specify
+  the path to a script when running `bolt script run` or
+  `Invoke-BoltScript`.
+
+* **New analytics about plan function file source**
+  ([#2687](https://github.com/puppetlabs/bolt/pull/2687))
+
+  Bolt now reports whether a file path is an absolute path or a Puppet file path
+  for the `run_script`, `file::read`, and `upload_file` plan functions.
+
+### Bug fixes
+
+* **Handle plan parameter tags without descriptions**
+  ([#2672](https://github.com/puppetlabs/bolt/issues/2672))
+
+  Bolt no longer errors if a plan includes a Puppet strings `@param` tag
+  that does not have a description.
+
+* **Run YAML plan `plan` steps with `targets` key**
+  ([#2677](https://github.com/puppetlabs/bolt/pull/2677))
+
+  YAML plans that have a `plan` step with a top-level `targets` key now
+  pass the targets to the plan.
+
+* **Test YAML plans with BoltSpec**
+  ([#2682](https://github.com/puppetlabs/bolt/pull/2682))
+
+  YAML plans can now be tested with BoltSpec.
+
+* **Convert YAML plans with a `null` eval step**
+  ([#2677](https://github.com/puppetlabs/bolt/pull/2677))
+
+  YAML plans that include a `null` eval step no longer raise an error
+  when converted to a Puppet language plan.
+
+* **Correctly read SSL key contents in `http_request` task**
+  ([#2693](https://github.com/puppetlabs/bolt/pull/2693))
+
+  The `http_request` now correctly reads key contents from the path passed to
+  the `key` parameter. Previously, the task used the file path itself as the key
+  contents.
+
 ## Bolt 3.1.0 (2021-03-01)
 
 ### New features
