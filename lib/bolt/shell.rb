@@ -8,6 +8,22 @@ module Bolt
       @target = target
       @conn = conn
       @logger = Bolt::Logger.logger(@target.safe_name)
+
+      if Bolt::Logger.stream
+        Bolt::Logger.warn_once("stream_experimental",
+                               "The 'stream' option is experimental, and might "\
+                               "include breaking changes between minor versions.")
+        @stream_logger = Bolt::Logger.logger(:stream)
+        # Don't send stream messages to the parent logger
+        @stream_logger.additive = false
+
+        # Log stream messages without any other data or color
+        pattern = Logging.layouts.pattern(pattern: '%m\n')
+        @stream_logger.appenders = Logging.appenders.stdout(
+          'console',
+          layout: pattern
+        )
+      end
     end
 
     def run_command(*_args)

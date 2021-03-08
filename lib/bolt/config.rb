@@ -419,6 +419,10 @@ module Bolt
       @data['spinner']
     end
 
+    def stream
+      @data['stream']
+    end
+
     def inventoryfile
       @data['inventoryfile']
     end

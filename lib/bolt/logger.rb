@@ -91,6 +91,14 @@ module Bolt
       Logging.logger[:root].appenders.any?
     end
 
+    def self.stream
+      @stream
+    end
+
+    def self.stream=(stream)
+      @stream = stream
+    end
+
     # A helper to ensure the Logging library is always initialized with our
     # custom log levels before retrieving a Logger instance.
     def self.logger(name)

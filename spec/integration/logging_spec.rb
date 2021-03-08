@@ -149,3 +149,93 @@ describe 'suppressing warnings' do
     end
   end
 end
+
+shared_examples 'streaming output' do
+  include BoltSpec::Files
+  include BoltSpec::Integration
+  include BoltSpec::Project
+
+  let(:lines)       { @log_output.readlines }
+  let(:logger)      { Bolt::Logger.logger(:stream) }
+
+  around :each do |example|
+    with_project(config: config) do |project|
+      @project = project
+      example.run
+    end
+  end
+
+  context 'with streaming enabled' do
+    let(:config) {
+      { 'modulepath' => fixtures_path('modules'),
+        'stream' => true }
+    }
+
+    before :each do
+      allow(Bolt::Logger).to receive(:logger).with(any_args).and_call_original
+      expect(Bolt::Logger).to receive(:logger).with(:stream).and_return(logger)
+      # Don't actually print logs
+      allow(logger).to receive(:warn)
+    end
+
+    it 'streams stdout to the console' do
+      expect(logger).to receive(:warn).with(/\[#{safe_name}\] out: #{user}/)
+      run_cli(%W[command run #{whoami} -t #{uri}] + config_flags, project: @project)
+    end
+
+    it 'streams stderr to the console' do
+      expect(logger).to receive(:warn).with(/\[#{safe_name}\] err: error/)
+      run_cli(%W[command run #{err_cmd} -t #{uri}] + config_flags, project: @project)
+    end
+
+    it 'formats multi-line messages correctly' do
+      expected = <<~OUTPUT
+      [#{safe_name}] out: In like a lion
+      [#{safe_name}] out: Out like a lamb
+      OUTPUT
+      expect(logger).to receive(:warn).with(expected.chomp)
+      run_cli(%W[task run sample::multiline -t #{uri}] + config_flags, project: @project)
+    end
+
+    it 'does not print streaming logs to log files' do
+      run_cli(%W[command run #{whoami} -t #{uri}] + config_flags, project: @project)
+      expect(File.read(File.join(@project.path, 'bolt-debug.log'))).not_to include("[#{safe_name}] out: bolt")
+    end
+  end
+
+  context 'with streaming disabled' do
+    let(:config) { {} }
+
+    it 'does not print streaming logs' do
+      allow(Bolt::Logger).to receive(:logger).with(any_args).and_call_original
+      expect(Bolt::Logger).not_to receive(:logger).with(:stream)
+      run_cli(%W[command run #{whoami} -t #{uri}] + config_flags, project: @project)
+    end
+  end
+end
+
+describe 'streaming output over SSH', ssh: true do
+  include BoltSpec::Conn
+
+  let(:uri)           { conn_uri('ssh', include_password: true) }
+  let(:safe_name)     { conn_uri('ssh') }
+  let(:whoami)        { 'whoami' }
+  let(:user)          { conn_info('ssh')[:user] }
+  let(:err_cmd)       { "echo 'error' 1>&2" }
+  let(:config_flags)  { %w[--no-host-key-check] }
+
+  include_examples 'streaming output'
+end
+
+describe 'streaming output over WinRM', winrm: true do
+  include BoltSpec::Conn
+
+  let(:uri)         { conn_uri('winrm', include_password: true) }
+  let(:safe_name)   { conn_uri('winrm') }
+  let(:user)        { conn_info('winrm')[:user] }
+  let(:whoami)      { '$env:UserName' }
+  let(:err_cmd)     { '$host.ui.WriteErrorLine("error")' }
+  let(:config_flags)  { %w[--no-ssl --no-ssl-verify] }
+
+  include_examples 'streaming output'
+end

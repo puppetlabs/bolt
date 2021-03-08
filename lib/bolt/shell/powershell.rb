@@ -310,12 +310,26 @@ module Bolt
           # the proper encoding so the string isn't later misinterpreted
           encoding = out.external_encoding
           out.binmode
-          result.stdout << out.read.force_encoding(encoding)
+          to_print = out.read.force_encoding(encoding)
+          if !to_print.chomp.empty? && @stream_logger
+            formatted = to_print.lines.map do |msg|
+              "[#{@target.safe_name}] out: #{msg.chomp}"
+            end.join("\n")
+            @stream_logger.warn(formatted)
+          end
+          result.stdout << to_print
         end
         stderr = Thread.new do
           encoding = err.external_encoding
           err.binmode
-          result.stderr << err.read.force_encoding(encoding)
+          to_print = err.read.force_encoding(encoding)
+          if !to_print.chomp.empty? && @stream_logger
+            formatted = to_print.lines.map do |msg|
+              "[#{@target.safe_name}] err: #{msg.chomp}"
+            end.join("\n")
+            @stream_logger.warn(formatted)
+          end
+          result.stderr << to_print
         end
 
         stdout.join

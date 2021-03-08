@@ -12,7 +12,6 @@ module Bolt
         super
 
         @run_as = nil
-
         @sudo_id = SecureRandom.uuid
         @sudo_password = @target.options['sudo-password'] || @target.password
       end
@@ -390,14 +389,23 @@ module Bolt
           # See if we can read from out or err, or write to in
           ready_read, ready_write, = select(read_streams.keys, write_stream, nil, timeout)
 
-          # Read from out and err
           ready_read&.each do |stream|
+            stream_name = stream == out ? 'out' : 'err'
             # Check for sudo prompt
-            read_streams[stream] << if use_sudo
-                                      check_sudo(stream, inp, options[:stdin])
-                                    else
-                                      stream.readpartial(CHUNK_SIZE)
-                                    end
+            to_print = if use_sudo
+                         check_sudo(stream, inp, options[:stdin])
+                       else
+                         stream.readpartial(CHUNK_SIZE)
+                       end
+
+            if !to_print.chomp.empty? && @stream_logger
+              formatted = to_print.lines.map do |msg|
+                "[#{@target.safe_name}] #{stream_name}: #{msg.chomp}"
+              end.join("\n")
+              @stream_logger.warn(formatted)
+            end
+
+            read_streams[stream] << to_print
           rescue EOFError
           end
 

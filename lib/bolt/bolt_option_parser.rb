@@ -13,7 +13,7 @@ module Bolt
                 run_context: %w[concurrency inventoryfile save-rerun cleanup],
                 global_config_setters: PROJECT_PATHS + %w[modulepath],
                 transports: %w[transport connect-timeout tty native-ssh ssh-command copy-command],
-                display: %w[format color verbose trace],
+                display: %w[format color verbose trace stream],
                 global: %w[help version log-level clear-cache] }.freeze
 
     ACTION_OPTS = OPTIONS.values.flatten.freeze
@@ -887,6 +887,9 @@ module Bolt
       end
       define('-v', '--[no-]verbose', 'Display verbose logging') do |value|
         @options[:verbose] = value
+      end
+      define('--stream', 'Stream output from scripts and commands to the console') do |_|
+        @options[:stream] = true
       end
       define('--trace', 'Display error stack traces') do |_|
         @options[:trace] = true

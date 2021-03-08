@@ -175,6 +175,7 @@ module Bolt
     # Completes the setup process by configuring Bolt and log messages
     def finalize_setup
       Bolt::Logger.configure(config.log, config.color, config.disable_warnings)
+      Bolt::Logger.stream = config.stream
       Bolt::Logger.analytics = analytics
       Bolt::Logger.flush_queue
 
