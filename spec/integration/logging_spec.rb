@@ -179,19 +179,19 @@ shared_examples 'streaming output' do
     end
 
     it 'streams stdout to the console' do
-      expect(logger).to receive(:warn).with(/\[#{safe_name}\] out: #{user}/)
+      expect(logger).to receive(:warn).with(/\[#{uri}\] out: #{user}/)
       run_cli(%W[command run #{whoami} -t #{uri}] + config_flags, project: @project)
     end
 
     it 'streams stderr to the console' do
-      expect(logger).to receive(:warn).with(/\[#{safe_name}\] err: error/)
+      expect(logger).to receive(:warn).with(/\[#{uri}\] err: error/)
       run_cli(%W[command run #{err_cmd} -t #{uri}] + config_flags, project: @project)
     end
 
     it 'formats multi-line messages correctly' do
       expected = <<~OUTPUT
-      [#{safe_name}] out: In like a lion
-      [#{safe_name}] out: Out like a lamb
+      [#{uri}] out: In like a lion
+      [#{uri}] out: Out like a lamb
       OUTPUT
       expect(logger).to receive(:warn).with(expected.chomp)
       run_cli(%W[task run sample::multiline -t #{uri}] + config_flags, project: @project)
@@ -199,7 +199,7 @@ shared_examples 'streaming output' do
 
     it 'does not print streaming logs to log files' do
       run_cli(%W[command run #{whoami} -t #{uri}] + config_flags, project: @project)
-      expect(File.read(File.join(@project.path, 'bolt-debug.log'))).not_to include("[#{safe_name}] out: bolt")
+      expect(File.read(File.join(@project.path, 'bolt-debug.log'))).not_to include("[#{uri}] out: bolt")
     end
   end
 
@@ -217,12 +217,12 @@ end
 describe 'streaming output over SSH', ssh: true do
   include BoltSpec::Conn
 
-  let(:uri)           { conn_uri('ssh', include_password: true) }
-  let(:safe_name)     { conn_uri('ssh') }
+  let(:uri)           { conn_uri('ssh') }
+  let(:pw)            { conn_info('ssh')[:password] }
   let(:whoami)        { 'whoami' }
   let(:user)          { conn_info('ssh')[:user] }
   let(:err_cmd)       { "echo 'error' 1>&2" }
-  let(:config_flags)  { %w[--no-host-key-check] }
+  let(:config_flags)  { %W[--no-host-key-check --password #{pw}] }
 
   include_examples 'streaming output'
 end
@@ -230,12 +230,12 @@ end
 describe 'streaming output over WinRM', winrm: true do
   include BoltSpec::Conn
 
-  let(:uri)         { conn_uri('winrm', include_password: true) }
-  let(:safe_name)   { conn_uri('winrm') }
-  let(:user)        { conn_info('winrm')[:user] }
-  let(:whoami)      { '$env:UserName' }
-  let(:err_cmd)     { '$host.ui.WriteErrorLine("error")' }
-  let(:config_flags)  { %w[--no-ssl --no-ssl-verify] }
+  let(:uri)           { conn_uri('winrm') }
+  let(:pw)            { conn_info('winrm')[:password] }
+  let(:user)          { conn_info('winrm')[:user] }
+  let(:whoami)        { '$env:UserName' }
+  let(:err_cmd)       { '$host.ui.WriteErrorLine("error")' }
+  let(:config_flags)  { %W[--no-ssl --no-ssl-verify --password #{pw}] }
 
   include_examples 'streaming output'
 end
