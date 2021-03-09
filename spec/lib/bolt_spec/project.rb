@@ -18,12 +18,11 @@ module BoltSpec
         # Set default config and inventory if not provided
         cfg = { 'name' => name }
         cfg.merge!(config) if config
-        inventory ||= {}
 
         # Create project directory and files
         FileUtils.mkdir_p(project_path)
         File.write(config_path, cfg.to_yaml)
-        File.write(inventory_path, inventory.to_yaml)
+        File.write(inventory_path, inventory.to_yaml) unless inventory.nil?
 
         yield(project_path)
       end
