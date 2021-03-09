@@ -78,6 +78,19 @@ describe 'run_script' do
         .and_return(result_set)
     end
 
+    it 'with pwsh_params' do
+      executor.expects(:run_script)
+              .with([target], full_path, [], { pwsh_params: { 'Name' => 'BoltyMcBoltface' } }, [])
+              .returns(result_set)
+      inventory.expects(:get_targets).with(hostname).returns([target])
+
+      is_expected.to run
+        .with_params('test/uploads/hostname.sh',
+                     hostname,
+                     { 'pwsh_params' => { 'Name' => 'BoltyMcBoltface' } })
+        .and_return(result_set)
+    end
+
     it 'with _run_as' do
       executor.expects(:run_script)
               .with([target], full_path, [], { run_as: 'root' }, [])
@@ -245,5 +258,25 @@ describe 'run_script' do
         .with_params('test/uploads/nonesuch.sh', [])
         .and_raise_error(/Plan language function 'run_script' cannot be used/)
     end
+  end
+
+  context 'with arguments and pwsh_params' do
+    it 'fails' do
+      is_expected.to run
+        .with_params('test/uploads/script.sh', [], 'arguments' => [], 'pwsh_params' => {})
+        .and_raise_error(/Cannot specify both 'arguments' and 'pwsh_params'/)
+    end
+  end
+
+  it 'fails if arguments is not an array' do
+    is_expected.to run
+      .with_params('test/uploads/script.sh', [], 'arguments' => { 'foo' => 'bar' })
+      .and_raise_error(/Option 'arguments' must be an array/)
+  end
+
+  it 'fails if pwsh_params is not a hash' do
+    is_expected.to run
+      .with_params('test/uploads/script.sh', [], 'pwsh_params' => %w[foo bar])
+      .and_raise_error(/Option 'pwsh_params' must be a hash/)
   end
 end

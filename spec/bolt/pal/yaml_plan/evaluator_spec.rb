@@ -281,38 +281,89 @@ describe Bolt::PAL::YamlPlan::Evaluator do
         'arguments' => %w[a b c] }
     end
 
-    it 'passes arguments to the script' do
-      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => %w[a b c]]
-      expect(scope).to receive(:call_function).with('run_script', args)
+    context 'with arguments' do
+      it 'passes arguments to the script' do
+        args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => %w[a b c]]
+        expect(scope).to receive(:call_function).with('run_script', args)
 
-      step.evaluate(scope, subject)
+        step.evaluate(scope, subject)
+      end
+
+      it 'succeeds if no arguments are specified' do
+        step_body.delete('arguments')
+
+        args = ['mymodule/myscript.sh', 'foo.example.com']
+        expect(scope).to receive(:call_function).with('run_script', args)
+
+        step.evaluate(scope, subject)
+      end
+
+      it 'succeeds if empty arguments are specified' do
+        step_body['arguments'] = []
+
+        args = ['mymodule/myscript.sh', 'foo.example.com']
+        expect(scope).to receive(:call_function).with('run_script', args)
+
+        step.evaluate(scope, subject)
+      end
+
+      it 'succeeds if nil arguments are specified' do
+        step_body['arguments'] = nil
+
+        args = ['mymodule/myscript.sh', 'foo.example.com']
+        expect(scope).to receive(:call_function).with('run_script', args)
+
+        step.evaluate(scope, subject)
+      end
+
+      it 'errors if arguments is not an array' do
+        step_body['arguments'] = { 'foo' => 'bar' }
+
+        expect { step }.to raise_error(/arguments key must be an array/)
+      end
     end
 
-    it 'succeeds if no arguments are specified' do
-      step_body.delete('arguments')
+    context 'with pwsh_params' do
+      let(:params) { { 'Name' => 'BoltyMcBoltface' } }
+      let(:script) { 'mymodule/myscript.sh' }
+      let(:target) { 'foo.example.com' }
 
-      args = ['mymodule/myscript.sh', 'foo.example.com']
-      expect(scope).to receive(:call_function).with('run_script', args)
+      let(:step_body) do
+        {
+          'script'      => script,
+          'targets'     => target,
+          'pwsh_params' => params
+        }
+      end
 
-      step.evaluate(scope, subject)
-    end
+      it 'passes pwsh_params to the script' do
+        args = [script, target, { 'pwsh_params' => params }]
 
-    it 'succeeds if empty arguments are specified' do
-      step_body['arguments'] = []
+        expect(scope).to receive(:call_function).with('run_script', args)
+        step.evaluate(scope, subject)
+      end
 
-      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
-      expect(scope).to receive(:call_function).with('run_script', args)
+      it 'succeeds if empty pwsh_params are specified' do
+        step_body['pwsh_params'] = {}
+        args = [script, target]
 
-      step.evaluate(scope, subject)
-    end
+        expect(scope).to receive(:call_function).with('run_script', args)
+        step.evaluate(scope, subject)
+      end
 
-    it 'succeeds if nil arguments are specified' do
-      step_body['arguments'] = nil
+      it 'succeeds if nil pwsh_params are specified' do
+        step_body['pwsh_params'] = nil
+        args = [script, target]
 
-      args = ['mymodule/myscript.sh', 'foo.example.com', 'arguments' => []]
-      expect(scope).to receive(:call_function).with('run_script', args)
+        expect(scope).to receive(:call_function).with('run_script', args)
+        step.evaluate(scope, subject)
+      end
 
-      step.evaluate(scope, subject)
+      it 'errors if pwsh_params is not a hash' do
+        step_body['pwsh_params'] = ['-Name', 'foo']
+
+        expect { step }.to raise_error(/pwsh_params key must be a hash/)
+      end
     end
 
     it 'supports a description' do

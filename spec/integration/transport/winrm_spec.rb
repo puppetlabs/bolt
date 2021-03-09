@@ -500,6 +500,24 @@ describe Bolt::Transport::WinRM do
       end
     end
 
+    it "can run a PowerShell script with named parameters", winrm: true do
+      contents = <<~PS
+        [CmdletBinding()]
+        Param(
+          [Parameter(Mandatory = $True)]
+          [String]
+          $Name
+        )
+        
+        Write-Output "Hello $Name"
+      PS
+
+      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
+        result = winrm.run_script(target, file.path, [], pwsh_params: { 'Name' => 'BoltyMcBoltface' })
+        expect(result['stdout']).to eq("Hello BoltyMcBoltface\r\n")
+      end
+    end
+
     it "ignores run_as", winrm: true do
       contents = "Write-Output \"hellote\""
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
