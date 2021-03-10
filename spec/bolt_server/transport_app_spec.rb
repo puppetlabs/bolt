@@ -1056,6 +1056,64 @@ describe "BoltServer::TransportApp" do
         end
       end
 
+      context "parsing the target's plugin hooks" do
+        it 'defaults to a puppet_library plugin hook that uses the task plugin set to puppet_agent::install' do
+          with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+            versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+            post_to_project_inventory_targets(versioned_project)
+            expect(last_response.status).to eq(200)
+            target_list = JSON.parse(last_response.body)
+            expect(target_list.first['plugin_hooks'].size).to eql(1)
+            expect(target_list.first['plugin_hooks']).to include('puppet_library')
+            expect(target_list.first['plugin_hooks']['puppet_library']['plugin']).to eql('task')
+            expect(target_list.first['plugin_hooks']['puppet_library']['task']).to eql('puppet_agent::install')
+            expect(target_list.first['plugin_hooks']['puppet_library']['parameters']).to eql('stop_service' => true)
+          end
+        end
+
+        context 'when the user specifies a default for plugin hooks' do
+          let(:user_specified_plugin_hooks) do
+            { 'resolve_reference' => {} }
+          end
+          let(:bolt_project) do
+            super().merge('plugin-hooks' => user_specified_plugin_hooks)
+          end
+
+          context 'when the user does not specify a default for the puppet_library plugin hook' do
+            it 'returns the default puppet_library plugin hook while preserving the other defaults' do
+              with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+                versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+                post_to_project_inventory_targets(versioned_project)
+                expect(last_response.status).to eq(200)
+                target_list = JSON.parse(last_response.body)
+                expect(target_list.first['plugin_hooks']).to include('resolve_reference')
+                expect(target_list.first['plugin_hooks']).to include('puppet_library')
+                expect(target_list.first['plugin_hooks']['puppet_library']['task']).to eql('puppet_agent::install')
+                expect(target_list.first['plugin_hooks']['puppet_library']['task']).to eql('puppet_agent::install')
+              end
+            end
+          end
+
+          context 'when the user specifies a default for the puppet_library plugin hook' do
+            let(:user_specified_plugin_hooks) do
+              super().merge('puppet_library' => { 'plugin' => 'puppet_agent' })
+            end
+
+            it 'returns the user-specified defaults' do
+              with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
+                versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
+                post_to_project_inventory_targets(versioned_project)
+                expect(last_response.status).to eq(200)
+                target_list = JSON.parse(last_response.body)
+                expect(target_list.first['plugin_hooks']).to include('resolve_reference')
+                expect(target_list.first['plugin_hooks']).to include('puppet_library')
+                expect(target_list.first['plugin_hooks']['puppet_library']['plugin']).to eql('puppet_agent')
+              end
+            end
+          end
+        end
+      end
+
       it 'errors when versioned_project is invalid' do
         post_to_project_inventory_targets('foo')
         expect(last_response.status).to eq(500)

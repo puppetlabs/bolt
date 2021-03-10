@@ -690,11 +690,23 @@ module BoltServer
         Bolt::Util.validate_file('inventory file', context[:config].project.inventory_file)
 
         begin
+          # Set the default puppet_library plugin hook if it has not already been
+          # set
+          context[:config].data['plugin-hooks']['puppet_library'] ||= {
+            'plugin'     => 'task',
+            'task'       => 'puppet_agent::install',
+            'parameters' => {
+              'stop_service' => true
+            }
+          }
+
           connect_plugin = BoltServer::Plugin::PuppetConnectData.new(body['puppet_connect_data'])
           plugins = Bolt::Plugin.setup(context[:config], context[:pal], load_plugins: false)
           plugins.add_plugin(connect_plugin)
           inventory = Bolt::Inventory.from_config(context[:config], plugins)
-          target_list = inventory.get_targets('all').map { |targ| targ.to_h.merge({ 'transport' => targ.transport }) }
+          target_list = inventory.get_targets('all').map do |targ|
+            targ.to_h.merge({ 'transport' => targ.transport, 'plugin_hooks' => targ.plugin_hooks })
+          end
         rescue Bolt::Plugin::PluginError::LoadingDisabled => e
           msg = "Cannot load plugin #{e.details['plugin_name']}: plugin not supported"
           raise BoltServer::Plugin::PluginNotSupported.new(msg, e.details['plugin_name'])
