@@ -266,10 +266,15 @@ describe "Bolt::Outputter::Human" do
   end
 
   it "prints CommandResults" do
-    outputter.print_result(Bolt::Result.for_command(target, "stout", "sterr", 2, 'command', "executed", []))
-    lines = output.string
-    expect(lines).to match(/STDOUT:\n    stout/)
-    expect(lines).to match(/STDERR:\n    sterr/)
+    value = {
+      'stdout'        => 'stdout',
+      'stderr'        => 'stderr',
+      'merged_output' => "stdout\nstderr",
+      'exit_code'     => 2
+    }
+
+    outputter.print_result(Bolt::Result.for_command(target, value, 'command', "executed", []))
+    expect(output.string).to match(/stdout.*stderr/m)
   end
 
   it "prints TaskResults" do

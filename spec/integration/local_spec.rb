@@ -71,7 +71,12 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['value']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq(
+            "stdout"        => "param\n",
+            "stderr"        => "",
+            "merged_output" => "param\n",
+            "exit_code"     => 0
+          )
         end
       end
     end
@@ -123,7 +128,12 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} hello] + config_flags)
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['value']).to eq("stdout" => "hello\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq(
+            "stdout"        => "hello\n",
+            "stderr"        => "",
+            "merged_output" => "hello\n",
+            "exit_code"     => 0
+          )
         end
       end
     end
@@ -139,7 +149,12 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['value']).to eq("stdout" => "param\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq(
+            "stdout"        => "param\n",
+            "stderr"        => "",
+            "merged_output" => "param\n",
+            "exit_code"     => 0
+          )
         end
       end
     end
@@ -150,7 +165,12 @@ describe "when running over the local transport" do
         results = run_cli_json(%W[script run #{script.path} param --targets localhost])
         results['items'].each do |result|
           expect(result['status']).to eq('success')
-          expect(result['value']).to eq("stdout" => "Ruby\r\nparam\r\n", "stderr" => "", "exit_code" => 0)
+          expect(result['value']).to eq(
+            "stdout"        => "Ruby\r\nparam\r\n",
+            "stderr"        => "",
+            "merged_output" => "Ruby\r\nparam\r\n",
+            "exit_code"     => 0
+          )
         end
       end
     end

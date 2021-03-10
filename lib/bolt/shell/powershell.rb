@@ -195,9 +195,7 @@ module Bolt
         wrap_command = conn.is_a?(Bolt::Transport::Local::Connection)
         output = execute(command, wrap_command)
         Bolt::Result.for_command(target,
-                                 output.stdout.string,
-                                 output.stderr.string,
-                                 output.exit_code,
+                                 output.to_h,
                                  'command',
                                  command,
                                  position)
@@ -224,9 +222,7 @@ module Bolt
           output = execute([shell_init, *env_assignments, command].join("\r\n"))
 
           Bolt::Result.for_command(target,
-                                   output.stdout.string,
-                                   output.stderr.string,
-                                   output.exit_code,
+                                   output.to_h,
                                    'script',
                                    script,
                                    position)
@@ -322,7 +318,8 @@ module Bolt
             end.join("\n")
             @stream_logger.warn(formatted)
           end
-          result.stdout << to_print
+          result.stdout        << to_print
+          result.merged_output << to_print
         end
         stderr = Thread.new do
           encoding = err.external_encoding
@@ -334,7 +331,8 @@ module Bolt
             end.join("\n")
             @stream_logger.warn(formatted)
           end
-          result.stderr << to_print
+          result.stderr        << to_print
+          result.merged_output << to_print
         end
 
         stdout.join

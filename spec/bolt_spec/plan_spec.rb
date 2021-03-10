@@ -84,7 +84,7 @@ describe "BoltSpec::Plans" do
       expect(result).to be_ok
       expect(result.value.class).to eq(Bolt::ResultSet)
       results = result.value.result_hash
-      expected_result = { 'stdout' => 'done', 'stderr' => '', 'exit_code' => 0 }
+      expected_result = { 'stdout' => 'done', 'stderr' => '', 'merged_output' => 'done', 'exit_code' => 0 }
       targets.each { |target| expect(results[target].value).to eq(expected_result) }
     end
 

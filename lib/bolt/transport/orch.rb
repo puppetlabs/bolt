@@ -252,11 +252,7 @@ module Bolt
 
         # If we get here, there's no error so we don't need the file or line
         # number
-        Bolt::Result.for_command(target,
-                                 result.value['stdout'],
-                                 result.value['stderr'],
-                                 result.value['exit_code'],
-                                 action, obj, [])
+        Bolt::Result.for_command(target, result.value, action, obj, [])
       end
     end
   end

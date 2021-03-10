@@ -24,9 +24,7 @@ module Bolt
         running_as(options[:run_as]) do
           output = execute(command, environment: options[:env_vars], sudoable: true)
           Bolt::Result.for_command(target,
-                                   output.stdout.string,
-                                   output.stderr.string,
-                                   output.exit_code,
+                                   output.to_h,
                                    'command',
                                    command,
                                    position)
@@ -82,9 +80,7 @@ module Bolt
             dir.chown(run_as)
             output = execute([path, *arguments], environment: options[:env_vars], sudoable: true)
             Bolt::Result.for_command(target,
-                                     output.stdout.string,
-                                     output.stderr.string,
-                                     output.exit_code,
+                                     output.to_h,
                                      'script',
                                      script,
                                      position)
@@ -405,7 +401,8 @@ module Bolt
               @stream_logger.warn(formatted)
             end
 
-            read_streams[stream] << to_print
+            read_streams[stream]        << to_print
+            result_output.merged_output << to_print
           rescue EOFError
           end
 
@@ -455,7 +452,8 @@ module Bolt
         when 126
           msg = "\n\nThis might be caused by the default tmpdir being mounted "\
             "using 'noexec'. See http://pup.pt/task-failure for details and workarounds."
-          result_output.stderr << msg
+          result_output.stderr        << msg
+          result_output.merged_output << msg
           @logger.trace { "Command #{command_str} failed with exit code #{result_output.exit_code}" }
         else
           @logger.trace { "Command #{command_str} failed with exit code #{result_output.exit_code}" }

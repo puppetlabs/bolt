@@ -142,16 +142,9 @@ module Bolt
           end
 
           # Use special handling if the result looks like a command or script result
-          if result.generic_value.keys == %w[stdout stderr exit_code]
+          if result.generic_value.keys == %w[stdout stderr merged_output exit_code]
             safe_value = result.safe_value
-            unless safe_value['stdout'].strip.empty?
-              @stream.puts(indent(2, "STDOUT:"))
-              @stream.puts(indent(4, safe_value['stdout']))
-            end
-            unless safe_value['stderr'].strip.empty?
-              @stream.puts(indent(2, "STDERR:"))
-              @stream.puts(indent(4, safe_value['stderr']))
-            end
+            @stream.puts(indent(2, safe_value['merged_output'])) unless safe_value['merged_output'].strip.empty?
           elsif result.generic_value.any?
             @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
           end

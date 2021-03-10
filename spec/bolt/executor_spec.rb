@@ -612,8 +612,15 @@ describe "Bolt::Executor" do
     let(:executor) { Bolt::Executor.new(2, analytics) }
 
     it "batch_execute only creates 2 threads" do
+      value = {
+        'stdout'        => 'foo',
+        'stderr'        => 'bar',
+        'merged_output' => "foo\nbar",
+        'exit_code'     => 0
+      }
+
       state = targets.each_with_object({}) do |target, acc|
-        acc[target] = { promise: Concurrent::Promise.new { Bolt::Result.for_command(target, "foo", "bar", 0) },
+        acc[target] = { promise: Concurrent::Promise.new { Bolt::Result.for_command(target, value) },
                         running: false }
       end
 

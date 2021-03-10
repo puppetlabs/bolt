@@ -73,12 +73,26 @@ describe Bolt::Result do
 
   describe :for_command do
     it 'exposes value' do
-      result = Bolt::Result.for_command(target, "stout", "sterr", 0, 'command', 'command', [])
-      expect(result.value).to eq('stdout' => 'stout', 'stderr' => 'sterr', 'exit_code' => 0)
+      value = {
+        'stdout'        => 'stdout',
+        'stderr'        => 'stderr',
+        'merged_output' => "stdout\nstderr",
+        'exit_code'     => 0
+      }
+
+      result = Bolt::Result.for_command(target, value, 'command', 'command', [])
+      expect(result.value).to eq(value)
     end
 
     it 'creates errors' do
-      result = Bolt::Result.for_command(target, "stout", "sterr", 1, 'command', 'command', ['/jacko/lantern', 6])
+      value = {
+        'stdout'        => 'stdout',
+        'stderr'        => 'stderr',
+        'merged_output' => "stdout\nstderr",
+        'exit_code'     => 1
+      }
+
+      result = Bolt::Result.for_command(target, value, 'command', 'command', ['/jacko/lantern', 6])
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/command-error')
       expect(result.error_hash['details']).to include({ 'file' => '/jacko/lantern', 'line' => 6 })
     end

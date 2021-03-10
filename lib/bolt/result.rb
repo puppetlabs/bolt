@@ -28,20 +28,14 @@ module Bolt
       %w[file line].zip(position).to_h.compact
     end
 
-    def self.for_command(target, stdout, stderr, exit_code, action, command, position)
-      value = {
-        'stdout' => stdout,
-        'stderr' => stderr,
-        'exit_code' => exit_code
-      }
-
+    def self.for_command(target, value, action, command, position)
       details = create_details(position)
-      unless exit_code == 0
-        details['exit_code'] = exit_code
+      unless value['exit_code'] == 0
+        details['exit_code'] = value['exit_code']
         value['_error'] = {
           'kind' => 'puppetlabs.tasks/command-error',
           'issue_code' => 'COMMAND_ERROR',
-          'msg' => "The command failed with exit code #{exit_code}",
+          'msg' => "The command failed with exit code #{value['exit_code']}",
           'details' => details
         }
       end

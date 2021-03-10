@@ -39,7 +39,12 @@ describe "running YAML plans", ssh: true do
 
     expect(result.first['target']).to eq(target)
     expect(result.first['status']).to eq('success')
-    expect(result.first['value']).to eq("stdout" => "hello world\n", "stderr" => "", "exit_code" => 0)
+    expect(result.first['value']).to eq(
+      "stdout"        => "hello world\n",
+      "stderr"        => "",
+      "merged_output" => "hello world\n",
+      "exit_code"     => 0
+    )
   end
 
   it 'runs a task' do
