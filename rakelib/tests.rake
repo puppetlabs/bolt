@@ -10,7 +10,7 @@ begin
 
     desc "Run RSpec tests that do not require VM fixtures or a particular shell"
     RSpec::Core::RakeTask.new(:unit) do |t|
-      t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd --tag ~bash --tag ~winrm ' \
+      t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~winrm ' \
                      '--tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
                      '--tag ~omi --tag ~kerberos'
     end
@@ -32,7 +32,7 @@ begin
 
     desc 'Run tests that require a host System Under Test configured with LXD'
     RSpec::Core::RakeTask.new(:lxd) do |t|
-      t.rspec_opts = '--tag lxd'
+      t.rspec_opts = '--tag lxd_transport'
     end
 
     desc 'Run tests that require Bash on the local host'
@@ -58,8 +58,8 @@ begin
       # Run RSpec tests that do not require WinRM
       desc ''
       RSpec::Core::RakeTask.new(:fast) do |t|
-        t.rspec_opts = '--tag ~winrm --tag ~lxd --tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
-                       '--tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive'
+        t.rspec_opts = '--tag ~winrm --tag ~lxd_transport --tag ~windows_agents --tag ~puppetserver ' \
+                       '--tag ~puppetdb --tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive'
       end
 
       # Run RSpec tests that are slow or require slow to start containers for setup
@@ -73,7 +73,7 @@ begin
       # Run RSpec tests that do not require Puppet Agents on Windows
       desc ''
       RSpec::Core::RakeTask.new(:agentless) do |t|
-        t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd --tag ~bash --tag ~windows_agents ' \
+        t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~windows_agents ' \
                        '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb --tag ~omi ' \
                        '--tag ~kerberos'
       end

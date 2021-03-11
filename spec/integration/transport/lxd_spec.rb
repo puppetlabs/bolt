@@ -8,7 +8,7 @@ require 'bolt/inventory'
 
 require 'shared_examples/transport'
 
-describe Bolt::Transport::LXD, lxd: true do
+describe Bolt::Transport::LXD, lxd_transport: true do
   include BoltSpec::Conn
   include BoltSpec::Transport
 
