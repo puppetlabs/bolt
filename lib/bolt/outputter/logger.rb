@@ -20,6 +20,10 @@ module Bolt
           log_plan_start(event)
         when :plan_finish
           log_plan_finish(event)
+        when :container_start
+          log_container_start(event)
+        when :container_finish
+          log_container_finish(event)
         end
       end
 
@@ -47,6 +51,19 @@ module Bolt
         plan = event[:plan]
         duration = event[:duration]
         @logger.info("Finished: plan #{plan} in #{duration.round(2)} sec")
+      end
+
+      def log_container_start(event)
+        @logger.info("Starting: run container '#{event[:image]}'")
+      end
+
+      def log_container_finish(event)
+        result = event[:result]
+        if result.success?
+          @logger.info("Finished: run container '#{result.object}' succeeded.")
+        else
+          @logger.info("Finished: run container '#{result.object}' failed.")
+        end
       end
     end
   end

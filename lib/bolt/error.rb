@@ -61,6 +61,21 @@ module Bolt
     end
   end
 
+  class ContainerFailure < Bolt::Error
+    attr_reader :result
+
+    def initialize(result)
+      details = {
+        'value' => result.value,
+        'object' => result.object
+      }
+      message = "Plan aborted: Running container '#{result.object}' failed."
+      super(message, 'bolt/container-failure', details)
+      @result = result
+      @error_code = 2
+    end
+  end
+
   class RunFailure < Bolt::Error
     attr_reader :result_set
 

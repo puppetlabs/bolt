@@ -164,13 +164,10 @@ module Bolt
         target == other.target &&
         value == other.value
     end
+    alias == eql?
 
     def [](key)
       value[key]
-    end
-
-    def ==(other)
-      eql?(other)
     end
 
     def to_json(opts = nil)

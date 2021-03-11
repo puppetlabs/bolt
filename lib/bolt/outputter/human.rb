@@ -92,6 +92,10 @@ module Bolt
             print_plan_start(event)
           when :plan_finish
             print_plan_finish(event)
+          when :container_start
+            print_container_start(event) if plan_logging?
+          when :container_finish
+            print_container_finish(event) if plan_logging?
           when :start_spin
             start_spin
           when :stop_spin
@@ -110,6 +114,34 @@ module Bolt
 
       def print_start(target)
         @stream.puts(colorize(:green, "Started on #{target.safe_name}..."))
+      end
+
+      def print_container_result(result)
+        if result.success?
+          @stream.puts(colorize(:green, "Finished running container #{result.object}:"))
+        else
+          @stream.puts(colorize(:red, "Failed running container #{result.object}:"))
+        end
+
+        if result.error_hash
+          @stream.puts(colorize(:red, remove_trail(indent(2, result.error_hash['msg']))))
+          return 0
+        end
+
+        # Only print results if there's something other than empty string and hash
+        safe_value = result.safe_value
+        if safe_value['stdout'].strip.empty? && safe_value['stderr'].strip.empty?
+          @stream.puts(indent(2, "Running container #{result.object} completed successfully with no result"))
+        else
+          unless safe_value['stdout'].strip && safe_value['stdout'].strip.empty?
+            @stream.puts(indent(2, "STDOUT:"))
+            @stream.puts(indent(4, safe_value['stdout']))
+          end
+          unless safe_value['stderr'].strip.empty?
+            @stream.puts(indent(2, "STDERR:"))
+            @stream.puts(indent(4, safe_value['stderr']))
+          end
+        end
       end
 
       def print_result(result)
@@ -178,6 +210,25 @@ module Bolt
         plural = failures == 1 ? '' : 's'
         message = "Finished: #{description} with #{failures} failure#{plural} in #{duration.round(2)} sec"
         @stream.puts(colorize(:green, message))
+      end
+
+      def print_container_start(image:, **_kwargs)
+        @stream.puts(colorize(:green, "Starting: run container '#{image}'"))
+      end
+
+      def print_container_finish(event)
+        result = if event[:result].is_a?(Bolt::ContainerFailure)
+                   event[:result].result
+                 else
+                   event[:result]
+                 end
+
+        if result.success?
+          @stream.puts(colorize(:green, "Finished: run container '#{result.object}' succeeded."))
+        else
+          @stream.puts(colorize(:red, "Finished: run container '#{result.object}' failed."))
+        end
+        print_container_result(result) if @verbose
       end
 
       def print_plan_start(event)
@@ -445,6 +496,10 @@ module Bolt
           @stream.puts("Plan completed successfully with no result")
         when Bolt::ApplyFailure, Bolt::RunFailure
           print_result_set(value.result_set)
+        when Bolt::ContainerResult
+          print_container_result(value)
+        when Bolt::ContainerFailure
+          print_container_result(value.result)
         when Bolt::ResultSet
           print_result_set(value)
         else

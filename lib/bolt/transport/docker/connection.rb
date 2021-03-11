@@ -34,6 +34,11 @@ module Bolt
           @container_info["Id"]
         end
 
+        private def env_hash
+          # Set the DOCKER_HOST if we are using a non-default service-url
+          @docker_host.nil? ? {} : { 'DOCKER_HOST' => @docker_host }
+        end
+
         def connect
           # We don't actually have a connection, but we do need to
           # check that the container exists and is running.
@@ -54,10 +59,7 @@ module Bolt
         end
 
         def add_env_vars(env_vars)
-          @env_vars = env_vars.each_with_object([]) do |env_var, acc|
-            acc << "--env"
-            acc << "#{env_var[0]}=#{env_var[1]}"
-          end
+          @env_vars = Bolt::Util.format_env_vars_for_cli(env_vars)
         end
 
         # Executes a command inside the target container. This is called from the shell class.
@@ -88,9 +90,9 @@ module Bolt
 
         def upload_file(source, destination)
           @logger.trace { "Uploading #{source} to #{destination}" }
-          _stdout, stderr, status = execute_local_command('cp', [source, "#{container_id}:#{destination}"])
-          unless status.exitstatus.zero?
-            raise "Error writing to container #{container_id}: #{stderr}"
+          _out, err, stat = Bolt::Util.exec_docker(['cp', source, "#{container_id}:#{destination}"], env_hash)
+          unless stat.exitstatus.zero?
+            raise "Error writing to container #{container_id}: #{err}"
           end
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
@@ -102,29 +104,12 @@ module Bolt
           # copy the *contents* of the directory.
           # https://docs.docker.com/engine/reference/commandline/cp/
           FileUtils.mkdir_p(destination)
-          _stdout, stderr, status = execute_local_command('cp', ["#{container_id}:#{source}", destination])
-          unless status.exitstatus.zero?
-            raise "Error downloading content from container #{container_id}: #{stderr}"
+          _out, err, stat = Bolt::Util.exec_docker(['cp', "#{container_id}:#{source}", destination], env_hash)
+          unless stat.exitstatus.zero?
+            raise "Error downloading content from container #{container_id}: #{err}"
           end
         rescue StandardError => e
           raise Bolt::Node::FileError.new(e.message, 'WRITE_ERROR')
-        end
-
-        # Executes a Docker CLI command. This is useful for running commands as
-        # part of this class without having to go through the `execute`
-        # function and manage pipes.
-        #
-        # @param subcommand [String] The docker subcommand to run
-        #   e.g. 'inspect' for `docker inspect`
-        # @param arguments [Array] Arguments to pass to the docker command
-        #   e.g. 'src' and 'dest' for `docker cp <src> <dest>
-        # @return [String, String, Process::Status] The output of the command: STDOUT, STDERR, Process Status
-        private def execute_local_command(subcommand, arguments = [])
-          # Set the DOCKER_HOST if we are using a non-default service-url
-          env_hash = @docker_host.nil? ? {} : { 'DOCKER_HOST' => @docker_host }
-          docker_command = [subcommand].concat(arguments)
-
-          Open3.capture3(env_hash, 'docker', *docker_command, { binmode: true })
         end
 
         # Executes a Docker CLI command and parses the output in JSON format
@@ -135,14 +120,14 @@ module Bolt
         #   e.g. 'src' and 'dest' for `docker cp <src> <dest>
         # @return [Object] Ruby object representation of the JSON string
         private def execute_local_json_command(subcommand, arguments = [])
-          command_options = ['--format', '{{json .}}'].concat(arguments)
-          stdout, _stderr, _status = execute_local_command(subcommand, command_options)
-          extract_json(stdout)
+          cmd = [subcommand, '--format', '{{json .}}'].concat(arguments)
+          out, _err, _stat = Bolt::Util.exec_docker(cmd, env_hash)
+          extract_json(out)
         end
 
         # Converts the JSON encoded STDOUT string from the docker cli into ruby objects
         #
-        # @param stdout_string [String] The string to convert
+        # @param stdout [String] The string to convert
         # @return [Object] Ruby object representation of the JSON string
         private def extract_json(stdout)
           # The output from the docker format command is a JSON string per line.

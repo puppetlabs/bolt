@@ -28,6 +28,27 @@ The following functions are available to `ApplyResult` objects.
 | `to_data` | `Hash` | A serialized representation of `ApplyResult`. |
 | `value` | `Hash` | A hash including the Puppet report from the apply action under a `report` key. |
 
+### `ContainerResult`
+
+The [run_container](plan_functions.md#run_container) plan function returns a `ContainerResult`
+object. A `ContainerResult` is a standalone object (not part of a `ResultSet`) that includes either
+the `stdout` and `stderr` values from running the container, or an `_error` object if the container
+exited with a nonzero exit code.
+
+The following functions are available to `ContainerResult` objects. 
+
+| Function | Type returned | Description |
+|---|---|---|
+| `[]` | `Data` | Accesses the value hash directly and returns the value for the key. This function does not use dot notation. Call the function directly on the `ContainerResult`. For example, `$result[key]`. |
+| `error` | `Error` | An object constructed from the `_error` field of the result's value. |
+| `ok` | `Boolean` | Whether the result was successful. |
+| `status` | `String` | Either `success` if the result was successful or `failure`. |
+| `stdout` | `String` | The value of 'stdout' output by the container. |
+| `stderr` | `String` | The value of 'stderr' output by the container. |
+| `to_data` | `Hash` | A serialized representation of `ContainerResult`. |
+| `value` | `Hash` | A hash including the `stdout`, `stderr`, and `exit_code` received from the
+container. |
+
 ### `ResourceInstance`
 
 `ResourceInstance` objects are used to store the observed and desired state of a
