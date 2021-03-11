@@ -83,6 +83,14 @@ describe 'apply', expensive: true do
       # defined in inventory in BoltSpec::Conn.
       include_examples 'agentful tests', 'nix_agents'
 
+      it 'runs successfully with a tty' do
+        results = run_cli_json(%w[plan run basic::notify -t nix_agents --tty], project: project)
+
+        results.each do |result|
+          expect(result['status']).to eq('success')
+        end
+      end
+
       context 'in an apply block' do
         it 'gets resources' do
           results = run_cli_json(%w[plan run basic::resources -t nix_agents], project: project)
