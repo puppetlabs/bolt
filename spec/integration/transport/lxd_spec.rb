@@ -8,7 +8,7 @@ require 'bolt/inventory'
 
 require 'shared_examples/transport'
 
-describe Bolt::Transport::LXD, lxd_transport: true do
+describe Bolt::Transport::LXD do
   include BoltSpec::Conn
   include BoltSpec::Transport
 
@@ -24,7 +24,7 @@ describe Bolt::Transport::LXD, lxd_transport: true do
     inventory.get_target(uri)
   end
 
-  context 'with lxd' do
+  context 'with local lxd', lxd_transport: true do
     let(:transport)  { :lxd }
     let(:os_context) { posix_context }
 
@@ -37,23 +37,66 @@ describe Bolt::Transport::LXD, lxd_transport: true do
     end
 
     include_examples 'transport api'
-  end
 
-  context 'with_connection' do
-    it "fails with an unknown host" do
-      expect {
-        lxd.with_connection(inventory.get_target('not_a_target')) {}
-      }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching 'not_a_target'/)
+    context 'with_connection' do
+      it "fails with an unknown host" do
+        expect {
+          lxd.with_connection(inventory.get_target('lxd://not_a_target')) {}
+        }.to raise_error(Bolt::Node::ConnectError,
+                         /Could not find a container with name or ID matching 'local:not_a_target'/)
+      end
+    end
+
+    context 'when there is no host in the target' do
+      # Directly create an inventory target, since Inventory#get_target doesn't allow
+      # for passing config and would set the host as the name passed to it
+      let(:target) { Bolt::Target.from_hash({ 'name' => 'hostless' }, inventory) }
+
+      it 'errors' do
+        expect { lxd.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
+      end
     end
   end
 
-  context 'when there is no host in the target' do
-    # Directly create an inventory target, since Inventory#get_target doesn't allow
-    # for passing config and would set the host as the name passed to it
-    let(:target) { Bolt::Target.from_hash({ 'name' => 'hostless' }, inventory) }
+  context 'with remote lxc configured', lxd_remote: true do
+    let(:transport)         { :lxd }
+    let(:os_context)        { posix_context }
+    let(:transport_config)  {
+      {
+        'uri' => uri,
+        'config' => {
+          'lxd' => { 'remote' => 'myremote' }
+        }
+      }
+    }
+    let(:target) { Bolt::Target.from_hash(transport_config, inventory) }
 
-    it 'errors' do
-      expect { lxd.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
+    it "can test whether the target is available" do
+      expect(runner.connected?(target)).to eq(true)
+    end
+
+    it "returns false if the target is not available" do
+      expect(runner.connected?(inventory.get_target('unknownfoo'))).to eq(false)
+    end
+
+    include_examples 'transport api'
+
+    context 'with_connection' do
+      it "fails with an unknown host" do
+        expect {
+          lxd.with_connection(inventory.get_target('not_a_target')) {}
+        }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching 'not_a_target'/)
+      end
+    end
+
+    context 'when there is no host in the target' do
+      # Directly create an inventory target, since Inventory#get_target doesn't allow
+      # for passing config and would set the host as the name passed to it
+      let(:target) { Bolt::Target.from_hash({ 'name' => 'hostless' }, inventory) }
+
+      it 'errors' do
+        expect { lxd.run_command(target, 'whoami') }.to raise_error(/does not have a host/)
+      end
     end
   end
 end

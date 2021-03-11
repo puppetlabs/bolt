@@ -279,6 +279,10 @@
                         }
                       ]
                     },
+                    "remote": {
+                      "type": "string",
+                      "description": "The LXD remote host to use."
+                    },
                     "tmpdir": {
                       "description": "The directory to upload and execute temporary files on the target.",
                       "oneOf": [

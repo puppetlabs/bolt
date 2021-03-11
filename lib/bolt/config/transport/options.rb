@@ -266,6 +266,13 @@ module Bolt
             _plugin: true,
             _example: "BOLT.PRODUCTION"
           },
+          "remote" => {
+            type: String,
+            description: "The LXD remote host to use.",
+            _default: "local",
+            _plugin: false,
+            _example: 'myremote'
+          },
           "run-as" => {
             type: String,
             description: "The user to run commands as after login. The run-as user must be different than the "\
