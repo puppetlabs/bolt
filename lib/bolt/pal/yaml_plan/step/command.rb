@@ -13,6 +13,14 @@ module Bolt
             Set['command', 'targets']
           end
 
+          def self.validate_step_keys(body, number)
+            super
+
+            if body.key?('env_vars') && ![Hash, String].include?(body['env_vars'].class)
+              raise StepError.new('env_vars key must be a hash or evaluable string', body['name'], number)
+            end
+          end
+
           # Returns an array of arguments to pass to the step's function call
           #
           private def format_args(body)

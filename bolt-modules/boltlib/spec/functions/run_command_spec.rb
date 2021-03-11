@@ -219,4 +219,36 @@ describe 'run_command' do
         .and_raise_error(/Plan language function 'run_command' cannot be used/)
     end
   end
+
+  context 'with _env_vars' do
+    let(:command) { 'echo $FRUIT' }
+    let(:targets) { ['localhost'] }
+
+    it 'errors if _env_vars is not a hash' do
+      is_expected.to run
+        .with_params(command, targets, { '_env_vars' => 'mango' })
+        .and_raise_error(/Option 'env_vars' must be a hash/)
+    end
+
+    it 'errors if _env_vars keys are not strings' do
+      is_expected.to run
+        .with_params(command, targets, { '_env_vars' => { 1 => 'a' } })
+        .and_raise_error(/Keys for option 'env_vars' must be strings: 1/)
+    end
+
+    it 'transforms values to json' do
+      env_vars = { 'FRUIT' => { 'apple' => 'banana' } }
+      options  = { env_vars: env_vars.transform_values(&:to_json) }
+
+      executor.expects(:run_command)
+              .with(targets, command, options, [])
+              .returns(Bolt::ResultSet.new([]))
+      inventory.expects(:get_targets)
+               .with(targets)
+               .returns(targets)
+
+      is_expected.to run
+        .with_params(command, targets, { '_env_vars' => env_vars })
+    end
+  end
 end
