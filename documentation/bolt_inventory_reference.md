@@ -18,7 +18,7 @@ A map of configuration options for the implicit `all` group. Configuration
 set at this level applies to all groups and targets in the inventory file.
 For a detailed description of each option, their default values, and any
 available sub-options, see [Transport configuration
-reference](#bolt_transports_reference.md).
+reference](bolt_transports_reference.md).
 
 - **Type:** Hash
 
@@ -117,7 +117,7 @@ group.
 A map of configuration options for the group. Configuration set at this level
 applies to all groups and targets under the group. For a detailed description
 of each option, their default values, and any available sub-options, see
-[Transport configuration reference](#bolt_transports_reference.md).
+[Transport configuration reference](bolt_transports_reference.md).
 
 - **Type:** Hash
 
