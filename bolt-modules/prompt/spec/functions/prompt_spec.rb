@@ -28,6 +28,20 @@ describe 'prompt' do
     expect(result.unwrap).to eq(response)
   end
 
+  it 'returns a default value if no input is provided' do
+    $stdin.expects(:tty?).returns(true)
+    $stdin.expects(:gets).returns('')
+    $stderr.expects(:print)
+
+    is_expected.to run.with_params(prompt, 'default' => response).and_return(response)
+  end
+
+  it 'errors if default value is not a string' do
+    is_expected.to run
+      .with_params(prompt, 'default' => 1)
+      .and_raise_error(/Option 'default' must be a string/)
+  end
+
   it 'errors when passed invalid data types' do
     is_expected.to run.with_params(1)
                       .and_raise_error(ArgumentError,
