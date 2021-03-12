@@ -72,7 +72,7 @@
   },
   "steps": {
     "command": {
-      "description": "Runs a single command on a list of targets and returns the results. Results include output sent to standard out (stdout) and standard error (stderr), and the command's exit code.",
+      "description": "Runs a single command on a list of targets and returns the results. Results include output sent to stdout and stderr, and the command's exit code.",
       "type": "object",
       "additionalProperties": false,
       "required": ["command", "targets"],
@@ -133,7 +133,7 @@
       }
     },
     "message": {
-      "description": "Print a message. This will print a message to standard out (stdout) when using the 'human' output format or standard error (stderr) when using the 'json' output format.",
+      "description": "Print a message. This will print a message to stdout when using the 'human' output format or stderr when using the 'json' output format.",
       "type": "object",
       "additionalProperties": false,
       "required": ["message"],
@@ -177,6 +177,29 @@
         },
         "targets": {
           "$ref": "#/definitions/targets"
+        }
+      }
+    },
+    "prompt": {
+      "description": "Displays a prompt to the user and waits for input.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["prompt"],
+      "properties": {
+        "default": {
+          "description": "The default value to use if the user does not provide input or stdin is not a tty.",
+          "type": "string"
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        },
+        "prompt": {
+          "description": "The prompt to display to the user.",
+          "type": "string"
+        },
+        "sensitive": {
+          "description": "Whether to redact the response and mark it as sensitive. Bolt wraps sensitive values in the Sensitive data type.",
+          "type": "boolean"
         }
       }
     },

@@ -12,7 +12,7 @@ Puppet::Functions.create_function(:'prompt::menu') do
   # @param menu A list of options to choose from.
   # @param options A hash of additional options.
   # @option options [String] default The default option to return if the user does not provide
-  #   input or if standard in (stdin) is not a tty. Must be an option present in the menu.
+  #   input or if stdin is not a tty. Must be an option present in the menu.
   # @return The selected option.
   # @example Prompt the user to select from a list of options
   #   $selection = prompt::menu('Select a fruit', ['apple', 'banana', 'carrot'])
@@ -30,7 +30,7 @@ Puppet::Functions.create_function(:'prompt::menu') do
   # @param menu A hash of options to choose from, where keys are the input used to select a value.
   # @param options A hash of additional options.
   # @option options [String] default The default option to return if the user does not provide
-  #   input or if standard in (stdin) is not a tty. Must be an option present in the menu.
+  #   input or if stdin is not a tty. Must be an option present in the menu.
   # @return The selected option.
   # @example Prompt the user to select from a list of options with custom inputs
   #   $menu = { 'y' => 'yes', 'n' => 'no' }

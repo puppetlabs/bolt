@@ -372,15 +372,15 @@ For example:
 ```yaml
 steps:
   - resources:
-    # This resource is type 'package' and title 'nginx'
-    - package: nginx
-      parameters:
-        ensure: latest
-    # This resource is type 'service' and title 'nginx'
-    - type: service
-      title: nginx
-      parameters:
-        ensure: running
+      # This resource is type 'package' and title 'nginx'
+      - package: nginx
+        parameters:
+          ensure: latest
+      # This resource is type 'service' and title 'nginx'
+      - type: service
+        title: nginx
+        parameters:
+          ensure: running
     targets:
       - web1.example.com
       - web2.example.com
@@ -414,6 +414,50 @@ steps:
     targets: web1.example.com
     parameters:
       message: "The count is ${count}, and twice the count is ${double_count}"
+```
+
+### Prompt step
+
+The `prompt` step displays a prompt to the user and waits for input.
+
+Prompt steps support the following keys:
+
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `default` | `Array`, `Boolean`, `Hash`, `Number`, `String` | The default value to use if the user does not provide input or if standard input (stdin) is not a tty. Must be a string value unless also using the `menu` key. | |
+| `menu` | `Array`, `Hash` | A list of options to choose from, or a hash of options to choose from where each key is the input used to select a value. | |
+| `name` | `String` | The name of the variable to save the step result to. | |
+| `prompt` | `String` | The prompt to display to the user. | ✓ |
+| `sensitive` | `Boolean` | Whether to redact the response and mark it as sensitive. Bolt wraps sensitive values in the Sensitive data type. | |
+
+For example, to prompt the user for input:
+
+```yaml
+steps:
+  - name: api_token
+    prompt: Enter your API token
+    default: "lookup('api_token')"
+  - name: result
+    task: make_request
+    targets: localhost
+    parameters:
+      api_token: $api_token
+
+return: $result
+```
+
+Or to prompt the user to choose from an option from a menu:
+
+```yaml
+steps:
+  - name: fruit
+    prompt: Select a fruit
+    menu:
+      - apple
+      - banana
+      - carrot
+
+return: $fruit
 ```
 
 ## Parameters

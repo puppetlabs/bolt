@@ -14,6 +14,7 @@ module Bolt
           eval
           message
           plan
+          prompt
           resources
           script
           task
@@ -209,11 +210,12 @@ module Bolt
 end
 
 require 'bolt/pal/yaml_plan/step/command'
+require 'bolt/pal/yaml_plan/step/download'
 require 'bolt/pal/yaml_plan/step/eval'
+require 'bolt/pal/yaml_plan/step/message'
 require 'bolt/pal/yaml_plan/step/plan'
+require 'bolt/pal/yaml_plan/step/prompt'
 require 'bolt/pal/yaml_plan/step/resources'
 require 'bolt/pal/yaml_plan/step/script'
 require 'bolt/pal/yaml_plan/step/task'
 require 'bolt/pal/yaml_plan/step/upload'
-require 'bolt/pal/yaml_plan/step/download'
-require 'bolt/pal/yaml_plan/step/message'
