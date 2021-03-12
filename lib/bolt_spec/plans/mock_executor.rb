@@ -17,7 +17,7 @@ module BoltSpec
 
     # Nothing on the executor is 'public'
     class MockExecutor
-      attr_reader :noop, :error_message, :in_parallel
+      attr_reader :noop, :error_message, :in_parallel, :transports
       attr_accessor :run_as, :transport_features, :execute_any_plan
 
       def initialize(modulepath)
@@ -210,16 +210,6 @@ module BoltSpec
         yield
       end
 
-      def report_function_call(_function); end
-
-      def report_bundled_content(_mode, _name); end
-
-      def report_file_source(_plan_function, _source); end
-
-      def report_apply(_statements, _resources); end
-
-      def report_yaml_plan(_plan); end
-
       def publish_event(event)
         if event[:type] == :message
           unless @stub_out_message
@@ -257,6 +247,41 @@ module BoltSpec
         end.new(transport_features)
       end
       # End apply_prep mocking
+
+      # Public methods on Bolt::Executor that need to be mocked so there aren't
+      # "undefined method" errors.
+
+      def batch_execute(_targets); end
+
+      def create_yarn(_scope, _block, _object, _index); end
+
+      def finish_plan(_plan_result); end
+
+      def handle_event(_event); end
+
+      def prompt(_prompt, _options); end
+
+      def report_function_call(_function); end
+
+      def report_bundled_content(_mode, _name); end
+
+      def report_file_source(_plan_function, _source); end
+
+      def report_apply(_statements, _resources); end
+
+      def report_yaml_plan(_plan); end
+
+      def round_robin(_skein); end
+
+      def run_task_with(_target_mapping, _task, _options = {}, _position = []); end
+
+      def shutdown; end
+
+      def start_plan(_plan_context); end
+
+      def subscribe(_subscriber, _types = nil); end
+
+      def unsubscribe(_subscriber, _types = nil); end
     end
   end
 end
