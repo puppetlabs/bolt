@@ -96,6 +96,48 @@ module Bolt
       finalize_setup
     end
 
+    # Prints a welcome message when users first install Bolt and run `bolt`, `bolt help` or `bolt --help`
+    def welcome_message
+      bolt = <<~BOLT
+                   `.::-`
+              `.-:///////-.`
+           `-:////:.  `-:///:-  /ooo.                        .ooo/
+       `.-:///::///:-`   `-//:  ymmm-                        :mmmy  .---.
+      :///:-.   `.:////.  -//:  ymmm-                        :mmmy  +mmm+
+      ://.          ///.  -//:  ymmm--/++/-       `-/++/:`   :mmmy-:smmms::-
+      ://.          ://. .://:  ymmmdmmmmmmdo`  .smmmmmmmmh: :mmmysmmmmmmmms
+      ://.          ://:///:-.  ymmmh/--/hmmmy -mmmd/-.:hmmm+:mmmy.-smmms--.
+      ://:.`      .-////:-`     ymmm-     ymmm:hmmm-    `dmmm/mmmy  +mmm+
+      `-:///:-..:///:-.`        ymmm-     ommm/dmmm`     hmmm+mmmy  +mmm+
+         `.-:////:-`            ymmm+    /mmmm.ommms`   /mmmh:mmmy  +mmmo
+             `-.`               ymmmmmhhmmmmd:  ommmmhydmmmy`:mmmy  -mmmmdhd
+                                oyyy+shddhs/`    .+shddhy+-  -yyyo   .ohddhs
+
+
+      BOLT
+      example_cmd = if Bolt::Util.windows?
+                      "Invoke-BoltCommand -Command 'hostname' -Targets localhost"
+                    else
+                      "bolt command run 'hostname' --target localhost"
+                    end
+      prev_cmd = String.new("bolt")
+      prev_cmd << " #{@argv[0]}" unless @argv.empty?
+
+      message = <<~MSG
+      🎉 Welcome to Bolt #{VERSION}
+      😌 We're here to help bring order to the chaos
+      📖 Find our documentation at https://bolt.guide
+      🙋 Ask a question in #bolt on https://slack.puppet.com/
+      🔩 Contribute at https://github.com/puppetlabs/bolt/
+      💡 Not sure where to start? Try "#{example_cmd}"
+
+      We only print this message once. Run "#{prev_cmd}" again for help text.
+      MSG
+
+      $stdout.print "\033[36m#{bolt}\033[0m"
+      $stdout.print message
+    end
+
     # Parses the command and validates options. All errors that are raised here
     # are not handled by the outputter, as it relies on config being loaded.
     def parse_command
@@ -106,6 +148,16 @@ module Bolt
         # If the subcommand is not enabled, display the default
         # help text
         options[:subcommand] = nil unless COMMANDS.include?(options[:subcommand])
+
+        if Bolt::Util.first_run?
+          FileUtils.mkdir_p(Bolt::Util.first_runs_free.dirname)
+          FileUtils.touch(Bolt::Util.first_runs_free)
+
+          if options[:subcommand].nil? && $stdout.isatty
+            welcome_message
+            raise Bolt::CLIExit
+          end
+        end
 
         # Update the parser for the subcommand (or lack thereof)
         parser.update
