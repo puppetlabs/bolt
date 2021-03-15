@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt 3.2.0 (2021-03-08)
+## Bolt 3.3.0 (2021-03-15)
 
 ### New features
 
@@ -45,6 +45,33 @@
   the path to a script when running `bolt script run` or
   `Invoke-BoltScript`.
 
+* **Add `pwsh_params` option to `run_script` plan function**
+  ([#2651](https://github.com/puppetlabs/bolt/issues/2651))
+
+  The `run_script` plan function now accepts a `pwsh_params` option
+  which can be used to pass named parameters to a PowerShell script.
+
+* **Upgrade bundled modules to latest versions**
+
+  Several of Bolt's bundled modules have been upgraded to their latest
+  versions. Some modules have been upgraded to new major versions, which
+  are not compatible with Puppet 5. Bolt officially dropped support for
+  Puppet 5 in Bolt 3.0.
+
+  The following modules have been upgraded to new major versions:
+
+  - [puppetlabs-package 2.0.0](https://forge.puppet.com/puppetlabs/package)
+  - [puppetlabs-puppet_conf 1.0.0](https://forge.puppet.com/puppetlabs/puppet_conf)
+  - [puppetlabs-scheduled_task 3.0.0](https://forge.puppet.com/puppetlabs/scheduled_task)
+  - [puppetlabs-service 2.0.0](https://forge.puppet.com/puppetlabs/service)
+  - [puppetlabs-stdlib 7.0.0](https://forge.puppet.com/puppetlabs/stdlib)
+  - [puppetlabs-reboot 4.0.0](https://forge.puppet.com/puppetlabs/reboot)
+
+  The following module has been upgraded to the latest version and is
+  still compatible with Puppet 5:
+
+  - [puppetlabs-augeas_core 1.1.2](https://forge.puppetcom/puppetlabs/augeas_core)
+
 * **New analytics about plan function file source**
   ([#2687](https://github.com/puppetlabs/bolt/pull/2687))
 
@@ -82,6 +109,25 @@
   The `http_request` now correctly reads key contents from the path passed to
   the `key` parameter. Previously, the task used the file path itself as the key
   contents.
+
+* **Support `run-as` configuration when downloading files**
+  ([#2679](https://github.com/puppetlabs/bolt/issues/2679))
+
+  The `run-as` configuration for the SSH transport is now supported when
+  downloading files.
+
+* **Do not send task parameters over stdin when using a tty**
+  ([#2680](https://github.com/puppetlabs/bolt/issues/2680))
+
+  Tasks with a `stdin` input method that are run on targets with `tty:
+  true` configuration no longer return the task's parameters as part of
+  the task output. Previously, Bolt was sending these parameters to the
+  task twice, causing them to be printed to standard out (stdout) and
+  returned in the task output.
+
+## Bolt 3.2.0
+
+_This version of Bolt was not released._
 
 ## Bolt 3.1.0 (2021-03-01)
 
