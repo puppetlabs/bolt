@@ -149,20 +149,20 @@ module Bolt
 
             remote_task_path = write_executable(task_dir, executable)
 
+            execute_options[:stdin] = stdin
+
             # Avoid the horrors of passing data on stdin via a tty on multiple platforms
             # by writing a wrapper script that directs stdin to the task.
             if stdin && target.options['tty']
               wrapper = make_wrapper_stringio(remote_task_path, stdin, execute_options[:interpreter])
+              # Wrapper script handles interpreter and stdin. Delete these execute options
               execute_options.delete(:interpreter)
+              execute_options.delete(:stdin)
               execute_options[:wrapper] = true
               remote_task_path = write_executable(dir, wrapper, 'wrapper.sh')
             end
 
             dir.chown(run_as)
-
-            # Don't pass parameters on stdin if using a tty, as the parameters are
-            # already part of the wrapper script.
-            execute_options[:stdin] = stdin unless stdin && target.options['tty']
 
             execute_options[:sudoable] = true if run_as
             output = execute(remote_task_path, **execute_options)
