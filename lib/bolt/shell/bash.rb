@@ -160,7 +160,10 @@ module Bolt
 
             dir.chown(run_as)
 
-            execute_options[:stdin] = stdin
+            # Don't pass parameters on stdin if using a tty, as the parameters are
+            # already part of the wrapper script.
+            execute_options[:stdin] = stdin unless stdin && target.options['tty']
+
             execute_options[:sudoable] = true if run_as
             output = execute(remote_task_path, **execute_options)
           end
