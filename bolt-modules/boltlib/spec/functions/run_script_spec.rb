@@ -11,6 +11,8 @@ describe 'run_script' do
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }
+  let(:module_root) { File.expand_path(fixtures('modules', 'test')) }
+  let(:full_path) { File.join(module_root, 'files/uploads/hostname.sh') }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
@@ -26,8 +28,6 @@ describe 'run_script' do
     let(:target) { Bolt::Target.new(hostname) }
     let(:result) { Bolt::Result.new(target, value: { 'stdout' => hostname }) }
     let(:result_set) { Bolt::ResultSet.new([result]) }
-    let(:module_root) { File.expand_path(fixtures('modules', 'test')) }
-    let(:full_path) { File.join(module_root, 'files/uploads/hostname.sh') }
     before(:each) do
       Puppet.features.stubs(:bolt?).returns(true)
     end
@@ -278,5 +278,36 @@ describe 'run_script' do
     is_expected.to run
       .with_params('test/uploads/script.sh', [], 'pwsh_params' => %w[foo bar])
       .and_raise_error(/Option 'pwsh_params' must be a hash/)
+  end
+
+  context 'with _env_vars' do
+    let(:targets) { ['localhost'] }
+
+    it 'errors if _env_vars is not a hash' do
+      is_expected.to run
+        .with_params(full_path, targets, { '_env_vars' => 'value' })
+        .and_raise_error(/Option 'env_vars' must be a hash/)
+    end
+
+    it 'errors if _env_vars keys are not strings' do
+      is_expected.to run
+        .with_params(full_path, targets, { '_env_vars' => { 1 => 'a' } })
+        .and_raise_error(/Keys for option 'env_vars' must be strings: 1/)
+    end
+
+    it 'transforms values to json' do
+      env_vars = { 'FRUIT' => { 'apple' => 'banana' } }
+      options  = { env_vars: env_vars.transform_values(&:to_json) }
+
+      executor.expects(:run_script)
+              .with(targets, full_path, [], options, [])
+              .returns(Bolt::ResultSet.new([]))
+      inventory.expects(:get_targets)
+               .with(targets)
+               .returns(targets)
+
+      is_expected.to run
+        .with_params(full_path, targets, { '_env_vars' => env_vars })
+    end
   end
 end

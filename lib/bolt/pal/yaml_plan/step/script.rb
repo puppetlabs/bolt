@@ -27,6 +27,10 @@ module Bolt
             if body.key?('pwsh_params') && !body['pwsh_params'].nil? && !body['pwsh_params'].is_a?(Hash)
               raise StepError.new('pwsh_params key must be a hash', body['name'], number)
             end
+
+            if body.key?('env_vars') && ![Hash, String].include?(body['env_vars'].class)
+              raise StepError.new('env_vars key must be a hash or evaluable string', body['name'], number)
+            end
           end
 
           # Returns an array of arguments to pass to the step's function call

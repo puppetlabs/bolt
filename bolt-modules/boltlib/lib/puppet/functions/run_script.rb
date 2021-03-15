@@ -16,7 +16,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   #   Cannot be used with `arguments`.
   # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @option options [String] _run_as User to run as using privilege escalation.
-  # @option options [Hash] _env_vars Map of environment variables to set.
+  # @option options [Hash[String, Any]] _env_vars Map of environment variables to set.
   # @return A list of results, one entry per target.
   # @example Run a local script on Linux targets as 'root'
   #   run_script('/var/tmp/myscript', $targets, '_run_as' => 'root')
@@ -44,7 +44,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
   #   Cannot be used with `arguments`.
   # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @option options [String] _run_as User to run as using privilege escalation.
-  # @option options [Hash] _env_vars Map of environment variables to set.
+  # @option options [Hash[String, Any]] _env_vars Map of environment variables to set.
   # @return A list of results, one entry per target.
   # @example Run a script
   #   run_script('/var/tmp/myscript', $targets, 'Downloading my application')
@@ -84,6 +84,23 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     options = options.select { |opt| opt.start_with?('_') }.transform_keys { |k| k.sub(/^_/, '').to_sym }
     options[:description] = description if description
     options[:pwsh_params] = pwsh_params if pwsh_params
+
+    # Ensure env_vars is a hash and that each hash value is transformed to JSON
+    # so we don't accidentally pass Ruby-style data to the target.
+    if options[:env_vars]
+      unless options[:env_vars].is_a?(Hash)
+        raise Bolt::ValidationError, "Option 'env_vars' must be a hash"
+      end
+
+      if (bad_keys = options[:env_vars].keys.reject { |k| k.is_a?(String) }).any?
+        raise Bolt::ValidationError,
+              "Keys for option 'env_vars' must be strings: #{bad_keys.map(&:inspect).join(', ')}"
+      end
+
+      options[:env_vars] = options[:env_vars].transform_values do |val|
+        [Array, Hash].include?(val.class) ? val.to_json : val
+      end
+    end
 
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
