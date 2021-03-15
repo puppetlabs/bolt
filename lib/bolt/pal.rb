@@ -521,10 +521,30 @@ module Bolt
       end
     end
 
-    def convert_plan(plan_path)
+    def convert_plan(plan)
+      path = File.expand_path(plan)
+
+      # If the path doesn't exist, check if it's a plan name
+      unless File.exist?(path)
+        in_bolt_compiler do |compiler|
+          sig = compiler.plan_signature(plan)
+
+          # If the plan was loaded, look for it on the module loader
+          # There has to be an easier way to do this...
+          if sig
+            type = compiler.list_plans.find { |p| p.name == plan }
+            path = sig.instance_variable_get(:@plan_func)
+                      .loader
+                      .find(type)
+                      .origin
+                      .first
+          end
+        end
+      end
+
       Puppet[:tasks] = true
       transpiler = YamlPlan::Transpiler.new
-      transpiler.transpile(plan_path)
+      transpiler.transpile(path)
     end
 
     # Returns a mapping of all modules available to the Bolt compiler
