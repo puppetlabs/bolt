@@ -24,8 +24,8 @@ module Bolt
           end
         end
 
-        def chown(owner)
-          return if owner.nil? || owner == @owner
+        def chown(owner, force: false)
+          return if owner.nil? || (owner == @owner && !force)
 
           result = @shell.execute(['id', '-g', owner])
           if result.exit_code != 0
