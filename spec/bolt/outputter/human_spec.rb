@@ -226,6 +226,23 @@ describe "Bolt::Outputter::Human" do
     TASK_OUTPUT
   end
 
+  it 'prints noop option in the usage if task supports noop' do
+    name = 'test'
+    files = [{
+      'name' => 'test.rb',
+      'path' => '/path/to/test.rb'
+    }]
+    metadata = {
+      'description' => 'A test task',
+      'supports_noop' => true
+    }
+
+    option = (Bolt::Util.powershell? ? '[-Noop]' : '[--noop]')
+
+    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    expect(output.string).to match(/#{option}/)
+  end
+
   it 'prints modulepath as builtin for builtin modules' do
     name = 'monkey_bread'
     files = [{ 'name' => 'monkey_bread.rb',
