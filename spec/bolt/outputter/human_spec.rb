@@ -146,6 +146,41 @@ describe "Bolt::Outputter::Human" do
     TASK_OUTPUT
   end
 
+  it 'succeeds if task parameters do not have a type' do
+    name = 'donut'
+    files = [{ 'name' => 'glazed.rb',
+               'path' => '/path/to/glazed.rb' }]
+    metadata = {
+      'parameters' => {
+        'flavor' => {
+          'description' => 'What flavor of donut'
+        }
+      }
+    }
+
+    command = if Bolt::Util.powershell?
+                'Invoke-BoltTask -Name donut -Targets <targets> flavor=<value>'
+              else
+                'bolt task run donut --targets <targets> flavor=<value>'
+              end
+
+    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    expect(output.string).to eq(<<~TASK_OUTPUT)
+
+       donut
+
+       USAGE:
+       #{command}
+
+       PARAMETERS:
+       - flavor: Any
+           What flavor of donut
+
+       MODULE:
+       /path/to/glazed.rb
+    TASK_OUTPUT
+  end
+
   it 'converts Data (undef) to Any' do
     name = 'sticky_bun'
     files = [{ 'name' => 'sticky.rb',
