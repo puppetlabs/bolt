@@ -78,9 +78,9 @@ directory (moduledir) in your Bolt project directory (`.modules`):
 The list of directories where Bolt looks for content is called the modulepath.
 Bolt always loads content from:
 - The current Bolt project.
-- The Bolt-managed moduledir (`.modules`).
 - Any modules in the configurable modules directory. By default this is
   `modules/`.
+- The Bolt-managed moduledir (`.modules`).
 - Any modules that come bundled with Bolt.
 
 If you'd like to modify or add a directory to Bolt's modulepath, add the path to
