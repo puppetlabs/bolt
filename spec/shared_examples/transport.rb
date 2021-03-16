@@ -23,7 +23,7 @@ def posix_context
                 end
 
   {
-    stdout_command: ['echo hello', /^hello$/],
+    stdout_command: ['echo "hello"', /hello/],
     stderr_command: ['ssh -V', /OpenSSH/],
     destination_dir: '/tmp',
     # Grep exits non-zero? This works locally, I'm not sure why it doesn't in CI
@@ -51,8 +51,8 @@ end
 
 def windows_context
   {
-    stdout_command: ['echo hello', /^hello\r$/],
-    stderr_command: ['echo oops 1>&2', /oops/],
+    stdout_command: ['echo hello', /hello/],
+    stderr_command: ['$host.ui.WriteErrorLine("oops")', /oops/],
     pipe_command: ["Get-Service | Where-Object {$_.Name -like \"*net*\"}", /Netman/],
     destination_dir: 'C:/mytmp',
     supported_req: 'powershell',

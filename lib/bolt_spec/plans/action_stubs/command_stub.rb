@@ -29,7 +29,14 @@ module BoltSpec
       end
 
       def result_for(target, stdout: '', stderr: '')
-        Bolt::Result.for_command(target, stdout, stderr, 0, 'command', '', [])
+        value = {
+          'stdout'        => stdout,
+          'stderr'        => stderr,
+          'merged_output' => "#{stdout}\n#{stderr}".strip,
+          'exit_code'     => 0
+        }
+
+        Bolt::Result.for_command(target, value, 'command', '', [])
       end
 
       # Public methods

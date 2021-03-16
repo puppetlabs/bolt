@@ -70,6 +70,13 @@ describe Bolt::Transport::SSH, ssh: true do
 
     include_examples 'transport api'
     include_examples 'with sudo'
+
+    it 'merges stdout and stderr' do
+      command = "echo 'hello' && echo 'goodbye' 1>&2"
+      result  = ssh.run_command(target, command)
+      expect(result['merged_output']).to match(/hello/)
+      expect(result['merged_output']).to match(/goodbye/)
+    end
   end
 
   context 'with native ssh' do

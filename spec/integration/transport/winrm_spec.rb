@@ -309,6 +309,13 @@ describe Bolt::Transport::WinRM do
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
+    it "merges outputs and errors", winrm: true do
+      command = "Write-Output 'hello'; $host.ui.WriteErrorLine('goodbye')"
+      result = winrm.run_command(target, command)
+      expect(result['merged_output']).to match(/hello/)
+      expect(result['merged_output']).to match(/goodbye/)
+    end
+
     it "ignores run_as", winrm: true do
       expect(winrm.run_command(target, command, run_as: 'root')['stdout']).to eq("#{user}\r\n")
     end

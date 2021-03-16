@@ -84,6 +84,27 @@ The following functions are available to `Result` objects.
 | `to_data` | `Hash` | A serialized representation of `Result`. |
 | `value` | `Hash` | The output or return of executing on the target. |
 
+#### Command and script result value keys
+
+The `Result` object returned by the `run_command` and `run_script` plan function
+includes the following keys on the `value` hash:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `exit_code` | `Number` | The command's or script's exit code. |
+| `merged_output` | `String` | Output written to both standard error (stderr) and standard out (stdout) in the order that Bolt received the output. |
+| `stderr` | `String` | Output written to standard error (stderr). |
+| `stdout` | `String` | Output written to standard out (stdout). |
+
+#### Download result value keys
+
+The `Result` object returned by the `download_file` plan function includes the
+following key on the `value` hash:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `path` | `String` | The path to the downloaded file on the local host. |
+
 ### `ResultSet`
 
 For each target that you execute an action on, Bolt returns a `Result` object
