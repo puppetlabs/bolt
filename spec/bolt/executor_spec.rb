@@ -514,9 +514,34 @@ describe "Bolt::Executor" do
       executor.prompt(prompt, sensitive: true)
     end
 
+    it 'returns the default value if no input is provided' do
+      allow($stdin).to receive(:tty?).and_return(true)
+      allow($stderr).to receive(:print).with("#{prompt} [#{response}]: ")
+      expect($stdin).to receive(:gets).and_return('')
+
+      result = executor.prompt(prompt, default: response)
+      expect(result).to eq(response)
+    end
+
+    it 'does not display the default value when sensitive' do
+      allow($stdin).to receive(:tty?).and_return(true)
+      allow($stderr).to receive(:print).with("#{prompt}: ")
+      allow($stdin).to receive(:noecho).and_return('')
+
+      result = executor.prompt(prompt, default: response, sensitive: true)
+      expect(result).to eq(response)
+    end
+
     it 'errors if STDIN is not a tty' do
       allow($stdin).to receive(:tty?).and_return(false)
       expect { executor.prompt(prompt, {}) }.to raise_error(Bolt::Error, /STDIN is not a tty, unable to prompt/)
+    end
+
+    it 'returns the default value if STDIN is not a tty' do
+      allow($stdin).to receive(:tty?).and_return(false)
+
+      result = executor.prompt(prompt, default: response)
+      expect(result).to eq(response)
     end
   end
 
