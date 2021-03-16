@@ -9,11 +9,13 @@ module Bolt
       class LXD < Base
         OPTIONS = %w[
           cleanup
+          remote
           tmpdir
         ].freeze
 
         DEFAULTS = {
-          'cleanup' => true
+          'cleanup' => true,
+          'remote'  => 'local'
         }.freeze
       end
     end

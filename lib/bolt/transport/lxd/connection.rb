@@ -24,17 +24,17 @@ module Bolt
         end
 
         def container_id
-          "local:#{@target.host}"
+          "#{@target.transport_config['remote']}:#{@target.host}"
         end
 
         def connect
-          out, err, status = execute_local_command(%w[list --format json])
+          out, err, status = execute_local_command(%W[list #{container_id} --format json])
           unless status.exitstatus.zero?
             raise "Error listing available containers: #{err}"
           end
-          containers = JSON.parse(out).map { |c| c['name'] }
-          unless containers.include?(@target.host)
-            raise "Could not find a container with name or ID matching '#{@target.host}'"
+          containers = JSON.parse(out)
+          if containers.empty?
+            raise "Could not find a container with name or ID matching '#{container_id}'"
           end
           @logger.trace("Opened session")
           true

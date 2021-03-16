@@ -553,6 +553,16 @@
                 }
               ]
             },
+            "remote": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/remote"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "tmpdir": {
               "oneOf": [
                 {
@@ -1566,6 +1576,10 @@
           "$ref": "#/definitions/_plugin"
         }
       ]
+    },
+    "remote": {
+      "type": "string",
+      "description": "The LXD remote host to use."
     },
     "run-as": {
       "description": "The user to run commands as after login. The run-as user must be different than the login user.",
