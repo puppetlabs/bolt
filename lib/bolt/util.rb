@@ -77,6 +77,14 @@ module Bolt
         File.exist?(path) ? read_yaml_hash(path, file_name) : {}
       end
 
+      def first_runs_free
+        Bolt::Config.user_path + '.first_runs_free'
+      end
+
+      def first_run?
+        Bolt::Config.user_path && !File.exist?(first_runs_free)
+      end
+
       # Accepts a path with either 'plans' or 'tasks' in it and determines
       # the name of the module
       def module_name(path)
