@@ -636,6 +636,11 @@ targets without the `puppet-agent` package installed.
 Save the following plan to `patch/plans/init.pp`:
 
 ```puppet
+# Apply patches to agent targets and install the agent package on
+# targets without an agent.
+#
+# @param targets The targets to patch.
+#
 plan patch (
   TargetSpec $targets
 ) {
@@ -666,6 +671,10 @@ which do not.
 Save the following plan to `patch/plans/get_targets.pp`:
 
 ```puppet
+# Group targets by their agent status.
+#
+# @param targets The targets to check agent status for.
+#
 plan patch::get_targets (
   TargetSpec $targets
 ) {
@@ -815,6 +824,154 @@ describe 'patch' do
     expect_task('puppet_agent::install').not_be_called
 
     run_plan('patch', 'targets' => 'agents')
+  end
+end
+```
+
+Run the tests:
+
+```shell
+bundle exec rake spec
+```
+
+### Testing a plan that uses `run_task_with`
+
+The following example demonstrates testing a plan that uses the [`run_task_with()`
+plan function](#plan_functions.md#run-task-with).
+
+This plan accepts two parameters: `sql` and `targets`. The plan executes SQL on
+a Postgres database using the `postgresql::sql` task. Each target has a
+different user and password configured for the database, which is listed in the
+inventory file under each target's `vars` field. The user and password are
+passed to the task as target-specific parameters using the `run_task_with()`
+function.
+
+Save the following plan to `sql/plans/init.pp`:
+
+```puppet
+# Execute SQL.
+#
+# @param sql The SQL.
+# @param targets The targets to execute the SQL on.
+#
+plan sql (
+  String     $sql,
+  TargetSpec $targets
+) {
+  $results = run_task_with('postgresql::sql', $targets) |$target| {
+    {
+      'sql'      => $sql,
+      'password' => $target.vars['postgres_password'],
+      'user'     => $target.vars['postgres_user']
+    }
+  }
+
+  return $results
+}
+```
+
+As a plan author, you might want to ensure the `sql` plan runs the
+`postgresql::sql` task on each target with the correct user and password
+that are listed under each target's `vars` field.
+
+To ensure the `postgresql::sql` task is available to the tests, add the
+`puppetlabs/postgresql` module to the `.fixtures.yml` file in the module's root
+directory.
+
+```yaml
+# .fixtures.yml
+fixtures:
+  forge_modules:
+    postgresql:
+      repo: "puppetlabs/postgresql"
+      ref: "7.0.2"
+```
+
+Because the plan uses the target `vars` field, the tests must include an
+inventory. You can override the default inventory in `BoltSpec` using the
+`inventory_data` function.
+
+When testing plans that include the `run_task_with()` function, you should
+include stubs or mocks for each target the task is expected to run on.
+For example, if you pass two targets to the `run_task_with()` function:
+
+```puppet
+run_task_with('task', ['target1', 'target2'])
+```
+
+And your task includes a single assertion that the task is run on both
+targets:
+
+```ruby
+expect_task('task').with_targets(['target1', 'target2'])
+```
+
+Then the assertion will never be satisfied. This is because BoltSpec executes a
+separate task run for each target passed to the `run_task_with()` function. Both
+of the following assertions, however, would be satisfied:
+
+```ruby
+# Assert that the task is run twice
+expect_task('task').be_called_times(2)
+```
+
+```ruby
+# Assert that the task is run on each target
+expect_task('task').with_targets('target1')
+expect_task('task').with_targets('target2')
+```
+
+Save the following test to `sql/spec/plans/init_spec.rb`:
+
+```ruby
+# frozen_string_literal: true
+
+require 'spec_helper'
+require 'bolt_spec/plans'
+
+describe 'sql' do
+  include BoltSpec::Plans
+
+  # Inventory that is loaded by Bolt with targets that can be referenced
+  # by name in stubs and mocks
+  def inventory_data
+    {
+      'targets' => [
+        {
+          'name' => 'target1',
+          'vars' => {
+            'postgres_password' => 'Bolt!',
+            'postgres_user'     => 'bolt'
+          }
+        },
+        {
+          'name' => 'target2',
+          'vars' => {
+            'postgres_password' => 'Puppet!',
+            'postgres_user'     => 'puppet'
+          }
+        }
+      ]
+    }
+  end
+
+  let(:sql) { 'select * from examples' }
+
+  # Configure Puppet and Bolt before running the test
+  before(:all) do
+    BoltSpec::Plans.init
+  end
+
+  it 'passes target-specific parameters to the postgresql::sql task' do
+    expect_task('postgresql::sql')
+      .with_targets('target1')
+      .with_params('password' => 'Bolt!', 'user' => 'bolt', 'sql' => sql)
+
+    expect_task('postgresql::sql')
+      .with_targets('target2')
+      .with_params('password' => 'Puppet!', 'user' => 'puppet', 'sql' => sql)
+
+    run_plan('sql', 'sql' => sql, 'targets' => 'all')
   end
 end
 ```
