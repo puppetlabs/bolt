@@ -211,6 +211,26 @@ describe Bolt::Transport::Orch, orchestrator: true do
         expect(node_results[1].error_hash).to eq(error_result['_error'])
       end
 
+      context 'with malformed _error key' do
+        it 'handles _error values that are not a hash' do
+          error_result = { '_error' => 'something went wrong' }
+          results = [{ 'name' => 'node1', 'state' => 'failed', 'result' => error_result }]
+          node_result = orch.process_run_results(targets, results, 'thetask').first
+
+          expect(node_result).not_to be_success
+          expect(node_result.error_hash).to eq(error_result['_error'])
+        end
+
+        it 'handles _error values where details is not a hash' do
+          error_result = { '_error' => { 'details' => 'something went wrong' } }
+          results = [{ 'name' => 'node1', 'state' => 'failed', 'result' => error_result }]
+          node_result = orch.process_run_results(targets, results, 'thetask').first
+
+          expect(node_result).not_to be_success
+          expect(node_result.error_hash).to eq(error_result['_error'])
+        end
+      end
+
       it "returns an error for skipped nodes" do
         results = [{ 'name' => 'node1', 'state' => 'finished', 'result' => { '_output' => 'hello' } },
                    # XXX double-check that this is the correct result for a skipped node
