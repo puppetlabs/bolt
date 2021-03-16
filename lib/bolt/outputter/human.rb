@@ -283,7 +283,7 @@ module Bolt
         end
 
         if task.supports_noop
-          usage << Bolt::Util.powershell? ? '[-Noop]' : '[--noop]'
+          usage << (Bolt::Util.powershell? ? ' [-Noop]' : ' [--noop]')
         end
 
         task_info << "\n#{task.name}"
