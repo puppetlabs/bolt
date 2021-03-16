@@ -282,7 +282,7 @@ module Bolt
           pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
           pretty_params << "    Default: #{v['default'].inspect}\n" if v.key?('default')
           pretty_params << "    #{v['description']}\n" if v['description']
-          usage << if v['type'].start_with?("Optional")
+          usage << if v['type']&.start_with?("Optional")
                      " [#{k}=<value>]"
                    else
                      " #{k}=<value>"
