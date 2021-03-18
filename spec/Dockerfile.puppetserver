@@ -9,7 +9,7 @@ ENV PUPPET_REPORTS log
 COPY fixtures/ssl/ca.pem /etc/puppetlabs/puppet/ssl/certs/ca.pem
 COPY fixtures/ssl/cert.pem /etc/puppetlabs/puppet/ssl/certs/"$hostname".pem
 COPY fixtures/ssl/key.pem /etc/puppetlabs/puppet/ssl/private_keys/"$hostname".pem
-COPY fixtures/ssl/crl.pem /etc/puppetlabs/puppet/ssl/ca/ca_crl.pem
+COPY fixtures/ssl/crl.pem /etc/puppetlabs/puppet/ssl/crl.pem
 COPY fixtures/ssl/ca.cfg /etc/puppetlabs/puppetserver/services.d/ca.cfg
 
 RUN chown -R puppet:puppet /etc/puppetlabs/puppet/ssl
