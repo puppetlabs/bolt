@@ -1,7 +1,9 @@
 # Releasing Bolt 
 
-Hello, fearless reader! This document details the release process for Bolt. We have a weekly release cadence and
-aim to release new versions of Bolt on Mondays. 
+Hello, fearless reader! This document details the release process for Bolt packages and the PuppetBolt
+PowerShell module.
+
+## Bolt packages
 
 1. Generate the changelog using the changelog rake task, where `VERSION` is the next tagged version of Bolt.
 
@@ -42,3 +44,38 @@ aim to release new versions of Bolt on Mondays.
 
 1. Once packages are public, send an email to the `internal-puppet-products-update` group with the release
    notes and announce the new version in the `#bolt` channel on the community Slack.
+
+## PuppetBolt PowerShell module
+
+Releasing a new version of the PuppetBolt PowerShell module is currently a manual process.
+
+### Prerequisites
+
+Before getting started, you should have the following installed on your system:
+
+- [.Net SDK](https://dotnet.microsoft.com/download)
+- [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.1)
+
+### Releasing
+
+After the Bolt repository has been tagged for a new release, you can release a new version
+of the PuppetBolt module:
+
+1. Build the PowerShell module:
+
+   ```powershell
+   > bundle exec rake pwsh:generate_module
+   ```
+
+1. Confirm that the contents of `./pwsh_module/PuppetBolt` were updated and that the
+   version listed in `./pwsh_module/PuppetBolt/PuppetBolt.psd1` matches the new
+   Bolt version.
+
+1. Publish the module to PowerShell Gallery:
+
+   ```powershell
+   > Publish-Module -Path ./pwsh_module/PuppetBolt -NuGetApiKey <API KEY>
+   ```
+
+   The API key can be found in the _PowerShell Gallery_ vault in 1Password. If you do not
+   have access to this vault, file a ticket with the help desk to be added to it.
