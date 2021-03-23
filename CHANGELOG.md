@@ -1,5 +1,94 @@
 # Changelog
 
+## Bolt 3.4.0 (2021-03-23)
+
+### New features
+
+* **Display merged stdout and stderr output for commands and scripts**
+  ([#2653](https://github.com/puppetlabs/bolt/issues/2653))
+
+  The `bolt command|script run` commands and `Invoke-BoltCommand|Script`
+  cmdlets now display merged output from stdout and stderr in the CLI.
+  This merged output is also available to the `Result` object in plans
+  and in the JSON output format under the `merged_output` key.
+
+* **Convert YAML plans by name**
+  ([#2712](https://github.com/puppetlabs/bolt/pull/2712))
+
+  The `bolt plan convert` and `Convert-BoltPlan` commands now accept the
+  name of a YAML plan to convert instead of just a path to a YAML plan.
+
+* **Add default value for `prompt` plan function**
+  ([#2704](https://github.com/puppetlabs/bolt/issues/2704))
+
+  The `prompt` plan function has a new `default` option which can be
+  used to return a default value when a user does not provide input
+  or when stdin is not a tty.
+
+* **LXD transport supports remote hosts**
+  ([#2669](https://github.com/puppetlabs/bolt/issues/2669))
+
+  The LXD transport includes a new `remote` option to configure
+  connections to remote LXD servers.
+
+* **Add welcome message when users first run Bolt**
+  ([#2711](https://github.com/puppetlabs/bolt/pull/2711))
+
+  Bolt now prints a welcome message when users first run Bolt if they run
+  `bolt`, `bolt --help`, or `bolt help`.
+
+* **`prompt::menu` plan function**
+  ([#2714](https://github.com/puppetlabs/bolt/pull/2714))
+
+  The new `prompt::menu` plan function can be used to prompt the user to
+  select an option from a menu of options.
+
+* **Upgrade bundled modules**
+  ([#2734](https://github.com/puppetlabs/bolt/pull/2734))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [puppet_agent 4.5.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.5.0)
+  - [puppet_conf 1.1.0](https://forge.puppet.com/puppetlabs/puppet_conf/1.1.0)
+  - [reboot 4.0.2](https://forge.puppet.com/puppetlabs/reboot/4.0.2)
+
+### Bug fixes
+
+* **Ensure `env_vars` is a hash in commands and scripts**
+  ([#2689](https://github.com/puppetlabs/bolt/issues/2689))
+
+  Bolt now ensures that the `env_vars` option passed to commands and
+  scripts in plans is a hash and will raise a helpful error message
+  otherwise.
+
+* **Convert `env_vars` hash values to JSON**
+  ([#2689](https://github.com/puppetlabs/bolt/issues/2689))
+
+  Bolt now converts hash values for an environment variable passed to a
+  command or script to JSON. Previously, a hash value would be passed
+  with Ruby-style syntax.
+
+* **Don't stacktrace when showing tasks that include untyped parameters**
+  ([#2719](https://github.com/puppetlabs/bolt/issues/2719))
+
+  Bolt will now correctly show task details for tasks that include
+  parameters that do not specify a type, instead of stacktracing.
+
+* **Do not error when showing 'noop' task info**
+  ([#2722](https://github.com/puppetlabs/bolt/pull/2722))
+
+  Bolt no longer errors when printing task information for a task that
+  supports running in no-operation mode.
+
+* **Handle malformed `_error` values in task results in Orchestrator**
+  ([#2723](https://github.com/puppetlabs/bolt/pull/2723))
+
+  Bolt now handles `_error` from task results in the Orchestrator
+  transport when the value of the key is not a hash, does not include the
+  `details` key, or the `details` key is not a hash. Previously Bolt would
+  error if any of these conditions was true.
+
 ## Bolt 3.3.0 (2021-03-15)
 
 ### New features
