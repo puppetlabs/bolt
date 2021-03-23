@@ -59,6 +59,18 @@ module Bolt
           # the result otherwise make sure an error is generated
           if state == 'finished' || (result && result['_error'])
             if result['_error']
+              unless result['_error'].is_a?(Hash)
+                result['_error'] = { 'kind' => 'puppetlabs.tasks/task-error',
+                                     'issue_code' => 'TASK_ERROR',
+                                     'msg' => result['_error'],
+                                     'details' => {} }
+              end
+
+              result['_error']['details'] ||= {}
+              unless result['_error']['details'].is_a?(Hash)
+                deets = result['_error']['details']
+                result['_error']['details'] = { 'msg' => deets }
+              end
               file_line = %w[file line].zip(position).to_h.compact
               result['_error']['details'].merge!(file_line) unless result['_error']['details']['file']
             end
