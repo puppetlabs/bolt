@@ -17,7 +17,7 @@ module BoltSpec
 
     # Nothing on the executor is 'public'
     class MockExecutor
-      attr_reader :noop, :error_message, :in_parallel
+      attr_reader :noop, :error_message, :in_parallel, :transports
       attr_accessor :run_as, :transport_features, :execute_any_plan
 
       def initialize(modulepath)
@@ -89,6 +89,14 @@ module BoltSpec
           raise UnexpectedInvocation, @error_message
         end
         result
+      end
+
+      def run_task_with(target_mapping, task, options = {}, _position = [])
+        resultsets = target_mapping.map do |target, arguments|
+          run_task([target], task, arguments, options)
+        end.compact
+
+        Bolt::ResultSet.new(resultsets.map(&:results).flatten)
       end
 
       def download_file(targets, source, destination, options = {}, _position = [])
@@ -210,16 +218,6 @@ module BoltSpec
         yield
       end
 
-      def report_function_call(_function); end
-
-      def report_bundled_content(_mode, _name); end
-
-      def report_file_source(_plan_function, _source); end
-
-      def report_apply(_statements, _resources); end
-
-      def report_yaml_plan(_plan); end
-
       def publish_event(event)
         if event[:type] == :message
           unless @stub_out_message
@@ -257,6 +255,87 @@ module BoltSpec
         end.new(transport_features)
       end
       # End apply_prep mocking
+
+      # Evaluates a `parallelize()` block and returns the result. Normally,
+      # Bolt's executor wraps this in a Yarn for each object passed to the
+      # `parallelize()` function, and then executes them in parallel before
+      # returning the result from the block. However, in BoltSpec the block is
+      # executed for each object sequentially, and this function returns the
+      # result itself.
+      #
+      def create_yarn(scope, block, object, _index)
+        # Create the new scope
+        newscope = Puppet::Parser::Scope.new(scope.compiler)
+        local = Puppet::Parser::Scope::LocalScope.new
+
+        # Compress the current scopes into a single vars hash to add to the new scope
+        current_scope = scope.effective_symtable(true)
+        until current_scope.nil?
+          current_scope.instance_variable_get(:@symbols)&.each_pair { |k, v| local[k] = v }
+          current_scope = current_scope.parent
+        end
+        newscope.push_ephemerals([local])
+
+        begin
+          result = catch(:return) do
+            args = { block.parameters[0][1].to_s => object }
+            block.closure.call_by_name_with_scope(newscope, args, true)
+          end
+
+          # If we got a return from the block, get it's value
+          # Otherwise the result is the last line from the block
+          result = result.value if result.is_a?(Puppet::Pops::Evaluator::Return)
+
+          # Validate the result is a PlanResult
+          unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
+            raise Bolt::InvalidParallelResult.new(result.to_s, *Puppet::Pops::PuppetStack.top_of_stack)
+          end
+
+          result
+        rescue Puppet::PreformattedError => e
+          if e.cause.is_a?(Bolt::Error)
+            e.cause
+          else
+            raise e
+          end
+        end
+      end
+
+      # BoltSpec already evaluated the `parallelize()` block for each object
+      # passed to the function, so these results can be returned as-is.
+      #
+      def round_robin(results)
+        results
+      end
+
+      # Public methods on Bolt::Executor that need to be mocked so there aren't
+      # "undefined method" errors.
+
+      def batch_execute(_targets); end
+
+      def finish_plan(_plan_result); end
+
+      def handle_event(_event); end
+
+      def prompt(_prompt, _options); end
+
+      def report_function_call(_function); end
+
+      def report_bundled_content(_mode, _name); end
+
+      def report_file_source(_plan_function, _source); end
+
+      def report_apply(_statements, _resources); end
+
+      def report_yaml_plan(_plan); end
+
+      def shutdown; end
+
+      def start_plan(_plan_context); end
+
+      def subscribe(_subscriber, _types = nil); end
+
+      def unsubscribe(_subscriber, _types = nil); end
     end
   end
 end

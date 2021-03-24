@@ -217,7 +217,7 @@ module Bolt
       results
     end
 
-    def report_transport(transport, count)
+    private def report_transport(transport, count)
       name = transport.class.name.split('::').last.downcase
       unless @reported_transports.include?(name)
         @analytics&.event('Transport', 'initialize', label: name, value: count)
@@ -475,7 +475,7 @@ module Bolt
       Time.now
     end
 
-    def wait_until(timeout, retry_interval)
+    private def wait_until(timeout, retry_interval)
       start = wait_now
       until yield
         raise(TimeoutError, 'Timed out waiting for target') if (wait_now - start).to_i >= timeout
