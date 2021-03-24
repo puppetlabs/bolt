@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
-require 'bolt/config/transport/ssh'
-require 'bolt/config/transport/winrm'
-require 'bolt/config/transport/orch'
+require 'bolt/config/transport/docker'
 require 'bolt/config/transport/local'
 require 'bolt/config/transport/lxd'
-require 'bolt/config/transport/docker'
+require 'bolt/config/transport/orch'
+require 'bolt/config/transport/podman'
 require 'bolt/config/transport/remote'
+require 'bolt/config/transport/ssh'
+require 'bolt/config/transport/winrm'
 
 module Bolt
   class Config
@@ -14,13 +15,14 @@ module Bolt
       # Transport config classes. Used to load default transport config which
       # gets passed along to the inventory.
       TRANSPORT_CONFIG = {
-        'ssh'    => Bolt::Config::Transport::SSH,
-        'winrm'  => Bolt::Config::Transport::WinRM,
-        'pcp'    => Bolt::Config::Transport::Orch,
+        'docker' => Bolt::Config::Transport::Docker,
         'local'  => Bolt::Config::Transport::Local,
         'lxd'    => Bolt::Config::Transport::LXD,
-        'docker' => Bolt::Config::Transport::Docker,
-        'remote' => Bolt::Config::Transport::Remote
+        'pcp'    => Bolt::Config::Transport::Orch,
+        'podman' => Bolt::Config::Transport::Podman,
+        'remote' => Bolt::Config::Transport::Remote,
+        'ssh'    => Bolt::Config::Transport::SSH,
+        'winrm'  => Bolt::Config::Transport::WinRM
       }.freeze
 
       # Plugin definition. This is used by the JSON schemas to indicate that an option
@@ -496,6 +498,12 @@ module Bolt
           type: Hash,
           _plugin: true,
           _example: { "job-poll-interval" => 15, "job-poll-timeout" => 30 }
+        },
+        "podman" => {
+          description: "A map of configuration options for the podman transport.",
+          type: Hash,
+          _plugin: true,
+          _example: { "cleanup" => false, "tmpdir" => "/mount/tmp" }
         },
         "remote" => {
           description: "A map of configuration options for the remote transport.",

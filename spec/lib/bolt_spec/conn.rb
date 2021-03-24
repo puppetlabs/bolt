@@ -23,14 +23,14 @@ module BoltSpec
         default_port      = 25985
         additional_config = { ssl: false,
                               'connect-timeout': 30 }
-      when 'docker'
+      when 'docker', 'podman'
         default_user     = ''
         default_password = ''
         default_host     = 'ubuntu_node'
       when 'lxd'
         default_host     = 'testlxd'
       else
-        raise Error, "The transport must be either 'ssh', 'winrm', 'docker', or 'lxd'."
+        raise Error, "The transport must be either 'ssh', 'winrm', 'docker', 'podman', or 'lxd'."
       end
 
       additional_config.merge(

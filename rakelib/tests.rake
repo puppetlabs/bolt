@@ -12,7 +12,7 @@ begin
     RSpec::Core::RakeTask.new(:unit) do |t|
       t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~winrm ' \
                      '--tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
-                     '--tag ~omi --tag ~kerberos --tag ~lxd_remote'
+                     '--tag ~omi --tag ~kerberos --tag ~lxd_remote --tag ~podman'
     end
 
     desc 'Run tests that require a host System Under Test configured with WinRM'
@@ -40,6 +40,11 @@ begin
       t.rspec_opts = '--tag lxd_remote'
     end
 
+    desc 'Run tests that require a host System Under Test configured with Podman'
+    RSpec::Core::RakeTask.new(:podman) do |t|
+      t.rspec_opts = '--tag podman'
+    end
+
     desc 'Run tests that require Bash on the local host'
     RSpec::Core::RakeTask.new(:bash) do |t|
       t.rspec_opts = '--tag bash'
@@ -65,7 +70,7 @@ begin
       RSpec::Core::RakeTask.new(:fast) do |t|
         t.rspec_opts = '--tag ~winrm --tag ~lxd_transport --tag ~windows_agents --tag ~puppetserver ' \
                        '--tag ~puppetdb --tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive ' \
-                       '--tag ~lxd_remote'
+                       '--tag ~lxd_remote --tag ~podman'
       end
 
       # Run RSpec tests that are slow or require slow to start containers for setup
@@ -81,7 +86,7 @@ begin
       RSpec::Core::RakeTask.new(:agentless) do |t|
         t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~windows_agents ' \
                        '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb --tag ~omi ' \
-                       '--tag ~kerberos --tag ~lxd_remote'
+                       '--tag ~kerberos --tag ~lxd_remote --tag ~podman'
       end
 
       # Run RSpec tests that require Puppet Agents configured with Windows

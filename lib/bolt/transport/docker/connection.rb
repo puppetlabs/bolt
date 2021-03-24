@@ -34,6 +34,10 @@ module Bolt
           @container_info["Id"]
         end
 
+        def run_cmd(cmd, env_vars)
+          Bolt::Util.exec_docker(cmd, env_vars)
+        end
+
         private def env_hash
           # Set the DOCKER_HOST if we are using a non-default service-url
           @docker_host.nil? ? {} : { 'DOCKER_HOST' => @docker_host }
@@ -90,7 +94,7 @@ module Bolt
 
         def upload_file(source, destination)
           @logger.trace { "Uploading #{source} to #{destination}" }
-          _out, err, stat = Bolt::Util.exec_docker(['cp', source, "#{container_id}:#{destination}"], env_hash)
+          _out, err, stat = run_cmd(['cp', source, "#{container_id}:#{destination}"], env_hash)
           unless stat.exitstatus.zero?
             raise "Error writing to container #{container_id}: #{err}"
           end
@@ -104,7 +108,7 @@ module Bolt
           # copy the *contents* of the directory.
           # https://docs.docker.com/engine/reference/commandline/cp/
           FileUtils.mkdir_p(destination)
-          _out, err, stat = Bolt::Util.exec_docker(['cp', "#{container_id}:#{source}", destination], env_hash)
+          _out, err, stat = run_cmd(['cp', "#{container_id}:#{source}", destination], env_hash)
           unless stat.exitstatus.zero?
             raise "Error downloading content from container #{container_id}: #{err}"
           end
@@ -119,9 +123,9 @@ module Bolt
         # @param arguments [Array] Arguments to pass to the docker command
         #   e.g. 'src' and 'dest' for `docker cp <src> <dest>
         # @return [Object] Ruby object representation of the JSON string
-        private def execute_local_json_command(subcommand, arguments = [])
+        def execute_local_json_command(subcommand, arguments = [])
           cmd = [subcommand, '--format', '{{json .}}'].concat(arguments)
-          out, _err, _stat = Bolt::Util.exec_docker(cmd, env_hash)
+          out, _err, _stat = run_cmd(cmd, env_hash)
           extract_json(out)
         end
 

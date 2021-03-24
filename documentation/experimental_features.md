@@ -38,6 +38,28 @@ plan bolt (
 }
 ```
 
+## Podman support
+
+Bolt now has experimental support for [Podman](https://podman.io/), a daemonless container engine.
+The Podman transport supports connecting to containers managed by Podman on the local system.
+The Podman transport accepts many of the same configuration options as the Docker transport. You can
+see the full list of supported configuration options [on the transport reference
+page](bolt_transports_reference.md). The Podman transport doesn't support the `service-url`
+configuration options as the transport doesn't support remote connections. If this is a feature
+you're interested in, let us know [in Slack](https://slack.puppet.com) or submit a [Github
+issue](https://github.com/puppetlabs/bolt/issues).
+
+The example inventory file below demonstrates connecting to a Podman container target named
+`postgres_db`.
+
+```
+targets:
+  - uri: podman://postgres_db
+    config:
+      podman:
+        tmpdir: /root/tmp
+```
+
 ## Streaming output
 
 This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-320-2021-3-08).
@@ -65,7 +87,7 @@ once as the actions are running, and again after Bolt prints the results.
 This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-320-2021-3-08).
 
 The LXD transport supports connecting to Linux containers on the local system. Similar to the Docker
-transport, The LXD transport accepts the name of the container as the URI, and connects to the
+transport, the LXD transport accepts the name of the container as the URI, and connects to the
 container by shelling out to the `lxc` command. The example inventory file below demonstrates
 connecting to a Linux container target named `ubuntuone`.
 
