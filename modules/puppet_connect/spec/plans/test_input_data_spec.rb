@@ -13,10 +13,10 @@ describe 'puppet_connect::test_input_data' do
       'targets' => [
         {
           'name' => 'ssh_target',
-          'uri'  => 'ssh_uri',
+          'uri' => 'ssh_uri',
           'config' => {
             'transport' => 'ssh',
-            'ssh'  => {
+            'ssh' => {
               'load-config' => true
             }
           }
@@ -44,7 +44,7 @@ describe 'puppet_connect::test_input_data' do
     it 'returns an error result' do
       result = run_plan('puppet_connect::test_input_data', {})
       expect(result.ok?).to be(false)
-      expect(result.value.msg).to match(%r{ssh_target.*ssh.*winrm})
+      expect(result.value.msg).to match(/ssh_target.*ssh.*winrm/)
     end
   end
 
@@ -59,7 +59,7 @@ describe 'puppet_connect::test_input_data' do
       expect_out_message
       result = run_plan('puppet_connect::test_input_data', {})
       expect(result.ok?).to be(false)
-      expect(result.value.msg).to match(%r{ssh_target})
+      expect(result.value.msg).to match(/ssh_target/)
     end
   end
 
@@ -70,7 +70,7 @@ describe 'puppet_connect::test_input_data' do
     run_plan('puppet_connect::test_input_data', {})
 
     expect(ssh_target.config).to include('ssh')
-    ssh_config = ssh_target.config['ssh'] 
+    ssh_config = ssh_target.config['ssh']
     expect(ssh_config).to include('load-config' => false, 'host-key-check' => false)
   end
 
@@ -81,22 +81,22 @@ describe 'puppet_connect::test_input_data' do
     run_plan('puppet_connect::test_input_data', {})
 
     expect(winrm_target.config).to include('winrm')
-    winrm_config = winrm_target.config['winrm'] 
+    winrm_config = winrm_target.config['winrm']
     expect(winrm_config).to include('ssl' => false, 'ssl-verify' => false)
   end
 
   it 'checks if the targets are connectable' do
     expect_command('echo Connected')
       .be_called_times(1)
-      .with_targets(['ssh_target', 'winrm_target'])
+      .with_targets(%w[ssh_target winrm_target])
       .return_for_targets({
-        'ssh_target' => {
-          'stdout' => 'Connected'
-        },
-        'winrm_target' => {
-          'stdout' => 'Connected'
-        }
-      })
+                            'ssh_target' => {
+                              'stdout' => 'Connected'
+                            },
+                            'winrm_target' => {
+                              'stdout' => 'Connected'
+                            }
+                          })
 
     result = run_plan('puppet_connect::test_input_data', {}).value
     expect(result.size).to eql(2)
@@ -117,6 +117,36 @@ describe 'puppet_connect::test_input_data' do
       allow_command('echo Connected')
       result = run_plan('puppet_connect::test_input_data', {}).value
       expect(result.ok).to be(true)
+    end
+  end
+
+  context 'when the inventory contains an unsupported puppet_library hook' do
+    let(:inventory_data) do
+      sup = super()
+      sup['plugin_hooks'] = { 'puppet_library' => { 'plugin' => 'foo' } }
+      sup
+    end
+
+    it 'returns an error result' do
+      result = run_plan('puppet_connect::test_input_data', {})
+      expect(result.ok?).to be(false)
+      expect(result.value.msg).to match(/Only task plugins are acceptable for puppet_library hook/)
+    end
+  end
+
+  context 'when all targets do not have the same puppet_library plugin hook' do
+    let(:inventory_data) do
+      sup = super()
+      sup['targets'][0]['plugin_hooks'] = { 'puppet_library' => { 'plugin' => 'task', 'task' => 'foo' } }
+      sup['targets'][1]['plugin_hooks'] = { 'puppet_library' => { 'plugin' => 'task', 'task' => 'bar' } }
+      sup
+    end
+
+    it 'returns an error result' do
+      allow_out_message
+      result = run_plan('puppet_connect::test_input_data', {})
+      expect(result.ok?).to be(false)
+      expect(result.value.msg).to match(/The puppet_library plugin config must be the same across all targets/)
     end
   end
 end

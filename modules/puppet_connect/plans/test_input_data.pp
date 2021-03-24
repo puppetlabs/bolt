@@ -13,6 +13,19 @@
 #
 plan puppet_connect::test_input_data(TargetSpec $targets = 'all') {
   $targs = get_targets($targets)
+  $unique_plugins = $targs.group_by |$t| {$t.plugin_hooks['puppet_library']}
+  if ($unique_plugins.keys.length > 1) {
+    out::message('Multiple puppet_library plugin hooks detected')
+    $unique_plugins.each |$plug, $target_list| {
+      $target_message = if ($target_list.length > 10) {
+                          "${target_list.length} targets"
+                        } else {
+                          $target_list.join(', ')
+                        }
+      out::message("Plugin hook ${plug} configured for ${target_message}")
+    }
+    fail_plan("The puppet_library plugin config must be the same across all targets")
+  }
   $targs.each |$target| {
     case $target.transport {
       'ssh': {
@@ -58,6 +71,15 @@ plan puppet_connect::test_input_data(TargetSpec $targets = 'all') {
       default: {
         fail_plan("Inventory contains target ${target} with unsupported transport, must be ssh or winrm")
       }
+    }
+
+    # Bolt defaults to using the "module" based form of the puppet_agent plugin. Connect defaults
+    # to using the "task" based form as *only* the task based form in supported in Connect. This check
+    # ensures that if the default is not being used, only task based plugins are allowed.
+    $plugin = $target.plugin_hooks["puppet_library"]
+    $user_configured_plugin = $plugin != { "plugin"=> "puppet_agent", "stop_service"=> true }
+    if ($user_configured_plugin and $plugin["plugin"] != "task"){
+      fail_plan("Only task plugins are acceptable for puppet_library hook")
     }
   }
   # The SSH/WinRM transports will report an 'unknown host' error for targets where
