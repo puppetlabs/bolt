@@ -92,6 +92,7 @@ module Bolt
       end
 
       def add_facts(new_facts = {})
+        validate_fact_names(new_facts)
         @facts = Bolt::Util.deep_merge(@facts, new_facts)
       end
 
@@ -153,7 +154,22 @@ module Bolt
           raise Bolt::UnknownTransportError.new(transport, uri)
         end
 
+        validate_fact_names(facts)
+
         transport_config
+      end
+
+      # Validate fact names and issue a deprecation warning if any fact names have a dot.
+      #
+      private def validate_fact_names(facts)
+        if (dotted = facts.keys.select { |name| name.include?('.') }).any?
+          Bolt::Logger.deprecate(
+            'dotted_fact_name',
+            "Target '#{safe_name}' includes dotted fact names: '#{dotted.join("', '")}'. Dotted fact "\
+            "names are deprecated and Bolt does not automatically convert facts with dotted names to "\
+            "structured facts. For more information, see https://pup.pt/bolt-dotted-facts"
+          )
+        end
       end
 
       def host
