@@ -11,6 +11,7 @@ module Bolt
         facts
         features
         groups
+        plugin_hooks
         targets
         vars
       ].freeze
