@@ -703,6 +703,9 @@ module BoltServer
           connect_plugin = BoltServer::Plugin::PuppetConnectData.new(body['puppet_connect_data'])
           plugins = Bolt::Plugin.setup(context[:config], context[:pal], load_plugins: false)
           plugins.add_plugin(connect_plugin)
+          %w[aws_inventory azure_inventory gcloud_inventory].each do |plugin_name|
+            plugins.add_module_plugin(plugin_name) if plugins.known_plugin?(plugin_name)
+          end
           inventory = Bolt::Inventory.from_config(context[:config], plugins)
           target_list = inventory.get_targets('all').map do |targ|
             targ.to_h.merge({ 'transport' => targ.transport, 'plugin_hooks' => targ.plugin_hooks })

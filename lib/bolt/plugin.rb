@@ -178,8 +178,6 @@ module Bolt
     end
 
     def add_ruby_plugin(plugin_name)
-      raise PluginError::LoadingDisabled, plugin_name unless @load_plugins
-
       cls_name = Bolt::Util.snake_name_to_class_name(plugin_name)
       filename = "bolt/plugin/#{plugin_name}"
       require filename
@@ -203,8 +201,6 @@ module Bolt
       }
 
       mod = modules[plugin_name]
-      raise PluginError::Unknown, plugin_name unless mod&.plugin?
-      raise PluginError::LoadingDisabled, plugin_name unless @load_plugins
 
       plugin = Bolt::Plugin::Module.load(mod, opts)
       add_plugin(plugin)
@@ -224,6 +220,12 @@ module Bolt
       end
     end
 
+    def known_plugin?(plugin_name)
+      @plugins.include?(plugin_name) ||
+        RUBY_PLUGINS.include?(plugin_name) ||
+        (modules.include?(plugin_name) && modules[plugin_name].plugin?)
+    end
+
     def get_hook(plugin_name, hook)
       plugin = by_name(plugin_name)
       raise PluginError::Unknown, plugin_name unless plugin
@@ -235,16 +237,16 @@ module Bolt
 
     # Calling by_name or get_hook will load any module based plugin automatically
     def by_name(plugin_name)
-      return @plugins[plugin_name] if @plugins.include?(plugin_name)
-      begin
-        if RUBY_PLUGINS.include?(plugin_name)
+      if known_plugin?(plugin_name)
+        if @plugins.include?(plugin_name)
+          @plugins[plugin_name]
+        elsif !@load_plugins
+          raise PluginError::LoadingDisabled, plugin_name
+        elsif RUBY_PLUGINS.include?(plugin_name)
           add_ruby_plugin(plugin_name)
-        elsif !@unknown.include?(plugin_name)
+        else
           add_module_plugin(plugin_name)
         end
-      rescue PluginError::Unknown
-        @unknown << plugin_name
-        nil
       end
     end
 
