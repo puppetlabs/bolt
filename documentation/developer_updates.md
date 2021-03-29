@@ -3,6 +3,39 @@
 Find out what the Bolt team is working on and why we're making the decisions
 we're making.
 
+## March 2021
+
+### Deprecating dotted fact names
+
+With the release of Facter 4, dotted fact names are automatically converted to
+structured facts. For example, the custom fact `role.name = server` becomes the
+following structured fact:
+
+```
+{
+  "role" => {
+    "name" => "server"
+  }
+}
+```
+
+This is a significant change from earlier versions of Facter, which permitted
+dotted fact names.
+
+Because Bolt allows you to set facts in the inventory file or during a plan run,
+and uses Facter directly (such as when running the `apply_prep` function) and
+indirectly (such as when making a PuppetDB query), we've updated Bolt to warn
+you when it detects a dotted fact name.
+
+If Bolt detects that a target has a dotted fact name set in either the inventory
+or during a plan run, it displays a deprecation warning. Bolt does not
+automatically convert these facts to structured facts, which is inconsistent
+behavior with Facter 4.
+
+To suppress these deprecation warnings, you can either update your facts or add
+the `dotted_fact_name` ID to the `disable-warnings` option in your project
+configuration.
+
 ## November 2020
 
 ### Changes coming in Bolt 3.0
