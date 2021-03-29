@@ -1,5 +1,53 @@
 # Changelog
 
+## Bolt 3.5.0 (2021-03-29)
+
+### New features
+
+* **Test plans that use `run_task_with()` plan function in BoltSpec**
+  ([#2692](https://github.com/puppetlabs/bolt/issues/2692))
+
+  Plans that use the `run_task_with()` plan function can now be tested
+  with BoltSpec.
+
+* **`run_container()` plan function**
+  ([#2614](https://github.com/puppetlabs/bolt/issues/2614))
+
+  Bolt now ships with a `run_container()` Puppet plan function that will
+  run a container and return its output.
+
+* **Update bundled modules**
+  ([#2748](https://github.com/puppetlabs/bolt/pull/2748))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [aws_inventory 0.7.0](https://forge.puppet.com/puppetlabs/aws_inventory/0.7.0/changelog)
+  - [gcloud_inventory 0.3.0](https://forge.puppet.com/puppetlabs/gcloud_inventory/0.3.0/changelog)
+
+### Bug fixes
+
+* **Do not warn on top level `plugin_hooks` config**
+  ([#2742](https://github.com/puppetlabs/bolt/pull/2742))
+
+  Bolt no longer warns that `plugin_hooks` are an unknown option when configured
+  in inventory file.
+
+* **Allow `version` key in inventory files**
+  ([#2746](https://github.com/puppetlabs/bolt/pull/2746))
+
+  Bolt now recognizes the `version` configuration in an inventory file
+  and doesn't raise a warning that the key is unknown.
+
+### Deprecations
+
+* **Deprecate dotted fact names**
+  ([#2737](https://github.com/puppetlabs/bolt/issues/2737))
+
+  Dotted fact names (e.g. `foo.bar`) are now deprecated. Bolt issues a
+  deprecation warning if it detects a target is loaded with these facts
+  or has them added during a plan run.
+
 ## Bolt 3.4.0 (2021-03-23)
 
 ### New features
