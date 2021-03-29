@@ -330,6 +330,25 @@ describe "Bolt::CLI" do
     end
   end
 
+  context 'executor#future' do
+    let(:cli)     { Bolt::CLI.new(%w[command run uptime -t foo]) }
+    let(:config)  { { 'future' => { 'file_paths' => true } } }
+
+    around(:each) do |example|
+      in_project(config: config) do |project|
+        @project = project
+        example.run
+      end
+    end
+
+    it 'sets future on the executor' do
+      expect(Bolt::Executor).to receive(:new)
+        .with(100, any_args, nil, false, { 'file_paths' => true })
+        .and_call_original
+      cli.execute(cli.parse)
+    end
+  end
+
   context "without a config file" do
     let(:project) { Bolt::Project.new({}, '.') }
     before(:each) do
@@ -2252,7 +2271,8 @@ describe "Bolt::CLI" do
         expect(Bolt::Executor).to receive(:new).with(Bolt::Config.default.concurrency,
                                                      anything,
                                                      true,
-                                                     anything).and_return(executor)
+                                                     anything,
+                                                     nil).and_return(executor)
 
         plugins = Bolt::Plugin.setup(Bolt::Config.default, nil)
         allow(cli).to receive(:plugins).and_return(plugins)

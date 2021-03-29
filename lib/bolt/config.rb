@@ -328,13 +328,6 @@ module Bolt
     end
 
     def validate
-      if @data['future']
-        Bolt::Logger.warn(
-          "future_option",
-          "Configuration option 'future' no longer exposes future behavior."
-        )
-      end
-
       if @data['modulepath']&.include?(@project.managed_moduledir.to_s)
         raise Bolt::ValidationError,
               "Found invalid path in modulepath: #{@project.managed_moduledir}. This path "\
@@ -393,6 +386,10 @@ module Bolt
 
     def format=(value)
       @data['format'] = value
+    end
+
+    def future
+      @data['future']
     end
 
     def trace

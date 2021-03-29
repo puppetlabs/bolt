@@ -33,13 +33,14 @@ module Bolt
   }.freeze
 
   class Executor
-    attr_reader :noop, :transports, :in_parallel
+    attr_reader :noop, :transports, :in_parallel, :future
     attr_accessor :run_as
 
     def initialize(concurrency = 1,
                    analytics = Bolt::Analytics::NoopClient.new,
                    noop = false,
-                   modified_concurrency = false)
+                   modified_concurrency = false,
+                   future = {})
       # lazy-load expensive gem code
       require 'concurrent'
       @analytics = analytics
@@ -64,6 +65,7 @@ module Bolt
       @noop = noop
       @run_as = nil
       @in_parallel = false
+      @future = future
       @pool = if concurrency > 0
                 Concurrent::ThreadPoolExecutor.new(name: 'exec', max_threads: concurrency)
               else

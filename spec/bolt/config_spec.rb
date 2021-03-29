@@ -190,20 +190,6 @@ describe Bolt::Config do
     end
   end
 
-  describe 'with future set' do
-    let(:future_config) { { 'future' => true } }
-    let(:config) { Bolt::Config.new(project, future_config) }
-
-    it 'logs a warning' do
-      expect(Bolt::Logger).to receive(:warn).with(
-        anything,
-        /Configuration option 'future'/
-      )
-
-      config
-    end
-  end
-
   describe 'merging config files' do
     let(:project_config) {
       {
