@@ -1403,6 +1403,10 @@
           "$ref": "#/definitions/_plugin"
         }
       ]
+    },
+    "version": {
+      "description": "The version of the inventory file.",
+      "type": "integer"
     }
   },
   "oneOf": [
@@ -1449,6 +1453,16 @@
             }
           ]
         },
+        "plugin_hooks": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/plugin_hooks"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        },
         "targets": {
           "oneOf": [
             {
@@ -1463,6 +1477,16 @@
           "oneOf": [
             {
               "$ref": "#/definitions/vars"
+            },
+            {
+              "$ref": "#/definitions/_plugin"
+            }
+          ]
+        },
+        "version": {
+          "oneOf": [
+            {
+              "$ref": "#/definitions/version"
             },
             {
               "$ref": "#/definitions/_plugin"
