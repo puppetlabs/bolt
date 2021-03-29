@@ -14,6 +14,7 @@ module Bolt
         plugin_hooks
         targets
         vars
+        version
       ].freeze
 
       # Definitions used to validate the data.
@@ -124,6 +125,13 @@ module Bolt
           description: "A map of variables for the group or target.",
           type: Hash,
           _plugin: true
+        },
+        "version" => {
+          description: "The version of the inventory file.",
+          type: Integer,
+          _plugin: false,
+          _example: 2,
+          _default: 2
         }
       }.freeze
     end

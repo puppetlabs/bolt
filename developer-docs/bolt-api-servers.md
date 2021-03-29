@@ -378,7 +378,7 @@ This endpoint behaves identically to the /ssh/check_node_connections endpoint, b
 
 ### POST /project_inventory_targets
 
-This endpoint parses a project inventory and returns a list of target hashes. Note that the only accepetable inventoryfile location is the default `inventory.yaml` at the root of the project.
+This endpoint parses a project inventory and returns a list of target hashes. Note that the only accepetable inventory file location is the default `inventory.yaml` at the root of the project.
 
 #### Query parameters
 
@@ -386,7 +386,7 @@ This endpoint parses a project inventory and returns a list of target hashes. No
 
 #### POST body
 
-- `connect_data`: Hash, *required* - Data for the Connect plugin to look up. Keys are the lookup in the inventoryfile which points to a hash with a required "value" key that points to the value to look up.
+- `connect_data`: Hash, *required* - Data for the Connect plugin to look up. Keys are the lookup in the inventory file which points to a hash with a required "value" key that points to the value to look up.
 
 #### Request
 
