@@ -332,6 +332,29 @@ module Bolt
         end
       end
 
+      # Executes a Docker CLI command. This is useful for running commands as
+      # part of this class without having to go through the `execute`
+      # function and manage pipes.
+      #
+      # @param cmd [String] The docker command and arguments to run
+      #   e.g. 'cp <src> <dest>' for `docker cp <src> <dest>`
+      # @return [String, String, Process::Status] The output of the command: STDOUT, STDERR, Process Status
+      def exec_docker(cmd, env = {})
+        Open3.capture3(env, 'docker', *cmd, { binmode: true })
+      end
+
+      # Formats a map of environment variables to be passed to a command that
+      # accepts repeated `--env` flags
+      #
+      # @param env_vars [Hash] A map of environment variables keys and their values
+      # @return [String]
+      def format_env_vars_for_cli(env_vars)
+        @env_vars = env_vars.each_with_object([]) do |(key, value), acc|
+          acc << "--env"
+          acc << "#{key}=#{value}"
+        end
+      end
+
       def unix_basename(path)
         raise Bolt::ValidationError, "path must be a String, received #{path.class} #{path}" unless path.is_a?(String)
         path.split('/').last

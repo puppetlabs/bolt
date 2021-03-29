@@ -8,9 +8,39 @@ API might change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
+## `run_container` plan step
+
+This feature was introduced in [Bolt 3.5.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-350-2021-3-29).
+
+Currently available as a Puppet plan function, `run_container()` runs a provided image and
+returns the `stdout`, `stderr`, and `exit_code` for that image. The function supports several
+options, including `cmd` to specify a command to run in the container, `volumes` to mount volumes to
+the container, and `ports` to publish ports from the container on the host. You can see all the
+supported options in the [plan function documentation](plan_functions.md#run_container).
+
+The function runs the container on the Bolt controller, not on remote targets. This function is
+supported on both \*nix and Windows systems. 
+
+This plan clones the [Relay repository](https://github.com/puppetlabs/relay), builds the Go binary in a
+container that has all the dependencies in it, and installs the binary to a local path.
+
+```
+plan bolt (
+  TargetSpec $targets = 'localhost'
+) {
+  $relay_path = '/tmp/relay'
+  run_command("git clone git@github.com:puppetlabs/relay.git ${$relay_path}", 'localhost')
+  run_container('golang', 'volumes' => { $relay_path => '/relay' },
+                'workdir' => '/relay',
+                'rm' => true,
+                'cmd' => "/bin/sh -c \"./scripts/generate && ./scripts/build\"")
+  run_command("mv ${$relay_path}/bin/* /usr/bin", 'localhost')
+}
+```
+
 ## Streaming output
 
-This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-310-2021-3-08).
+This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-320-2021-3-08).
 
 You can set the new `stream` output option in `bolt-project.yaml` or `bolt-defaults.yaml`, or
 specify the option on the command line as `--stream`. Bolt streams results back to the console as
@@ -32,7 +62,7 @@ once as the actions are running, and again after Bolt prints the results.
 
 ## LXD Transport
 
-This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-310-2021-3-08).
+This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-320-2021-3-08).
 
 The LXD transport supports connecting to Linux containers on the local system. Similar to the Docker
 transport, The LXD transport accepts the name of the container as the URI, and connects to the
