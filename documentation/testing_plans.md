@@ -837,7 +837,7 @@ bundle exec rake spec
 ### Testing a plan that uses `run_task_with`
 
 The following example demonstrates testing a plan that uses the [`run_task_with()`
-plan function](#plan_functions.md#run-task-with).
+plan function](plan_functions.md#run-task-with).
 
 This plan accepts two parameters: `sql` and `targets`. The plan executes SQL on
 a Postgres database using the `postgresql::sql` task. Each target has a
