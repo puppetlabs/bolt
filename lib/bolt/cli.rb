@@ -635,7 +635,18 @@ module Bolt
 
     def list_targets
       inventoryfile = config.inventoryfile || config.default_inventoryfile
+      outputter.print_targets(group_targets_by_source, inventoryfile)
+    end
 
+    def show_targets
+      inventoryfile = config.inventoryfile || config.default_inventoryfile
+      outputter.print_target_info(group_targets_by_source, inventoryfile)
+    end
+
+    # Returns a hash of targets sorted by those that are found in the
+    # inventory and those that are provided on the command line.
+    #
+    private def group_targets_by_source
       # Retrieve the known group and target names. This needs to be done before
       # updating targets, as that will add adhoc targets to the inventory.
       known_names = inventory.target_names
@@ -646,17 +657,7 @@ module Bolt
         known_names.include?(target.name)
       end
 
-      target_list = {
-        inventory: inventory_targets,
-        adhoc:     adhoc_targets
-      }
-
-      outputter.print_targets(target_list, inventoryfile)
-    end
-
-    def show_targets
-      update_targets(options)
-      outputter.print_target_info(options[:targets])
+      { inventory: inventory_targets, adhoc: adhoc_targets }
     end
 
     def list_groups

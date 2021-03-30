@@ -452,29 +452,77 @@ module Bolt
         targets += target_list[:inventory].map { |target| [target.name, nil] }
         targets += target_list[:adhoc].map { |target| [target.name, adhoc] }
 
-        if targets.any?
-          @stream.puts format_table(targets, 0, 2)
-          @stream.puts
-        end
+        info = +''
 
-        @stream.puts "INVENTORY FILE:"
-        if File.exist?(inventoryfile)
-          @stream.puts inventoryfile
-        else
-          @stream.puts wrap("Tried to load inventory from #{inventoryfile}, but the file does not exist")
-        end
+        # Add target list
+        info << colorize(:cyan, "Targets\n")
+        info << if targets.any?
+                  format_table(targets, 2, 2).to_s
+                else
+                  indent(2, 'No targets')
+                end
+        info << "\n\n"
 
-        @stream.puts "\nTARGET COUNT:"
-        @stream.puts "#{targets.count} total, #{target_list[:inventory].count} from inventory, "\
-                     "#{target_list[:adhoc].count} adhoc"
+        @stream.puts info
+
+        print_inventory_summary(
+          target_list[:inventory].count,
+          target_list[:adhoc].count,
+          inventoryfile
+        )
       end
 
-      def print_target_info(targets)
-        @stream.puts ::JSON.pretty_generate(
-          targets: targets.map(&:detail)
+      def print_target_info(target_list, inventoryfile)
+        adhoc_targets     = target_list[:adhoc].map(&:name).to_set
+        inventory_targets = target_list[:inventory].map(&:name).to_set
+        targets           = target_list.values.flatten.sort_by(&:name)
+
+        info = +''
+
+        if targets.any?
+          adhoc = colorize(:yellow, " (Not found in inventory file)")
+
+          targets.each do |target|
+            info << colorize(:cyan, target.name)
+            info << adhoc if adhoc_targets.include?(target.name)
+            info << "\n"
+            info << indent(2, target.detail.to_yaml.lines.drop(1).join)
+            info << "\n"
+          end
+        else
+          info << colorize(:cyan, "Targets\n")
+          info << indent(2, "No targets\n\n")
+        end
+
+        @stream.puts info
+
+        print_inventory_summary(
+          inventory_targets.count,
+          adhoc_targets.count,
+          inventoryfile
         )
-        count = "#{targets.count} target#{'s' unless targets.count == 1}"
-        @stream.puts colorize(:green, count)
+      end
+
+      private def print_inventory_summary(inventory_count, adhoc_count, inventoryfile)
+        info = +''
+
+        # Add inventory file source
+        info << colorize(:cyan, "Inventory file\n")
+        info << if File.exist?(inventoryfile)
+                  indent(2, "#{inventoryfile}\n")
+                else
+                  indent(2, wrap("Tried to load inventory from #{inventoryfile}, but the file does not exist\n"))
+                end
+        info << "\n"
+
+        # Add target count summary
+        count = "#{inventory_count + adhoc_count} total, "\
+                "#{inventory_count} from inventory, "\
+                "#{adhoc_count} adhoc"
+        info << colorize(:cyan, "Target count\n")
+        info << indent(2, count)
+
+        @stream.puts info
       end
 
       def print_groups(groups)
