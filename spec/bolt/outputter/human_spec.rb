@@ -130,20 +130,14 @@ describe "Bolt::Outputter::Human" do
               end
 
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
-    expect(output.string).to eq(<<~TASK_OUTPUT)
-
-      cinnamon_roll - A delicious sweet bun
-
-      USAGE:
-      #{command}
-
-      PARAMETERS:
-      - icing: Cream cheese
-          Rich, tangy, sweet
-
-      MODULE:
-      /path/to/cinnamony/goodness
-    TASK_OUTPUT
+    expect(output.string).to match(/cinnamon_roll.*A delicious sweet bun/m),
+                             'Does not print name and description'
+    expect(output.string).to match(/Usage.*#{Regexp.escape(command)}/m),
+                             'Does not print usage string'
+    expect(output.string).to match(/Parameters.*icing.*Cream cheese/m),
+                             'Does not print parameters'
+    expect(output.string).to match(%r{Module.*/path/to/cinnamony/goodness}m),
+                             'Does not print module path'
   end
 
   it 'succeeds if task parameters do not have a type' do
@@ -158,72 +152,8 @@ describe "Bolt::Outputter::Human" do
       }
     }
 
-    command = if Bolt::Util.powershell?
-                'Invoke-BoltTask -Name donut -Targets <targets> flavor=<value>'
-              else
-                'bolt task run donut --targets <targets> flavor=<value>'
-              end
-
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
-    expect(output.string).to eq(<<~TASK_OUTPUT)
-
-       donut
-
-       USAGE:
-       #{command}
-
-       PARAMETERS:
-       - flavor: Any
-           What flavor of donut
-
-       MODULE:
-       /path/to/glazed.rb
-    TASK_OUTPUT
-  end
-
-  it 'converts Data (undef) to Any' do
-    name = 'sticky_bun'
-    files = [{ 'name' => 'sticky.rb',
-               'path' => '/this/test/is/making/me/hungry/tasks/sticky.rb' },
-             { 'name' => 'bun.sh',
-               'path' => '/path/to/wrong/module/tasks/bun.sh' }]
-    metadata = {
-      'description' => 'A delicious sweet bun with nuts',
-      'parameters' => {
-        'glaze' => {
-          'type' => 'Sticky',
-          'description' => 'Sweet'
-        },
-        'pecans' => {
-          'description' => 'The best kind of nut',
-          'type' => 'Data'
-        }
-      }
-    }
-
-    command = if Bolt::Util.powershell?
-                'Invoke-BoltTask -Name sticky_bun -Targets <targets> glaze=<value> pecans=<value>'
-              else
-                'bolt task run sticky_bun --targets <targets> glaze=<value> pecans=<value>'
-              end
-
-    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
-    expect(output.string).to eq(<<~TASK_OUTPUT)
-
-      sticky_bun - A delicious sweet bun with nuts
-
-      USAGE:
-      #{command}
-
-      PARAMETERS:
-      - glaze: Sticky
-          Sweet
-      - pecans: Data
-          The best kind of nut
-
-      MODULE:
-      /this/test/is/making/me/hungry
-    TASK_OUTPUT
+    expect(output.string).to match(/flavor.*Any/)
   end
 
   it 'prints noop option in the usage if task supports noop' do
@@ -249,23 +179,8 @@ describe "Bolt::Outputter::Human" do
                'path' => "#{Bolt::Config::Modulepath::MODULES_PATH}/monkey/bread" }]
     metadata = {}
 
-    command = if Bolt::Util.powershell?
-                'Invoke-BoltTask -Name monkey_bread -Targets <targets>'
-              else
-                'bolt task run monkey_bread --targets <targets>'
-              end
-
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
-    expect(output.string).to eq(<<~TASK_OUTPUT)
-
-      monkey_bread
-
-      USAGE:
-      #{command}
-
-      MODULE:
-      built-in module
-    TASK_OUTPUT
+    expect(output.string).to match(/Module.*built-in module/m)
   end
 
   it 'prints correct file separator for modulepath' do
@@ -295,26 +210,21 @@ describe "Bolt::Outputter::Human" do
     }
 
     command = if Bolt::Util.powershell?
-                'Invoke-BoltPlan -Name planity_plan foo=<value> [baz=<value>]'
+                'Invoke-BoltPlan -Name planity_plan [baz=<value>] foo=<value>'
               else
-                'bolt plan run planity_plan foo=<value> [baz=<value>]'
+                'bolt plan run planity_plan [baz=<value>] foo=<value>'
               end
 
     outputter.print_plan_info(plan)
-    expect(output.string).to eq(<<~PLAN_OUTPUT)
 
-      planity_plan
-
-      USAGE:
-      #{command}
-
-      PARAMETERS:
-      - foo: Bar
-      - baz: Bar
-
-      MODULE:
-      plans/plans/plans/plans
-    PLAN_OUTPUT
+    expect(output.string).to match(/planity_plan.*No description/m),
+                             'Does not print plan name and description'
+    expect(output.string).to match(/Usage.*#{Regexp.escape(command)}/m),
+                             'Does not print usage string'
+    expect(output.string).to match(/Parameters.*baz.*Bar.*foo.*Bar/m),
+                             'Does not print parameters'
+    expect(output.string).to match(%r{Module.*plans/plans/plans/plans}m),
+                             'Does not print module path'
   end
 
   it "prints CommandResults" do
