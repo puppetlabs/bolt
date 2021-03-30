@@ -116,7 +116,9 @@ module Bolt
         )
       end
 
-      def print_target_info(targets)
+      def print_target_info(target_list, _inventoryfile)
+        targets = target_list.values.flatten
+
         @stream.puts ::JSON.pretty_generate(
           targets: targets.map(&:detail),
           count: targets.count

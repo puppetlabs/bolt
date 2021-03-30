@@ -511,13 +511,13 @@ describe "Bolt::Outputter::Human" do
     it 'prints the inventory file path' do
       expect(File).to receive(:exist?).with(inventoryfile).and_return(true)
       outputter.print_targets(target_list, inventoryfile)
-      expect(output.string).to match(/INVENTORY FILE:\s*#{inventoryfile}/)
+      expect(output.string).to match(/Inventory file.*#{inventoryfile}/m)
     end
 
     it 'prints a message that the inventory file does not exist' do
       expect(File).to receive(:exist?).with(inventoryfile).and_return(false)
       outputter.print_targets(target_list, inventoryfile)
-      expect(output.string).to match(/INVENTORY FILE:.*does not exist/m)
+      expect(output.string).to match(/Inventory file.*does not exist/m)
     end
 
     it 'prints target counts' do
