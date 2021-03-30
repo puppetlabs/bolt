@@ -541,7 +541,11 @@ module Bolt
         end
         code = apply_manifest(options[:code], options[:targets], options[:object], options[:noop])
       else
-        executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop], config.modified_concurrency)
+        executor = Bolt::Executor.new(config.concurrency,
+                                      analytics,
+                                      options[:noop],
+                                      config.modified_concurrency,
+                                      config.future)
         targets = options[:targets]
 
         results = nil
@@ -688,7 +692,11 @@ module Bolt
       plan_context = { plan_name: plan_name,
                        params: plan_arguments }
 
-      executor = Bolt::Executor.new(config.concurrency, analytics, options[:noop], config.modified_concurrency)
+      executor = Bolt::Executor.new(config.concurrency,
+                                    analytics,
+                                    options[:noop],
+                                    config.modified_concurrency,
+                                    config.future)
       if %w[human rainbow].include?(options.fetch(:format, 'human'))
         executor.subscribe(outputter)
       else
@@ -724,7 +732,11 @@ module Bolt
         Bolt::Logger.warn("empty_manifest", message)
       end
 
-      executor = Bolt::Executor.new(config.concurrency, analytics, noop, config.modified_concurrency)
+      executor = Bolt::Executor.new(config.concurrency,
+                                    analytics,
+                                    noop,
+                                    config.modified_concurrency,
+                                    config.future)
       executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
       executor.subscribe(log_outputter)
       # apply logging looks like plan logging, so tell the outputter we're in a

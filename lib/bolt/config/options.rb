@@ -133,6 +133,20 @@ module Bolt
           _example: "json",
           _default: "human"
         },
+        "future" => {
+          description: "Enable new Bolt features that may include breaking changes.",
+          type: Hash,
+          properties: {
+            "file_paths" => {
+              description: "Load scripts from the `scripts/` directory of a module",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            }
+          },
+          _plugin: false,
+          _example: { 'file_paths' => true }
+        },
         "hiera-config" => {
           description: "The path to the Hiera configuration file.",
           type: String,
@@ -557,6 +571,7 @@ module Bolt
         concurrency
         disable-warnings
         format
+        future
         hiera-config
         log
         modulepath

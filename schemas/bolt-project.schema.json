@@ -22,6 +22,9 @@
     "format": {
       "$ref": "#/definitions/format"
     },
+    "future": {
+      "$ref": "#/definitions/future"
+    },
     "hiera-config": {
       "$ref": "#/definitions/hiera-config"
     },
@@ -133,6 +136,16 @@
         "json",
         "rainbow"
       ]
+    },
+    "future": {
+      "description": "Enable new Bolt features that may include breaking changes.",
+      "type": "object",
+      "properties": {
+        "file_paths": {
+          "description": "Load scripts from the `scripts/` directory of a module",
+          "type": "boolean"
+        }
+      }
     },
     "hiera-config": {
       "description": "The path to the Hiera configuration file.",
