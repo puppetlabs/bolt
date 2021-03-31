@@ -128,7 +128,7 @@ module Bolt
         "format" => {
           description: "The format to use when printing results.",
           type: String,
-          enum: %w[human json rainbow],
+          enum: %w[human json rainbow quiet],
           _plugin: false,
           _example: "json",
           _default: "human"

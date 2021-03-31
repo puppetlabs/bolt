@@ -698,7 +698,7 @@ module Bolt
                                     options[:noop],
                                     config.modified_concurrency,
                                     config.future)
-      if %w[human rainbow].include?(options.fetch(:format, 'human'))
+      if %w[human rainbow quiet].include?(options.fetch(:format, 'human'))
         executor.subscribe(outputter)
       else
         # Only subscribe to out::message events for JSON outputter

@@ -337,7 +337,7 @@ namespace :pwsh do
           when 'modules'
             pwsh_param[:type] = nil
           when 'format'
-            pwsh_param[:validate_set] = %w[human json rainbow]
+            pwsh_param[:validate_set] = %w[human json rainbow quiet]
           end
 
           @pwsh_command[:options] << pwsh_param
