@@ -78,7 +78,8 @@
       "enum": [
         "human",
         "json",
-        "rainbow"
+        "rainbow",
+        "quiet"
       ]
     },
     "inventory-config": {

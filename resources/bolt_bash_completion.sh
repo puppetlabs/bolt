@@ -116,7 +116,7 @@ _bolt() {
 		fi
 		;;
 	--format)
-		next="json human"
+		next="json human quiet"
 		;;
 	--log-level)
 		next="debug info notice warn error fatal"

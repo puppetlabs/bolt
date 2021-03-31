@@ -10,6 +10,8 @@ module Bolt
         Bolt::Outputter::JSON.new(color, verbose, trace, false)
       when 'rainbow'
         Bolt::Outputter::Rainbow.new(color, verbose, trace, spin)
+      when 'quiet'
+        Bolt::Outputter::Quiet.new(color, verbose, trace, spin)
       when nil
         raise "Cannot use outputter before parsing."
       end
@@ -55,3 +57,4 @@ require 'bolt/outputter/human'
 require 'bolt/outputter/json'
 require 'bolt/outputter/logger'
 require 'bolt/outputter/rainbow'
+require 'bolt/outputter/quiet'

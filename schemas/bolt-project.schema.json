@@ -134,7 +134,8 @@
       "enum": [
         "human",
         "json",
-        "rainbow"
+        "rainbow",
+        "quiet"
       ]
     },
     "future": {
