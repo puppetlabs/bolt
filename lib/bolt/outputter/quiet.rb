@@ -154,7 +154,6 @@ module Bolt
             @stream.puts(indent(2, message))
           end
         end
-
       end
 
       def format_log(log)
