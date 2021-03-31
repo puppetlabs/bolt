@@ -43,6 +43,111 @@ describe 'run_script' do
         .and_return(result_set)
     end
 
+    context 'with future.file_paths enabled' do
+      let(:module_root) { File.expand_path(fixtures('modules')) }
+
+      before(:each) do
+        executor.expects(:future).returns({ 'file_paths' => true })
+        inventory.stubs(:get_targets).with(hostname).returns([target])
+      end
+
+      context 'with nonspecific module syntax' do
+        it 'does not load from scripts/ subdir' do
+          is_expected.to run
+            .with_params('with_scripts/hostname.sh', hostname)
+            .and_raise_error(/No such file or directory: .*with_scripts.*hostname\.sh/)
+        end
+
+        it 'loads from files/' do
+          full_path = File.join(module_root, 'with_files/files/hostname.sh')
+
+          executor.expects(:run_script)
+                  .with([target], full_path, [], {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_files/hostname.sh', hostname)
+            .and_return(result_set)
+        end
+      end
+
+      context 'with scripts/ specified' do
+        # hostname.sh is in with_both/files/scripts/ and with_both/scripts/
+        it 'prefers loading from files/scripts/' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_both/files/scripts/hostname.sh')
+
+          executor.expects(:run_script)
+                  .with([target], full_path, [], {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_both/scripts/hostname.sh', hostname)
+            .and_return(result_set)
+        end
+
+        it 'falls back to scripts/ if not found in files/' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_scripts/scripts/hostname.sh')
+
+          executor.expects(:run_script)
+                  .with([target], full_path, [], {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_scripts/scripts/hostname.sh', hostname)
+            .and_return(result_set)
+        end
+      end
+
+      context 'with files/ specified' do
+        it 'prefers loading from files/files/' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_files/files/files/hostname.sh')
+
+          executor.expects(:run_script)
+                  .with([target], full_path, [], {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_files/files/hostname.sh', hostname)
+            .and_return(result_set)
+        end
+
+        it 'falls back to files/ if enabled' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_files/files/toplevel.sh')
+
+          executor.expects(:run_script)
+                  .with([target], full_path, [], {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_files/files/toplevel.sh', hostname)
+            .and_return(result_set)
+        end
+      end
+    end
+
+    context 'with future.file_paths explicitly disabled' do
+      before(:each) do
+        executor.expects(:future).returns({ 'file_paths' => false })
+      end
+
+      it 'does not load from scripts/' do
+        is_expected.to run
+          .with_params('with_scripts/scripts/hostname.sh', hostname)
+          .and_raise_error(/No such file or directory: .*with_scripts.*hostname\.sh/)
+      end
+
+      it 'does not load from files/ if files/files/script.sh is specified' do
+        # This file exists at the toplevel but not under files/, so should not get loaded
+        is_expected.to run
+          .with_params('with_files/files/toplevel.sh', hostname)
+          .and_raise_error(/No such file or directory: .*with_files.*toplevel\.sh/)
+      end
+    end
+
     it 'with host given as Target' do
       executor.expects(:run_script)
               .with([target], full_path, [], {}, [])

@@ -12,14 +12,20 @@ Puppet::Functions.create_function(:'file::exists', Puppet::Functions::InternalFu
   #   file::exists('example/VERSION')
   dispatch :exists do
     scope_param
-    required_param 'String', :filename
+    required_param 'String[1]', :filename
     return_type 'Boolean'
   end
 
   def exists(scope, filename)
     # Send Analytics Report
-    Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
-    found = Puppet::Parser::Files.find_file(filename, scope.compiler.environment)
+    executor = Puppet.lookup(:bolt_executor) {}
+    executor&.report_function_call(self.class.name)
+
+    future = executor&.future || Puppet.lookup(:future) || {}
+    fallback = future.fetch('file_paths', false)
+
+    # Find the file path if it exists, otherwise return nil
+    found = Bolt::Util.find_file_from_scope(filename, scope, fallback)
     found ? Puppet::FileSystem.exist?(found) : false
   end
 end

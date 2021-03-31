@@ -1068,14 +1068,15 @@ describe "Bolt::CLI" do
     end
 
     describe '#find_file' do
-      let(:cli)          { Bolt::CLI.new([]) }
-      let(:config)       { Bolt::Config.from_project(project) }
-      let(:project)      { @project }
-      let(:module_name)  { 'test' }
-      let(:file_name)    { 'script.sh' }
-      let(:local_file)   { project.path + file_name }
-      let(:project_file) { project.path + 'files' + file_name }
-      let(:module_file)  { project.path + 'modules' + module_name + 'files' + file_name }
+      let(:cli)            { Bolt::CLI.new([]) }
+      let(:config)         { Bolt::Config.from_project(project) }
+      let(:project)        { @project }
+      let(:module_name)    { 'test' }
+      let(:file_name)      { 'script.sh' }
+      let(:local_file)     { project.path + file_name }
+      let(:project_file)   { project.path + 'files' + file_name }
+      let(:module_file)    { project.path + 'modules' + module_name + 'files' + file_name }
+      let(:module_script)  { project.path + 'modules' + module_name + 'scripts' + file_name }
 
       around(:each) do |example|
         in_project do |project|
@@ -1100,29 +1101,33 @@ describe "Bolt::CLI" do
         allow(cli).to receive(:config).and_return(config)
       end
 
-      it 'locates a file at an absolute path' do
-        expect(cli.find_file(local_file.to_s)).to eq(local_file.to_s)
-      end
+      context 'with future.file_paths disabled' do
+        it 'locates a file at an absolute path' do
+          expect(cli.find_file(local_file.to_s, false)).to eq(local_file.to_s)
+        end
 
-      it 'locates a file at a relative path' do
-        expect(cli.find_file(file_name)).to eq(file_name)
-      end
+        it 'locates a file at a relative path' do
+          expect(cli.find_file(file_name, false)).to eq(file_name)
+        end
 
-      it 'locates a file in a module' do
-        expect(cli.find_file(File.join(module_name, file_name))).to eq(module_file.to_s)
-      end
+        it 'locates a file in a module' do
+          expect(cli.find_file(File.join(module_name, file_name), false))
+            .to eq(module_file.to_s)
+        end
 
-      it 'locates a file in a project' do
-        expect(cli.find_file(File.join(project.name, file_name))).to eq(project_file.to_s)
-      end
+        it 'locates a file in a project' do
+          expect(cli.find_file(File.join(project.name, file_name), false))
+            .to eq(project_file.to_s)
+        end
 
-      it 'prefers a file path over a Puppet path' do
-        FileUtils.mkdir_p(project.path + module_name)
-        FileUtils.touch(project.path + module_name + file_name)
+        it 'prefers a file path over a Puppet path' do
+          FileUtils.mkdir_p(project.path + module_name)
+          FileUtils.touch(project.path + module_name + file_name)
 
-        path = [module_name, file_name].join(File::SEPARATOR)
+          path = [module_name, file_name].join(File::SEPARATOR)
 
-        expect(cli.find_file(path)).to eq(path)
+          expect(cli.find_file(path, false)).to eq(path)
+        end
       end
     end
 
@@ -1247,7 +1252,14 @@ describe "Bolt::CLI" do
     end
 
     describe "execute" do
-      let(:executor) { double('executor', noop: false, subscribe: nil, shutdown: nil, in_parallel: false) }
+      let(:executor) {
+        double('executor',
+               noop: false,
+               subscribe: nil,
+               shutdown: nil,
+               in_parallel: false,
+               future: {})
+      }
       let(:cli) { Bolt::CLI.new({}) }
       let(:targets) { [target] }
       let(:output) { StringIO.new }

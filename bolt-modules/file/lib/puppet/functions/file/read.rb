@@ -11,7 +11,7 @@ Puppet::Functions.create_function(:'file::read', Puppet::Functions::InternalFunc
   #   file::read('example/VERSION')
   dispatch :read do
     scope_param
-    required_param 'String', :filename
+    required_param 'String[1]', :filename
     return_type 'String'
   end
 
@@ -20,7 +20,11 @@ Puppet::Functions.create_function(:'file::read', Puppet::Functions::InternalFunc
     executor = Puppet.lookup(:bolt_executor) {}
     executor&.report_function_call(self.class.name)
 
-    found = Puppet::Parser::Files.find_file(filename, scope.compiler.environment)
+    future = executor&.future || Puppet.lookup(:future) || {}
+    fallback = future.fetch('file_paths', false)
+
+    # Find the file path if it exists, otherwise return nil
+    found = Bolt::Util.find_file_from_scope(filename, scope, fallback)
     unless found && Puppet::FileSystem.exist?(found)
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, file: filename
