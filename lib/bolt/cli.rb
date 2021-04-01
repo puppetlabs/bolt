@@ -822,15 +822,10 @@ module Bolt
     #
     def assert_project_file(project)
       unless project.project_file?
-        msg = if project.config_file.exist?
-                command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
-                "Detected Bolt configuration file #{project.config_file}, unable to install "\
-                "modules. To update to a project configuration file, run '#{command}'."
-              else
-                command = Bolt::Util.powershell? ? 'New-BoltProject' : 'bolt project init'
-                "Could not find project configuration file #{project.project_file}, unable "\
-                "to install modules. To create a Bolt project, run '#{command}'."
-              end
+        command = Bolt::Util.powershell? ? 'New-BoltProject' : 'bolt project init'
+
+        msg = "Could not find project configuration file #{project.project_file}, unable "\
+              "to install modules. To create a Bolt project, run '#{command}'."
 
         raise Bolt::Error.new(msg, 'bolt/missing-project-config-error')
       end
