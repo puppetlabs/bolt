@@ -2,15 +2,11 @@
 
 require 'json'
 require 'shellwords'
-require 'bolt/transport/simple'
+require 'bolt/transport/base'
 
 module Bolt
   module Transport
-    class Docker < Simple
-      def provided_features
-        ['shell']
-      end
-
+    class Podman < Docker
       def with_connection(target)
         conn = Connection.new(target)
         conn.connect
@@ -20,4 +16,4 @@ module Bolt
   end
 end
 
-require 'bolt/transport/docker/connection'
+require 'bolt/transport/podman/connection'

@@ -100,6 +100,9 @@
         "pcp": {
           "$ref": "#/definitions/pcp"
         },
+        "podman": {
+          "$ref": "#/definitions/podman"
+        },
         "remote": {
           "$ref": "#/definitions/remote"
         },
@@ -347,13 +350,14 @@
         {
           "type": "string",
           "enum": [
-            "ssh",
-            "winrm",
-            "pcp",
+            "docker",
             "local",
             "lxd",
-            "docker",
-            "remote"
+            "pcp",
+            "podman",
+            "remote",
+            "ssh",
+            "winrm"
           ]
         },
         {
@@ -660,6 +664,79 @@
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/token-file"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "podman": {
+      "description": "A map of configuration options for the podman transport.",
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "cleanup": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/cleanup"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "host": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/host"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "interpreters": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/interpreters"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "shell-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/shell-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "tmpdir": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tmpdir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "tty": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tty"
                 },
                 {
                   "$ref": "#/definitions/_plugin"

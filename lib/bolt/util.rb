@@ -343,6 +343,17 @@ module Bolt
         Open3.capture3(env, 'docker', *cmd, { binmode: true })
       end
 
+      # Executes a Podman CLI command. This is useful for running commands as
+      # part of this class without having to go through the `execute`
+      # function and manage pipes.
+      #
+      # @param cmd [String] The podman command and arguments to run
+      #   e.g. 'cp <src> <dest>' for `podman cp <src> <dest>`
+      # @return [String, String, Process::Status] The output of the command: STDOUT, STDERR, Process Status
+      def exec_podman(cmd, env = {})
+        Open3.capture3(env, 'podman', *cmd, { binmode: true })
+      end
+
       # Formats a map of environment variables to be passed to a command that
       # accepts repeated `--env` flags
       #

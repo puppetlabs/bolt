@@ -12,24 +12,26 @@ require 'bolt/config'
 require 'bolt/result_set'
 require 'bolt/puppetdb'
 # Load transports
-require 'bolt/transport/ssh'
-require 'bolt/transport/winrm'
-require 'bolt/transport/orch'
+require 'bolt/transport/docker'
 require 'bolt/transport/local'
 require 'bolt/transport/lxd'
-require 'bolt/transport/docker'
+require 'bolt/transport/orch'
+require 'bolt/transport/podman'
 require 'bolt/transport/remote'
+require 'bolt/transport/ssh'
+require 'bolt/transport/winrm'
 require 'bolt/yarn'
 
 module Bolt
   TRANSPORTS = {
-    ssh: Bolt::Transport::SSH,
-    winrm: Bolt::Transport::WinRM,
-    pcp: Bolt::Transport::Orch,
+    docker: Bolt::Transport::Docker,
     local: Bolt::Transport::Local,
     lxd: Bolt::Transport::LXD,
-    docker: Bolt::Transport::Docker,
-    remote: Bolt::Transport::Remote
+    pcp: Bolt::Transport::Orch,
+    podman: Bolt::Transport::Podman,
+    remote: Bolt::Transport::Remote,
+    ssh: Bolt::Transport::SSH,
+    winrm: Bolt::Transport::WinRM
   }.freeze
 
   class Executor

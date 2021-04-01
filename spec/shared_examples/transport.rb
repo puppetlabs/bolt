@@ -16,7 +16,7 @@ def posix_context
   # The docker transport doesn't run commands in a shell by default so commands
   # that interpolate variables won't work. For other transports, on the other
   # hand, that's exactly the behavior we want to ensure.
-  env_command = if target.protocol == 'docker'
+  env_command = if target.protocol =~ /^(docker|podman)$/
                   "printenv BOLT_TEST_VAR"
                 else
                   'echo $BOLT_TEST_VAR'
@@ -122,7 +122,7 @@ shared_examples 'transport api' do
     end
 
     it "can return a non-zero exit status" do
-      command = if target.protocol == 'docker'
+      command = if target.protocol =~ /^(docker|podman)$/
                   # explicitly launch bash for Docker transport because Docker doesn't have
                   # a default shell when you perform: docker exec
                   "/bin/bash -c 'exit 2'"
