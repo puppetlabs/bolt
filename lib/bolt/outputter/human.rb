@@ -6,6 +6,7 @@ module Bolt
   class Outputter
     class Human < Bolt::Outputter
       COLORS = {
+        dim:    "2", # Dim, the other color of the rainbow
         red:    "31",
         green:  "32",
         yellow: "33",
@@ -313,78 +314,115 @@ module Bolt
 
       # @param [Hash] task A hash representing the task
       def print_task_info(task)
-        # Building lots of strings...
-        pretty_params = +""
-        task_info = +""
-        usage = if Bolt::Util.powershell?
-                  +"Invoke-BoltTask -Name #{task.name} -Targets <targets>"
-                else
-                  +"bolt task run #{task.name} --targets <targets>"
-                end
+        params = (task.parameters || []).sort
 
-        task.parameters&.each do |k, v|
-          pretty_params << "- #{k}: #{v['type'] || 'Any'}\n"
-          pretty_params << "    Default: #{v['default'].inspect}\n" if v.key?('default')
-          pretty_params << "    #{v['description']}\n" if v['description']
-          usage << if v['type']&.start_with?("Optional")
-                     " [#{k}=<value>]"
+        info = +''
+
+        # Add task name and description
+        info << colorize(:cyan, "#{task.name}\n")
+        info << if task.description
+                  indent(2, task.description.chomp)
+                else
+                  indent(2, 'No description')
+                end
+        info << "\n\n"
+
+        # Build usage string
+        usage = +''
+        usage << if Bolt::Util.powershell?
+                   "Invoke-BoltTask -Name #{task.name} -Targets <targets>"
+                 else
+                   "bolt task run #{task.name} --targets <targets>"
+                 end
+        usage << (Bolt::Util.powershell? ? ' [-Noop]' : ' [--noop]') if task.supports_noop
+        params.each do |name, data|
+          usage << if data['type']&.start_with?('Optional')
+                     " [#{name}=<value>]"
                    else
-                     " #{k}=<value>"
+                     " #{name}=<value>"
                    end
         end
 
-        if task.supports_noop
-          usage << (Bolt::Util.powershell? ? ' [-Noop]' : ' [--noop]')
+        # Add usage
+        info << colorize(:cyan, "Usage\n")
+        info << indent(2, wrap(usage))
+        info << "\n"
+
+        # Add parameters, if any
+        if params.any?
+          info << colorize(:cyan, "Parameters\n")
+          params.each do |name, data|
+            info << indent(2, "#{colorize(:yellow, name)}  #{colorize(:dim, data['type'] || 'Any')}\n")
+            info << indent(4, "#{wrap(data['description']).chomp}\n") if data['description']
+            info << indent(4, "Default: #{data['default'].inspect}\n") if data.key?('default')
+            info << "\n"
+          end
         end
 
-        task_info << "\n#{task.name}"
-        task_info << " - #{task.description}" if task.description
-        task_info << "\n\n"
-        task_info << "USAGE:\n#{usage}\n\n"
-        task_info << "PARAMETERS:\n#{pretty_params}\n" unless pretty_params.empty?
-        task_info << "MODULE:\n"
-
+        # Add module location
         path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
-        task_info << if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
-                       "built-in module"
-                     else
-                       path
-                     end
-        @stream.puts(task_info)
+        info << colorize(:cyan, "Module\n")
+        info << if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
+                  indent(2, 'built-in module')
+                else
+                  indent(2, path)
+                end
+
+        @stream.puts info
       end
 
       # @param [Hash] plan A hash representing the plan
       def print_plan_info(plan)
-        # Building lots of strings...
-        pretty_params = +""
-        plan_info = +""
-        usage = if Bolt::Util.powershell?
-                  +"Invoke-BoltPlan -Name #{plan['name']}"
-                else
-                  +"bolt plan run #{plan['name']}"
-                end
+        params = plan['parameters'].sort
 
-        plan['parameters'].each do |name, p|
-          pretty_params << "- #{name}: #{p['type']}\n"
-          pretty_params << "    Default: #{p['default_value']}\n" unless p['default_value'].nil?
-          pretty_params << "    #{p['description']}\n" if p['description']
-          usage << (p.include?('default_value') ? " [#{name}=<value>]" : " #{name}=<value>")
+        info = +''
+
+        # Add plan name and description
+        info << colorize(:cyan, "#{plan['name']}\n")
+        info << if plan['description']
+                  indent(2, plan['description'].chomp)
+                else
+                  indent(2, 'No description')
+                end
+        info << "\n\n"
+
+        # Build the usage string
+        usage = +''
+        usage << if Bolt::Util.powershell?
+                   "Invoke-BoltPlan -Name #{plan['name']}"
+                 else
+                   "bolt plan run #{plan['name']}"
+                 end
+        params.each do |name, data|
+          usage << (data.include?('default_value') ? " [#{name}=<value>]" : " #{name}=<value>")
         end
 
-        plan_info << "\n#{plan['name']}"
-        plan_info << " - #{plan['description']}" if plan['description']
-        plan_info << "\n\n"
-        plan_info << "USAGE:\n#{usage}\n\n"
-        plan_info << "PARAMETERS:\n#{pretty_params}\n" unless plan['parameters'].empty?
-        plan_info << "MODULE:\n"
+        # Add usage
+        info << colorize(:cyan, "Usage\n")
+        info << indent(2, wrap(usage))
+        info << "\n"
 
-        path = plan['module']
-        plan_info << if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
-                       "built-in module"
-                     else
-                       path
-                     end
-        @stream.puts(plan_info)
+        # Add parameters, if any
+        if params.any?
+          info << colorize(:cyan, "Parameters\n")
+
+          params.each do |name, data|
+            info << indent(2, "#{colorize(:yellow, name)}  #{colorize(:dim, data['type'])}\n")
+            info << indent(4, "#{wrap(data['description']).chomp}\n") if data['description']
+            info << indent(4, "Default: #{data['default_value']}\n") unless data['default_value'].nil?
+            info << "\n"
+          end
+        end
+
+        # Add module location
+        info << colorize(:cyan, "Module\n")
+        info << if plan['module'].start_with?(Bolt::Config::Modulepath::MODULES_PATH)
+                  indent(2, 'built-in module')
+                else
+                  indent(2, plan['module'])
+                end
+
+        @stream.puts info
       end
 
       def print_plans(plans, modulepath)
