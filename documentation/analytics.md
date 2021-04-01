@@ -5,13 +5,33 @@ about how to improve it. You can opt out of providing this data.
 
 ## Opt out of data collection
 
-You can opt out of data collection by modifying Bolt's analytics configuration
-file. This file is located in the user's home directory at `<HOME
-DIRECTORY>/.puppetlabs/etc/bolt/analytics.yaml`. To opt out of data collection,
-add the following line to the file:
+You can opt out of data collection by setting an option in Bolt's configuration
+or by setting an environment variable.
+
+### Bolt configuration
+
+To disable data collection, set `analytics: false` in your [configuration
+file](configuring_bolt.md). This option is supported in the system-wide,
+user-level, and project configuration files.
 
 ```yaml
-disabled: true
+# bolt-defaults.yaml
+analytics: false
+```
+
+Setting the `analytics: false` option in a configuration file disables data
+collection universally. You cannot override the option by setting it to `true`
+in another configuration file. For example, setting `analytics: true` in a
+project configuration file does not enable data collection if you've set
+`analytics: false` in the system-wide or user-level configuration file.
+
+### Environment variable
+
+To disable data collection, set the `BOLT_DISABLE_ANALYTICS` environment
+variable to any value.
+
+```
+export BOLT_DISABLE_ANALYTICS=true
 ```
 
 ## Data collected

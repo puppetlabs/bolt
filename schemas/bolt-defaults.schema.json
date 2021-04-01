@@ -4,6 +4,9 @@
   "description": "Bolt Defaults bolt-defaults.yaml Schema",
   "type": "object",
   "properties": {
+    "analytics": {
+      "$ref": "#/definitions/analytics"
+    },
     "color": {
       "$ref": "#/definitions/color"
     },
@@ -51,6 +54,10 @@
     }
   },
   "definitions": {
+    "analytics": {
+      "description": "Whether to disable analytics. Setting this option to 'false' in the system-wide or user-level configuration will disable analytics for all projects, even if this option is set to 'true' at the project level.",
+      "type": "boolean"
+    },
     "color": {
       "description": "Whether to use colored output when printing messages to the console.",
       "type": "boolean"

@@ -4,6 +4,9 @@
   "description": "Bolt Project bolt-project.yaml Schema",
   "type": "object",
   "properties": {
+    "analytics": {
+      "$ref": "#/definitions/analytics"
+    },
     "apply-settings": {
       "$ref": "#/definitions/apply-settings"
     },
@@ -75,6 +78,10 @@
     }
   },
   "definitions": {
+    "analytics": {
+      "description": "Whether to disable analytics. Setting this option to 'false' in the system-wide or user-level configuration will disable analytics for all projects, even if this option is set to 'true' at the project level.",
+      "type": "boolean"
+    },
     "apply-settings": {
       "description": "A map of Puppet settings to use when applying Puppet code using the `apply` plan function or the `bolt apply` command.",
       "type": "object",

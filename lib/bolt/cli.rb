@@ -943,7 +943,7 @@ module Bolt
 
     def analytics
       @analytics ||= begin
-        client = Bolt::Analytics.build_client
+        client = Bolt::Analytics.build_client(config.analytics)
         client.bundled_content = bundled_content
         client
       end
