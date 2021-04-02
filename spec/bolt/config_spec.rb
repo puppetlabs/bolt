@@ -329,6 +329,24 @@ describe Bolt::Config do
       project_config['log'] = { '~/.puppetlabs/debug.log' => 'disable' }
       expect(config.log).not_to include('~/.puppetlabs/debug.log')
     end
+
+    context 'analytics' do
+      it 'defaults to enabled' do
+        expect(config.analytics).to eq(true)
+      end
+
+      it 'overrides a true value with false' do
+        system_config['analytics']  = true
+        project_config['analytics'] = false
+        expect(config.analytics).to eq(false)
+      end
+
+      it 'does not override a false value' do
+        system_config['analytics']  = false
+        project_config['analytics'] = true
+        expect(config.analytics).to eq(false)
+      end
+    end
   end
 
   describe '#modulepath' do

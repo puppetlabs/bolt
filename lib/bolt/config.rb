@@ -169,6 +169,7 @@ module Bolt
       @config_files = []
 
       default_data = {
+        'analytics'           => true,
         'apply-settings'      => {},
         'color'               => true,
         'compile-concurrency' => Etc.nprocessors,
@@ -263,6 +264,8 @@ module Bolt
           # Disabled warnings are concatenated
           when 'disable-warnings'
             val1.concat(val2)
+          when 'analytics'
+            val1 && val2
           # All other values are overwritten
           else
             val2
@@ -454,6 +457,10 @@ module Bolt
 
     def disable_warnings
       Set.new(@project.disable_warnings + @data['disable-warnings'])
+    end
+
+    def analytics
+      @data['analytics']
     end
 
     # Check if there is a case-insensitive match to the path

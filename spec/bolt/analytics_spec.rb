@@ -16,11 +16,16 @@ describe Bolt::Analytics do
     allow(subject).to receive(:write_config)
   end
 
-  it 'creates a NoopClient if analytics is disabled' do
+  it 'creates a NoopClient if analytics is disabled in analytics file' do
     default_config.replace('disabled' => true)
     expect(subject).not_to receive(:write_config)
 
     expect(subject.build_client).to be_instance_of(Bolt::Analytics::NoopClient)
+  end
+
+  it 'creates a NoopClient if analytics is disabled in config' do
+    expect(subject).not_to receive(:write_config)
+    expect(subject.build_client(false)).to be_instance_of(Bolt::Analytics::NoopClient)
   end
 
   it 'creates a NoopClient if reading config fails' do

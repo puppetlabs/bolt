@@ -29,7 +29,7 @@ module Bolt
       yaml_plan_count: :cd13
     }.freeze
 
-    def self.build_client
+    def self.build_client(enabled = true)
       logger = Bolt::Logger.logger(self)
       begin
         config_file = config_path
@@ -38,7 +38,7 @@ module Bolt
         config = { 'disabled' => true }
       end
 
-      if config['disabled'] || ENV['BOLT_DISABLE_ANALYTICS']
+      if !enabled || config['disabled'] || ENV['BOLT_DISABLE_ANALYTICS']
         logger.debug "Analytics opt-out is set, analytics will be disabled"
         NoopClient.new
       else
@@ -80,12 +80,8 @@ module Bolt
         unless ENV['BOLT_DISABLE_ANALYTICS']
           msg = <<~ANALYTICS
             Bolt collects data about how you use it. You can opt out of providing this data.
-
-            To disable analytics data collection, add this line to ~/.puppetlabs/etc/bolt/analytics.yaml :
-              disabled: true
-
-            Read more about what data Bolt collects and why here:
-              https://puppet.com/docs/bolt/latest/bolt_installing.html#analytics-data-collection
+            To learn how to disable data collection, or see what data Bolt collects and why,
+            see http://pup.pt/bolt-analytics
           ANALYTICS
           Bolt::Logger.warn_once('analytics_opt_out', msg)
         end
