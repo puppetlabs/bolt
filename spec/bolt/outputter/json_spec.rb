@@ -177,7 +177,7 @@ describe "Bolt::Outputter::JSON" do
     end
 
     it 'outputs inventory targets with count and file' do
-      outputter.print_targets(target_list, inventoryfile)
+      outputter.print_targets(target_list, inventoryfile, true)
       parsed = JSON.parse(output.string)
 
       expect(parsed['inventory']).to eq(
@@ -188,7 +188,7 @@ describe "Bolt::Outputter::JSON" do
     end
 
     it 'outputs adhoc targets with count' do
-      outputter.print_targets(target_list, inventoryfile)
+      outputter.print_targets(target_list, inventoryfile, true)
       parsed = JSON.parse(output.string)
 
       expect(parsed['adhoc']).to eq(
@@ -198,7 +198,7 @@ describe "Bolt::Outputter::JSON" do
     end
 
     it 'outputs all targets with count' do
-      outputter.print_targets(target_list, inventoryfile)
+      outputter.print_targets(target_list, inventoryfile, true)
       parsed = JSON.parse(output.string)
 
       expect(parsed['targets']).to match_array(%w[target target])

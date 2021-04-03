@@ -2661,6 +2661,15 @@ describe "Bolt::CLI" do
       cli.execute(cli.parse)
     end
 
+    it 'defaults to showing all targets' do
+      cli = Bolt::CLI.new(%w[inventory show])
+      inventory = double('inventory', target_names: [], get_targets: [])
+      allow(cli).to receive(:inventory).and_return(inventory)
+      expect(inventory).to receive(:get_targets).with('all')
+      expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_targets)
+      cli.execute(cli.parse)
+    end
+
     it 'lists groups in the inventory file' do
       cli = Bolt::CLI.new(%w[group show])
       expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_groups)
