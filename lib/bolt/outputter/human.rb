@@ -483,7 +483,7 @@ module Bolt
         end
       end
 
-      def print_targets(target_list, inventoryfile, target_flag)
+      def print_targets(target_list, inventory_source, default_inventory, target_flag)
         adhoc = colorize(:yellow, "(Not found in inventory file)")
 
         targets  = []
@@ -501,18 +501,13 @@ module Bolt
                 end
         info << "\n\n"
 
-        @stream.puts info
+        info << format_inventory_source(inventory_source, default_inventory)
+        info << format_target_summary(target_list[:inventory].count, target_list[:adhoc].count, target_flag, false)
 
-        print_inventory_summary(
-          target_list[:inventory].count,
-          target_list[:adhoc].count,
-          inventoryfile,
-          target_flag,
-          false
-        )
+        @stream.puts info
       end
 
-      def print_target_info(target_list, inventoryfile, target_flag)
+      def print_target_info(target_list, inventory_source, default_inventory, target_flag)
         adhoc_targets     = target_list[:adhoc].map(&:name).to_set
         inventory_targets = target_list[:inventory].map(&:name).to_set
         targets           = target_list.values.flatten.sort_by(&:name)
@@ -534,28 +529,27 @@ module Bolt
           info << indent(2, "No targets\n\n")
         end
 
-        @stream.puts info
+        info << format_inventory_source(inventory_source, default_inventory)
+        info << format_target_summary(inventory_targets.count, adhoc_targets.count, target_flag, true)
 
-        print_inventory_summary(
-          inventory_targets.count,
-          adhoc_targets.count,
-          inventoryfile,
-          target_flag,
-          true
-        )
+        @stream.puts info
       end
 
-      private def print_inventory_summary(inventory_count, adhoc_count, inventoryfile, target_flag, detail_flag)
+      private def format_inventory_source(inventory_source, default_inventory)
         info = +''
 
         # Add inventory file source
-        info << colorize(:cyan, "Inventory file\n")
-        info << if File.exist?(inventoryfile)
-                  indent(2, "#{inventoryfile}\n")
+        info << colorize(:cyan, "Inventory source\n")
+        info << if inventory_source
+                  indent(2, "#{inventory_source}\n")
                 else
-                  indent(2, wrap("Tried to load inventory from #{inventoryfile}, but the file does not exist\n"))
+                  indent(2, wrap("Tried to load inventory from #{default_inventory}, but the file does not exist\n"))
                 end
         info << "\n"
+      end
+
+      private def format_target_summary(inventory_count, adhoc_count, target_flag, detail_flag)
+        info = +''
 
         # Add target count summary
         count = "#{inventory_count + adhoc_count} total, "\
@@ -579,13 +573,25 @@ module Bolt
           end
         end
 
-        @stream.puts info
+        info
       end
 
-      def print_groups(groups)
-        count = "#{groups.count} group#{'s' unless groups.count == 1}"
-        @stream.puts groups.join("\n")
-        @stream.puts colorize(:green, count)
+      def print_groups(groups, inventory_source, default_inventory)
+        info = +''
+
+        # Add group list
+        info << colorize(:cyan, "Groups\n")
+        info << indent(2, groups.join("\n"))
+        info << "\n\n"
+
+        # Add inventory file source
+        info << format_inventory_source(inventory_source, default_inventory)
+
+        # Add group count summary
+        info << colorize(:cyan, "Group count\n")
+        info << indent(2, "#{groups.count} total")
+
+        @stream.puts info
       end
 
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`

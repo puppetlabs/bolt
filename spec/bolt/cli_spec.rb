@@ -2663,7 +2663,7 @@ describe "Bolt::CLI" do
 
     it 'defaults to showing all targets' do
       cli = Bolt::CLI.new(%w[inventory show])
-      inventory = double('inventory', target_names: [], get_targets: [])
+      inventory = double('inventory', target_names: [], get_targets: [], source: '')
       allow(cli).to receive(:inventory).and_return(inventory)
       expect(inventory).to receive(:get_targets).with('all')
       expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_targets)

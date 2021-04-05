@@ -642,8 +642,12 @@ module Bolt
         options[:targets] = 'all'
       end
 
-      inventoryfile = config.inventoryfile || config.default_inventoryfile
-      outputter.print_targets(group_targets_by_source, inventoryfile, target_flag)
+      outputter.print_targets(
+        group_targets_by_source,
+        inventory.source,
+        config.default_inventoryfile,
+        target_flag
+      )
     end
 
     def show_targets
@@ -653,8 +657,12 @@ module Bolt
         options[:targets] = 'all'
       end
 
-      inventoryfile = config.inventoryfile || config.default_inventoryfile
-      outputter.print_target_info(group_targets_by_source, inventoryfile, target_flag)
+      outputter.print_target_info(
+        group_targets_by_source,
+        inventory.source,
+        config.default_inventoryfile,
+        target_flag
+      )
     end
 
     # Returns a hash of targets sorted by those that are found in the
@@ -675,8 +683,7 @@ module Bolt
     end
 
     def list_groups
-      groups = inventory.group_names
-      outputter.print_groups(groups)
+      outputter.print_groups(inventory.group_names.sort, inventory.source, config.default_inventoryfile)
     end
 
     def run_plan(plan_name, plan_arguments, nodes, options)
