@@ -458,7 +458,19 @@ module Bolt
         # Read any remaining data in the pipe. Do not wait for
         # EOF in case the pipe is inherited by a child process.
         read_streams.each do |stream, _|
-          loop { read_streams[stream] << stream.read_nonblock(CHUNK_SIZE) }
+          loop {
+            to_print << stream.read_nonblock(CHUNK_SIZE)
+
+            if !to_print.chomp.empty? && @stream_logger
+              formatted = to_print.lines.map do |msg|
+                "[#{@target.safe_name}] #{stream_name}: #{msg.chomp}"
+              end.join("\n")
+              @stream_logger.warn(formatted)
+            end
+
+            read_streams[stream]        << to_print
+            result_output.merged_output << to_print
+          }
         rescue Errno::EAGAIN, EOFError
         end
         result_output.stdout << read_streams[out]
