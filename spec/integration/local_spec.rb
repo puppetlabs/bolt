@@ -123,6 +123,11 @@ describe "when running over the local transport" do
       expect(result.map { |r| r['stdout'].strip }).to eq(%w[root root])
     end
 
+    it 'returns merged output', :reset_puppet_settings do
+      result = run_nodes(["command", "run", ">&2 echo Hello $USER && whoami"] + config_flags)
+      expect(result.map { |r| r['merged_output'].strip }).to eq(["Hello root\nroot", "Hello root\nroot"])
+    end
+
     it 'with script with parameters', :reset_puppet_settings do
       with_tempfile_containing('script', "#!/usr/bin/env bash \n echo $1", '.sh') do |script|
         results = run_cli_json(%W[script run #{script.path} hello] + config_flags)

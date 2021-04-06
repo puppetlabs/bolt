@@ -396,7 +396,12 @@ module Bolt
         # See if there's a sudo prompt
         if use_sudo
           ready_read = select([err], nil, nil, timeout * 5)
-          read_streams[err] << check_sudo(err, inp, options[:stdin]) if ready_read
+          to_print = check_sudo(err, inp, options[:stdin]) if ready_read
+          unless to_print.nil?
+            log_stream(to_print, 'err')
+            read_streams[err]           << to_print
+            result_output.merged_output << to_print
+          end
         end
 
         # True while the process is running or waiting for IO input
@@ -412,14 +417,7 @@ module Bolt
                        else
                          stream.readpartial(CHUNK_SIZE)
                        end
-
-            if !to_print.chomp.empty? && @stream_logger
-              formatted = to_print.lines.map do |msg|
-                "[#{@target.safe_name}] #{stream_name}: #{msg.chomp}"
-              end.join("\n")
-              @stream_logger.warn(formatted)
-            end
-
+            log_stream(to_print, stream_name)
             read_streams[stream]        << to_print
             result_output.merged_output << to_print
           rescue EOFError
@@ -458,7 +456,13 @@ module Bolt
         # Read any remaining data in the pipe. Do not wait for
         # EOF in case the pipe is inherited by a child process.
         read_streams.each do |stream, _|
-          loop { read_streams[stream] << stream.read_nonblock(CHUNK_SIZE) }
+          stream_name = stream == out ? 'out' : 'err'
+          loop {
+            to_print = stream.read_nonblock(CHUNK_SIZE)
+            log_stream(to_print, stream_name)
+            read_streams[stream]        << to_print
+            result_output.merged_output << to_print
+          }
         rescue Errno::EAGAIN, EOFError
         end
         result_output.stdout << read_streams[out]
@@ -488,6 +492,15 @@ module Bolt
 
       def sudo_prompt
         '[sudo] Bolt needs to run as another user, password: '
+      end
+
+      private def log_stream(to_print, stream_name)
+        if !to_print.chomp.empty? && @stream_logger
+          formatted = to_print.lines.map do |msg|
+            "[#{@target.safe_name}] #{stream_name}: #{msg.chomp}"
+          end.join("\n")
+          @stream_logger.warn(formatted)
+        end
       end
     end
   end
