@@ -3,6 +3,103 @@
 Find out what the Bolt team is working on and why we're making the decisions
 we're making.
 
+## April 2021
+
+### How Bolt loads scripts
+
+#### Where we are
+
+As of now, Bolt typically accepts the location of a script or file as an absolute path or
+a [Module-style file loading](https://puppet.com/docs/puppet/latest/file_serving.html). Puppet module
+syntax is `<module_name>/<path_to_file>` where the `<module_name>` is the name of the module on the
+modulepath to load from, and `<path_to_file>` is the path with the `<module_name>/files/`
+subdirectory to load from. For example if I provided Bolt with `ruby_task_helper/task_helper.rb`,
+that would find the [ruby_task_helper module]() on the modulepath, and look in
+`ruby_task_helper/files/` for the file `task_helper.rb`. Similarly,
+`powershell_task_helper/BoltPwshHelper/BoltPwshHelper.psm1` will look in
+`powershell_task_helper/files/BoltPwshHelper/` for `BoltPwshHelper.psm1`.
+
+Users can also load tasks and plans as first-class citizens of a module, but with a slightly
+different syntax that uses double-colons instead of slashes. For example, if you provide Bolt with
+the task `terraform::apply` it will find the `terraform` module on the modulepath and look in
+`terraform/tasks` for a task called `apply` (with any file extension). Providing
+`terraform::subdir::apply` would look in `terraform/tasks/subdir/` for `apply`.
+
+What all of these loading methods leave out is one of the most common artifacts Bolt users use:
+scripts. Scripts can be loaded using the module-style file loading, but they need to be in the
+`files/` subdirectory of a module, not the `scripts/` subdirectory. It's about time scripts got
+their due as the Bolt workhorses they are. That's why we're introducing specific module-style
+syntax. While "specific module-style syntax" is kind of a mouthful, it will provide a more elegant and
+comprehensible workflow for sharing and loading scripts from a module. With these changes, there's
+no magic to understanding where a file is being loaded from, and scripts are more visible as the
+core Bolt entities they are.
+
+#### Where we're going
+
+Eventually, users will be able to load files by providing `<module_name>/files/myfile`, and load
+scripts by providing `<module_name>/scripts/myscript.sh`. This more detailed syntax will make
+scripts more like first-class citizens in Bolt, and will disambiguate loading files vs loading
+scripts from a module. Plus, it is easier to understand where files are coming from if the full path
+is provided, as opposed to magically looking in the `files/` directory for a file. Once fully rolled
+out the old, magic syntax `<module_name>/myfile` will no longer load from the `files/` subdirectory
+of a module.
+
+#### How we get there 🚲
+
+This is a big change in how Bolt loads file and scripts, so it's going to take a few different
+phases to transition from where we are to where we're going. Inevitably, in order for a module to
+function with older versions of Bolt module authors will need to have scripts in two places at some
+point: one under the `files/` directory and one in the new locations that Bolt will load from. We
+know this is a burden on content authors, but we think it's worth the improved experience for users
+new to the Puppet ecosystem and Bolt.
+
+**Phase 1**: In this phase, specific module-style syntax will be opt-in using the new `file_paths`
+project-level configuration option, which is nested under the `future` key. When provided with the
+following paths, Bolt will search these subdirectories in order:
+
+- Provided: `module/myscript.sh`
+  - Load from `files/myscript.sh` (old behavior)
+- Provided: `module/scripts/myscript.sh`
+  - Load from `files/scripts/myscript.sh` (old behavior)
+  - Fall back to `scripts/myscript.sh` (new behavior)
+- Provided: `module/files/myscript.sh`
+  - Load from `files/files/myscript.sh` (old behavior)
+  - Fall back to `files/myscript.sh` (new behavior)
+
+**Phase 2**: In this phase, the precedence of paths searched will be switched: so Bolt will first
+look in the new location for a given path, and then the old location. Since this is a breaking
+change it will either be gated by the same future flag as above, or will happen with a major version
+release.
+
+- Provided: `module/myscript.sh`
+  - Load from `files/myscript.sh` (old behavior)
+- Provided: `module/scripts/myscript.sh`
+  - Load from `scripts/myscript.sh` (new behavior)
+  - Fall back to `files/scripts/myscript.sh` (old behavior)
+- Provided: `module/files/myscript.sh`
+  - Load from `files/myscript.sh` (new behavior)
+  - Fall back to `files/files/myscript.sh` (old behavior)
+
+**Phase 3**: Issue a deprecation warning when a file is found in the old location, and when a
+non-specific module-style path is provided.
+
+- Provided: `module/myscript.sh`
+  - Raise deprecation warning
+- Provided: `module/scripts/myscript.sh`
+  - Raise a deprecation warning if file is found at `files/scripts/myscript.sh`
+- Provided: `module/files/myscript.sh`
+  - Raise a deprecation warning if file is found at `files/files/myscript.sh`
+
+**Phase 4**: The final phase, Bolt will only load scripts from specific-paths and will error if
+provided a non-specific module syntax.
+
+- Provided: `module/myscript.sh`
+  - Error
+- Provided: `module/scripts/myscript.sh`
+  - Load from `scripts/myscript.sh`
+- Provided: `module/files/myscript.sh`
+  - Load from `files/myscript.sh`
+
 ## March 2021
 
 ### Deprecating dotted fact names
