@@ -1,5 +1,44 @@
 # Changelog
 
+## Bolt 3.6.0 (2021-04-06)
+
+### New features
+
+* **Improved inventory output**
+  ([#2751](https://github.com/puppetlabs/bolt/pull/2751))
+
+  The `bolt inventory show` and `Get-BoltInventory` command now display
+  `human` output in the same format as other `show` commands.
+
+* **Improved plan and task information output**
+  ([#2754](https://github.com/puppetlabs/bolt/pull/2754))
+
+  The `bolt plan|task show <name>` and `Get-Bolt(Plan|Task) -Name
+  <name>` commands now display `human` output in a similar format to
+  other `show` commands.
+
+* **Podman transport**
+  ([#2456](https://github.com/puppetlabs/bolt/issues/2456))
+
+  The Podman transport connects to local running Podman containers,
+  useful for testing scenarios or debugging.
+
+* **Disable analytics in system, user, and project config files**
+  ([#2759](https://github.com/puppetlabs/bolt/issues/2759))
+
+  The new `analytics` configuration option can be used to disable data
+  collection in Bolt and is supported in both `bolt-defaults.yaml` and
+  `bolt-project.yaml`. Disabling data collection cannot be overridden by
+  enabling it in another configuration file.
+
+### Bug fixes
+
+* **Do not stack trace when missing project configuration file**
+  ([#2756](https://github.com/puppetlabs/bolt/issues/2756))
+
+  Bolt no longer stack traces when installing modules if the project
+  does not have a `bolt-project.yaml` configuration file.
+
 ## Bolt 3.5.0 (2021-03-29)
 
 ### New features
