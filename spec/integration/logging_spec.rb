@@ -155,8 +155,10 @@ shared_examples 'streaming output' do
   include BoltSpec::Integration
   include BoltSpec::Project
 
-  let(:lines)       { @log_output.readlines }
-  let(:logger)      { Bolt::Logger.logger(:stream) }
+  let(:lines)         { @log_output.readlines }
+  let(:logger)        { Bolt::Logger.logger(:stream) }
+  let(:rootuser)      { 'root' }
+  let(:run_as_flags)  { config_flags + %W[--run-as #{rootuser} --sudo-password #{pw}] }
 
   around :each do |example|
     with_project(config: config) do |project|
@@ -186,6 +188,11 @@ shared_examples 'streaming output' do
     it 'streams stderr to the console' do
       expect(logger).to receive(:warn).with(/\[#{uri}\] err: error/)
       run_cli(%W[command run #{err_cmd} -t #{uri}] + config_flags, project: @project)
+    end
+
+    it 'streams when using run-as', ssh: true do
+      expect(logger).to receive(:warn).with(/\[#{uri}\] out: #{rootuser}/)
+      run_cli(%W[command run #{whoami} -t #{uri}] + run_as_flags, project: @project)
     end
 
     it 'formats multi-line messages correctly' do
