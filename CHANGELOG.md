@@ -1,5 +1,17 @@
 # Changelog
 
+## Bolt 3.6.1 (2021-04-07)
+
+### Bug fixes
+
+* **Ensure all messages print, even after thread finishes**
+  ([#2770](https://github.com/puppetlabs/bolt/pull/2770))
+
+  Bolt now ensures that all messages from a command or script are
+  printed back to the user. Previously, some messages would be lost
+  if they were read after the thread finished executing or when Bolt had
+  been prompted for a sudo password.
+
 ## Bolt 3.6.0 (2021-04-06)
 
 ### New features
