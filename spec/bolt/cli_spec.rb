@@ -491,7 +491,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/USAGE.*bolt apply \[manifest.pp\]/m).to_stdout
+          }.to output(/USAGE.*bolt apply \[manifest\]/m).to_stdout
         end
       end
     end
@@ -2658,6 +2658,15 @@ describe "Bolt::CLI" do
     it 'lists targets with resolved configuration' do
       cli = Bolt::CLI.new(%w[inventory show -t localhost --detail])
       expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_target_info)
+      cli.execute(cli.parse)
+    end
+
+    it 'defaults to showing all targets' do
+      cli = Bolt::CLI.new(%w[inventory show])
+      inventory = double('inventory', target_names: [], get_targets: [])
+      allow(cli).to receive(:inventory).and_return(inventory)
+      expect(inventory).to receive(:get_targets).with('all')
+      expect_any_instance_of(Bolt::Outputter::Human).to receive(:print_targets)
       cli.execute(cli.parse)
     end
 

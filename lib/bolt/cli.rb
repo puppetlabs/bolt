@@ -47,6 +47,8 @@ module Bolt
       'guide' => %w[]
     }.freeze
 
+    TARGETING_OPTIONS = %i[query rerun targets].freeze
+
     attr_reader :config, :options
 
     def initialize(argv)
@@ -262,7 +264,7 @@ module Bolt
     end
 
     def update_targets(options)
-      target_opts = options.keys.select { |opt| %i[query rerun targets].include?(opt) }
+      target_opts = options.keys.select { |opt| TARGETING_OPTIONS.include?(opt) }
       target_string = "'--targets', '--rerun', or '--query'"
       if target_opts.length > 1
         raise Bolt::CLIError, "Only one targeting option #{target_string} can be specified"
@@ -634,13 +636,25 @@ module Bolt
     end
 
     def list_targets
+      if options.keys.any? { |key| TARGETING_OPTIONS.include?(key) }
+        target_flag = true
+      else
+        options[:targets] = 'all'
+      end
+
       inventoryfile = config.inventoryfile || config.default_inventoryfile
-      outputter.print_targets(group_targets_by_source, inventoryfile)
+      outputter.print_targets(group_targets_by_source, inventoryfile, target_flag)
     end
 
     def show_targets
+      if options.keys.any? { |key| TARGETING_OPTIONS.include?(key) }
+        target_flag = true
+      else
+        options[:targets] = 'all'
+      end
+
       inventoryfile = config.inventoryfile || config.default_inventoryfile
-      outputter.print_target_info(group_targets_by_source, inventoryfile)
+      outputter.print_target_info(group_targets_by_source, inventoryfile, target_flag)
     end
 
     # Returns a hash of targets sorted by those that are found in the

@@ -190,7 +190,8 @@ module Bolt
           apply
 
       USAGE
-          bolt apply [manifest.pp] [options]
+          bolt apply [manifest] {--targets TARGETS | --query QUERY | --rerun FILTER}
+            [options]
 
       DESCRIPTION
           Apply Puppet manifest code on the specified targets.
@@ -219,7 +220,8 @@ module Bolt
           run
 
       USAGE
-          bolt command run <command> [options]
+          bolt command run <command> {--targets TARGETS | --query QUERY | --rerun FILTER}
+            [options]
 
       DESCRIPTION
           Run a command on the specified targets.
@@ -248,7 +250,8 @@ module Bolt
           download
 
       USAGE
-          bolt file download <src> <dest> [options]
+          bolt file download <source> <destination> {--targets TARGETS | --query QUERY | --rerun FILTER}
+            [options]
 
       DESCRIPTION
           Download a file or directory from one or more targets.
@@ -267,7 +270,8 @@ module Bolt
           upload
 
       USAGE
-          bolt file upload <src> <dest> [options]
+          bolt file upload <source> <destination> {--targets TARGETS | --query QUERY | --rerun FILTER}
+            [options]
 
       DESCRIPTION
           Upload a local file or directory.
@@ -343,7 +347,12 @@ module Bolt
           bolt inventory show [options]
 
       DESCRIPTION
-          Show the list of targets an action would run on.
+          Show the list of targets an action would run on. This command will list
+          all targets in the project's inventory by default.
+
+          To filter the targets in the list, use the --targets, --query, or --rerun
+          options. To view detailed configuration and data for targets, use the
+          --detail option.
     HELP
 
     MODULE_HELP = <<~HELP
@@ -432,7 +441,7 @@ module Bolt
           plan
 
       USAGE
-          bolt plan <action> [parameters] [options]
+          bolt plan <action> [options]
 
       DESCRIPTION
           Convert, create, show, and run Bolt plans.
@@ -449,16 +458,18 @@ module Bolt
           convert
 
       USAGE
-          bolt plan convert <path> [options]
+          bolt plan convert <plan name> [options]
 
       DESCRIPTION
-          Convert a YAML plan to a Puppet language plan and print the converted plan to stdout.
+          Convert a YAML plan to a Puppet language plan and print the converted
+          plan to stdout.
 
           Converting a YAML plan might result in a plan that is syntactically
           correct but has different behavior. Always verify a converted plan's
           functionality. Note that the converted plan is not written to a file.
 
       EXAMPLES
+          bolt plan convert myproject::myplan
           bolt plan convert path/to/plan/myplan.yaml
     HELP
 
@@ -467,7 +478,7 @@ module Bolt
           new
       
       USAGE
-          bolt plan new <plan> [options]
+          bolt plan new <plan name> [options]
       
       DESCRIPTION
           Create a new plan in the current project.
@@ -481,7 +492,7 @@ module Bolt
           run
 
       USAGE
-          bolt plan run <plan> [parameters] [options]
+          bolt plan run <plan name> [parameters] [options]
 
       DESCRIPTION
           Run a plan on the specified targets.
@@ -495,7 +506,7 @@ module Bolt
           show
 
       USAGE
-          bolt plan show [plan] [options]
+          bolt plan show [plan name] [options]
 
       DESCRIPTION
           Show available plans and plan documentation.
@@ -557,7 +568,8 @@ module Bolt
           bolt project migrate [options]
 
       DESCRIPTION
-          Migrate a Bolt project to use current best practices and the latest version of configuration files.
+          Migrate a Bolt project to use current best practices and the latest version of
+          configuration files.
     HELP
 
     SCRIPT_HELP = <<~HELP
@@ -579,7 +591,8 @@ module Bolt
           run
 
       USAGE
-          bolt script run <script> [arguments] [options]
+          bolt script run <script> [arguments] {--targets TARGETS | --query QUERY | --rerun FILTER}
+            [options]
 
       DESCRIPTION
           Run a script on the specified targets.
@@ -661,7 +674,8 @@ module Bolt
           run
 
       USAGE
-          bolt task run <task> [parameters] [options]
+          bolt task run <task name> [parameters] {--targets TARGETS | --query QUERY | --rerun FILTER}
+            [options]
 
       DESCRIPTION
           Run a task on the specified targets.
@@ -677,7 +691,7 @@ module Bolt
           show
 
       USAGE
-          bolt task show [task] [options]
+          bolt task show [task name] [options]
 
       DESCRIPTION
           Show available tasks and task documentation.
@@ -710,7 +724,8 @@ module Bolt
              "SSH is the default protocol; can be #{TRANSPORTS.keys.join(', ')}",
              'For Windows targets, specify the winrm:// protocol if it has not be configured',
              'For SSH, port defaults to `22`',
-             'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting') do |targets|
+             'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting',
+             "For more information, see 'bolt guide targets'.") do |targets|
         @options[:targets] ||= []
         @options[:targets] << Bolt::Util.get_arg_input(targets)
       end

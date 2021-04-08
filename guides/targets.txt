@@ -1,0 +1,31 @@
+TOPIC
+    targets
+
+DESCRIPTION
+    A target is a device that Bolt connects to and runs actions on. Targets can
+    be physical, such as servers, or virtual, such as containers or virtual
+    machines.
+
+    Several of Bolt's commands connect to targets and run actions on them. When
+    you run these commands, Bolt requires a list of targets to run the action
+    on. For example, the `bolt script run` command and `Invoke-BoltScript`
+    PowerShell cmdlet require you to provide a list of targets to run your
+    script on. You can provide a list of targets to a command using one of the
+    following command-line options:
+
+    Shell commands
+        -t, --targets TARGETS
+        -q, --query   QUERY
+            --rerun   FILTER
+
+    PowerShell cmdlets
+        -T, -Targets TARGETS
+        -Q, -Query   QUERY
+            -Rerun   FILTER
+
+    Typically, targets and their configuration and data are listed in a
+    project's inventory file. For more information about inventory files,
+    see 'bolt guide inventory'.
+
+DOCUMENTATION
+    https://pup.pt/bolt-commands

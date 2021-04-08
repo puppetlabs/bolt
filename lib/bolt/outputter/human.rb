@@ -483,7 +483,7 @@ module Bolt
         end
       end
 
-      def print_targets(target_list, inventoryfile)
+      def print_targets(target_list, inventoryfile, target_flag)
         adhoc = colorize(:yellow, "(Not found in inventory file)")
 
         targets  = []
@@ -506,11 +506,13 @@ module Bolt
         print_inventory_summary(
           target_list[:inventory].count,
           target_list[:adhoc].count,
-          inventoryfile
+          inventoryfile,
+          target_flag,
+          false
         )
       end
 
-      def print_target_info(target_list, inventoryfile)
+      def print_target_info(target_list, inventoryfile, target_flag)
         adhoc_targets     = target_list[:adhoc].map(&:name).to_set
         inventory_targets = target_list[:inventory].map(&:name).to_set
         targets           = target_list.values.flatten.sort_by(&:name)
@@ -537,11 +539,13 @@ module Bolt
         print_inventory_summary(
           inventory_targets.count,
           adhoc_targets.count,
-          inventoryfile
+          inventoryfile,
+          target_flag,
+          true
         )
       end
 
-      private def print_inventory_summary(inventory_count, adhoc_count, inventoryfile)
+      private def print_inventory_summary(inventory_count, adhoc_count, inventoryfile, target_flag, detail_flag)
         info = +''
 
         # Add inventory file source
@@ -559,6 +563,21 @@ module Bolt
                 "#{adhoc_count} adhoc"
         info << colorize(:cyan, "Target count\n")
         info << indent(2, count)
+
+        # Add filtering information
+        unless target_flag && detail_flag
+          info << colorize(:cyan, "\n\nAdditional information\n")
+
+          unless target_flag
+            opt = Bolt::Util.windows? ? "'-Targets', '-Query', or '-Rerun'" : "'--targets', '--query', or '--rerun'"
+            info << indent(2, "Use the #{opt} option to view specific targets\n")
+          end
+
+          unless detail_flag
+            opt = Bolt::Util.windows? ? '-Detail' : '--detail'
+            info << indent(2, "Use the '#{opt}' option to view target configuration and data")
+          end
+        end
 
         @stream.puts info
       end
