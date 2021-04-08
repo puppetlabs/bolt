@@ -122,9 +122,11 @@ module Bolt
               raise StepError.new("Parameters key must be a hash", body['name'], step_number)
             end
 
-            metaparams = option_keys.map { |key| "_#{key}" }
+            metaparams = body['parameters'].keys
+                                           .select { |key| key.start_with?('_') }
+                                           .map { |key| key.sub(/^_/, '') }
 
-            if (dups = body['parameters'].keys & metaparams).any?
+            if (dups = body.keys & metaparams).any?
               raise StepError.new(
                 "Cannot specify metaparameters when using top-level keys with same name: #{dups.join(', ')}",
                 body['name'],
