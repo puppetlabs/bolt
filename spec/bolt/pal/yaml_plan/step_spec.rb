@@ -12,6 +12,27 @@ describe Bolt::PAL::YamlPlan::Step do
       Bolt::PAL::YamlPlan::BareString.new(str)
     end
 
+    shared_examples 'metaparameters' do
+      it 'permits metaparameters under the parameters key' do
+        step_body['parameters']['_catch_errors'] = true
+        expect { step }.not_to raise_error
+      end
+
+      it 'permits top-level metaparameters keys' do
+        step_body['catch_errors'] = true
+        expect { step }.not_to raise_error
+      end
+
+      it 'errors with duplicate metaparameters under parameters key and top-level keys' do
+        step_body['parameters']['_catch_errors'] = true
+        step_body['catch_errors'] = true
+        expect { step }.to raise_error(
+          Bolt::PAL::YamlPlan::Step::StepError,
+          /Cannot specify metaparameters when using top-level keys with same name: catch_errors/
+        )
+      end
+    end
+
     context 'with message step' do
       let(:step_body) do
         {
@@ -62,6 +83,8 @@ describe Bolt::PAL::YamlPlan::Step do
                      " {'butter' => 'crunchy peanut'})\n"
       }
 
+      include_examples 'metaparameters'
+
       it 'stringifies a task step' do
         expect(step.transpile).to eq(output)
       end
@@ -70,9 +93,11 @@ describe Bolt::PAL::YamlPlan::Step do
     context 'with plan step' do
       let(:step_body) do
         { "plan" => make_string("sandwich::pbj"),
-          "parameters" => { make_string("bread") => make_string("wheat") } }
+          "parameters" => { 'bread' => make_string("wheat") } }
       end
       let(:output) { "  run_plan('sandwich::pbj', {'bread' => 'wheat'})\n" }
+
+      include_examples 'metaparameters'
 
       it 'stringifies a plan step' do
         expect(step.transpile).to eq(output)
