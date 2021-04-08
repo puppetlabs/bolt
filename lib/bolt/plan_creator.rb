@@ -36,8 +36,8 @@ module Bolt
       prefix, _, basename = segment_plan_name(plan_name)
 
       unless prefix == project.name
-        message = "First segment of plan name '#{plan_name}' must match project name '#{project.name}'. "\
-                  "Did you mean '#{project.name}::#{plan_name}'?"
+        message = "Incomplete plan name: A plan name must be prefixed with the name of the "\
+          "project or module. Did you mean '#{project.name}::#{plan_name}'?"
 
         raise Bolt::ValidationError, message
       end

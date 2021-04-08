@@ -39,7 +39,7 @@ describe Bolt::PlanCreator do
     it 'errors if the first name segment is not the project name' do
       expect { subject.validate_input(project, 'plan') }.to raise_error(
         Bolt::ValidationError,
-        /First segment of plan name 'plan' must match project name/
+        /Incomplete plan name: A plan name must be prefixed with the name of the/
       )
     end
 
