@@ -22,6 +22,9 @@ jobs:
   agentful:
     name: Agentful
     runs-on: windows-latest
+    strategy:
+      matrix:
+        ruby: [2.7, 3.0]
     env:
       WINDOWS_AGENTS: true
     steps:
@@ -30,7 +33,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Update gems
         run: bundle update
@@ -55,6 +58,9 @@ jobs:
   agentless:
     name: Agentless
     runs-on: windows-latest
+    strategy:
+      matrix:
+        ruby: [2.7, 3.0]
     env:
       BOLT_WINDOWS: true
     steps:
@@ -63,7 +69,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Update gems
         run: bundle update

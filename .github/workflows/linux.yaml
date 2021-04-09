@@ -17,13 +17,16 @@ jobs:
   fast:
     name: Fast
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [2.7, 3.0]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Update gems
         run: bundle update
@@ -42,13 +45,16 @@ jobs:
   slow:
     name: Slow
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [2.7, 3.0]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Update gems
         run: bundle update

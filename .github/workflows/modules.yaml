@@ -16,13 +16,16 @@ jobs:
   linux:
     name: Linux
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [2.7, 3.0]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Update gems
         run: bundle update
@@ -32,6 +35,9 @@ jobs:
   windows:
     name: Windows
     runs-on: windows-latest
+    strategy:
+      matrix:
+        ruby: [2.7, 3.0]
     env:
       BOLT_WINDOWS: true
     steps:
@@ -40,7 +46,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Update gems
         run: bundle update

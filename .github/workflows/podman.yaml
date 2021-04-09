@@ -11,6 +11,9 @@ on:
 jobs:
   podman:
     name: Podman
+    strategy:
+      matrix:
+        ruby: [2.7, 3.0]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,7 +21,7 @@ jobs:
       - name: Setup Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: 2.7
+          ruby-version: ${{ matrix.ruby }}
           bundler-cache: true
       - name: Update gems
         run: bundle update

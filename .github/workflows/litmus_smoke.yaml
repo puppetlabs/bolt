@@ -19,7 +19,7 @@ jobs:
       - name: Setup Ruby
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: '2.7.x'
+          ruby-version: 2.7
       - name: Checkout package module
         uses: actions/checkout@v2
         with:
