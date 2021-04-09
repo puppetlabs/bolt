@@ -414,39 +414,37 @@ describe "Bolt::Outputter::Human" do
     end
 
     it 'prints adhoc targets' do
-      outputter.print_targets(target_list, inventoryfile, true)
+      outputter.print_targets(target_list, inventoryfile, nil, true)
       expect(output.string).to match(/target\s*\(Not found in inventory file\)/)
     end
 
-    it 'prints the inventory file path' do
-      expect(File).to receive(:exist?).with(inventoryfile).and_return(true)
-      outputter.print_targets(target_list, inventoryfile, true)
-      expect(output.string).to match(/Inventory file.*#{inventoryfile}/m)
+    it 'prints the inventory source' do
+      outputter.print_targets(target_list, inventoryfile, nil, true)
+      expect(output.string).to match(/Inventory source.*#{inventoryfile}/m)
     end
 
     it 'prints a message that the inventory file does not exist' do
-      expect(File).to receive(:exist?).with(inventoryfile).and_return(false)
-      outputter.print_targets(target_list, inventoryfile, true)
-      expect(output.string).to match(/Inventory file.*does not exist/m)
+      outputter.print_targets(target_list, nil, inventoryfile, true)
+      expect(output.string).to match(/Inventory source.*does not exist/m)
     end
 
     it 'prints target counts' do
-      outputter.print_targets(target_list, inventoryfile, true)
+      outputter.print_targets(target_list, inventoryfile, nil, true)
       expect(output.string).to match(/2 total, 1 from inventory, 1 adhoc/)
     end
 
     it 'prints suggestion to use a targetting option if one was not provided' do
-      outputter.print_targets(target_list, inventoryfile, false)
+      outputter.print_targets(target_list, inventoryfile, nil, false)
       expect(output.string).to match(/Use the .* option to view specific targets/)
     end
 
     it 'does not print suggestion to use a targetting option if one was provided' do
-      outputter.print_targets(target_list, inventoryfile, true)
+      outputter.print_targets(target_list, inventoryfile, nil, true)
       expect(output.string).not_to match(/Use the .* option to view specific targets/)
     end
 
     it 'prints suggestion to use detail option' do
-      outputter.print_targets(target_list, inventoryfile, true)
+      outputter.print_targets(target_list, inventoryfile, nil, true)
       expect(output.string).to match(/Use the .* option to view target configuration and data/)
     end
   end
@@ -462,18 +460,43 @@ describe "Bolt::Outputter::Human" do
     end
 
     it 'prints suggestion to use a targetting option if one was not provided' do
-      outputter.print_target_info(target_list, inventoryfile, false)
+      outputter.print_target_info(target_list, inventoryfile, nil, false)
       expect(output.string).to match(/Use the .* option to view specific targets/)
     end
 
     it 'does not print suggestion to use a targetting option if one was provided' do
-      outputter.print_target_info(target_list, inventoryfile, true)
+      outputter.print_target_info(target_list, inventoryfile, nil, true)
       expect(output.string).not_to match(/Use the .* option to view specific targets/)
     end
 
     it 'does not print suggestion to use detail option' do
-      outputter.print_target_info(target_list, inventoryfile, true)
+      outputter.print_target_info(target_list, inventoryfile, nil, true)
       expect(output.string).not_to match(/Use the .* option to view target configuration and data/)
+    end
+  end
+
+  context '#print_groups' do
+    let(:inventoryfile) { '/path/to/inventory' }
+    let(:groups)        { %w[apple banana carrot] }
+
+    it 'prints groups' do
+      outputter.print_groups(groups, inventoryfile, nil)
+      expect(output.string).to match(/Groups.*apple.*banana.*carrot/m)
+    end
+
+    it 'prints the inventory source' do
+      outputter.print_groups(groups, inventoryfile, nil)
+      expect(output.string).to match(/Inventory source.*#{inventoryfile}/m)
+    end
+
+    it 'prints that the inventory file does not exist' do
+      outputter.print_groups(groups, nil, inventoryfile)
+      expect(output.string).to match(/Inventory source.*but the file does not exist/m)
+    end
+
+    it 'prints the group count' do
+      outputter.print_groups(groups, inventoryfile, nil)
+      expect(output.string).to match(/Group count.*3 total/m)
     end
   end
 end

@@ -6,7 +6,7 @@ require 'bolt/inventory/target'
 module Bolt
   class Inventory
     class Inventory
-      attr_reader :targets, :plugins, :config, :transport
+      attr_reader :config, :plugins, :source, :targets, :transport
 
       class WildcardError < Bolt::Error
         def initialize(target)
@@ -15,7 +15,7 @@ module Bolt
       end
 
       # TODO: Pass transport config instead of config object
-      def initialize(data, transport, transports, plugins)
+      def initialize(data, transport, transports, plugins, source = nil)
         @logger       = Bolt::Logger.logger(self)
         @data         = data || {}
         @transport    = transport
@@ -24,6 +24,7 @@ module Bolt
         @groups       = Group.new(@data, plugins, all_group: true)
         @group_lookup = {}
         @targets      = {}
+        @source       = source
 
         @groups.resolve_string_targets(@groups.target_aliases, @groups.all_targets)
 

@@ -86,6 +86,7 @@ module Bolt
         if config.default_inventoryfile.exist?
           logger.debug("Loaded inventory from #{config.default_inventoryfile}")
         else
+          source = nil
           logger.debug("Tried to load inventory from #{config.default_inventoryfile}, but the file does not exist")
         end
       end
@@ -100,17 +101,17 @@ module Bolt
         validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
       end
 
-      inventory = create_version(data, config.transport, config.transports, plugins)
+      inventory = create_version(data, config.transport, config.transports, plugins, source)
       inventory.validate
       inventory
     end
 
-    def self.create_version(data, transport, transports, plugins)
+    def self.create_version(data, transport, transports, plugins, source = nil)
       version = (data || {}).delete('version') { 2 }
 
       case version
       when 2
-        Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
+        Bolt::Inventory::Inventory.new(data, transport, transports, plugins, source)
       else
         raise ValidationError.new("Unsupported version #{version} specified in inventory", nil)
       end
@@ -120,7 +121,7 @@ module Bolt
       config  = Bolt::Config.default
       plugins = Bolt::Plugin.setup(config, nil)
 
-      create_version({}, config.transport, config.transports, plugins)
+      create_version({}, config.transport, config.transports, plugins, nil)
     end
   end
 end

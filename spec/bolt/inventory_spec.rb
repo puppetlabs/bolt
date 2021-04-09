@@ -2,12 +2,14 @@
 
 require 'spec_helper'
 require 'bolt_spec/config'
+require 'bolt_spec/env_var'
 require 'bolt/inventory'
 require 'bolt/plugin'
 require 'yaml'
 
 describe Bolt::Inventory do
   include BoltSpec::Config
+  include BoltSpec::EnvVar
 
   let(:pal)     { nil } # Not used
   let(:config)  { make_config }
@@ -17,11 +19,11 @@ describe Bolt::Inventory do
     let(:inventory) { Bolt::Inventory.from_config(config, plugins) }
     let(:target)    { inventory.get_targets('target1')[0] }
 
-    before(:each) do
-      ENV['BOLT_INVENTORY'] = inventory_env.to_yaml
+    around(:each) do |example|
+      with_env_vars('BOLT_INVENTORY' => inventory_env.to_yaml) do
+        example.run
+      end
     end
-
-    after(:each) { ENV.delete('BOLT_INVENTORY') }
 
     context 'with valid config' do
       let(:inventory_env) {
@@ -61,6 +63,33 @@ describe Bolt::Inventory do
     it 'errors when invalid version number is specified' do
       expect { Bolt::Inventory.create_version({ 'version' => 1 }, config.transport, config.transports, plugins) }
         .to raise_error(Bolt::Inventory::ValidationError, /Unsupported version/)
+    end
+  end
+
+  describe :from_config do
+    let(:inventory) { Bolt::Inventory.from_config(config, plugins) }
+
+    it 'sets inventory source to BOLT_INVENTORY' do
+      data = { 'targets' => ['foo'] }.to_json
+
+      with_env_vars('BOLT_INVENTORY' => data) do
+        expect(inventory.source).to eq('BOLT_INVENTORY')
+      end
+    end
+
+    it 'sets inventory source to configured inventory file' do
+      expect(inventory.source).to eq(config.inventoryfile)
+    end
+
+    it 'sets inventory source to default inventory file' do
+      allow(config).to receive(:inventoryfile).and_return(nil)
+      allow(config.default_inventoryfile).to receive(:exist?).and_return(true)
+      expect(inventory.source).to eq(config.default_inventoryfile)
+    end
+
+    it 'sets inventory source to nil when no inventory is loaded' do
+      allow(config).to receive(:inventoryfile).and_return(nil)
+      expect(inventory.source).to eq(nil)
     end
   end
 end
