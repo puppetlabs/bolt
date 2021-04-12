@@ -242,9 +242,8 @@ begin
             val
           end
         end
-
         # Add attributes, which are listed under the type's params
-        data.dig('docstring', 'tags').each do |param|
+        data.dig('docstring', 'tags')&.each do |param|
           functions << {
             'name' => param['name'],
             'desc' => param['text'].tr("\n", ' '),

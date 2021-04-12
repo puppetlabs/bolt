@@ -607,10 +607,26 @@ module Bolt
       end
     end
 
-    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil, applicator = nil)
+    def run_plan(plan_name, params, executor, inventory = nil, pdb_client = nil, applicator = nil)
+      # Start the round robin inside the plan compiler, so that
+      # backgrounded tasks can finish once the main plan exits
       in_plan_compiler(executor, inventory, pdb_client, applicator) do |compiler|
-        r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
-        Bolt::PlanResult.from_pcore(r, 'success')
+        # Create a Fiber for the main plan. This will be run along with any
+        # other Fibers created during the plan run in the round_robin, with the
+        # main plan always taking precedence in being resumed.
+        future = executor.create_future(name: plan_name) do |_scope|
+          r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
+          Bolt::PlanResult.from_pcore(r, 'success')
+        rescue Bolt::Error => e
+          Bolt::PlanResult.new(e, 'failure')
+        end
+
+        # Round robin until all Fibers, including the main plan, have finished.
+        # This will stay alive until backgrounded tasks have finished.
+        executor.round_robin until executor.plan_complete?
+
+        # Return the result from the main plan
+        future.value
       end
     rescue Bolt::Error => e
       Bolt::PlanResult.new(e, 'failure')

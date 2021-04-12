@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'bolt/container_result'
 require 'bolt/pal'
 
 module Bolt

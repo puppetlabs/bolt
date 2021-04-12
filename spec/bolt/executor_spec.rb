@@ -904,41 +904,4 @@ describe "Bolt::Executor" do
       end
     end
   end
-
-  context "when round robining" do
-    it "subscribes to node_result messages" do
-      expect(executor).to receive(:subscribe).with(executor, [:node_result])
-      executor.round_robin([])
-    end
-
-    it "stops the spinner" do
-      skein = %w[a b c d].each_with_index.map do |val, index|
-        fiber = Fiber.new do
-          sleep(rand(0.01..0.1))
-          val + 'e'
-        end
-        Bolt::Yarn.new(fiber, index)
-      end
-
-      executor.round_robin(skein)
-      expect(collector.events).to include({ type: :stop_spin })
-    end
-
-    it "returns results in the same order they were originally" do
-      skein = %w[a b c d].each_with_index.map do |val, index|
-        fiber = Fiber.new do
-          sleep(rand(0.01..0.1))
-          val + 'e'
-        end
-
-        Bolt::Yarn.new(fiber, index)
-      end
-
-      expect(executor.round_robin(skein)).to eq(%w[ae be ce de])
-    end
-
-    it "returns an empty array if there are no elements to round robin" do
-      expect(executor.round_robin([])).to eq([])
-    end
-  end
 end
