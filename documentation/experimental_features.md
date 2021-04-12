@@ -80,7 +80,9 @@ Finished on docker://puppet_6_node:
 ```
 
 As you can see, when you configure output to stream, Bolt might print to the console twice:
-once as the actions are running, and again after Bolt prints the results.
+once as the actions are running, and again after Bolt prints the results. You can prevent
+Bolt from printing the results once the action has completed by specifying the `--no-verbose`
+command-line option.
 
 ## LXD Transport
 
