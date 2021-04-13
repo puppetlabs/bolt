@@ -111,7 +111,7 @@ describe "Bolt::CLI" do
     context '#list_topics' do
       it 'lists topics' do
         cli = Bolt::CLI.new(['guide'])
-        expect(cli.outputter).to receive(:print_topics).with(cli.guides.keys)
+        expect(cli.outputter).to receive(:print_topics).with(cli.guides.keys - ['guide'])
         cli.list_topics
       end
 
@@ -400,7 +400,7 @@ describe "Bolt::CLI" do
           expect {
             cli.parse
           }.to raise_error(Bolt::CLIExit)
-        }.to output(/USAGE.*bolt/m).to_stdout
+        }.to output(/Usage.*bolt/m).to_stdout
       end
 
       it "accepts --help" do
@@ -409,7 +409,7 @@ describe "Bolt::CLI" do
           expect {
             cli.parse
           }.to raise_error(Bolt::CLIExit)
-        }.to output(/USAGE.*bolt/m).to_stdout
+        }.to output(/Usage.*bolt/m).to_stdout
       end
 
       context 'listing actions with help' do
@@ -419,7 +419,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/ACTIONS.*run/m).to_stdout
+          }.to output(/Actions.*run/m).to_stdout
         end
 
         it 'accepts script' do
@@ -428,7 +428,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/ACTIONS.*run/m).to_stdout
+          }.to output(/Actions.*run/m).to_stdout
         end
 
         it 'accepts task' do
@@ -437,7 +437,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/ACTIONS.*run.*show/m).to_stdout
+          }.to output(/Actions.*run.*show/m).to_stdout
         end
 
         it 'accepts plan' do
@@ -446,7 +446,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/ACTIONS.*run.*show/m).to_stdout
+          }.to output(/Actions.*run.*show/m).to_stdout
         end
 
         it 'accepts file' do
@@ -455,7 +455,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/ACTIONS.*download.*upload/m).to_stdout
+          }.to output(/Actions.*download.*upload/m).to_stdout
         end
 
         it 'accepts inventory' do
@@ -464,7 +464,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/ACTIONS.*show/m).to_stdout
+          }.to output(/Actions.*show/m).to_stdout
         end
 
         it 'excludes invalid subcommand flags' do
@@ -491,7 +491,7 @@ describe "Bolt::CLI" do
             expect {
               cli.parse
             }.to raise_error(Bolt::CLIExit)
-          }.to output(/USAGE.*bolt apply \[manifest\]/m).to_stdout
+          }.to output(/Usage.*bolt apply \[manifest\]/m).to_stdout
         end
       end
     end

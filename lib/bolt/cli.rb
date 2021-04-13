@@ -892,7 +892,7 @@ module Bolt
 
     # Display the list of available Bolt guides.
     def list_topics
-      outputter.print_topics(guides.keys)
+      outputter.print_topics(guides.keys - ['guide'])
       0
     end
 
