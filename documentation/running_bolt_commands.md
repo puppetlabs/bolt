@@ -296,6 +296,87 @@ Invoke-BoltCommand -Command 'Get-Location' -Targets windows.example.org -Transpo
 
 - [Bolt transports reference](bolt_transports_reference.md)
 
+
+## Stream output
+
+🧪 _This feature is experimental and is subject to change._
+
+Bolt can stream output from running commands and scripts on a target, allowing you
+to see what is happening on a target as an action runs.
+
+To enable streaming from the command line, you can specify the `stream` command-line
+option:
+
+_\*nix shell command_
+
+```shell
+bolt command run whoami --targets servers --stream
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command whoami -Targets servers -Stream
+```
+
+To enable streaming for all commands and scripts, add the `stream` option to
+a `bolt-project.yaml` or `bolt-defaults.yaml` configuration file:
+
+```yaml
+---
+name: myproject
+stream: true
+```
+
+When streaming is enabled, Bolt prints the output to the console in the order it
+receives it. Each line of the output includes the name of the target that
+returned the output and whether it was printed to standard output (`out`) or
+standard error (`err`).
+
+```shell
+$ bolt command run 'echo stdout && echo stderr 1>&2' -t localhost --stream
+
+Started on localhost...
+[localhost] out: stdout
+[localhost] err: stderr
+Finished on localhost:
+  stdout
+  stderr
+Successful on 1 target: localhost
+Ran on 1 target in 0.01 sec
+```
+
+Once an action finishes running, Bolt prints all of the output from a target
+under the target's name. If you do not want to see the output a second time, you
+can specify the `no-verbose` command-line option when running a command or
+script. This command-line option does not have a corresponding configuration
+option.
+
+_\*nix shell command_
+
+```shell
+bolt command run whoami --targets servers --stream --no-verbose
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltCommand -Command whoami -Targets servers -Stream -Verbose:$false
+```
+
+When you specify `no-verbose`, the output from the target is only printed once.
+
+```shell
+$ bolt command run 'echo stdout && echo stderr 1>&2' -t localhost --stream --no-verbose
+
+Started on localhost...
+[localhost] out: stdout
+[localhost] err: stderr
+Finished on localhost:
+Successful on 1 target: localhost
+Ran on 1 target in 0.01 sec
+```
+
 ## Run a script
 
 When you run a script on a target Bolt copies the script from your

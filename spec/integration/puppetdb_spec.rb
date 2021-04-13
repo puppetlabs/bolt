@@ -27,7 +27,7 @@ describe Bolt::PuppetDB::Client, puppetdb: true do
         'certname'           => target,
         'environment'        => 'dev',
         'producer'           => 'bolt',
-        'producer_timestamp' => Time.now.strftime("%Y-%m-%d"),
+        'producer_timestamp' => '2021-01-01',
         'values'             => facts
       }
     end

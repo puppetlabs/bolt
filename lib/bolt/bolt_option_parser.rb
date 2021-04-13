@@ -903,7 +903,10 @@ module Bolt
       define('-v', '--[no-]verbose', 'Display verbose logging') do |value|
         @options[:verbose] = value
       end
-      define('--stream', 'Stream output from scripts and commands to the console') do |_|
+      define('--stream',
+             'Stream output from scripts and commands to the console.',
+             'Run with --no-verbose to prevent Bolt from displaying output',
+             'a second time after the action is completed.') do |_|
         @options[:stream] = true
       end
       define('--trace', 'Display error stack traces') do |_|
