@@ -1,5 +1,50 @@
 # Changelog
 
+## Bolt 3.7.0 (2021-04-13)
+
+### New features
+
+* **Default to showing all targets with `bolt inventory show`**
+  ([#2747](https://github.com/puppetlabs/bolt/issues/2747))
+
+  The `bolt inventory show` and `Get-BoltInventory` commands now default
+  ot showing all targets in the inventory if a targetting option
+  (`--targets`, `--query`, `--rerun`) are not provided.
+
+* **Improved group information output**
+  ([#2766](https://github.com/puppetlabs/bolt/pull/2766))
+
+  The `bolt group show` and `Get-BoltGroup` commands now display `human`
+  output in a similar format to other `show` commands. The `json` output
+  now includes the path to the inventory file that the groups are loaded
+  from.
+
+* **`puppetdb_command` plan function**
+  ([#2771](https://github.com/puppetlabs/bolt/issues/2771))
+
+  The `puppetdb_command` plan function can be used to invoke commands in
+  PuppetDB. Currently, only the `replace_facts` command is officially
+  tested and supported, though other commands might work as well.
+
+  _This feature is experimental and subject to change._
+
+### Bug fixes
+
+* **Do not error when using metaparameters in YAML plans**
+  ([#2777](https://github.com/puppetlabs/bolt/issues/2777))
+
+  Bolt no longer errors for YAML plans that include a plan or task step
+  that includes an additional option (e.g. `_catch_errors`) under the
+  `parameters` key.
+
+* **Output correct inventory source with `inventory show`**
+  ([#2766](https://github.com/puppetlabs/bolt/pull/2766))
+
+  The `bolt inventory show` and `Get-BoltInventory` commands now output
+  the correct source of inventory when using the `BOLT_INVENTORY`
+  environment variable. Previously, Bolt would output the path to the
+  default inventory file.
+
 ## Bolt 3.6.1 (2021-04-07)
 
 ### Bug fixes
