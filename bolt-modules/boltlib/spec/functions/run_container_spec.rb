@@ -8,11 +8,27 @@ describe 'run_container' do
   let(:executor) { Bolt::Executor.new }
   let(:tasks_enabled) { true }
   let(:user) { Bolt::Util.windows? ? "user manager\\containeradministrator\r" : 'root' }
-  let(:image) do
-    if Bolt::Util.windows?
-      'mcr.microsoft.com/windows/servercore:ltsc2019'
-    else
-      'ubuntu:14.04'
+
+  # So that this can be called in the before block
+  def image
+    @image ||= if Bolt::Util.windows?
+                 'mcr.microsoft.com/windows/servercore:ltsc2019'
+               else
+                 'ubuntu:20.04'
+               end
+  end
+
+  before :all do
+    # Ensure that the Docker image we're using is available
+    images, _status = Open3.capture2e("docker images #{image}")
+    # If the output doesn't include the name of the repository (which is
+    # separate from the tag in output), download it
+    unless images.include?(image.split(":")[0])
+      begin
+        `docker pull #{image}`
+      rescue StandardError => e
+        raise "Error download Docker image #{image} to execute run_container tests with: #{e}"
+      end
     end
   end
 
@@ -39,8 +55,8 @@ describe 'run_container' do
     end
 
     it 'with given image and command' do
-      # This image is cached in Github Actions environments, so we don't get
-      # downloading output
+      # This image should be cached in Github Actions environments, so we don't
+      # get downloading output
       is_expected.to run
         .with_params(image, { 'cmd' => 'whoami', 'rm' => true })
         .and_return(result)

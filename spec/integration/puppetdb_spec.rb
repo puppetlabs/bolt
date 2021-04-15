@@ -34,7 +34,13 @@ describe Bolt::PuppetDB::Client, puppetdb: true do
 
     it 'replaces facts' do
       expect { client.send_command(command, version, payload) }.not_to raise_error
-      expect(client.facts_for_node([target])).to eq(target => facts)
+      retrieved = {}
+      5.times do
+        retrieved = client.facts_for_node([target])
+        break unless retrieved.empty?
+        sleep 5
+      end
+      expect(retrieved).to eq(target => facts)
     end
 
     it 'returns a UUID' do
