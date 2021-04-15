@@ -169,6 +169,35 @@ describe "Bolt::CLI" do
     end
   end
 
+  context 'lookup' do
+    let(:pal)     { double('pal', lookup: results) }
+    let(:results) { Bolt::ResultSet.new([]) }
+
+    it 'errors without a key' do
+      expect { Bolt::CLI.new(%w[lookup]).parse }.to raise_error(
+        Bolt::CLIError,
+        /Must specify a key to look up/
+      )
+    end
+
+    it 'errors without a targeting option' do
+      cli = Bolt::CLI.new(%w[lookup key])
+
+      expect { cli.execute(cli.parse) }.to raise_error(
+        Bolt::CLIError,
+        /Command requires a targeting option/
+      )
+    end
+
+    it 'calls Bolt::PAL#lookup' do
+      allow(Bolt::PAL).to receive(:new).and_return(pal)
+      expect(pal).to receive(:lookup)
+
+      cli = Bolt::CLI.new(%w[lookup key --targets foo])
+      cli.execute(cli.parse)
+    end
+  end
+
   context 'module' do
     let(:cli)            { Bolt::CLI.new(command) }
     let(:command)        { %w[module show] }

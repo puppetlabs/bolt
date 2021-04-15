@@ -174,12 +174,16 @@ module Bolt
             @stream.puts(remove_trail(indent(2, result.message)))
           end
 
-          # Use special handling if the result looks like a command or script result
-          if result.generic_value.keys == %w[stdout stderr merged_output exit_code]
+          case result.action
+          when 'command', 'script'
             safe_value = result.safe_value
             @stream.puts(indent(2, safe_value['merged_output'])) unless safe_value['merged_output'].strip.empty?
-          elsif result.generic_value.any?
-            @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
+          when 'lookup'
+            @stream.puts(indent(2, result['value']))
+          else
+            if result.generic_value.any?
+              @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
+            end
           end
         end
       end

@@ -34,7 +34,7 @@ Describe "test bolt module" {
 
     it "has the correct number of exported functions" {
       # should count of pwsh functions
-      @($commands).Count | Should -Be 23
+      @($commands).Count | Should -Be 24
     }
   }
 }
@@ -303,6 +303,13 @@ Describe "test all bolt command examples" {
     It "bolt task show canary" {
       $results = Get-BoltTask -name 'canary'
       $results | Should -Be "bolt task show canary"
+    }
+  }
+
+  Context "bolt lookup" {
+    It "bolt lookup key --targets target1,target2" {
+      $results = Invoke-BoltLookup -key 'key' -targets 'target1,target2'
+      $results | Should -Be "bolt lookup key --targets target1,target2"
     }
   }
 }

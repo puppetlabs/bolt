@@ -66,6 +66,9 @@ module Bolt
       when 'guide'
         { flags: OPTIONS[:global] + %w[format],
           banner: GUIDE_HELP }
+      when 'lookup'
+        { flags: ACTION_OPTS + %w[hiera-config],
+          banner: LOOKUP_HELP }
       when 'module'
         case action
         when 'add'
@@ -187,6 +190,7 @@ module Bolt
           guide             View guides for Bolt concepts and features
           inventory         Show the list of targets an action would run on
           module            Manage Bolt project modules
+          lookup            Look up a value with Hiera
           plan              Convert, create, show, and run Bolt plans
           project           Create and migrate Bolt projects
           script            Upload a local script and run it remotely
@@ -396,6 +400,24 @@ module Bolt
 
       #{colorize(:cyan, 'Documentation')}
           To learn more about the inventory run 'bolt guide inventory'.
+    HELP
+
+    LOOKUP_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          lookup
+
+      #{colorize(:cyan, 'Usage')}
+          bolt lookup <key> {--targets TARGETS | --query QUERY | --rerun FILTER}
+            [options]
+
+      #{colorize(:cyan, 'Description')}
+          Look up a value with Hiera.
+
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about using Hiera with Bolt at https://pup.pt/bolt-hiera.
+
+      #{colorize(:cyan, 'Examples')}
+          bolt lookup password --targets servers
     HELP
 
     MODULE_HELP = <<~HELP

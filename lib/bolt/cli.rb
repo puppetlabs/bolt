@@ -33,18 +33,19 @@ module Bolt
 
   class CLI
     COMMANDS = {
-      'command' => %w[run],
-      'script' => %w[run],
-      'task' => %w[show run],
-      'plan' => %w[show run convert new],
-      'file' => %w[download upload],
-      'secret' => %w[encrypt decrypt createkeys],
+      'apply'     => %w[],
+      'command'   => %w[run],
+      'file'      => %w[download upload],
+      'group'     => %w[show],
+      'guide'     => %w[],
       'inventory' => %w[show],
-      'group' => %w[show],
-      'project' => %w[init migrate],
-      'module' => %w[add generate-types install show],
-      'apply' => %w[],
-      'guide' => %w[]
+      'lookup'    => %w[],
+      'module'    => %w[add generate-types install show],
+      'plan'      => %w[show run convert new],
+      'project'   => %w[init migrate],
+      'script'    => %w[run],
+      'secret'    => %w[encrypt decrypt createkeys],
+      'task'      => %w[show run]
     }.freeze
 
     TARGETING_OPTIONS = %i[query rerun targets].freeze
@@ -326,6 +327,10 @@ module Bolt
         raise Bolt::CLIError, "a manifest file or --execute is required"
       end
 
+      if options[:subcommand] == 'lookup' && !options[:object]
+        raise Bolt::CLIError, "Must specify a key to look up"
+      end
+
       if options[:subcommand] == 'command' && (!options[:object] || options[:object].empty?)
         raise Bolt::CLIError, "Must specify a command to run"
       end
@@ -511,6 +516,8 @@ module Bolt
         when 'migrate'
           code = Bolt::ProjectManager.new(config, outputter, pal).migrate
         end
+      when 'lookup'
+        code = lookup(options[:object], options[:targets])
       when 'plan'
         case options[:action]
         when 'new'
@@ -684,6 +691,38 @@ module Bolt
 
     def list_groups
       outputter.print_groups(inventory.group_names.sort, inventory.source, config.default_inventoryfile)
+    end
+
+    # Looks up a value with Hiera, using targets as the contexts to perform the
+    # look ups in.
+    #
+    def lookup(key, targets)
+      executor = Bolt::Executor.new(
+        config.concurrency,
+        analytics,
+        options[:noop],
+        config.modified_concurrency,
+        config.future
+      )
+
+      executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
+      executor.subscribe(log_outputter)
+      executor.publish_event(type: :plan_start, plan: nil)
+
+      results = outputter.spin do
+        pal.lookup(
+          key,
+          targets,
+          inventory,
+          executor,
+          config.concurrency
+        )
+      end
+
+      executor.shutdown
+      outputter.print_result_set(results)
+
+      results.ok ? 0 : 1
     end
 
     def run_plan(plan_name, plan_arguments, nodes, options)

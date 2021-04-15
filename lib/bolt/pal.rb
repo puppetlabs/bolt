@@ -615,5 +615,50 @@ module Bolt
     rescue Bolt::Error => e
       Bolt::PlanResult.new(e, 'failure')
     end
+
+    def lookup(key, targets, inventory, executor, _concurrency)
+      # Install the puppet-agent package and collect facts. Facts are
+      # automatically added to the targets.
+      in_plan_compiler(executor, inventory, nil) do |compiler|
+        compiler.call_function('apply_prep', targets)
+      end
+
+      overrides = {
+        bolt_inventory: inventory,
+        bolt_project:   @project
+      }
+
+      # Do a lookup with a catalog compiler, which uses the 'hierarchy' key in
+      # Hiera config.
+      results = targets.map do |target|
+        node = Puppet::Node.from_data_hash(
+          'name'       => target.name,
+          'parameters' => { 'clientcert' => target.name }
+        )
+
+        trusted = Puppet::Context::TrustedInformation.local(node).to_h
+
+        env_conf = {
+          modulepath: @modulepath.full_modulepath,
+          facts:      target.facts,
+          variables:  target.vars
+        }
+
+        with_puppet_settings do
+          Puppet::Pal.in_tmp_environment(target.name, **env_conf) do |pal|
+            Puppet.override(overrides) do
+              Puppet.lookup(:pal_current_node).trusted_data = trusted
+              pal.with_catalog_compiler do |compiler|
+                Bolt::Result.for_lookup(target, key, compiler.call_function('lookup', key))
+              rescue StandardError => e
+                Bolt::Result.from_exception(target, e)
+              end
+            end
+          end
+        end
+      end
+
+      Bolt::ResultSet.new(results)
+    end
   end
 end

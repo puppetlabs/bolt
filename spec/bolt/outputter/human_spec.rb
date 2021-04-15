@@ -249,6 +249,12 @@ describe "Bolt::Outputter::Human" do
     expect(lines).to match(/^    "key": "val"$/)
   end
 
+  it 'prints lookup results' do
+    result = Bolt::Result.for_lookup(target, 'key', 'value')
+    outputter.print_result(result)
+    expect(output.string).to match(/Finished on #{target}.*value/m)
+  end
+
   it "prints empty results from a plan" do
     outputter.print_plan_result(Bolt::PlanResult.new([], 'success'))
     expect(output.string).to eq("[\n\n]\n")
