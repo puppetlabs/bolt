@@ -67,8 +67,7 @@ module Bolt
                  elsif git.start_with?('https://github.com')
                    git.split('https://github.com/').last.split('.git').first
                  else
-                   raise Bolt::ValidationError,
-                         "Invalid git source: #{git}. Only GitHub modules are supported."
+                   raise Bolt::ValidationError, invalid_git_msg(git)
                  end
 
           [git, repo]
@@ -87,6 +86,14 @@ module Bolt
             'git' => @git,
             'ref' => @ref
           }
+        end
+
+        # Returns an error message that the provided repo is not a git repo or
+        # is private.
+        #
+        private def invalid_git_msg(repo_name)
+          "#{repo_name} is not a public GitHub repository. See https://pup.pt/no-resolve "\
+            "for information on how to install this module."
         end
 
         # Returns a PuppetfileResolver::Model::GitModule object for resolving.
@@ -157,10 +164,7 @@ module Bolt
 
               raise Bolt::Error.new(message, 'bolt/github-api-rate-limit-error')
             when Net::HTTPNotFound
-              raise Bolt::Error.new(
-                "#{git} is not a git repository.",
-                "bolt/missing-git-repository-error"
-              )
+              raise Bolt::Error.new(invalid_git_msg(git), "bolt/missing-git-repository-error")
             else
               raise Bolt::Error.new(
                 "Ref #{ref} at #{git} is not a commit, tag, or branch.",
