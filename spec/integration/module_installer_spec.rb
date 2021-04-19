@@ -172,7 +172,7 @@ describe 'installing modules' do
     it 'errors' do
       expect { run_cli(command, project: project) }.to raise_error(
         Bolt::Error,
-        %r{https://github.com/puppetlabs/puppetlabs-foobarbaz is not a git repository.}
+        %r{https://github.com/puppetlabs/puppetlabs-foobarbaz is not a public GitHub repository.}
       )
     end
   end

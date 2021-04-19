@@ -41,7 +41,7 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
       init_hash['git'] = 'https://gitlab.com/puppetlabs/puppetlabs-yaml'
       expect { spec }.to raise_error(
         Bolt::ValidationError,
-        /Invalid git source/
+        /^.*is not a public GitHub repository/
       )
     end
 
@@ -173,7 +173,7 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
       it 'errors' do
         expect { spec.sha }.to raise_error(
           Bolt::Error,
-          /is not a git repository/
+          /is not a public GitHub repository/
         )
       end
     end
