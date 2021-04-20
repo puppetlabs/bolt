@@ -46,8 +46,8 @@ module Bolt
         def connect
           # We don't actually have a connection, but we do need to
           # check that the container exists and is running.
-          output = execute_local_json_command('ps')
-          index = output.find_index { |item| item["ID"] == target.host || item["Names"] == target.host }
+          output = execute_local_json_command('ps', ['--no-trunc'])
+          index = output.find_index { |item| item["ID"].start_with?(target.host) || item["Names"] == target.host }
           raise "Could not find a container with name or ID matching '#{target.host}'" if index.nil?
           # Now find the indepth container information
           output = execute_local_json_command('inspect', [output[index]["ID"]])
