@@ -113,7 +113,9 @@ module Bolt
                 options[:use_agent] = false
               end
             elsif Bolt::Util.windows?
-              unless pageant_running?
+              pageant = Net::SSH::Authentication::Pageant::Win.FindWindow("Pageant", "Pageant")
+              # If pageant is not running
+              if pageant.to_i == 0
                 @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }
                 options[:use_agent] = false
               end
@@ -311,45 +313,6 @@ module Bolt
           match = remote_version.match(/OpenSSH_for_Windows_(\d+\.\d+)/)
           if match && match[1].to_f < 7.9
             raise "Powershell over SSH requires OpenSSH server >= 7.9, target is running #{match[1]}"
-          end
-        end
-
-        # Returns true if the Pageant process is running. Used to determine if
-        # the 'use_agent' setting for net-ssh should be disabled.
-        #
-        def pageant_running?
-          @pageant_running ||= begin
-            require 'fiddle'
-
-            # Create a handler and open the 'user32' library, which includes the
-            # 'FindWindowW' function used to determine if the Pageant process
-            # is running.
-            user32 = Fiddle.dlopen('user32')
-
-            # Wrap the 'FindWindowW' function:
-            # https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-findwindoww
-            # This function accepts two parameters: the class name and the
-            # window name. Both parameters are pointers to strings. If the
-            # function locates the window, it returns a handle to the window.
-            # Otherwise, it returns NULL (0).
-            find_window = Fiddle::Function.new(
-              user32['FindWindowW'],                    # Function name
-              [Fiddle::TYPE_VOIDP, Fiddle::TYPE_VOIDP], # Parameter types
-              Fiddle::TYPE_LONG                         # Return type
-            )
-
-            # Pack the name of the window into a pointer, and then decode that
-            # pointer as a native-endian signed long.
-            # https://apidock.com/ruby/Array/pack
-            # https://apidock.com/ruby/String/unpack
-            pageant, = ["Pageant\0".encode(Encoding::UTF_16LE)].pack("p").unpack("l!*")
-
-            # Find the 'Pageant' process using the 'FindWindowW' function.
-            status = find_window.call(0, pageant)
-
-            # If the function does not return NULL (0), then the process was
-            # found running.
-            status.to_i != 0
           end
         end
       end
