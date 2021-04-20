@@ -16,6 +16,7 @@ Puppet::Functions.create_function(:apply_prep) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @param options Options hash.
   # @option options [Array] _required_modules An array of modules to sync to the target.
+  # @return [nil]
   # @example Prepare targets by name.
   #   apply_prep('target1,target2')
   dispatch :apply_prep do

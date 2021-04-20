@@ -1,0 +1,93 @@
+# Data types
+
+This page lists custom data types used in Bolt plans and their functions.
+
+## Custom data types
+
+Bolt ships with several custom data types that can be used within a plan.
+
+<% @types.each do |data| -%>
+### `<%= data['name'] %>`
+
+<%= data['desc'] %>
+
+You can access `<%= data['name'] %>` functions with dot notation, using the
+syntax: `<%= data['name'] %>.function`.
+
+The following functions are available to `<%= data['name'] %>` objects.
+
+| Function | Return type | Description |
+| --- | --- | --- |
+<% data['funcs'].each do |func| -%>
+| `<%= func['name'] %>` | `<%= func['type'] %>` | <%= func['desc'] %> |
+<% end -%>
+
+<% if data['name'] == 'Result' -%>
+#### Command and script result value keys
+
+The `Result` object returned by the `run_command` and `run_script` plan function
+includes the following keys on the `value` hash:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `exit_code` | `Number` | The command's or script's exit code. |
+| `merged_output` | `String` | Output written to both standard error (stderr) and standard out (stdout) in the order that Bolt received the output. |
+| `stderr` | `String` | Output written to standard error (stderr). |
+| `stdout` | `String` | Output written to standard out (stdout). |
+
+#### Download result value keys
+
+The `Result` object returned by the `download_file` plan function includes the
+following key on the `value` hash:
+
+| Key | Type | Description |
+| --- | --- | --- |
+| `path` | `String` | The path to the downloaded file on the local host. |
+<% end -%>
+<% end -%>
+
+## Type Aliases
+
+Bolt also ships with type aliases, which provide an alternate name for existing types or lists of
+types. These types can be used within a plan, and have all of the attributes and functions of
+whichever Puppet type they are set to in the plan.
+
+### `TargetSpec`
+
+A `TargetSpec` is an alias for any of the following types:
+* `String`
+* `Target` (defined above)
+* `Array[TargetSpec]` (yep, it's recursive!)
+
+You can pass `TargetSpec` objects to `get_targets()` to return an `Array[Target]`. Generally, you shouldn't
+need to worry about the distinction between `TargetSpec` and `Target`/`Array[Target]`, because most
+Bolt plan functions handle them automatically. But if your use case requires it,
+you can use `get_targets()` to return an exact list of targets.
+
+📖  **Related information**
+- For more information on how to use `TargetSpec` in a plan, see [Writing 
+  plans](https://puppet.com/docs/bolt/latest/writing_plans.html#targetspec).
+
+### `PlanResult`
+
+A `PlanResult` describes the supported return values of a plan. This is the type returned from the
+`run_plan()` plan function. Similarly, a `parallelize()` plan function returns an `Array[PlanResult]`.
+Plans can return just about any Puppet type, so the `PlanResult` can be any of the following types:
+* `Boolean`
+* `Numeric`
+* `String`
+* `Undef`
+* `Error`
+* `Result`
+* `ApplyResult`
+* `ResultSet`
+* `Target`
+* `ResourceInstance`
+* `Array[PlanResults]`
+* `Hash{String => PlanResult}`. In other words, a `Hash` where each key is a `String` and each
+  corresponding value is a `PlanResult`, which could be any of the above types, including another
+  Hash.
+
+📖  **Related information**
+- [`run_plan()` plan function](plan_functions.md#run-plan)
+- [`parallelize()` plan function](plan_functions.md#parallelize)

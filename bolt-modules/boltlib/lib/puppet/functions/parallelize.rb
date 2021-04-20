@@ -10,6 +10,7 @@ Puppet::Functions.create_function(:parallelize, Puppet::Functions::InternalFunct
   # Map a block onto an array, where each array element executes in parallel.
   # This function is experimental.
   # @param data The array to apply the block to.
+  # @param block The code block to execute for each array element.
   # @return [Array] An array of PlanResult objects. Each input from the input
   #   array returns a corresponding PlanResult object.
   # @example Execute two tasks on two targets.

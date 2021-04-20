@@ -11,6 +11,7 @@ require 'bolt/error'
 Puppet::Functions.create_function(:remove_from_group) do
   # @param target A pattern identifying a single target.
   # @param group The name of the group to remove the target from.
+  # @return [nil]
   # @example Remove Target from group.
   #   remove_from_group('foo@example.com', 'group1')
   # @example Remove failing Targets from the rest of a plan

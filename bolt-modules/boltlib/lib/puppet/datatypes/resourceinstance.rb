@@ -1,5 +1,48 @@
 # frozen_string_literal: true
 
+# `ResourceInstance` objects are used to store the observed and desired state of a
+# target's resource and to track events for the resource. These objects do not
+# modify or interact with a target's resources.
+#
+# > The `ResourceInstance` data type is experimental and might change in a future
+# > release. You can learn more about this data type and how to use it in the
+# > [experimental features
+# > documentation](experimental_features.md#resourceinstance-data-type).
+#
+# @param events
+#   Events for the resource.
+# @param desired_state
+#   [Attributes](https://puppet.com/docs/puppet/latest/lang_resources.html#attributes) describing
+#   the desired state of the resource.
+# @param state
+#   [Attributes](https://puppet.com/docs/puppet/latest/lang_resources.html#attributes) describing
+#   the observed state of the resource.
+# @param target
+#   The resource's target.
+# @param title
+#   The [resource title](https://puppet.com/docs/puppet/latest/lang_resources.html#title).
+# @param type
+#   The [resource type](https://puppet.com/docs/puppet/latest/lang_resources.html#resource-types).
+#
+# @!method []
+#   Accesses the `state` hash directly and returns the value for the specified
+#   attribute. This function does not use dot noation. Call the function directly
+#   on the `ResourceInstance`. For example, `$resource['ensure']`.
+# @!method add_event(event)
+#   Add an event for the resource.
+# @!method overwrite_desired_state(desired_state)
+#   Overwrites the desired state of the resource.
+# @!method overwrite_state(state)
+#   Overwrites the observed state of the resource.
+# @!method set_desired_state(desired_state)
+#   Sets attributes describing the desired state of the resource. Performs a shallow
+#   merge with existing desired state.
+# @!method set_state(state)
+#   Sets attributes describing the observed state of the resource. Performs a shallow
+#   merge with existing state.
+# @!method reference
+#   The resources reference string. For example, `File[/etc/puppetlabs]`.
+#
 Puppet::DataTypes.create_type('ResourceInstance') do
   interface <<-PUPPET
     attributes => {
