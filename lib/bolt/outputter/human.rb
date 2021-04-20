@@ -293,7 +293,7 @@ module Bolt
       end
 
       def print_tasks(tasks, modulepath)
-        command = Bolt::Util.powershell? ? 'Get-BoltTask -Task <TASK NAME>' : 'bolt task show <TASK NAME>'
+        command = Bolt::Util.powershell? ? 'Get-BoltTask -Name <TASK NAME>' : 'bolt task show <TASK NAME>'
 
         tasks = tasks.map do |name, description|
           description = truncate(description, 72)
