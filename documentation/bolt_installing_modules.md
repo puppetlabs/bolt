@@ -177,6 +177,8 @@ project configuration file `bolt-project.yaml`. Specifications are listed under
 the `modules` key, and include specific keys depending on the type of module
 specified.
 
+If you need to install a module from a private git repository, see [Skip dependency resolution](#skip-dependency-resolution-for-a-module).
+
 ### Forge modules
 
 To specify a Forge module, use the following keys in the specification:
@@ -342,7 +344,7 @@ You might want to skip dependency resolution for a module if:
 
 - The module has outdated or incorrect metadata.
 - The module is a git module hosted in a repository other than a public GitHub
-  repository.
+  repository. For example, a private GitHub repository.
 - Bolt can't cleanly resolve the module's dependencies.
 
 You can configure Bolt to skip dependency resolution for a module by setting the
