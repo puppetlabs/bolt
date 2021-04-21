@@ -57,7 +57,7 @@ You can use the [Puppet `lookup()`
 function](https://puppet.com/docs/puppet/latest/hiera_automatic.html#puppet_lookup)
 in plans to look up data. It's useful to think of looking up Hiera data in Bolt
 plans in two different contexts: [inside apply
-blocks](applying_manifest_code.md) and outside apply blocks.
+blocks](applying_manifest_blocks.md) and outside apply blocks.
 
 ### Inside apply blocks
 
