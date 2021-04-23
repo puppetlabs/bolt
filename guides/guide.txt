@@ -1,0 +1,17 @@
+TOPIC
+    guide
+
+DESCRIPTION
+    A guide is a person (or CLI tool ;D) who leads travelers through unknown or
+    unfamiliar locations. The term can also be applied to a person who leads others
+    to more abstract goals such as knowledge or wisdom. 
+
+    Etymology: Originated sometime between 1325 and 1375. From Middle English
+    guide, from the Old French guide, from Old Occitan guida, from guidar, from
+    Frankish *wītan (“to show the way, lead”), from Proto-Germanic *wītaną (“to
+    see, know; go, depart”), from Proto-Indo-European *weyd- (“to see, know”).
+    Related also to English wit. 
+
+DOCUMENTATION
+    https://en.wikipedia.org/wiki/Guide
+    https://en.wiktionary.org/wiki/guide

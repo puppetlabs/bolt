@@ -156,18 +156,30 @@ module Bolt
       end
     end
 
+    COLORS = {
+      cyan: "36"
+    }.freeze
+
+    def self.colorize(color, string)
+      if $stdout.isatty
+        "\033[#{COLORS[color]}m#{string}\033[0m"
+      else
+        string
+      end
+    end
+
     BANNER = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           bolt
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt <subcommand> [action] [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Bolt is an orchestration tool that automates the manual work it takes to
           maintain your infrastructure.
 
-      SUBCOMMANDS
+      #{colorize(:cyan, 'Subcommands')}
           apply             Apply Puppet manifest code
           command           Run a command remotely
           file              Copy files between the controller and targets
@@ -181,79 +193,92 @@ module Bolt
           secret            Create encryption keys and encrypt and decrypt values
           task              Show and run Bolt tasks
 
-      GUIDES
+      #{colorize(:cyan, 'Guides')}
           For a list of guides on Bolt's concepts and features, run 'bolt guide'.
+          Find Bolt's documentation at https://bolt.guide.
     HELP
 
     APPLY_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           apply
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt apply [manifest] {--targets TARGETS | --query QUERY | --rerun FILTER}
             [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Apply Puppet manifest code on the specified targets.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          For documentation see http://pup.pt/bolt-apply.
+
+      #{colorize(:cyan, 'Examples')}
           bolt apply manifest.pp -t target
           bolt apply -e "file { '/etc/puppetlabs': ensure => present }" -t target
     HELP
 
     COMMAND_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           command
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt command <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Run a command on the specified targets.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          For documentation see http://pup.pt/bolt-commands.
+
+      #{colorize(:cyan, 'Actions')}
           run         Run a command on the specified targets.
     HELP
 
     COMMAND_RUN_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           run
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt command run <command> {--targets TARGETS | --query QUERY | --rerun FILTER}
             [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Run a command on the specified targets.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          For documentation see http://pup.pt/bolt-commands.
+
+      #{colorize(:cyan, 'Examples')}
           bolt command run 'uptime' -t target1,target2
     HELP
 
     FILE_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           file
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt file <action> [options]
 
-      DESCRIPTION
-          Copy files and directories between the controller and targets
+      #{colorize(:cyan, 'Description')}
+          Copy files and directories between the controller and targets.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          For documentation see http://pup.pt/bolt-commands.
+
+      #{colorize(:cyan, 'Actions')}
           download      Download a file or directory to the controller
           upload        Upload a local file or directory from the controller
     HELP
 
     FILE_DOWNLOAD_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           download
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt file download <source> <destination> {--targets TARGETS | --query QUERY | --rerun FILTER}
             [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Download a file or directory from one or more targets.
 
           Downloaded files and directories are saved to the a subdirectory
@@ -261,64 +286,76 @@ module Bolt
           destination directory is expanded relative to the downloads
           subdirectory of the project directory.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          For documentation see http://pup.pt/bolt-commands.
+
+      #{colorize(:cyan, 'Examples')}
           bolt file download /etc/ssh_config ssh_config -t all
     HELP
 
     FILE_UPLOAD_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           upload
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt file upload <source> <destination> {--targets TARGETS | --query QUERY | --rerun FILTER}
             [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Upload a local file or directory.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          For documentation see http://pup.pt/bolt-commands.
+
+      #{colorize(:cyan, 'Examples')}
           bolt file upload /tmp/source /etc/profile.d/login.sh -t target1
     HELP
 
     GROUP_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           group
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt group <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Show the list of groups in the inventory.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about the inventory run 'bolt guide inventory'.
+
+      #{colorize(:cyan, 'Actions')}
           show          Show the list of groups in the inventory
     HELP
 
     GROUP_SHOW_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           show
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt group show [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Show the list of groups in the inventory.
+
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about the inventory run 'bolt guide inventory'.
     HELP
 
     GUIDE_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           guide
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt guide [topic] [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           View guides for Bolt's concepts and features.
 
           Omitting a topic will display a list of available guides,
           while providing a topic will display the relevant guide.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Examples')}
           View a list of available guides
             bolt guide
           View the 'project' guide page
@@ -326,49 +363,55 @@ module Bolt
     HELP
 
     INVENTORY_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           inventory
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt inventory <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Show the list of targets an action would run on.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about the inventory run 'bolt guide inventory'.
+
+      #{colorize(:cyan, 'Actions')}
           show          Show the list of targets an action would run on
     HELP
 
     INVENTORY_SHOW_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           show
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt inventory show [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Show the list of targets an action would run on. This command will list
           all targets in the project's inventory by default.
 
           To filter the targets in the list, use the --targets, --query, or --rerun
           options. To view detailed configuration and data for targets, use the
-          --detail option.
+          --detail option. To learn more about the inventory run 'bolt guide inventory'.
+
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about the inventory run 'bolt guide inventory'.
     HELP
 
     MODULE_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           module
       
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt module <action> [options]
 
-      DESCRIPTION
-          Manage Bolt project modules
+      #{colorize(:cyan, 'Description')}
+          Manage Bolt project modules.
 
-          The module command is only supported when a project is configured
-          with the 'modules' key.
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt modules run 'bolt guide module'.
 
-      ACTIONS
+      #{colorize(:cyan, 'Actions')}
           add                   Add a module to the project
           generate-types        Generate type references to register in plans
           install               Install the project's modules
@@ -376,77 +419,84 @@ module Bolt
     HELP
 
     MODULE_ADD_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           add
       
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt module add <module> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Add a module to the project.
 
           Module declarations are loaded from the project's configuration
           file. Bolt will automatically resolve all module dependencies,
           generate a Puppetfile, and install the modules.
 
-          The module command is only supported when a project is configured
-          with the 'modules' key.
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt modules, run 'bolt guide module'.
     HELP
 
     MODULE_GENERATETYPES_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           generate-types
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt module generate-types [options]
 
-      DESCRIPTION
-          Generate type references to register in plans.
+      #{colorize(:cyan, 'Description')}
+          Generate type references to register in plans. To learn more about
+          Bolt modules, run 'bolt guide module'.
 
-          The module command is only supported when a project is configured
-          with the 'modules' key.
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt modules, run 'bolt guide module'.
     HELP
 
     MODULE_INSTALL_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           install
       
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt module install [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Install the project's modules.
 
           Module declarations are loaded from the project's configuration
           file. Bolt will automatically resolve all module dependencies,
           generate a Puppetfile, and install the modules.
+
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt modules, run 'bolt guide module'.
     HELP
 
     MODULE_SHOW_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           show
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt module show [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           List modules available to the Bolt project.
 
-          The module command is only supported when a project is configured
-          with the 'modules' key.
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt modules, run 'bolt guide module'.
     HELP
 
     PLAN_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           plan
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt plan <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Convert, create, show, and run Bolt plans.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt plans at https://pup.pt/bolt-plans.
+
+      #{colorize(:cyan, 'Actions')}
           convert       Convert a YAML plan to a Bolt plan
           new           Create a new plan in the current project
           run           Run a plan on the specified targets
@@ -454,13 +504,13 @@ module Bolt
     HELP
 
     PLAN_CONVERT_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           convert
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt plan convert <plan name> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Convert a YAML plan to a Puppet language plan and print the converted
           plan to stdout.
 
@@ -468,47 +518,56 @@ module Bolt
           correct but has different behavior. Always verify a converted plan's
           functionality. Note that the converted plan is not written to a file.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt plans at https://pup.pt/bolt-plans.
+
+      #{colorize(:cyan, 'Examples')}
           bolt plan convert myproject::myplan
           bolt plan convert path/to/plan/myplan.yaml
     HELP
 
     PLAN_NEW_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           new
       
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt plan new <plan name> [options]
       
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Create a new plan in the current project.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt plans at https://pup.pt/bolt-plans.
+
+      #{colorize(:cyan, 'Examples')}
           bolt plan new myproject::myplan
     HELP
 
     PLAN_RUN_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           run
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt plan run <plan name> [parameters] [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Run a plan on the specified targets.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt plans at https://pup.pt/bolt-plans.
+
+      #{colorize(:cyan, 'Examples')}
           bolt plan run canary --targets target1,target2 command=hostname
     HELP
 
     PLAN_SHOW_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           show
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt plan show [plan name] [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Show available plans and plan documentation.
 
           Omitting the name of a plan will display a list of plans available
@@ -517,7 +576,10 @@ module Bolt
           Providing the name of a plan will display detailed documentation for
           the plan, including a list of available parameters.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt plans at https://pup.pt/bolt-plans.
+
+      #{colorize(:cyan, 'Examples')}
           Display a list of available plans
             bolt plan show
           Display documentation for the aggregate::count plan
@@ -525,33 +587,39 @@ module Bolt
     HELP
 
     PROJECT_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           project
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt project <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Create and migrate Bolt projects
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt projects, run 'bolt guide project'.
+
+      #{colorize(:cyan, 'Actions')}
           init              Create a new Bolt project
           migrate           Migrate a Bolt project to the latest version
     HELP
 
     PROJECT_INIT_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           init
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt project init [name] [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Create a new Bolt project in the current working directory.
 
           Specify a name for the Bolt project. Defaults to the basename of the current working directory.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt projects, run 'bolt guide project'.
+
+      #{colorize(:cyan, 'Examples')}
           Create a new Bolt project using the directory as the project name.
             bolt project init
           Create a new Bolt project with a specified name.
@@ -561,139 +629,166 @@ module Bolt
     HELP
 
     PROJECT_MIGRATE_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           migrate
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt project migrate [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Migrate a Bolt project to use current best practices and the latest version of
           configuration files.
+
+      #{colorize(:cyan, 'Documentation')}
+          To learn more about Bolt projects, run 'bolt guide project'.
     HELP
 
     SCRIPT_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           script
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt script <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Run a script on the specified targets.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about running scrips at https://pup.pt/bolt-commands.
+
+      #{colorize(:cyan, 'Actions')}
           run         Run a script on the specified targets.
     HELP
 
     SCRIPT_RUN_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           run
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt script run <script> [arguments] {--targets TARGETS | --query QUERY | --rerun FILTER}
             [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Run a script on the specified targets.
 
           Arguments passed to a script are passed literally and are not interpolated
           by the shell. Any arguments containing spaces or special characters should
           be quoted.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about running scrips at https://pup.pt/bolt-commands.
+
+      #{colorize(:cyan, 'Examples')}
           bolt script run myscript.sh 'echo hello' --targets target1,target2
     HELP
 
     SECRET_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           secret
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt secret <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Create encryption keys and encrypt and decrypt values.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about secrets plugins at http://pup.pt/bolt-plugins.
+
+      #{colorize(:cyan, 'Actions')}
           createkeys           Create new encryption keys
           encrypt              Encrypt a value
           decrypt              Decrypt a value
     HELP
 
     SECRET_CREATEKEYS_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           createkeys
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt secret createkeys [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Create new encryption keys.
+
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about secrets plugins at http://pup.pt/bolt-plugins.
     HELP
 
     SECRET_DECRYPT_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           decrypt
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt secret decrypt <ciphertext> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Decrypt a value.
+
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about secrets plugins at http://pup.pt/bolt-plugins.
     HELP
 
     SECRET_ENCRYPT_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           encrypt
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
         bolt secret encrypt <plaintext> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Encrypt a value.
+
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about secrets plugins at http://pup.pt/bolt-plugins.
     HELP
 
     TASK_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           task
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt task <action> [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Show and run Bolt tasks.
 
-      ACTIONS
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt tasks at http://pup.pt/bolt-tasks.
+
+      #{colorize(:cyan, 'Actions')}
           run          Run a Bolt task
           show         Show available tasks and task documentation
     HELP
 
     TASK_RUN_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           run
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt task run <task name> [parameters] {--targets TARGETS | --query QUERY | --rerun FILTER}
             [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Run a task on the specified targets.
 
           Parameters take the form parameter=value.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt tasks at http://pup.pt/bolt-tasks.
+
+      #{colorize(:cyan, 'Examples')}
           bolt task run package --targets target1,target2 action=status name=bash
     HELP
 
     TASK_SHOW_HELP = <<~HELP
-      NAME
+      #{colorize(:cyan, 'Name')}
           show
 
-      USAGE
+      #{colorize(:cyan, 'Usage')}
           bolt task show [task name] [options]
 
-      DESCRIPTION
+      #{colorize(:cyan, 'Description')}
           Show available tasks and task documentation.
 
           Omitting the name of a task will display a list of tasks available
@@ -702,7 +797,10 @@ module Bolt
           Providing the name of a task will display detailed documentation for
           the task, including a list of available parameters.
 
-      EXAMPLES
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt tasks at http://pup.pt/bolt-tasks.
+
+      #{colorize(:cyan, 'Examples')}
           Display a list of available tasks
             bolt task show
           Display documentation for the canary task
@@ -714,120 +812,108 @@ module Bolt
 
       @options = options
 
-      separator "\nINVENTORY OPTIONS"
-      define('-t', '--targets TARGETS',
-             'Identifies the targets of command.',
-             'Enter a comma-separated list of target URIs or group names.',
-             "Or read a target list from an input file '@<file>' or stdin '-'.",
-             'Example: --targets localhost,target_group,ssh://nix.com:23,winrm://windows.puppet.com',
-             'URI format is [protocol://]host[:port]',
-             "SSH is the default protocol; can be #{TRANSPORTS.keys.join(', ')}",
-             'For Windows targets, specify the winrm:// protocol if it has not be configured',
-             'For SSH, port defaults to `22`',
-             'For WinRM, port defaults to `5985` or `5986` based on the --[no-]ssl setting',
+      separator "\n#{self.class.colorize(:cyan, 'Inventory options')}"
+      define('-t', '--targets TARGETS', 'Identifies the targets of the command.',
              "For more information, see 'bolt guide targets'.") do |targets|
         @options[:targets] ||= []
         @options[:targets] << Bolt::Util.get_arg_input(targets)
       end
-      define('-q', '--query QUERY', 'Query PuppetDB to determine the targets') do |query|
+      define('-q', '--query QUERY', 'Query PuppetDB to determine the targets.') do |query|
         @options[:query] = query
       end
-      define('--rerun FILTER', 'Retry on targets from the last run',
-             "'all' all targets that were part of the last run.",
-             "'failure' targets that failed in the last run.",
-             "'success' targets that succeeded in the last run.") do |rerun|
+      define("--rerun FILTER", "Retry on targets from the last run.",
+             "Available filters are 'all', 'failure', and 'success'.") do |rerun|
         @options[:rerun] = rerun
       end
-      define('--noop', 'See what changes Bolt will make without actually executing the changes') do |_|
+      define('--noop', 'See what changes Bolt will make without actually executing the changes.') do |_|
         @options[:noop] = true
       end
       define('--params PARAMETERS',
-             "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'") do |params|
+             "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'.") do |params|
         @options[:task_options] = parse_params(params)
       end
       define('-e', '--execute CODE',
-             "Puppet manifest code to apply to the targets") do |code|
+             "Puppet manifest code to apply to the targets.") do |code|
         @options[:code] = code
       end
-      define('--detail', 'Show resolved configuration for the targets') do |detail|
+      define('--detail', 'Show resolved configuration for the targets.') do |detail|
         @options[:detail] = detail
       end
 
-      separator "\nAUTHENTICATION OPTIONS"
-      define('-u', '--user USER', 'User to authenticate as') do |user|
+      separator "\n#{self.class.colorize(:cyan, 'Authentication options')}"
+      define('-u', '--user USER', 'User to authenticate as.') do |user|
         @options[:user] = user
       end
       define('-p', '--password PASSWORD',
-             'Password to authenticate with') do |password|
+             'Password to authenticate with.') do |password|
         @options[:password] = password
       end
-      define('--password-prompt', 'Prompt for user to input password') do |_password|
+      define('--password-prompt', 'Prompt for user to input password.') do |_password|
         $stderr.print "Please enter your password: "
         @options[:password] = $stdin.noecho(&:gets).chomp
         $stderr.puts
       end
-      define('--private-key KEY', 'Path to private ssh key to authenticate with') do |key|
+      define('--private-key KEY', 'Path to private ssh key to authenticate with.') do |key|
         @options[:'private-key'] = File.expand_path(key)
       end
-      define('--[no-]host-key-check', 'Check host keys with SSH') do |host_key_check|
+      define('--[no-]host-key-check', 'Check host keys with SSH.') do |host_key_check|
         @options[:'host-key-check'] = host_key_check
       end
-      define('--[no-]ssl', 'Use SSL with WinRM') do |ssl|
+      define('--[no-]ssl', 'Use SSL with WinRM.') do |ssl|
         @options[:ssl] = ssl
       end
-      define('--[no-]ssl-verify', 'Verify remote host SSL certificate with WinRM') do |ssl_verify|
+      define('--[no-]ssl-verify', 'Verify remote host SSL certificate with WinRM.') do |ssl_verify|
         @options[:'ssl-verify'] = ssl_verify
       end
 
-      separator "\nESCALATION OPTIONS"
-      define('--run-as USER', 'User to run as using privilege escalation') do |user|
+      separator "\n#{self.class.colorize(:cyan, 'Escalation options')}"
+      define('--run-as USER', 'User to run as using privilege escalation.') do |user|
         @options[:'run-as'] = user
       end
       define('--sudo-password PASSWORD',
-             'Password for privilege escalation') do |password|
+             'Password for privilege escalation.') do |password|
         @options[:'sudo-password'] = password
       end
-      define('--sudo-password-prompt', 'Prompt for user to input escalation password') do |_password|
+      define('--sudo-password-prompt', 'Prompt for user to input escalation password.') do |_password|
         $stderr.print "Please enter your privilege escalation password: "
         @options[:'sudo-password'] = $stdin.noecho(&:gets).chomp
         $stderr.puts
       end
-      define('--sudo-executable EXEC', "Specify an executable for running as another user.",
-             "This option is experimental.") do |exec|
+      define('--sudo-executable EXEC', "Experimental. Specify an executable for running as another user.") do |exec|
         @options[:'sudo-executable'] = exec
       end
 
-      separator "\nRUN CONTEXT OPTIONS"
+      separator "\n#{self.class.colorize(:cyan, 'Run context options')}"
       define('-c', '--concurrency CONCURRENCY', Integer,
-             'Maximum number of simultaneous connections') do |concurrency|
+             'Maximum number of simultaneous connections.') do |concurrency|
         @options[:concurrency] = concurrency
       end
       define('--compile-concurrency CONCURRENCY', Integer,
-             'Maximum number of simultaneous manifest block compiles (default: number of cores)') do |concurrency|
+             'Maximum number of simultaneous manifest block compiles (default: number of cores).') do |concurrency|
         @options[:'compile-concurrency'] = concurrency
       end
       define('--[no-]cleanup',
-             'Whether to clean up temporary files created on targets') do |cleanup|
+             'Whether to clean up temporary files created on targets.') do |cleanup|
         @options[:cleanup] = cleanup
       end
       define('-m', '--modulepath MODULES',
              "List of directories containing modules, separated by '#{File::PATH_SEPARATOR}'",
-             'Directories are case-sensitive') do |modulepath|
+             'Directories are case-sensitive.') do |modulepath|
         # When specified from the CLI, modulepath entries are relative to pwd
         @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR).map do |moduledir|
           File.expand_path(moduledir)
         end
       end
       define('--project PATH',
-             'Path to load the Bolt project from (default: autodiscovered from current dir)') do |path|
+             'Path to load the Bolt project from (default: autodiscovered from current dir).') do |path|
         @options[:project] = path
       end
       define('--hiera-config PATH',
-             'Specify where to load Hiera config from (default: ~/.puppetlabs/bolt/hiera.yaml)') do |path|
+             'Specify where to load Hiera config from (default: <project>/hiera.yaml).') do |path|
         @options[:'hiera-config'] = File.expand_path(path)
       end
       define('-i', '--inventoryfile PATH',
-             'Specify where to load inventory from (default: ~/.puppetlabs/bolt/inventory.yaml)') do |path|
+             'Specify where to load inventory from (default: <project>/inventory.yaml).') do |path|
         if ENV.include?(Bolt::Inventory::ENVIRONMENT_VAR)
           raise Bolt::CLIError, "Cannot pass inventory file when #{Bolt::Inventory::ENVIRONMENT_VAR} is set"
         end
@@ -837,8 +923,8 @@ module Bolt
         @options[:'save-rerun'] = save
       end
 
-      separator "\nREMOTE ENVIRONMENT OPTIONS"
-      define('--env-var ENVIRONMENT_VARIABLES', 'Environment variables to set on the target') do |envvar|
+      separator "\n#{self.class.colorize(:cyan, 'Remote environment options')}"
+      define('--env-var ENVIRONMENT_VARIABLES', 'Environment variables to set on the target.') do |envvar|
         unless envvar.include?('=')
           raise Bolt::CLIError, "Environment variables must be specified using 'myenvvar=key' format"
         end
@@ -846,47 +932,47 @@ module Bolt
         @options[:env_vars].store(*envvar.split('=', 2))
       end
 
-      separator "\nTRANSPORT OPTIONS"
+      separator "\n#{self.class.colorize(:cyan, 'Transport options')}"
       define('--transport TRANSPORT', TRANSPORTS.keys.map(&:to_s),
-             "Specify a default transport: #{TRANSPORTS.keys.join(', ')}") do |t|
+             "Specify a default transport: #{TRANSPORTS.keys.join(', ')}.",
+             "For more information, see 'bolt guide transports'.") do |t|
         @options[:transport] = t
       end
-      define('--[no-]native-ssh', 'Whether to shell out to native SSH or use the net-ssh Ruby library.',
-             'This option is experimental') do |bool|
+      define('--[no-]native-ssh',
+             'Experimental. Whether to shell out to native SSH or use the net-ssh Ruby library.') do |bool|
         @options[:'native-ssh'] = bool
       end
-      define('--ssh-command EXEC', "Executable to use instead of the net-ssh Ruby library. ",
-             "This option is experimental.") do |exec|
+      define('--ssh-command EXEC', "Experimental. Executable to use instead of the net-ssh Ruby library.") do |exec|
         @options[:'ssh-command'] = exec
       end
-      define('--copy-command EXEC', "Command to copy files to remote hosts if using native SSH. ",
-             "This option is experimental.") do |exec|
+      define('--copy-command EXEC',
+             "Experimental. Command to copy files to remote hosts if using native SSH.") do |exec|
         @options[:'copy-command'] = exec
       end
-      define('--connect-timeout TIMEOUT', Integer, 'Connection timeout in seconds (defaults vary)') do |timeout|
+      define('--connect-timeout TIMEOUT', Integer, 'Connection timeout in seconds (defaults vary).') do |timeout|
         @options[:'connect-timeout'] = timeout
       end
-      define('--[no-]tty', 'Request a pseudo TTY on targets that support it') do |tty|
+      define('--[no-]tty', 'Request a pseudo TTY on targets that support it.') do |tty|
         @options[:tty] = tty
       end
-      define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target') do |tmpdir|
+      define('--tmpdir DIR', 'The directory to upload and execute temporary files on the target.') do |tmpdir|
         @options[:tmpdir] = tmpdir
       end
 
-      separator "\nMODULE OPTIONS"
+      separator "\n#{self.class.colorize(:cyan, 'Module options')}"
       define('--[no-]resolve',
              'Use --no-resolve to install modules listed in the Puppetfile without resolving modules configured',
-             'in Bolt project configuration') do |resolve|
+             'in Bolt project configuration.') do |resolve|
         @options[:resolve] = resolve
       end
 
-      separator "\nPLAN OPTIONS"
+      separator "\n#{self.class.colorize(:cyan, 'Plan options')}"
       define('--pp', 'Create a new Puppet language plan.') do |_|
         @options[:puppet] = true
       end
 
-      separator "\nDISPLAY OPTIONS"
-      define('--filter FILTER', 'Filter tasks and plans by a matching substring') do |filter|
+      separator "\n#{self.class.colorize(:cyan, 'Display options')}"
+      define('--filter FILTER', 'Filter tasks and plans by a matching substring.') do |filter|
         unless /^[a-z0-9_:]+$/.match(filter)
           msg = "Illegal characters in filter string '#{filter}'. Filters must match a legal "\
                 "task or plan name."
@@ -894,13 +980,13 @@ module Bolt
         end
         @options[:filter] = filter
       end
-      define('--format FORMAT', 'Output format to use: human or json') do |format|
+      define('--format FORMAT', 'Output format to use: human, json, or rainbow.') do |format|
         @options[:format] = format
       end
-      define('--[no-]color', 'Whether to show output in color') do |color|
+      define('--[no-]color', 'Whether to show output in color.') do |color|
         @options[:color] = color
       end
-      define('-v', '--[no-]verbose', 'Display verbose logging') do |value|
+      define('-v', '--[no-]verbose', 'Display verbose logging.') do |value|
         @options[:verbose] = value
       end
       define('--stream',
@@ -909,25 +995,25 @@ module Bolt
              'a second time after the action is completed.') do |_|
         @options[:stream] = true
       end
-      define('--trace', 'Display error stack traces') do |_|
+      define('--trace', 'Display error stack traces.') do |_|
         @options[:trace] = true
       end
 
-      separator "\nADDITIONAL OPTIONS"
+      separator "\n#{self.class.colorize(:cyan, 'Additional options')}"
       define('--modules MODULES',
              'A comma-separated list of modules to install from the Puppet Forge',
              'when initializing a project. Resolves and installs all dependencies.') do |modules|
         @options[:modules] = modules.split(',').map { |mod| { 'name' => mod } }
       end
-      define('--force', 'Force a destructive action') do |_force|
+      define('--force', 'Force a destructive action.') do |_force|
         @options[:force] = true
       end
 
-      separator "\nGLOBAL OPTIONS"
-      define('-h', '--help', 'Display help') do |_|
+      separator "\n#{self.class.colorize(:cyan, 'Global options')}"
+      define('-h', '--help', 'Display help.') do |_|
         @options[:help] = true
       end
-      define('--version', 'Display the version') do |_|
+      define('--version', 'Display the version.') do |_|
         puts Bolt::VERSION
         raise Bolt::CLIExit
       end
@@ -937,10 +1023,10 @@ module Bolt
         @options[:log] = { 'console' => { 'level' => level } }
       end
       define('--clear-cache',
-             "Clear plugin cache before executing") do |_|
+             "Clear plugin cache before executing.") do |_|
         @options[:clear_cache] = true
       end
-      define('--plugin PLUGIN', 'Select the plugin to use') do |plug|
+      define('--plugin PLUGIN', 'Select the plugin to use.') do |plug|
         @options[:plugin] = plug
       end
     end

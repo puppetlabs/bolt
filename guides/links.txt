@@ -1,0 +1,13 @@
+TOPIC
+    links
+
+DESCRIPTION
+    Bolt documentation          https://bolt.guide
+    Ask a question in #bolt     https://slack.puppet.com/
+    Contribute at               https://github.com/puppetlabs/bolt/
+    Getting Started Guide       https://pup.pt/bolt-getting-started
+    Reference Documentation     https://pup.pt/bolt-reference
+    Troubleshooting Bolt        https://pup.pt/bolt-troubleshooting
+    Bolt Developer Updates      https://pup.pt/bolt-dev-updates
+    Bolt Changelog              https://pup.pt/bolt-changelog
+    Bolt Examples               https://pup.pt/bolt-examples

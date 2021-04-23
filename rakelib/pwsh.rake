@@ -86,7 +86,7 @@ namespace :pwsh do
       actions << nil if actions.empty?
       actions.each do |action|
         help_text = parser.get_help_text(subcommand, action)
-        matches = help_text[:banner].match(/USAGE(?<usage>.+?)DESCRIPTION(?<desc>.+?)(EXAMPLES|\z)/m)
+        matches = help_text[:banner].match(/Usage(?<usage>.+?)Description(?<desc>.+?)(Examples|\z)/m)
         action.chomp unless action.nil?
 
         if action.nil? && subcommand == 'apply'

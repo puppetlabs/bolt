@@ -6,22 +6,20 @@ DESCRIPTION
     be physical, such as servers, or virtual, such as containers or virtual
     machines.
 
-    Several of Bolt's commands connect to targets and run actions on them. When
-    you run these commands, Bolt requires a list of targets to run the action
-    on. For example, the `bolt script run` command and `Invoke-BoltScript`
-    PowerShell cmdlet require you to provide a list of targets to run your
-    script on. You can provide a list of targets to a command using one of the
-    following command-line options:
+    Several of Bolt's commands connect to targets and run actions on them.
+    These commands require a target or targets to run on. You can specify
+    targets to a command using one of the following command-line options:
 
-    Shell commands
-        -t, --targets TARGETS
-        -q, --query   QUERY
-            --rerun   FILTER
+    *nix options                Powershell options
+     -t, --targets TARGETS      -T, -Targets  TARGETS
+     -q, --query   QUERY        -Q, -Query    QUERY
+         --rerun   FILTER       -Rerun        FILTER
 
-    PowerShell cmdlets
-        -T, -Targets TARGETS
-        -Q, -Query   QUERY
-            -Rerun   FILTER
+    The 'targets' option accepts a comma-separated list of target URIs or group
+    names, or can read a target list from an input file '@<file>' or stdin '-'.
+    URIs can be specified with the format [protocol://][user@]host[:port]. To
+    learn more about available protocols and their defaults, run 'bolt guide
+    transports'.
 
     Typically, targets and their configuration and data are listed in a
     project's inventory file. For more information about inventory files,
