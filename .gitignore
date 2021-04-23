@@ -38,6 +38,7 @@ Gemfile.local
 .rerun.json
 .plugin_cache.json
 .plan_cache.json
+.task_cache.json
 Boltdir/
 bolt.yaml
 project.yaml

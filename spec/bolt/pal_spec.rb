@@ -12,6 +12,8 @@ describe Bolt::PAL do
   end
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
 
+  let(:project) { Bolt::Project.new({ 'name' => 'pal_test' }, Dir.getwd) }
+
   describe :parse_manifest do
     let(:pal) { Bolt::PAL.new(Bolt::Config::Modulepath.new([]), nil, nil) }
 
@@ -145,10 +147,9 @@ describe Bolt::PAL do
 
   describe :in_bolt_compiler do
     it "sets the bolt_project in the context" do
-      project = Bolt::Project.new({ 'name' => 'mytestproject' }, Dir.getwd)
       pal = Bolt::PAL.new(Bolt::Config::Modulepath.new([]), nil, nil, 1, nil, {}, project)
       pal.in_bolt_compiler do
-        expect(Puppet.lookup(:bolt_project).name).to eq('mytestproject')
+        expect(Puppet.lookup(:bolt_project).name).to eq(project.name)
       end
     end
   end
