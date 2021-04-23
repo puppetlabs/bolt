@@ -47,35 +47,13 @@ PowerShell module.
 
 ## PuppetBolt PowerShell module
 
-Releasing a new version of the PuppetBolt PowerShell module is currently a manual process.
+After Bolt packages have been released, you can publish a new version of the [PuppetBolt PowerShell 
+module](https://www.powershellgallery.com/packages/PuppetBolt).
 
-### Prerequisites
+1. Go to the [Publish PowerShell Module workflow](https://github.com/puppetlabs/bolt/actions/workflows/publish-powershell-module.yaml).
 
-Before getting started, you should have the following installed on your system:
+1. Click the `Run workflow` button at the top of the list of workflow runs. Set the ref to the tagged 
+   version of Bolt that you want to build the module for. The ref defaults to `main` and does not need
+   to be modified if publishing the module after tagging and releasing Bolt.
 
-- [.Net SDK](https://dotnet.microsoft.com/download)
-- [PowerShell](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell?view=powershell-7.1)
-
-### Releasing
-
-After the Bolt repository has been tagged for a new release, you can release a new version
-of the PuppetBolt module:
-
-1. Build the PowerShell module:
-
-   ```powershell
-   > bundle exec rake pwsh:generate_module
-   ```
-
-1. Confirm that the contents of `./pwsh_module/PuppetBolt` were updated and that the
-   version listed in `./pwsh_module/PuppetBolt/PuppetBolt.psd1` matches the new
-   Bolt version.
-
-1. Publish the module to PowerShell Gallery:
-
-   ```powershell
-   > Publish-Module -Path ./pwsh_module/PuppetBolt -NuGetApiKey <API KEY>
-   ```
-
-   The API key can be found in the _PowerShell Gallery_ vault in 1Password. If you do not
-   have access to this vault, file a ticket with the help desk to be added to it.
+1. Run the workflow!
