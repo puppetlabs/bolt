@@ -1,5 +1,30 @@
 # Changelog
 
+## Bolt 3.7.1 (2021-04-26)
+
+### New features
+
+* **Developer Update: Script loading changes**
+
+  There's a new Developer Update in town, [read it
+  here](https://puppet.com/docs/bolt/latest/developer_updates.html).
+
+### Bug fixes
+
+* **Allow Docker connections using full ID as the host**
+
+  The Bolt Docker transport now successfully connects to containers
+  when the full SHA 256 container ID string is provided as a name or
+  URL. Previously, Bolt could only connect when the 12 character
+  shortened form of the ID string was used.
+
+* **Fixed incorrect param in Get-BoltTask text** ([#2795](https://github.com/puppetlabs/bolt/issues/2795))
+
+  Fixed the 'Additional Information' section of the help text for the Get-BoltTask cmdlet having an
+  incorrect parameter for the task name
+
+  _Contributed by [Malivil](https://github.com/Malivil)_
+
 ## Bolt 3.7.0 (2021-04-13)
 
 ### New features
