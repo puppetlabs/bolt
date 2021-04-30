@@ -179,12 +179,6 @@ SSL_connect returned=1 errno=0 state=error: certificate verify failed (unable to
 Set the `SSL_CERT_DIR` and `SSL_CERT_FILE` environment variables to use a valid
 certificate and certificate directory.
 
-## I still need help
-
-Visit the **#bolt** channel in the [Puppet Community
-Slack](https://slack.puppet.com) to find a whole community of people waiting
-to help!
-
 ## PowerShell does not recognize Bolt cmdlets
 
 PowerShell 3.0 cannot automatically discover and load the Bolt module. If you're
@@ -251,3 +245,18 @@ To change your script execution policy:
     documentation about [execution
     policies](http://go.microsoft.com/fwlink/?LinkID=135170) and [how to set
     them](https://msdn.microsoft.com/en-us/powershell/reference/5.1/microsoft.powershell.security/set-executionpolicy).
+
+## 'Could not parse PKey: no start line' error message when using SSH private key
+
+Bolt does not support encrypted SSH private keys if the keys are provided using the
+`key-data` field in your transport configuration. If providing a decrypted key is feasible
+for your use case and security practices, you can manually decrypt the key by running
+`openssl rsa -in <KEY FILE>` and providing your passphrase. Alternatively, you can
+add the key to your SSH agent and *not* specify a `private-key` for Bolt to use. Bolt
+will use the agent to authenticate your connection.
+
+## I still need help
+
+Visit the **#bolt** channel in the [Puppet Community
+Slack](https://slack.puppet.com) to find a whole community of people waiting
+to help!
