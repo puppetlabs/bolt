@@ -74,7 +74,6 @@ module Bolt
           # CODEREVIEW: Is it always safe to pass --interactive?
           args += %w[--interactive]
           args += %w[--tty] if target.options['tty']
-          args += %W[--env DOCKER_HOST=#{@docker_host}] if @docker_host
           args += @env_vars if @env_vars
 
           if target.options['shell-command'] && !target.options['shell-command'].empty?
@@ -86,7 +85,7 @@ module Bolt
           docker_command = %w[docker exec] + args + [container_id] + Shellwords.split(command)
           @logger.trace { "Executing: #{docker_command.join(' ')}" }
 
-          Open3.popen3(*docker_command)
+          Open3.popen3(env_hash, *docker_command)
         rescue StandardError
           @logger.trace { "Command aborted" }
           raise
