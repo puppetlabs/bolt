@@ -172,6 +172,28 @@ describe Bolt::Util do
     end
   end
 
+  describe '#first_runs_free' do
+    it 'returns path to first run file under user-level default config dir' do
+      expect(Bolt::Util.first_runs_free).to eq(Bolt::Config.user_path + '.first_runs_free')
+    end
+
+    it 'falls back to system_path if user_path fails to be created' do
+      expect(FileUtils).to receive(:mkdir_p)
+        .with(Bolt::Config.user_path).and_raise(Errno::ENOENT, "No such file or directory")
+      expect(FileUtils).to receive(:mkdir_p)
+        .with(Bolt::Config.system_path).and_return([Bolt::Config.system_path])
+      expect(Bolt::Util.first_runs_free).to eq(Bolt::Config.system_path + '.first_runs_free')
+    end
+
+    it 'returns nil if both system_path and user_path fail to be created' do
+      expect(FileUtils).to receive(:mkdir_p)
+        .with(Bolt::Config.user_path).and_raise(Errno::ENOENT, "No such file or directory")
+      expect(FileUtils).to receive(:mkdir_p)
+        .with(Bolt::Config.system_path).and_raise(Errno::ENOENT, "No such file or directory")
+      expect(Bolt::Util.first_runs_free).to eq(nil)
+    end
+  end
+
   describe '#prompt_yes_no' do
     let(:outputter) { double('outputter', print_prompt: nil) }
 

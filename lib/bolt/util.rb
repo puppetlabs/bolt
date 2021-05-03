@@ -78,11 +78,23 @@ module Bolt
       end
 
       def first_runs_free
+        # If this fails, use the system path instead
+        FileUtils.mkdir_p(Bolt::Config.user_path)
         Bolt::Config.user_path + '.first_runs_free'
+      rescue StandardError
+        begin
+          # If using the system path fails, then don't bother with the welcome
+          # message
+          FileUtils.mkdir_p(Bolt::Config.system_path)
+          Bolt::Config.system_path + '.first_runs_free'
+        rescue StandardError
+          nil
+        end
       end
 
       def first_run?
-        Bolt::Config.user_path && !File.exist?(first_runs_free)
+        !first_runs_free.nil? &&
+          !File.exist?(first_runs_free)
       end
 
       # If Puppet is loaded, we aleady have the path to the module and should
