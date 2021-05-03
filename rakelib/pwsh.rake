@@ -47,6 +47,7 @@ namespace :pwsh do
       'download'   => 'Receive',
       'init'       => 'New',
       'install'    => 'Install',
+      'lookup'     => 'Invoke',
       'migrate'    => 'Update',
       'new'        => 'New',
       'run'        => 'Invoke',
@@ -89,7 +90,7 @@ namespace :pwsh do
         matches = help_text[:banner].match(/Usage(?<usage>.+?)Description(?<desc>.+?)(Examples|\z)/m)
         action.chomp unless action.nil?
 
-        if action.nil? && subcommand == 'apply'
+        if action.nil? && %w[apply lookup].include?(subcommand)
           cmdlet_verb = 'Invoke'
           cmdlet_noun = "Bolt#{subcommand.capitalize}"
         elsif @hardcoded_cmdlets["#{subcommand}:#{action}"]
@@ -274,6 +275,20 @@ namespace :pwsh do
               validate_not_null_or_empty: true
             }
           end
+        when 'lookup'
+          # bolt lookup <key> [options]
+          @pwsh_command[:options] << {
+            name:                       'Key',
+            ruby_short:                 'k',
+            parameter_set:              'key',
+            help_msg:                   'The key to look up',
+            type:                       'string',
+            switch:                     false,
+            mandatory:                  true,
+            position:                   0,
+            ruby_arg:                   'bare',
+            validate_not_null_or_empty: true
+          }
         end
 
         # verbose is a commonparameter and is already present in the

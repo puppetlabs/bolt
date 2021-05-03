@@ -28,6 +28,11 @@ module Bolt
       %w[file line].zip(position).to_h.compact
     end
 
+    def self.for_lookup(target, key, value)
+      val = { 'value' => value }
+      new(target, value: val, action: 'lookup', object: key)
+    end
+
     def self.for_command(target, value, action, command, position)
       details = create_details(position)
       unless value['exit_code'] == 0

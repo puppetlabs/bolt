@@ -83,6 +83,10 @@ module Bolt
         @stream.puts result.to_json
       end
 
+      def print_result_set(result_set)
+        @stream.puts result_set.to_json
+      end
+
       def print_topics(topics)
         print_table('topics' => topics)
       end

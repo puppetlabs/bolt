@@ -45,11 +45,79 @@ data set by a user overrides the default data set by the module’s author.
 
 ## Look up data from the command line
 
-If you have used Puppet, you might be familiar with the [`puppet lookup`
-command](https://puppet.com/docs/puppet/latest/hiera_automatic.html#using_puppet_lookup),
-which is the command line interface for the `lookup()` function. Bolt does not
-have an equivalent command line interface, so it is not possible to look up data
-with Hiera outside of running your code in Bolt.
+You can use the `bolt lookup` command and `Invoke-BoltLookup` PowerShell cmdlet
+to look up data from the command line. The `lookup` command looks up data in the
+context of a target, allowing you to interpolate target facts and variables in
+your hierarchy.
+
+> **Note:** The `bolt lookup` and `Invoke-BoltLookup` commands only look up data
+> using the `hierarchy` key in the Hiera configuration file. `plan_hierarchy`
+> is not supported from the command line.
+
+When you run the `bolt lookup` and `Invoke-BoltLookup` commands, Bolt first
+runs an `apply_prep` on each of the targets specified. This installs the
+`puppet-agent` package on the target, collects facts, and then stores the facts
+on the target to be used in interpolations.
+
+Looking up data from the command line is particularly useful if you need to
+debug a plan that includes calls to the `lookup()` function, or if you need to
+look up target-specific data such as a password for authenticating connections
+to the target.
+
+Given the following Hiera configuration at `<PROJECT DIRECTORY>/hiera.yaml`:
+
+```yaml
+# hiera.yaml
+version: 5
+
+hierarchy:
+  - name: "Per-OS defaults"
+    path: "os/%{facts.os.name}.yaml"
+  - name: "Common data"
+    path: "common.yaml"
+```
+
+And the following data source at `<PROJECT DIRECTORY>/data/os/Windows.yaml`:
+
+```yaml
+# data/os/Windows.yaml
+password: Bolt!
+```
+
+And the following data source at `<PROJECT DIRECTORY>/data/os/Ubuntu.yaml`:
+
+```yaml
+# data/os/Ubuntu.yaml
+password: Puppet!
+```
+
+You can look up the value for the `password` key from the command line using
+facts collected from your targets:
+
+_\*nix shell command_
+
+```shell
+bolt lookup password --targets windows_target,ubuntu_target
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltLooup -Key 'password' -Targets 'windows_target,ubuntu_target'
+```
+
+Bolt prints the value for the key to the console:
+
+```shell
+Starting: install puppet and gather facts on windows_target, ubuntu_target
+Finished: install puppet and gather facts with 0 failures in 6.7 sec
+Finished on windows_target:
+  Bolt!
+Finished on ubuntu_target:
+  Puppet!
+Successful on 2 targets: windows_target, ubuntu_target
+Ran on 2 targets
+```
 
 ## Look up data in plans
 
