@@ -85,6 +85,66 @@ module Bolt
         Bolt::Config.user_path && !File.exist?(first_runs_free)
       end
 
+      # If Puppet is loaded, we aleady have the path to the module and should
+      # just get it. This takes the path to a file provided by the user and a
+      # Puppet Parser scope object and tries to find the file, either as an
+      # absolute path or Puppet module syntax lookup. Returns the path to the
+      # file if found, or nil.
+      #
+      def find_file_from_scope(file, scope, fallback = false)
+        # If we got an absolute path, just return that.
+        return file if Pathname.new(file).absolute?
+
+        module_name, file_pattern = Bolt::Util.split_path(file)
+        # Get the absolute path to the module root from the scope
+        mod_path = scope.compiler.environment.module(module_name)&.path
+
+        # Search the module for the file, falling back to new-style paths if enabled.
+        find_file_in_module(mod_path, file_pattern, fallback) if mod_path
+      end
+
+      # This method is used by Bolt to find files when provided a
+      # module-style path without loading Puppet. It takes the absolute path to
+      # the module root and the module-style path minus the module name and
+      # searches subdirectories in the module in order of precedence.
+      #
+      def find_file_in_module(module_path, module_file, fallback = false)
+        # If the first part of the path is 'scripts' or 'files', the path may
+        # be a new-style file location and should fall back to the new path.
+        subdir_or_file = split_path(module_file).first
+        case subdir_or_file
+          # For any subdirs that may indicate the user passed a new-style path,
+          # first look in 'mymod/files/<relative_path>' (old-style) then fall
+          # back to 'mymod/<relative_path>' (new-style) if enabled.
+        when 'scripts', 'files'
+          search_module(module_path, module_file, fallback)
+        else
+          # If the path definitely isn't new-style, only look in the 'files/'
+          # directory.
+          search_module(module_path, module_file)
+        end
+      end
+
+      # This searches a module for files under 'files/' or 'scripts/',
+      # optionally falling back to the new style of file loading. It takes the
+      # absolute path to the module root, the relative path provided by the
+      # user, and whether to fall back to the new-style script loading if the
+      # file isn't found in 'files/'.
+      #
+      private def search_module(module_path, module_file, fallback = false)
+        if File.exist?(File.join(module_path, 'files', module_file))
+          File.join(module_path, 'files', module_file)
+        elsif File.exist?(File.join(module_path, module_file)) && fallback
+          File.join(module_path, module_file)
+        end
+      end
+
+      # Copied directly from puppet/lib/puppet/parser/files.rb
+      #
+      def split_path(path)
+        path.split(File::SEPARATOR, 2)
+      end
+
       # Accepts a path with either 'plans' or 'tasks' in it and determines
       # the name of the module
       def module_name(path)

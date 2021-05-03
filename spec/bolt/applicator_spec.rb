@@ -37,7 +37,8 @@ describe Bolt::Applicator do
       code_ast: ast,
       modulepath: modulepath,
       pdb_config: config.to_hash,
-      hiera_config: nil
+      hiera_config: nil,
+      future: {}
     }
   }
 

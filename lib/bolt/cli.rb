@@ -570,7 +570,8 @@ module Bolt
             when 'command'
               executor.run_command(targets, options[:object], executor_opts)
             when 'script'
-              script_path = find_file(options[:object])
+              script_path = find_file(options[:object], executor.future&.fetch('file_paths', false))
+              validate_file('script', script_path)
               executor.run_script(targets, script_path, options[:leftovers], executor_opts)
             when 'task'
               pal.run_task(options[:object],
@@ -595,8 +596,9 @@ module Bolt
                 dest = File.expand_path(dest, Dir.pwd)
                 executor.download_file(targets, src, dest, executor_opts)
               when 'upload'
-                validate_file('source file', src, true)
-                executor.upload_file(targets, src, dest, executor_opts)
+                src_path = find_file(src, executor.future&.fetch('file_paths', false))
+                validate_file('source file', src_path, true)
+                executor.upload_file(targets, src_path, dest, executor_opts)
               end
             end
         end
@@ -968,20 +970,17 @@ module Bolt
     # the path is a Puppet file path and looks for the file in a module's files
     # directory.
     #
-    def find_file(path)
-      unless File.exist?(path) || Pathname.new(path).absolute?
-        modulepath = Bolt::Config::Modulepath.new(config.modulepath)
-        modules    = Bolt::Module.discover(modulepath.full_modulepath, config.project)
-        mod, file = path.split(File::SEPARATOR, 2)
+    def find_file(path, future_file_paths)
+      return path if File.exist?(path) || Pathname.new(path).absolute?
+      modulepath = Bolt::Config::Modulepath.new(config.modulepath)
+      modules    = Bolt::Module.discover(modulepath.full_modulepath, config.project)
+      mod, file = path.split(File::SEPARATOR, 2)
 
-        if modules[mod]
-          @logger.debug("Did not find file at #{File.expand_path(path)}, checking in module '#{mod}'")
-          path = File.join(modules[mod].path, 'files', file)
-        end
+      if modules[mod]
+        @logger.debug("Did not find file at #{File.expand_path(path)}, checking in module '#{mod}'")
+        found = Bolt::Util.find_file_in_module(modules[mod].path, file || "", future_file_paths)
+        path = found.nil? ? File.join(modules[mod].path, 'files', file) : found
       end
-
-      Bolt::Util.validate_file('script', path)
-
       path
     end
 

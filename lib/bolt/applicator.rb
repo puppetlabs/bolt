@@ -87,7 +87,7 @@ module Bolt
         variables: @inventory.vars(target),
         trusted: trusted.to_h
       }
-      catalog_request = scope.merge(target: target_data)
+      catalog_request = scope.merge(target: target_data).merge(future: @executor.future || {})
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
       old_path = ENV['PATH']
