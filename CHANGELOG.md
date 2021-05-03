@@ -1,5 +1,37 @@
 # Changelog
 
+## Bolt 3.8.0 (2021-05-03)
+
+### New features
+
+* **Facts diff task accepts `exclude` parameter**
+  ([#2804](https://github.com/puppetlabs/bolt/pull/2804))
+
+  The `puppet_agent::facts_diff` task now accepts an `exclude` parameter
+  to filter output based on a provided regex.
+
+* **`lookup` command to look up values with Hiera**
+  ([#2499](https://github.com/puppetlabs/bolt/issues/2499))
+
+  The new `bolt lookup` and `Invoke-BoltLookup` commands can be used to
+  look up values with Hiera.
+
+* **Load files from specified Puppet paths**
+  ([#2731](https://github.com/puppetlabs/bolt/issues/2731))
+
+  If the project-level `future.file_paths` configuration is enabled,
+  Puppet files can be loaded using the new loading syntax. For more
+  information see https://pup.pt/bolt-loading-files.
+
+### Removals
+
+* **Puppet5 collection no longer available for `puppet_agent::install`
+  task**
+  ([#2804](https://github.com/puppetlabs/bolt/pull/2804))
+
+  Now that this collection is unavailable to download from, it's not a
+  valid parameter to the `puppet_agent::install` task.
+
 ## Bolt 3.7.1 (2021-04-26)
 
 ### New features
