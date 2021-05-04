@@ -316,6 +316,27 @@ describe 'apply', expensive: true do
         uninstall(uri, inventory: inventory)
       end
 
+      context 'with _run_as passed to apply_prep' do
+        let(:config) do
+          {
+            'ssh' => {
+              'host-key-check' => false,
+              'password' => password
+            }
+          }
+        end
+
+        it 'installs puppet' do
+          result = run_cli_json(%W[plan run prep::run_as -t #{uri}], project: project)
+
+          expect(result).not_to include('kind')
+          expect(result.count).to eq(1)
+          expect(result[0]['status']).to eq('success')
+          report = result[0]['value']['report']
+          expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
+        end
+      end
+
       it 'installs puppet' do
         result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
 

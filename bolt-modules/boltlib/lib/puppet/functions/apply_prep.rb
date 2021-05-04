@@ -16,6 +16,7 @@ Puppet::Functions.create_function(:apply_prep) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @param options Options hash.
   # @option options [Array] _required_modules An array of modules to sync to the target.
+  # @option options [String] _run_as User to run as using privilege escalation.
   # @return [nil]
   # @example Prepare targets by name.
   #   apply_prep('target1,target2')
@@ -71,7 +72,8 @@ Puppet::Functions.create_function(:apply_prep) do
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'apply_prep')
     end
 
-    options = options.transform_keys { |k| k.sub(/^_/, '').to_sym }
+    # Unfreeze this
+    options = options.slice(*%w[_run_as _required_modules])
 
     applicator = Puppet.lookup(:apply_executor)
 
@@ -79,14 +81,14 @@ Puppet::Functions.create_function(:apply_prep) do
 
     targets = inventory.get_targets(target_spec)
 
-    required_modules = options[:required_modules].nil? ? nil : Array(options[:required_modules])
-    if required_modules&.any?
+    required_modules = options.delete('_required_modules').to_a
+    if required_modules.any?
       Puppet.debug("Syncing only required modules: #{required_modules.join(',')}.")
     end
 
     # Gather facts, including custom facts
     plugins = applicator.build_plugin_tarball do |mod|
-      next unless required_modules.nil? || required_modules.include?(mod.name)
+      next unless required_modules.empty? || required_modules.include?(mod.name)
       search_dirs = []
       search_dirs << mod.plugins if mod.plugins?
       search_dirs << mod.pluginfacts if mod.pluginfacts?
@@ -107,8 +109,9 @@ Puppet::Functions.create_function(:apply_prep) do
             opts = t.plugin_hooks&.fetch('puppet_library').dup
             plugin_name = opts.delete('plugin')
             hook = inventory.plugins.get_hook(plugin_name, :puppet_library)
+            # Give plan function options precedence over inventory options
             { 'target' => t,
-              'hook_proc' => hook.call(opts, t, self) }
+              'hook_proc' => hook.call(opts.merge(options), t, self) }
           rescue StandardError => e
             Bolt::Result.from_exception(t, e)
           end
@@ -132,7 +135,7 @@ Puppet::Functions.create_function(:apply_prep) do
 
         task = applicator.custom_facts_task
         arguments = { 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins) }
-        results = executor.run_task(targets, task, arguments)
+        results = run_task(targets, task, arguments, options)
 
         # TODO: Standardize RunFailure type with error above
         raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
