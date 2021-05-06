@@ -235,7 +235,8 @@ module Bolt
           "private-key" => {
             type: [Hash, String],
             description: "Either the path to the private key file to use for authentication, or "\
-                         "a hash with the key `key-data` and the contents of the private key.",
+            "a hash with the key `key-data` and the contents of the private key. Note that "\
+            "the key cannot be encrypted if using the `key-data` hash.",
             required: ["key-data"],
             properties: {
               "key-data" => {
