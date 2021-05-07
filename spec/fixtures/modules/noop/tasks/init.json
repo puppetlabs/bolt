@@ -1,0 +1,13 @@
+{
+  "implementations": [
+    {
+      "name": "init_linux.sh",
+      "requirements": ["shell"]
+    },
+    {
+      "name": "init_windows.ps1",
+      "requirements": ["powershell"]
+    }
+  ],
+  "supports_noop": true
+}

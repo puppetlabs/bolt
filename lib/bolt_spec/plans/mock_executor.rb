@@ -21,7 +21,6 @@ module BoltSpec
       attr_accessor :run_as, :transport_features, :execute_any_plan
 
       def initialize(modulepath)
-        @noop = false
         @run_as = nil
         @in_parallel = false
         @future = {}
@@ -38,6 +37,13 @@ module BoltSpec
         @execute_any_plan = true
         # plans that are allowed to be executed by the @executor_real
         @allowed_exec_plans = {}
+      end
+
+      def with_settings(noop: false)
+        @noop = noop
+        yield
+      ensure
+        @noop = false
       end
 
       def module_file_id(file)

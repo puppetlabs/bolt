@@ -96,7 +96,7 @@ module Bolt
           { flags: OPTIONS[:global] + PROJECT_PATHS + %w[pp],
             banner: PLAN_NEW_HELP }
         when 'run'
-          { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir hiera-config],
+          { flags: ACTION_OPTS + %w[params compile-concurrency tmpdir hiera-config noop],
             banner: PLAN_RUN_HELP }
         when 'show'
           { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[filter format],
@@ -847,9 +847,6 @@ module Bolt
              "Available filters are 'all', 'failure', and 'success'.") do |rerun|
         @options[:rerun] = rerun
       end
-      define('--noop', 'See what changes Bolt will make without actually executing the changes.') do |_|
-        @options[:noop] = true
-      end
       define('--params PARAMETERS',
              "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'.") do |params|
         @options[:task_options] = parse_params(params)
@@ -925,6 +922,9 @@ module Bolt
         @options[:modulepath] = modulepath.split(File::PATH_SEPARATOR).map do |moduledir|
           File.expand_path(moduledir)
         end
+      end
+      define('--noop', 'See what changes Bolt will make without actually executing the changes.') do |_|
+        @options[:noop] = true
       end
       define('--project PATH',
              'Path to load the Bolt project from (default: autodiscovered from current dir).') do |path|

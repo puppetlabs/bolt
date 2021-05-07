@@ -219,6 +219,14 @@ describe 'run_script' do
         .and_return(result_set)
     end
 
+    it 'errors in noop mode' do
+      executor.expects(:noop).returns(true)
+
+      is_expected.to run
+        .with_params('test/uploads/hostname.sh', hostname)
+        .and_raise_error(Bolt::Error, /run_script is not supported in noop mode/)
+    end
+
     context 'with description' do
       let(:message) { 'test message' }
 

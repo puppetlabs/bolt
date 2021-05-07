@@ -38,6 +38,12 @@ Puppet::Functions.create_function(:run_container) do
 
     # Send Analytics Report
     executor = Puppet.lookup(:bolt_executor)
+
+    # executor.noop is set when using 'plan run --noop' from the CLI
+    if executor.noop
+      raise Bolt::Error.new('run_container is not supported in noop mode', 'bolt/noop-error')
+    end
+
     executor.report_function_call(self.class.name)
 
     options = options.transform_keys { |k| k.sub(/^_/, '').to_sym }

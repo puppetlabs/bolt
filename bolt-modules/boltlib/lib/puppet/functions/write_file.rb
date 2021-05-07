@@ -32,6 +32,12 @@ Puppet::Functions.create_function(:write_file) do
     end
 
     executor = Puppet.lookup(:bolt_executor)
+
+    # executor.noop is set when using 'plan run --noop' from the CLI
+    if executor.noop
+      raise Bolt::Error.new('write_file is not supported in noop mode', 'bolt/noop-error')
+    end
+
     # Send Analytics Report
     executor.report_function_call(self.class.name)
 

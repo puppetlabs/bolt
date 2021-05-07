@@ -64,6 +64,21 @@ describe "BoltSpec::Plans" do
     expect { run_plan('plans::yaml', {}) }.not_to raise_error
   end
 
+  context 'with noop mode' do
+    it 'runs plans' do
+      expect_task('plans::noop').always_return({ 'noop' => true })
+      result = run_plan('plans::noop', {}, noop: true)
+      expect(result.ok?).to be(true)
+    end
+
+    it 'errors with unsupported plan functions' do
+      expect_command('whoami').not_be_called
+      result = run_plan('plans::noop_unsupported', {}, noop: true)
+      expect(result.ok?).to be(false)
+      expect(result.value.msg).to match(/run_command is not supported in noop mode/)
+    end
+  end
+
   context 'with commands' do
     let(:plan_name) { 'plans::command' }
     let(:return_expects) { { command: 'echo hello', params: {} } }

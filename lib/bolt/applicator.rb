@@ -165,6 +165,8 @@ module Bolt
         options = args[1].transform_keys { |k| k.sub(/^_/, '').to_sym }
       end
 
+      options[:noop] = @executor.noop
+
       plan_vars = scope.to_hash(true, true)
 
       targets = @inventory.get_targets(args[0])

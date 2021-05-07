@@ -44,6 +44,12 @@ module Bolt
           super(msg, 'bolt/plugin-loading-disabled', { 'plugin_name' => plugin_name })
         end
       end
+
+      class NoopError < PluginError
+        def initialize(msg)
+          super(msg, 'bolt/noop-error')
+        end
+      end
     end
 
     class PluginContext

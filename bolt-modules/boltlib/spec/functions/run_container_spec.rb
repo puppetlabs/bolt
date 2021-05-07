@@ -62,6 +62,14 @@ describe 'run_container' do
         .and_return(result)
     end
 
+    it 'errors in noop mode' do
+      executor.expects(:noop).returns(true)
+
+      is_expected.to run
+        .with_params(image, { 'cmd' => 'whoami', 'rm' => true })
+        .and_raise_error(Bolt::Error, /run_container is not supported in noop mode/)
+    end
+
     context 'with errors' do
       before :each do
         mock_status.stubs(:exitstatus).returns(127)

@@ -1176,7 +1176,8 @@ describe "Bolt::CLI" do
       end
 
       it "fails show with --noop" do
-        expected = "Option '--noop' can only be specified when running a task or applying manifest code"
+        expected = "Option '--noop' can only be specified when running a plan, running "\
+                   "a task, or applying manifest code"
         expect {
           cli = Bolt::CLI.new(%w[task show foo --targets bar --noop])
           cli.parse
@@ -1215,14 +1216,6 @@ describe "Bolt::CLI" do
           cli = Bolt::CLI.new(%w[plan run foo --query nodes{} --targets bar])
           cli.update_targets(cli.parse)
         }.to raise_error(Bolt::CLIError, /Only one targeting option/)
-      end
-
-      it "fails with --noop" do
-        expected = "Option '--noop' can only be specified when running a task or applying manifest code"
-        expect {
-          cli = Bolt::CLI.new(%w[plan run foo --targets bar --noop])
-          cli.parse
-        }.to raise_error(Bolt::CLIError, expected)
       end
     end
 
@@ -2358,7 +2351,7 @@ describe "Bolt::CLI" do
 
           expect(executor).not_to receive(:run_task)
 
-          expect { cli.execute(options) }.to raise_error('Task does not support noop')
+          expect { cli.execute(options) }.to raise_error("Task 'sample::no_noop' does not support noop")
         end
 
         it "errors on a task without metadata" do
@@ -2366,7 +2359,7 @@ describe "Bolt::CLI" do
 
           expect(executor).not_to receive(:run_task)
 
-          expect { cli.execute(options) }.to raise_error('Task does not support noop')
+          expect { cli.execute(options) }.to raise_error("Task 'sample::echo' does not support noop")
         end
       end
     end

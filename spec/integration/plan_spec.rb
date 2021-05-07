@@ -193,4 +193,49 @@ describe 'plans' do
       )
     end
   end
+
+  context 'in noop mode' do
+    let(:config) { { 'modulepath' => modulepath } }
+
+    around(:each) do |example|
+      with_project(config: config) do |project|
+        @project = project
+        example.run
+      end
+    end
+
+    it 'runs a plan' do
+      results = run_cli_json(%w[plan run noop --noop], project: @project)
+
+      results.each do |result|
+        expect(result['status']).to eq('success')
+        expect(result.dig('value', 'noop')).to be(true)
+      end
+    end
+
+    it 'runs a sub-plan in noop mode' do
+      results = run_cli_json(%w[plan run noop::subplans --noop], project: @project)
+
+      results.each do |result|
+        expect(result['status']).to eq('success')
+        expect(result.dig('value', 'noop')).to be(true)
+      end
+    end
+
+    it 'errors when running unsupported plan functions' do
+      results = run_cli_json(%w[plan run noop::unsupported --noop], project: @project)
+
+      expect(results['kind']).to eq('bolt/noop-error')
+      expect(results['msg']).to eq('run_command is not supported in noop mode')
+    end
+
+    it 'does not override noop mode with _noop=false metaparameter' do
+      results = run_cli_json(%w[plan run noop::metaparameter --noop], project: @project)
+
+      results.each do |result|
+        expect(result['status']).to eq('success')
+        expect(result.dig('value', 'noop')).to be(true)
+      end
+    end
+  end
 end

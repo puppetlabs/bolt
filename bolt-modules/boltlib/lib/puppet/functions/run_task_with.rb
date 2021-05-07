@@ -167,11 +167,11 @@ Puppet::Functions.create_function(:run_task_with) do
     end
 
     # Add a noop parameter if the function was called with the noop metaparameter.
-    if options[:noop]
+    if executor.noop || options[:noop]
       if task.supports_noop
         target_mapping.each_value { |params| params['_noop'] = true }
       else
-        raise with_stack(:TASK_NO_NOOP, 'Task does not support noop')
+        raise with_stack(:TASK_NO_NOOP, "Task '#{task.name}' does not support noop")
       end
     end
 

@@ -74,6 +74,7 @@ Puppet::Functions.create_function(:apply_prep) do
 
     # Unfreeze this
     options = options.slice(*%w[_run_as _required_modules])
+    options['_noop'] = true if executor.noop
 
     applicator = Puppet.lookup(:apply_executor)
 
@@ -112,6 +113,13 @@ Puppet::Functions.create_function(:apply_prep) do
             # Give plan function options precedence over inventory options
             { 'target' => t,
               'hook_proc' => hook.call(opts.merge(options), t, self) }
+          # Catch and immediately re-raise noop errors so the entire plan fails,
+          # otherwise we'll get a failing result for each target. This error is
+          # raised by the plugin module, since that's where the plugin task is
+          # loaded and where Bolt checks if it can be run in noop mode.
+          rescue Bolt::Plugin::PluginError::NoopError
+            raise
+          # Catch all other errors and create a failing result.
           rescue StandardError => e
             Bolt::Result.from_exception(t, e)
           end
@@ -133,24 +141,30 @@ Puppet::Functions.create_function(:apply_prep) do
           need_install_targets.each { |target| set_agent_feature(target) }
         end
 
-        task = applicator.custom_facts_task
-        arguments = { 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins) }
-        results = run_task(targets, task, arguments, options)
+        # If running in noop mode, skip the custom facts task. This task uses
+        # the Puppet Ruby interpreter by default, which won't be available
+        # unless the target already has the puppet-agent package installed as
+        # apply_prep does not install the puppet-agent package in noop mode.
+        unless executor.noop
+          task = applicator.custom_facts_task
+          arguments = { 'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins) }
+          results = run_task(targets, task, arguments, options)
 
-        # TODO: Standardize RunFailure type with error above
-        raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
+          # TODO: Standardize RunFailure type with error above
+          raise Bolt::RunFailure.new(results, 'run_task', task.name) unless results.ok?
 
-        results.each do |result|
-          # Log a warning if the client version is < 6
-          if unsupported_puppet?(result['clientversion'])
-            Bolt::Logger.deprecate(
-              "unsupported_puppet",
-              "Detected unsupported Puppet agent version #{result['clientversion']} on target "\
-              "#{result.target}. Bolt supports Puppet agent 6.0.0 and higher."
-            )
+          results.each do |result|
+            # Log a warning if the client version is < 6
+            if unsupported_puppet?(result['clientversion'])
+              Bolt::Logger.deprecate(
+                "unsupported_puppet",
+                "Detected unsupported Puppet agent version #{result['clientversion']} on target "\
+                "#{result.target}. Bolt supports Puppet agent 6.0.0 and higher."
+              )
+            end
+
+            inventory.add_facts(result.target, result.value)
           end
-
-          inventory.add_facts(result.target, result.value)
         end
       end
     end

@@ -361,9 +361,10 @@ module Bolt
       end
 
       if options[:noop] &&
-         !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
+         !(%w[plan task].include?(options[:subcommand]) && options[:action] == 'run') &&
+         options[:subcommand] != 'apply'
         raise Bolt::CLIError,
-              "Option '--noop' can only be specified when running a task or applying manifest code"
+              "Option '--noop' can only be specified when running a plan, running a task, or applying manifest code"
       end
 
       if options[:env_vars]

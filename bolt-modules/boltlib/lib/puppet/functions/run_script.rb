@@ -105,6 +105,11 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
+    # executor.noop is set when using 'plan run --noop' from the CLI
+    if executor.noop
+      raise Bolt::Error.new('run_script is not supported in noop mode', 'bolt/noop-error')
+    end
+
     # Send Analytics Report
     executor.report_function_call(self.class.name)
 

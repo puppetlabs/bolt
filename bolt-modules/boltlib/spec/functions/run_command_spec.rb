@@ -26,6 +26,7 @@ describe 'run_command' do
     let(:command) { 'hostname' }
     let(:result) { Bolt::Result.new(target, value: { 'stdout' => hostname }) }
     let(:result_set) { Bolt::ResultSet.new([result]) }
+
     before(:each) do
       Puppet.features.stubs(:bolt?).returns(true)
     end
@@ -73,6 +74,14 @@ describe 'run_command' do
       is_expected.to run
         .with_params(command, hostname)
         .and_return(result_set)
+    end
+
+    it 'errors in noop mode' do
+      executor.expects(:noop).returns(true)
+
+      is_expected.to run
+        .with_params(command, hostname)
+        .and_raise_error(Bolt::Error, /run_command is not supported in noop mode/)
     end
 
     context 'with description' do

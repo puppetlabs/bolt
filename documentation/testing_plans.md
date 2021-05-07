@@ -242,6 +242,51 @@ it 'asks who you are' do
 end
 ```
 
+### Running plans in no-operation mode
+
+Use the `noop` option on the `run_plan` function to run a plan in no-operation
+(no-op) mode. To run a plan in no-op mode, set the `noop` option to `true`:
+
+```ruby
+run_plan('myplan', {}, noop: true)
+```
+
+When you run a plan in no-op mode, all tasks, apply blocks, and sub-plans are
+automatically run in no-op mode. If a plan run in no-op mode invokes any of
+the following functions, the plan automatically fails:
+
+- `download_file`
+- `file::write`
+- `run_command`
+- `run_script`
+- `upload_file`
+- `write_file`
+
+Because Bolt automatically fails when these functions are called in no-op mode,
+you can write tests that ensure the action is never invoked using
+[mocks](#stubs-and-mocks). For example, the following plan invokes the
+`run_command` function:
+
+```puppet
+plan command (
+  TargetSpec $targets = 'localhost'
+) {
+  $result = run_command('touch example.txt', $targets)
+}
+```
+
+You can write a test that ensures that the plan does not invoke `run_command`
+and that the plan fails with a helpful message:
+
+```ruby
+it 'fails in no-op mode' do
+  expect_command('touch example.txt').not_be_called
+  result = run_plan('command', {}, noop: true)
+  expect(result.ok?).to be(false)
+  expect(result.value.msg).to match(/run_command is not supported in noop mode/)
+end
+```
+
 ## Stubs and mocks
 
 The `BoltSpec` library includes several functions used to mock and stub plan

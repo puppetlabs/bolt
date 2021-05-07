@@ -114,7 +114,7 @@ module BoltSpec
       @puppetdb_client ||= MockPuppetDBClient.new(Bolt::PuppetDB::Config.new({}))
     end
 
-    def run_plan(name, params)
+    def run_plan(name, params, noop: false)
       pal = Bolt::PAL.new(
         Bolt::Config::Modulepath.new(config.modulepath),
         config.hiera_config,
@@ -125,8 +125,10 @@ module BoltSpec
         config.project
       )
 
-      result = executor.with_plan_allowed_exec(name, params) do
-        pal.run_plan(name, params, executor, inventory, puppetdb_client)
+      result = executor.with_settings(noop: noop) do
+        executor.with_plan_allowed_exec(name, params) do
+          pal.run_plan(name, params, executor, inventory, puppetdb_client)
+        end
       end
 
       if executor.error_message

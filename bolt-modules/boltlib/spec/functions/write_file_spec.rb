@@ -16,6 +16,14 @@ describe 'write_file' do
     end
   end
 
+  it 'errors in noop mode' do
+    executor.expects(:noop).returns(true)
+
+    is_expected.to run
+      .with_params('example.com', 'Hello, world!', 'hello.txt')
+      .and_raise_error(Bolt::Error, /write_file is not supported in noop mode/)
+  end
+
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
 

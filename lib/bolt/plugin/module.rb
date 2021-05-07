@@ -267,6 +267,14 @@ module Bolt
         options = {}
         options[:run_as] = meta_params['_run_as'] if meta_params['_run_as']
 
+        if meta_params['_noop']
+          if task.supports_noop
+            params['_noop'] = true
+          else
+            raise Bolt::Plugin::PluginError::NoopError, "puppet_library plugin '#{task.name}' does not support noop"
+          end
+        end
+
         proc do
           apply_prep.run_task([target], task, params, options).first
         end

@@ -197,6 +197,14 @@ describe 'download_file' do
         .and_return(result_set)
     end
 
+    it 'errors in noop mode' do
+      executor.expects(:noop).returns(true)
+
+      is_expected.to run
+        .with_params(source, destination, hostname)
+        .and_raise_error(Bolt::Error, /download_file is not supported in noop mode/)
+    end
+
     context 'with description' do
       let(:message) { 'test message' }
 

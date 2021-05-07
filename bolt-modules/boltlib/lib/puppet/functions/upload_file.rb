@@ -67,6 +67,11 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
+    # executor.noop is set when using 'plan run --noop' from the CLI
+    if executor.noop
+      raise Bolt::Error.new('upload_file is not supported in noop mode', 'bolt/noop-error')
+    end
+
     # Send Analytics Report
     executor.report_function_call(self.class.name)
 

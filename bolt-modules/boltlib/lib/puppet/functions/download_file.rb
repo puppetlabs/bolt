@@ -81,6 +81,11 @@ Puppet::Functions.create_function(:download_file, Puppet::Functions::InternalFun
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
 
+    # executor.noop is set when using 'plan run --noop' from the CLI
+    if executor.noop
+      raise Bolt::Error.new('download_file is not supported in noop mode', 'bolt/noop-error')
+    end
+
     if (destination = destination.strip).empty?
       raise Bolt::ValidationError, "Destination cannot be an empty string"
     end
