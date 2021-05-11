@@ -439,10 +439,12 @@ error. Bolt merges the 'file' and 'line' keys with results unless 'file' is pres
 
 ### Returning sensitive data
 
-To return secrets from a task, use the `_sensitive` key in the output. Bolt
-will treat the result as sensitive and won't allow it to be printed to the
-console or log.
+To return secrets from a task, use the `_sensitive` key at the top level of the output. Bolt treats
+the result as sensitive and does not allow it to be printed to the console or log. Note that Bolt
+does not obfuscate data under `_sensitive` if `_sensitive` is not at the top level.  For example,
+Bolt does not treat this `user` data as sensitive: `{user: _sensitive: { carmen: sandiego } }`.
 
+This task generates a random password for user 'someone', making the password hash sensitive.
 ```ruby
 #!/opt/puppetlabs/puppet/bin/ruby
 
@@ -455,6 +457,17 @@ user_password = [*'a'..'z'].sample(10).join
 result = { user: user_name, _sensitive: { password: user_password } }
 
 puts result.to_json
+```
+
+Running the task prints:
+```
+$ bolt task run mytask -t myhost
+Started on myhost...
+Finished on myhost:
+  {
+    "user": "someone",
+    "_sensitive": "Sensitive [value redacted]"
+  }
 ```
 
 ## Supporting no-op in tasks
