@@ -153,7 +153,6 @@ module Bolt
         options[:subcommand] = nil unless COMMANDS.include?(options[:subcommand])
 
         if Bolt::Util.first_run?
-          FileUtils.mkdir_p(Bolt::Util.first_runs_free.dirname)
           FileUtils.touch(Bolt::Util.first_runs_free)
 
           if options[:subcommand].nil? && $stdout.isatty
