@@ -17,6 +17,19 @@ describe 'file::exists' do
     it 'returns whether a file exists' do
       is_expected.to run.with_params('with_files/toplevel.sh').and_return(true)
     end
+  end
+
+  context "with an executor" do
+    # *Why* didn't we use kwargs
+    let(:executor) {
+      Bolt::Executor.new(1,
+                         Bolt::Analytics::NoopClient.new,
+                         false,
+                         false,
+                         future)
+    }
+
+    include_examples 'file loading'
 
     context 'with future.file_paths enabled' do
       let(:future)  { { 'file_paths' => true } }
@@ -81,19 +94,6 @@ describe 'file::exists' do
           .and_return(false)
       end
     end
-  end
-
-  context "with an executor" do
-    # *Why* didn't we use kwargs
-    let(:executor) {
-      Bolt::Executor.new(1,
-                         Bolt::Analytics::NoopClient.new,
-                         false,
-                         false,
-                         future)
-    }
-
-    include_examples 'file loading'
   end
 
   context "without an executor" do

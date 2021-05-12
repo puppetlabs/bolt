@@ -5,8 +5,7 @@ require 'spec_helper'
 
 describe 'file::read' do
   around(:each) do |example|
-    Puppet.override({ bolt_executor: executor,
-                      future: future }) do
+    Puppet.override({ bolt_executor: executor }) do
       example.run
     end
   end
@@ -18,6 +17,18 @@ describe 'file::read' do
       is_expected.to run.with_params('with_files/toplevel.sh')
                         .and_return("with_files/files/toplevel.sh\n")
     end
+  end
+
+  context "with an executor" do
+    let(:executor) {
+      Bolt::Executor.new(1,
+                         Bolt::Analytics::NoopClient.new,
+                         false,
+                         false,
+                         future)
+    }
+
+    include_examples 'file loading'
 
     context 'with future.file_paths enabled' do
       let(:future) { { 'file_paths' => true } }
@@ -82,18 +93,6 @@ describe 'file::read' do
           .and_raise_error(/No such file or directory: .*with_files.*toplevel\.sh/)
       end
     end
-  end
-
-  context "with an executor" do
-    let(:executor) {
-      Bolt::Executor.new(1,
-                         Bolt::Analytics::NoopClient.new,
-                         false,
-                         false,
-                         future)
-    }
-
-    include_examples 'file loading'
   end
 
   context "without an executor" do
