@@ -21,7 +21,7 @@ Puppet::Functions.create_function(:'file::readable', Puppet::Functions::Internal
     executor = Puppet.lookup(:bolt_executor) {}
     executor&.report_function_call(self.class.name)
 
-    future = executor&.future || Puppet.lookup(:future) || {}
+    future = executor&.future || Puppet.lookup(:future) { {} }
     fallback = future.fetch('file_paths', false)
 
     # Find the file path if it exists, otherwise return nil
