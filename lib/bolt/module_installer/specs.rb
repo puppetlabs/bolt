@@ -55,7 +55,7 @@ module Bolt
           Invalid module specification:
           #{hash.to_yaml.lines.drop(1).join.chomp}
 
-          To read more about specifying modules, see https://pup.pt/bolt-modules
+          To read more about specifying modules, see https://pup.pt/bolt-module-specs
         MESSAGE
       end
 
