@@ -1,5 +1,40 @@
 # Changelog
 
+## Bolt 3.8.1 (2021-05-17)
+
+### Bug fixes
+
+* **Support _run_as passed to apply_prep()**
+  ([#2808](https://github.com/puppetlabs/bolt/pull/2808))
+
+  Bolt now respects the `_run_as` metaparameter when passed to the
+  `apply_prep()` plan function. This is the only supported metaparameter, and
+  takes highest precedence per the [Bolt configuration
+  precedence](https://puppet.com/docs/bolt/latest/configuring_bolt.html#configuration-precedence)
+
+* **Don't stacktrace if welcome message file can't be written**
+  ([#2814](https://github.com/puppetlabs/bolt/pull/2814))
+
+  Previously, Bolt would stacktrace if it failed to make the directory to store
+  the welcome message file in, which relies on tilde `~` expansion. Bolt now
+  falls back to a system-level path, and then omits the welcome message entirely
+  if the system-level path also fails to be created or written to.
+
+* **Do not error in `file::*` plan functions when `future` is not configured**
+  ([#2828](https://github.com/puppetlabs/bolt/pull/2828))
+
+  The `file::exists`, `file::read`, and `file::readable` plan functions no
+  longer error when invoked outside of an apply block when `future` is not
+  configured.
+
+### Documentation
+
+* **JSON output documentation**
+  ([#2773](https://github.com/puppetlabs/bolt/issues/2773))
+
+  The format for JSON output for each of Bolt's commands is [now
+  documented](https://puppet.com/docs/bolt/latest/json_output_reference.md).
+
 ## Bolt 3.8.0 (2021-05-03)
 
 ### New features
