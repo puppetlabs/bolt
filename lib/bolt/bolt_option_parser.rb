@@ -996,8 +996,8 @@ module Bolt
       separator "\n#{self.class.colorize(:cyan, 'Display options')}"
       define('--filter FILTER', 'Filter tasks and plans by a matching substring.') do |filter|
         unless /^[a-z0-9_:]+$/.match(filter)
-          msg = "Illegal characters in filter string '#{filter}'. Filters must match a legal "\
-                "task or plan name."
+          msg = "Illegal characters in filter string '#{filter}'. Filters can "\
+          "only include lowercase letters, numbers, underscores, and colons."
           raise Bolt::CLIError, msg
         end
         @options[:filter] = filter
