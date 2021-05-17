@@ -203,8 +203,6 @@ manager](https://chocolatey.org/docs/installation) installed.
     refreshenv
     ```
 
-1. Install the [PuppetBolt PowerShell module](#puppetbolt-powershell-module).
-
 1. Run a [Bolt cmdlet](bolt_cmdlet_reference.md). If you see an error message
    instead of the expected output, you might need to [add the Bolt module to
    PowerShell](troubleshooting.md#powershell-does-not-recognize-bolt-cmdlets) or
@@ -238,8 +236,6 @@ Use the Windows installer (MSI) package to install Bolt on Windows:
 
 1.  Double-click the MSI file and run the installer.
 
-1. Install the [PuppetBolt PowerShell module](#puppetbolt-powershell-module).
-
 1.  Open a new PowerShell window and run a [Bolt cmdlet](bolt_cmdlet_reference.md).
     If you see an error message instead of the expected output, you might need to
     [add the Bolt module to
@@ -259,41 +255,6 @@ You can uninstall Bolt from Windows **Apps & Features**:
 1. Press **Windows** + **X** + **F** to open **Apps & Features**.
 
 1. Search for **Puppet Bolt**, select it, and click **Uninstall**.
-
-### PuppetBolt PowerShell module
-
-The PuppetBolt PowerShell module is available on the [PowerShell
-Gallery](https://www.powershellgallery.com/packages/PuppetBolt) and includes
-help documents and [PowerShell cmdlets](bolt_cmdlet_reference.md) for running
-each of Bolt's commands. New versions of the PuppetBolt module are shipped at the
-same time as a new Bolt release.
-
-**Install PuppetBolt**
-
-To install the PuppetBolt PowerShell module, run the following command in
-PowerShell:
-
-```powershell
-Install-Module PuppetBolt
-```
-
-**Update PuppetBolt**
-
-To update the PuppetBolt PowerShell module, run the following command in
-PowerShell:
-
-```powershell
-Update-Module PuppetBolt
-```
-
-**Uninstall PuppetBolt**
-
-To uninstall the PuppetBolt PowerShell module, run the following command in
-PowerShell:
-
-```powershell
-Remove-Module PuppetBolt
-```
 
 ## Install Bolt on RHEL
 
