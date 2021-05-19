@@ -23,6 +23,10 @@ module Bolt
           Bolt::Shell::Bash.new(target, self)
         end
 
+        def reset_cwd?
+          true
+        end
+
         def container_id
           "#{@target.transport_config['remote']}:#{@target.host}"
         end

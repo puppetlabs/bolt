@@ -36,6 +36,23 @@ describe Bolt::Transport::LXD do
       expect(runner.connected?(inventory.get_target('unknownfoo'))).to eq(false)
     end
 
+    context "with run-as configured" do
+      let(:transport_config) {
+        {
+          'uri' => uri,
+          'config' => {
+            'lxd' => { 'run-as' => 'root' }
+          }
+        }
+      }
+      let(:target) { Bolt::Target.from_hash(transport_config, inventory) }
+
+      it "uses run-as user" do
+        result = lxd.run_command(target, 'whoami')
+        expect(result.value['stdout'].strip).to eq('root')
+      end
+    end
+
     include_examples 'transport api'
 
     context 'with_connection' do
@@ -77,6 +94,19 @@ describe Bolt::Transport::LXD do
 
     it "returns false if the target is not available" do
       expect(runner.connected?(inventory.get_target('unknownfoo'))).to eq(false)
+    end
+
+    context "with run-as configured" do
+      let(:run_as_config) do
+        run_as = { 'config' => { 'lxd' => { 'run-as' => 'root' } } }
+        Bolt::Util.deep_merge(transport_config, run_as)
+      end
+      let(:target) { Bolt::Target.from_hash(transport_config, inventory) }
+
+      it "uses run-as user" do
+        result = lxd.run_command(target, 'whoami')
+        expect(result.value['stdout'].strip).to eq('root')
+      end
     end
 
     include_examples 'transport api'

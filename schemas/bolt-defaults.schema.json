@@ -408,6 +408,26 @@
                 }
               ]
             },
+            "run-as": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "run-as-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "service-url": {
               "oneOf": [
                 {
@@ -422,6 +442,26 @@
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/shell-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-executable": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-password": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
                 },
                 {
                   "$ref": "#/definitions/_plugin"
@@ -574,6 +614,46 @@
                 }
               ]
             },
+            "run-as": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "run-as-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-executable": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-password": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "tmpdir": {
               "oneOf": [
                 {
@@ -720,10 +800,50 @@
                 }
               ]
             },
+            "run-as": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "run-as-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "shell-command": {
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/shell-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-executable": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-password": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
                 },
                 {
                   "$ref": "#/definitions/_plugin"
