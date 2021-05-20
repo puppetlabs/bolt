@@ -255,6 +255,66 @@ for your use case and security practices, you can manually decrypt the key by ru
 add the key to your SSH agent and *not* specify a `private-key` for Bolt to use. Bolt
 will use the agent to authenticate your connection.
 
+## Running commands with the Docker transport does not use environment variables
+
+When Bolt runs a command using the Docker transport, it shells out to the
+`docker exec` command and sets environment variables using the `--env`
+command-line option to set environment variables. When you run a command
+using the Docker transport, and the command includes environment variable
+interpolations, the environment variables are not interpolated as expected.
+
+For example, the following command:
+
+```shell
+bolt command run 'echo \"\$PHRASE\"' --env-var PHRASE=hello --targets docker://example
+```
+
+Results in output similar to:
+
+```shell
+Started on docker://example...
+Finished on docker://example:
+  $PHRASE
+Successful on 1 target: docker://example
+Ran on 1 target in 0.59 sec
+```
+
+To run commands that interpolate environment variables using the Docker
+transport, update the command to execute a new shell process and then read
+the command from a string. For example, you can update the command to:
+
+```shell
+bolt command run "/bin/sh -c 'echo \"\$PHRASE\"'" --env-var PHRASE=hello --targets docker://example
+```
+
+This results in the expected output:
+
+```shell
+Started on docker://example...
+Finished on docker://example:
+  hello
+Successful on 1 target: docker://example
+Ran on 1 target in 0.59 sec
+```
+
+You can configure the Docker transport to always execute a new shell process
+when running commands by setting the `docker.shell-command` configuration option
+in your inventory file or `bolt-defaults.yaml` file:
+
+```yaml
+# inventory.yaml
+config:
+  docker:
+    shell-command: /bin/sh -c
+```
+
+```yaml
+# bolt-defaults.yaml
+inventory-config:
+  docker:
+    shell-command: /bin/sh -c
+```
+
 ## I still need help
 
 Visit the **#bolt** channel in the [Puppet Community
