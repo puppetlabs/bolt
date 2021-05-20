@@ -23,8 +23,9 @@ describe 'apply', expensive: true do
 
   let(:apply_settings) { {} }
   let(:project)        { @project }
+  let(:project_config) { base_config }
 
-  let(:project_config) do
+  let(:base_config) do
     {
       'apply-settings' => apply_settings,
       'hiera-config'   => fixtures_path('hiera', 'empty.yaml'),
@@ -138,6 +139,20 @@ describe 'apply', expensive: true do
                                 project: project)
 
           expect(result.first).to include('status' => 'success')
+        end
+
+        context 'in a project with a name different than the directory' do
+          let(:project_config) { base_config.merge('name' => 'example') }
+
+          it 'can reference project files with Puppet file syntax' do
+            FileUtils.mkdir_p(project.path + 'files')
+            FileUtils.touch(project.path + 'files' + 'testfile')
+
+            result = run_cli_json(%W[plan run basic::project_files -t nix_agents project_name=#{project.name}],
+                                  project: project)
+
+            expect(result.first).to include('status' => 'success')
+          end
         end
 
         context 'with show_diff configured' do
