@@ -52,7 +52,7 @@ module BoltServer
     DEFAULT_BOLT_CODEDIR = '/opt/puppetlabs/server/data/orchestration-services/code'
 
     MISSING_VERSIONED_PROJECT_RESPONSE = [
-      400, Bolt::ValidationError.new('`versioned_project` is a required argument').to_json
+      400, Bolt::ValidationError.new("'versioned_project' is a required argument").to_json
     ].freeze
 
     def initialize(config)
@@ -190,7 +190,7 @@ module BoltServer
           # Create directory in cache so we can move files in.
           FileUtils.mkdir_p(path)
         else
-          return [400, Bolt::Error.new("Invalid `kind` of '#{kind}' supplied. Must be `file` or `directory`.",
+          return [400, Bolt::Error.new("Invalid kind: '#{kind}' supplied. Must be 'file' or 'directory'.",
                                        'boltserver/schema-error').to_json]
         end
       end
@@ -277,7 +277,7 @@ module BoltServer
 
     def config_from_project(versioned_project)
       project_dir = File.join(@config['projects-dir'], versioned_project)
-      raise Bolt::ValidationError, "`versioned_project`: #{project_dir} does not exist" unless Dir.exist?(project_dir)
+      raise Bolt::ValidationError, "'versioned_project': #{project_dir} does not exist" unless Dir.exist?(project_dir)
       project = Bolt::Project.create_project(project_dir)
       Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
     end
@@ -383,12 +383,12 @@ module BoltServer
         pal = pal_from_project_bolt_config(bolt_config)
         pal.in_bolt_compiler do
           mod = Puppet.lookup(:current_environment).module(module_name)
-          raise ArgumentError, "`module_name`: #{module_name} does not exist" unless mod
+          raise ArgumentError, "module_name: #{module_name} does not exist" unless mod
           mod.file(file)
         end
       end
 
-      raise ArgumentError, "`file`: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
+      raise ArgumentError, "file: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
 
       fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
       Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|

@@ -1127,7 +1127,7 @@ describe "BoltServer::TransportApp" do
       it 'returns 400 if versioned_project is not specified' do
         get('/project_file_metadatas/foo_module/foo_file')
         error = last_response.body
-        expect(error).to include("`versioned_project` is a required argument")
+        expect(error).to include("'versioned_project' is a required argument")
         expect(last_response.status).to eq(400)
       end
 
