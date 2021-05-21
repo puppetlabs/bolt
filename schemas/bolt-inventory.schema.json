@@ -101,6 +101,38 @@
                         }
                       ]
                     },
+                    "run-as": {
+                      "description": "The user to run commands as after login. The run-as user must be different than the login user.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "run-as-command": {
+                      "description": "The command to elevate permissions. Bolt appends the user and command strings to the configured `run-as-command` before running it on the target. This command must not require  aninteractive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The `run-as-command` must be specified as an array.",
+                      "oneOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
                     "service-url": {
                       "description": "The URL of the host used for API requests.",
                       "oneOf": [
@@ -115,6 +147,28 @@
                     },
                     "shell-command": {
                       "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-executable": {
+                      "description": "The executable to use when escalating to the configured `run-as` user. This is useful when you want to escalate using the configured `sudo-password`, since `run-as-command` does not use `sudo-password` or support prompting. The command executed on the target is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is experimental.**",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-password": {
+                      "description": "The password to use when changing users via `run-as`.",
                       "oneOf": [
                         {
                           "type": "string"
@@ -284,6 +338,60 @@
                       "type": "string",
                       "description": "The LXD remote host to use."
                     },
+                    "run-as": {
+                      "description": "The user to run commands as after login. The run-as user must be different than the login user.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "run-as-command": {
+                      "description": "The command to elevate permissions. Bolt appends the user and command strings to the configured `run-as-command` before running it on the target. This command must not require  aninteractive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The `run-as-command` must be specified as an array.",
+                      "oneOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-executable": {
+                      "description": "The executable to use when escalating to the configured `run-as` user. This is useful when you want to escalate using the configured `sudo-password`, since `run-as-command` does not use `sudo-password` or support prompting. The command executed on the target is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is experimental.**",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-password": {
+                      "description": "The password to use when changing users via `run-as`.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
                     "tmpdir": {
                       "description": "The directory to upload and execute temporary files on the target.",
                       "oneOf": [
@@ -452,8 +560,62 @@
                         }
                       ]
                     },
+                    "run-as": {
+                      "description": "The user to run commands as after login. The run-as user must be different than the login user.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "run-as-command": {
+                      "description": "The command to elevate permissions. Bolt appends the user and command strings to the configured `run-as-command` before running it on the target. This command must not require  aninteractive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The `run-as-command` must be specified as an array.",
+                      "oneOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
                     "shell-command": {
                       "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-executable": {
+                      "description": "The executable to use when escalating to the configured `run-as` user. This is useful when you want to escalate using the configured `sudo-password`, since `run-as-command` does not use `sudo-password` or support prompting. The command executed on the target is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is experimental.**",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-password": {
+                      "description": "The password to use when changing users via `run-as`.",
                       "oneOf": [
                         {
                           "type": "string"

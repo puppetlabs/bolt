@@ -95,4 +95,19 @@ describe Bolt::Transport::Docker, docker: true do
       expect(result.value['stdout'].strip).to eq('/bin/bash')
     end
   end
+
+  context 'with run_as specified' do
+    let(:target_data) {
+      { 'uri' => uri,
+        'config' => {
+          'docker' => { 'run-as' => 'root' }
+        } }
+    }
+    let(:target) { Bolt::Target.from_hash(target_data, inventory) }
+
+    it 'runs as the specified user' do
+      result = docker.run_command(target, 'whoami')
+      expect(result.value['stdout'].strip).to eq('root')
+    end
+  end
 end

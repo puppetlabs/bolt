@@ -884,14 +884,24 @@ describe "Bolt::CLI" do
     describe "sudo" do
       it "supports running as a user" do
         cli = Bolt::CLI.new(%w[command run --targets foo whoami --run-as root])
-        expect(cli.parse[:'run-as']).to eq('root')
+        if Bolt::Util.windows?
+          expect { cli.parse }
+            .to raise_error(Bolt::ValidationError, "run-as is not supported when using PowerShell")
+        else
+          expect(cli.parse[:'run-as']).to eq('root')
+        end
       end
     end
 
     describe "sudo-password" do
       it "accepts a password" do
         cli = Bolt::CLI.new(%w[command run uptime --sudo-password opensez --run-as alibaba --targets foo])
-        expect(cli.parse).to include('sudo-password': 'opensez')
+        if Bolt::Util.windows?
+          expect { cli.parse }
+            .to raise_error(Bolt::ValidationError, "run-as is not supported when using PowerShell")
+        else
+          expect(cli.parse).to include('sudo-password': 'opensez')
+        end
       end
     end
 

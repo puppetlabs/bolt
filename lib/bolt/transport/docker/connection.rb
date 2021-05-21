@@ -27,6 +27,10 @@ module Bolt
                      end
         end
 
+        def reset_cwd?
+          true
+        end
+
         # The full ID of the target container
         #
         # @return [String] The full ID of the target container

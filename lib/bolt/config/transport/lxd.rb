@@ -11,7 +11,7 @@ module Bolt
           cleanup
           remote
           tmpdir
-        ].freeze
+        ].concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {
           'cleanup' => true,

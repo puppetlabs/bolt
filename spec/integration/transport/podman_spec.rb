@@ -71,4 +71,19 @@ describe Bolt::Transport::Podman, podman: true do
       expect(result.value['stdout'].strip).to eq('/bin/bash')
     end
   end
+
+  context 'with run-as specified' do
+    let(:target_data) {
+      { 'uri' => uri,
+        'config' => {
+          'podman' => { 'run-as' => 'root' }
+        } }
+    }
+    let(:target) { Bolt::Target.from_hash(target_data, inventory) }
+
+    it 'uses the specified shell' do
+      result = podman.run_command(target, 'whoami')
+      expect(result.value['stdout'].strip).to eq('root')
+    end
+  end
 end

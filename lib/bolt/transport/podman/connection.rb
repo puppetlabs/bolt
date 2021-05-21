@@ -30,6 +30,10 @@ module Bolt
                      end
         end
 
+        def reset_cwd?
+          true
+        end
+
         def connect
           # We don't actually have a connection, but we do need to
           # check that the container exists and is running.
