@@ -468,6 +468,188 @@ plugins:
         message: Enter your Vault password
 ```
 
+### Share inventory between projects
+
+Because projects are used to run a specific workflow on a list of targets, it's
+common to have multiple projects that each run a different workflow on the same
+list of targets. If you have multiple projects that all use the same inventory,
+it can be useful to use a shared inventory file so you don't need to maintain
+your inventory in each project individually.
+
+#### Using the command line
+
+The simplest way to specify a shared inventory is to save the inventory file in
+an accessible location such as the Bolt user configuration directory and then
+specify the inventory file from the command line.
+
+Save the shared inventory file to
+`~/.puppetlabs/etc/bolt/shared_inventory.yaml`:
+
+```yaml
+targets:
+  - server-1.example.org
+  - server-2.example.org
+  - server-3.example.org
+config:
+  ssh:
+    user: puppet
+    password: Bolt!
+    host-key-check: false
+```
+
+Specify the shared inventory file from the command line:
+
+_\*nix shell command_
+
+```shell
+bolt inventory show --targets all --inventoryfile ~/.puppetlabs/etc/bolt/shared_inventory.yaml
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Get-BoltInventory -Targets 'all' -Inventoryfile 'C:\Users\Administrator\.puppetlabs\etc\bolt\shared_inventory.yaml'
+```
+
+#### Using the `yaml` plugin
+
+Instead of specifying the path to the shared inventory file for every command,
+you can load the shared inventory into each project's inventory dynamically.
+To do this, create an `inventory.yaml` file for each project and use the `yaml`
+plugin to load the shared inventory.
+
+Save the shared inventory file to
+`~/.puppetlabs/etc/bolt/shared_inventory.yaml`:
+
+```yaml
+targets:
+  - server-1.example.org
+  - server-2.example.org
+  - server-3.example.org
+config:
+  ssh:
+    user: puppet
+    password: Bolt!
+    host-key-check: false
+```
+
+Save an inventory file to each project that loads the shared inventory file:
+
+```yaml
+_plugin: yaml
+filepath: ~/.puppetlabs/bolt/shared_inventory.yaml
+```
+
+When the project loads the inventory, it injects the shared inventory file,
+allowing you to reference the same list of targets across multiple projects.
+
+#### Composing project-specific inventory
+
+If your projects only share some inventory in common, or have project-specific
+configuration for targets, you can use the `yaml` plugin to compose an inventory
+for each project.
+
+For example, you might have two projects where both projects run on a set of web
+servers, but one of the projects also runs on a set of database servers. Both
+projects also specify different login credentials.
+
+To compose an inventory for each project, you can save each set of targets to a
+separate shared inventory, and then reference them as needed using the `yaml`
+plugin in each project's inventory file.
+
+Save the set of web servers to
+`~/.puppetlabs/etc/bolt/server_inventory.yaml`:
+
+```yaml
+- server-1.example.org
+- server-2.example.org
+- server-3.example.org
+```
+
+Save the set of database servers to
+`~/.puppetlabs/etc/bolt/database_inventory.yaml`:
+
+```yaml
+- db-1.example.org
+- db-2.example.org
+- db-3.example.org
+```
+
+Save an inventory file to each project that loads the necessary targets:
+
+```yaml
+# ~/projects/servers/inventory.yaml
+groups:
+  - name: servers
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/server_inventory.yaml
+config:
+  ssh:
+    user: admin
+    password: admin
+```
+
+```yaml
+# ~/projects/webapp/inventory.yaml
+groups:
+  - name: servers
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/server_inventory.yaml
+  - name: databases
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/database_inventory.yaml
+config:
+  ssh:
+    user: puppet
+    password: Bolt!
+```
+
+#### Specifying target defaults
+
+Shared inventory files allow you to specify default configuration and data for
+targets that can be overridden with project-specific configuration and data. If
+you list a target multiple times in an inventory file, the first instance of the
+target in the inventory file [takes precedence](#precedence) over subsequent
+instances of the target.
+
+For example, the following inventory file includes the `example.org` target. The
+target is defined in the project's inventory file and is also defined in a
+shared inventory file with some default configuration and data.
+
+```yaml
+# ~/projects/example/inventory.yaml
+groups:
+  - name: servers
+    targets:
+      - uri: example.org
+        name: example
+        config:
+          ssh:
+            password: Bolt!
+  - name: _defaults
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/shared_inventory.yaml
+```
+
+```yaml
+# ~/.puppetlabs/etc/bolt/shared_inventory.yaml
+- uri: example.org
+  name: example
+  config:
+    ssh:
+      user: admin
+      password: Puppet!
+  vars:
+    role: server
+```
+
+Bolt uses the password `Bolt!` because the project-specific target definition
+comes before the target definition in the shared inventory.
+
 📖 **Related information**
 
 - For more information on configuration options, see [Configuring
