@@ -1,18 +1,13 @@
-# Bolt API Servers
+# Bolt Server
 
 ## Overview
-Bolt has 2 API servers which provide services to run bolt tasks and plans over SSH and WinRM. Services are exposed via APIs as described in this document. Both servers work as a standalone service - the API server for tasks is available in PE Johnson and greater as `pe-bolt-server`, while the server for plans is still in the works as the `plan-executor`. The tasks server is referred to as 'bolt server', while the plan server is referred to as 'plan executor'
+Bolt has an API service (`pe-bolt-server`) that provides the ability to run tasks and plans over SSH/WinRM, retrieve task and plan metadata, and resolve project inventory.
 
 ## Configuration
-Bolt server can be configured by defining content in HOCON format at one of the following expected configuration file path locations.
 
-**Bolt Server Config**: `/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf`
+**Bolt Server Configuration File**: `/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf`
 
-**Plan Executor Config**: `/etc/puppetlabs/plan-executor/conf.d/plan-executor.conf`
-
-**Shared Options**
-
-Most options are shared by the bolt server and plan executor applications
+**Bolt Server Options**
 - `host`: String, *optional* - Hostname for server (default "127.0.0.1").
 - `port`: Integer, *optional* - The port the bolt server will run on (default 62658).
 - `ssl-cert`: String, *required* - Path to the cert file.
@@ -21,19 +16,15 @@ Most options are shared by the bolt server and plan executor applications
 - `ssl-cipher-suites`: Array, *optional* - TLS cipher suites in order of preference ([default](#default-ssl-cipher-suites)).
 - `loglevel`: String, *optional* - Bolt log level, acceptable values are `debug`, `info`, `notice`, `warn`, `error` (default `notice`).
 - `logfile`: String, *optional* - Path to log file.
-- `whitelist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server.
-
-**Bolt Server Only Options**
+- `allowlist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server.
 - `concurrency`: Integer, *optional* - The maximum number of server threads (default `100`).
-- `projects-dir`: String, *optional* - Path to bolt-projects dir managed by code manager when serving bolt-project content for team console.
-
-**Plan Executor Only Options**
-- `modulepath`: String, *required* - The path to modules to read plans from
-- `orchestrator-url`: String, *required* - The hostname of the orchestrator service
-- `workers`: Integer, *optional* - The number of worker processes to create (default `1`).
+- `projects-dir`: String, *required* - Path to bolt-projects dir managed by code manager when serving bolt-project content.
+- `builtin-content-dir`: Array, *required* - A list of directory paths that contain built-in content for all projects.
+- `cache-dir`: String, *required* - Path to directory on disk where content will be cached.
+- `file-server-uri`: String, *required* - URI to get task/plan file content from.
 
 **Environment Variable Options**
-The following configuration options can be set with environment variables. 
+The following configuration options can be set with environment variables.
 - `BOLT_SSL_CERT`
 - `BOLT_SSL_KEY`
 - `BOLT_SSL_CA_CERT`
@@ -138,7 +129,7 @@ For example, the following runs 'sample::complex_params' task on localhost:
         "path":"/puppet/v3/file_content/tasks/sample/complex_params.ps1",
         "params":{
           "environment":"production"}
-      }   
+      }
     }]
   },
   "parameters": {
@@ -901,37 +892,6 @@ The files array is required, and contains details about the files the task needs
 - `filename`: String, *required* - File name including extension
 - `size`: Number, *optional* - Size of file in Bytes
 
-
-## Plan Executor API Endpoints
-Each API endpoint accepts a request as described below. The request body must be a JSON object.
-
-### POST /plan/run
-- `plan_name`: String, *required* - The plan to run
-- `environment`: String, *optional* - The environment the plan runs in (default: `production`)
-- `job_id`: String, *required* - The ID of the plan_job this plan runs as, from the Orchestrator database.
-- `description`: String, *optional* - A description of the plan job being run
-- `params`: Hash, *required* - Key-value pairs of parameters to pass to the plan.
-
-For example, the following runs the `canary` plan:
-```
-{
-  "plan_name" : "canary",
-  "environment": "production",
-  "job_id": "123842",
-  "description" : "Start the canary plan on node1 and node2",
-  "params" : {
-  "nodes" : ["node1.example.com", "node2.example.com"],
-  "command" : "whoami",
-  "canary" : 1
-  }
-}
-```
-#### Response
-
-If successful, this will return
-```
-{"status": "running"}
-```
 
 ## Running Bolt Server in a container
 *Recommended*
