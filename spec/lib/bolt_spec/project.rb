@@ -32,7 +32,7 @@ module BoltSpec
     # instance.
     #
     def with_project(name = 'project', **kwargs)
-      with_project_directory(name, kwargs) do |project_path|
+      with_project_directory(name, **kwargs) do |project_path|
         project = Bolt::Project.create_project(project_path)
         yield(project)
       end

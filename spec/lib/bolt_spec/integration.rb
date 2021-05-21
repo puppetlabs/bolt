@@ -40,7 +40,7 @@ module BoltSpec
     end
 
     def run_cli_json(arguments, **opts)
-      output = run_cli(arguments + ['--format', 'json'], opts)
+      output = run_cli(arguments + ['--format', 'json'], **opts)
 
       begin
         result = JSON.parse(output, quirks_mode: true)

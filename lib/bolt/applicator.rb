@@ -306,11 +306,11 @@ module Bolt
       Puppet.lookup(:current_environment).override_with(modulepath: @plugin_dirs).modules.each do |mod|
         search_dirs = yield mod
 
-        parent = Pathname.new(mod.path).parent
+        tar_dir = Pathname.new(mod.name) # goes great with fish
         files = Find.find(*search_dirs).select { |file| File.file?(file) }
 
         files.each do |file|
-          tar_path = Pathname.new(file).relative_path_from(parent)
+          tar_path = tar_dir + Pathname.new(file).relative_path_from(mod.path)
           @logger.trace("Packing plugin #{file} to #{tar_path}")
           stat = File.stat(file)
           content = File.binread(file)
