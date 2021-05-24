@@ -1,5 +1,40 @@
 # Changelog
 
+## Bolt 3.9.0 (2021-05-24)
+
+### New features
+
+* **Support run-as for container transports when running on \*nix**
+  ([#2806](https://github.com/puppetlabs/bolt/issues/2806))
+
+  The Docker, LXD, and Podman transports now support `run-as`
+  configuration and related configuration options when running on *nix
+  systems. `run-as` is not supported for any Windows systems or the
+  PowerShell shell over SSH.
+
+### Bug fixes
+
+* **Upload project plugin files to correct directory when running an
+  apply**
+  ([#2832](https://github.com/puppetlabs/bolt/issues/2832))
+
+  Project plugin files are now uploaded to the correct directory when
+  running an apply. Previously, if a project used a `Boltdir` or had a
+  directory name that did not match the project's configured name, apply
+  blocks could not correctly reference files in the project using Puppet
+  file syntax (`puppet:///modules/<project name>/<file name>`).
+
+* **Correctly set `DOCKER_HOST` environment variable when connecting
+  to remote Docker hosts**
+  ([#2813](https://github.com/puppetlabs/bolt/pull/2813))
+
+  Bolt now correctly sets the `DOCKER_HOST` environment variable when
+  the `docker.service-url` configuration is set. Previously, this
+  environment variable was not set correctly, preventing the transport
+  from connecting to remote Docker hosts.
+
+  _Contributed by [Mic Kaczmarczik](https://github.com/mpkut)_
+
 ## Bolt 3.8.1 (2021-05-17)
 
 ### Bug fixes
