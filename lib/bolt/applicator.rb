@@ -307,10 +307,11 @@ module Bolt
         search_dirs = yield mod
 
         tar_dir = Pathname.new(mod.name) # goes great with fish
+        mod_dir = Pathname.new(mod.path)
         files = Find.find(*search_dirs).select { |file| File.file?(file) }
 
         files.each do |file|
-          tar_path = tar_dir + Pathname.new(file).relative_path_from(mod.path)
+          tar_path = tar_dir + Pathname.new(file).relative_path_from(mod_dir)
           @logger.trace("Packing plugin #{file} to #{tar_path}")
           stat = File.stat(file)
           content = File.binread(file)
