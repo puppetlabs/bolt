@@ -1,14 +1,21 @@
 # Changelog
 
-## Bolt 3.9.0 (2021-05-24)
+## Bolt 3.9.0 (2021-05-25)
 
 ### New features
 
-* **Support run-as for container transports when running on \*nix**
+* **Plan functions to support fire-and-forget parallelism**
+  ([#2764](https://github.com/puppetlabs/bolt/issues/2764))
+
+  Bolt now includes two new plan functions, `background()` and `wait()`, to
+  support fire-and-forget parallelism. Read more at
+  https://pup.pt/bolt-parallelism.
+
+* **Support run-as for container transports when running on nix**
   ([#2806](https://github.com/puppetlabs/bolt/issues/2806))
 
   The Docker, LXD, and Podman transports now support `run-as`
-  configuration and related configuration options when running on *nix
+  configuration and related configuration options when running on nix
   systems. `run-as` is not supported for any Windows systems or the
   PowerShell shell over SSH.
 
