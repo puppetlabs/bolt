@@ -444,7 +444,8 @@ the result as sensitive and does not allow it to be printed to the console or lo
 does not obfuscate data under `_sensitive` if `_sensitive` is not at the top level.  For example,
 Bolt does not treat this `user` data as sensitive: `{user: _sensitive: { carmen: sandiego } }`.
 
-This task generates a random password for user 'someone', making the password hash sensitive.
+This task generates a random password for user `someone`, making the password hash sensitive.
+
 ```ruby
 #!/opt/puppetlabs/puppet/bin/ruby
 
@@ -460,6 +461,7 @@ puts result.to_json
 ```
 
 Running the task prints:
+
 ```
 $ bolt task run mytask -t myhost
 Started on myhost...
