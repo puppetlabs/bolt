@@ -830,3 +830,41 @@ The files array is required, and contains details about the files the task needs
 - `sha256`: String, *required* - Shasum of the file contents
 - `filename`: String, *required* - File name including extension
 - `size`: Number, *optional* - Size of file in Bytes
+
+## Error responses
+
+Error responses follow the standard `kind`, `msg`, `details` object structure. Some examples:
+
+```
+{
+  "kind": "bolt/unknown-plan",
+  "msg": "Could not find a plan named 'defaults'. For a list of available plans, run 'bolt plan show'.",
+  "details": {}
+}
+```
+
+```
+{
+  "kind": "bolt-server/request-error",
+  "msg": "environment: 'prod' does not exist",
+  "details": {}
+}
+```
+
+```
+{
+  "kind": "bolt-server/request-error",
+  "msg": "'environment' is a required argument",
+  "details": {}
+}
+```
+
+```
+{
+  "kind": "bolt-server/request-error",
+  "msg": "There was an error validating the request body.",
+  "details": [
+    "The property '#/target' contains additional properties [\"ssl\", \"ssl-verify\"] outside of the schema when none are allowed in schema partial:target-ssh"
+  ]
+}
+```
