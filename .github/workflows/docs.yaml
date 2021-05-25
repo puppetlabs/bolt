@@ -3,10 +3,10 @@ name: Docs
 on:
   push:
     branches: [main]
-    paths-ignore: ['**.md', 'schemas/*']
+    paths-ignore: ['schemas/*']
   pull_request:
     types: [opened, reopened, edited, synchronize]
-    paths-ignore: ['**.md', 'schemas/*']
+    paths-ignore: ['schemas/*']
 
 jobs:
 
@@ -25,3 +25,7 @@ jobs:
         run: bundle update
       - name: Generate docs
         run: bundle exec rake docs:all
+      - name: Run DITA
+        uses: dita-ot/dita-ot-action@master
+        with:
+          build: dita -i documentation/bolt.ditamap -o out -f html5 --processing-mode=strict
