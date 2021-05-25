@@ -686,7 +686,13 @@ module BoltServer
     end
 
     error Bolt::Error do |err|
-      [500, err.to_json]
+      # In order to match the request code pattern, unknown plan/task content should 400. This also
+      # gives us an opportunity to trim the message instructing users to use CLI to show available content.
+      if ['bolt/unknown-plan', 'bolt/unknown-task'].include?(err.kind)
+        [404, BoltServer::RequestError.new(err.msg.split('.').first).to_json]
+      else
+        [500, err.to_json]
+      end
     end
 
     error StandardError do

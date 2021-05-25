@@ -129,9 +129,12 @@ describe "BoltServer::TransportApp" do
       end
       context 'with non-existant plan' do
         let(:path) { '/plans/foo/bar?environment=production' }
-        it 'returns 500 if an unknown plan error is thrown' do
+        it 'returns 404 if an unknown plan error is thrown' do
           get(path)
-          expect(last_response.status).to eq(500)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a plan named 'foo::bar'")
         end
       end
     end
@@ -241,10 +244,13 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with non-existant plan' do
-        let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
-        it 'returns 400 if an unknown plan error is thrown' do
+        let(:path) { "/project_plans/foo/bar?versioned_project=bolt_server_test_project" }
+        it 'returns 404 if an unknown plan error is thrown' do
           get(path)
-          expect(last_response.status).to eq(400)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a plan named 'foo::bar'")
         end
       end
     end
@@ -386,6 +392,17 @@ describe "BoltServer::TransportApp" do
           expect(resp).to eq(expected_response)
         end
       end
+
+      context 'with non-existant task' do
+        let(:path) { "/tasks/foo/bar?environment=production" }
+        it 'returns 404 if an unknown task error is thrown' do
+          get(path)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a task named 'foo::bar'")
+        end
+      end
     end
 
     describe '/project_tasks/:module_name/:task_name' do
@@ -453,6 +470,17 @@ describe "BoltServer::TransportApp" do
           get(path)
           resp = JSON.parse(last_response.body)
           expect(resp).to eq(expected_response)
+        end
+      end
+
+      context 'with non-existant task' do
+        let(:path) { "/project_tasks/foo/bar?versioned_project=bolt_server_test_project" }
+        it 'returns 404 if an unknown task error is thrown' do
+          get(path)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a task named 'foo::bar'")
         end
       end
     end
