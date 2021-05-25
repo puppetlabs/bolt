@@ -87,25 +87,13 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
       Bolt::ResultSet.new([])
     else
-      r = if executor.in_parallel
-            require 'concurrent'
-            require 'fiber'
-            future = Concurrent::Future.execute do
-              executor.upload_file(targets,
-                                   found,
-                                   destination,
-                                   options,
-                                   Puppet::Pops::PuppetStack.top_of_stack)
+      file_line = Puppet::Pops::PuppetStack.top_of_stack
+      r = if executor.in_parallel?
+            executor.run_in_thread do
+              executor.upload_file(targets, found, destination, options, file_line)
             end
-
-            Fiber.yield('unfinished') while future.incomplete?
-            future.value || future.reason
           else
-            executor.upload_file(targets,
-                                 found,
-                                 destination,
-                                 options,
-                                 Puppet::Pops::PuppetStack.top_of_stack)
+            executor.upload_file(targets, found, destination, options, file_line)
           end
       if !r.ok && !options[:catch_errors]
         raise Bolt::RunFailure.new(r, 'upload_file', source)

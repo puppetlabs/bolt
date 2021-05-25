@@ -154,15 +154,16 @@ plugin-cache:
 > **NOTE**: The same cache and cache configuration is used for the `resolve_reference()` plan
 function.
 
-## `Parallelize()` function
+## Parallelism in Bolt plans
 
-This feature was introduced in [Bolt
+The `parallelize()` plan function was introduced in [Bolt
 2.35.0](https://github.com/puppetlabs/bolt/tree/main/CHANGELOG.md#bolt-2350-2020-11-16).
+The `background()` and `wait()` plan functions were introduced in [Bolt 3.9.0](https://github.com/puppetlabs/bolt/tree/main/CHANGELOG.md#bolt-390-2021-05-25).
 
-Bolt plan functions have always run concurrently across targets - that is, if a function takes a
-list of targets and operates on them, the function runs that step on each target in parallel. For
-example, the following plan runs `hostname` on all targets at the same time, waits for all targets
-to finish, and then runs `whoami` on all targets at the same time. 
+For context, Bolt plan functions have always run concurrently across targets - that is, if a
+function takes a list of targets and operates on them, the function runs that step on each target in
+parallel. For example, the following plan runs `hostname` on all targets at the same time, waits for
+all targets to finish, and then runs `whoami` on all targets at the same time. 
 
 ```
 # $targets = target1,target2,target3
@@ -173,7 +174,62 @@ plan myplan(TargetSpec $targets) {
 ```
 
 In the example above, `target3` has to wait for `hostname` to finish on `target1` and `target2`
-before it can run `whoami`. The experimental `parallelize()` function accepts an array and a block,
+before it can run `whoami`.
+
+While useful, this form of parallelism is limited. Bolt plans have a few methods that allow a block
+of plan steps to execute in the background while other parts of the plan execute in parallel:
+* The `background` plan function begins executing a block of code in parellel with the main plan
+  and other backgrounded code blocks. This is great for use cases where you want to start a process
+  and don't care about the results, or don't need the results until much later in the plan. This
+  function returns a [Future](bolt_types_reference.md#Future) object so that the result can be
+  accessed later in the plan.
+* The `wait` function is a sister to `background`. It accepts a Future or array of Futures and
+  blocks until they are finished, optionally with a timeout, then returns the results.
+* The `parallelize` function accepts an array and a block of plan steps, and then creates a Future
+  for each block in the array. It blocks until all the Futures have finished.
+
+These two function invocations are equivalent:
+```
+# 
+parallelize(['./file1', './file2']) |$file| {
+  file_upload($file, '/home/user/', $targets)
+  ...
+}
+
+# Is equivalent to
+['./file1', './file2'].map |$file| {
+  background() || {
+    file_upload($file,...)
+    ...
+  }
+}.wait
+```
+
+### `background()` and `wait()` plan functions
+
+The `background()` plan function creates a new Future object, and begins running the code block in
+the background in parallel with the main plan and other backgrounded code blocks. The function
+accepts an optional name for the Future to make log messages easier to follow.
+
+The code block has access to all existing variables when it's created, and has its own scope, so any
+new variables are not accessible outside the code block.
+
+Plans will return normally even when they have Futures running in the background, and those
+Futures will continue to execute in parallel. However, Bolt itself will not exit until all Futures
+have completed in order to ensure that all work is finished. Any errors raised after the calling
+plan has finished will be logged at warn level for visibility.
+
+The `wait()` plan function accepts a single Future object or an array of Futures and blocks until
+they finish, with an optional timeout. If provided a timeout, any unfinished Futures will raise a
+timeout error if they have not completed within the timeout. You can return errors
+instead of raising them by passing `_catch_errors => true` to `wait()`. The `wait()`
+function returns the results from the Future blocks once they've all finished. If a
+Future errors, Bolt only raises the error after all other Futures finish executing and
+return to `wait()`.
+
+### `parallelize()` plan function
+
+The experimental `parallelize()` function accepts an array and a block,
 and runs the entire block on each array element in parallel. Inside a parallelize block, targets can
 run subsequent plan functions before all targets have finished each step. For example, here is the
 same plan with a parallelize block:
@@ -198,16 +254,19 @@ This functionality is particularly useful for plan functions that might take a l
 targets but not on others, or for plans where some long running process might fail on a target but the
 plan author wants the plan to be able to continue quickly on successful targets.
 
-Within the parallelize block, only the following functions can run in parallel: 
+
+#### How plan functions run in parallel
+
+Within a backgrounded code block, only the following functions can run in parallel: 
 - `run_command`
 - `run_task`
 - `run_task_with`
 - `run_script`
 - `upload_file`
 - `download_file`. 
-You can run other functions from a parallelize block, but those functions will block execution
-on other targets until they complete. For example, in the following plan, Bolt can start running
-`task2` and `task3` while `task1` is still executing. However, it cannot start `task4` while
+You can run other functions from a parallelize or background block, but those functions will block
+execution on other targets until they complete. For example, in the following plan, Bolt can start
+running `task2` and `task3` while `task1` is still executing. However, it cannot start `task4` while
 `out::message` is executing on any of the targets.
 
 ```
@@ -226,16 +285,17 @@ plan myplan(TargetSpec $targets) {
 }
 ```
 
-The `parallelize()` function returns an array that contains the results of executing the block in
-the same order as the input array. You can think of `parallelize()` as a `map` function that runs in
-parallel. The 'result' of the block for a particular input is either a value passed to a `return`
-statement, the result of the last function in the block, or an error. For example, consider the
-following plan:
+#### Getting Results from parallel blocks
+The `parallelize()` and `wait()` functions return an array that contains the results of executing
+the block in the same order as the input array. You can think of them as `map` functions
+that run in parallel. The `result` of the block for a particular input is either a value passed to
+a `return` statement, the result of the last function in the block, or an error.
 
+For example, consider the following plan:
 ```
-# $ts = [target1, target2, target3]
+$ts = get_targets($targets)
 $result = parallelize($ts) |$target| {
-    if target.name == 'target1' {
+    if $target.name == 'target1' {
       return "Don't run the task on this target"
     }
     run_task('task1', $target)
@@ -246,11 +306,30 @@ $result = parallelize($ts) |$target| {
 out::message($result)
 ```
 
+Similarly, using `wait()`:
+```
+$ts = get_targets($targets)
+$futures = $ts.each |$target| {
+  background() || {
+    if $target.name == 'target1' {
+      return "Don't run the task on this target"
+    }
+    run_task('task1', $target)
+    run_command('hostname', $target)
+  }
+}
+$result = wait($futures)
+
+# This will print ["Don't run the task on this target", "target2", "target3"]
+out::message($result)
+```
+
 If any step of the block errors, Bolt stops executing the block for that target, but continues
 executing for all other targets from the input array. When the block finishes, if there is an error
 in the result array, the plan throws a `PlanFailure` and includes the entire result array in the
 `details` key of the failure. If the block is wrapped in a `catch_errors()` block, Bolt catches the
-`PlanFailure` and continues executing the plan.
+`PlanFailure` and continues to execute the plan. If you've provided `_catch_errors => true`
+to `wait()`, Bolt returns any errors raised and the plan continues to execute.
 
 ## `ResourceInstance` data type
 

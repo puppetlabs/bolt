@@ -1291,19 +1291,22 @@ describe "Bolt::CLI" do
     end
 
     describe "execute" do
+      let(:modulepath) { Bolt::Config.default.modulepath }
       let(:executor) {
         double('executor',
                noop: false,
                subscribe: nil,
                shutdown: nil,
-               in_parallel: false,
+               in_parallel?: false,
+               plan_complete?: true,
                future: {})
       }
-      let(:cli) { Bolt::CLI.new({}) }
-      let(:targets) { [target] }
-      let(:output) { StringIO.new }
+      let(:cli)         { Bolt::CLI.new({}) }
+      let(:targets)     { [target] }
+      let(:output)      { StringIO.new }
       let(:result_vals) { [{}] }
-      let(:fail_vals) { [{ '_error' => {} }] }
+      let(:fail_vals)   { [{ '_error' => {} }] }
+
       let(:result_set) do
         results = targets.zip(result_vals).map do |t, r|
           Bolt::Result.new(t, value: r)
@@ -1320,6 +1323,8 @@ describe "Bolt::CLI" do
 
       before :each do
         allow(cli).to receive(:config).and_return(Bolt::Config.default)
+        allow(executor).to receive(:report_function_call)
+        allow(executor).to receive(:report_bundled_content)
         allow(Bolt::Executor).to receive(:new).and_return(executor)
         allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
         allow(executor).to receive(:run_plan) do |scope, plan, params|
@@ -1800,7 +1805,6 @@ describe "Bolt::CLI" do
         let(:task_t) { task_type(task_name, Regexp.new(task_path), input_method) }
 
         before :each do
-          allow(executor).to receive(:report_bundled_content)
           cli.config.modulepath = fixtures_path('modules')
         end
 
@@ -2042,6 +2046,7 @@ describe "Bolt::CLI" do
       end
 
       context "when running a plan", :reset_puppet_settings do
+        let(:modulepath)  { fixtures_path('modules') }
         let(:plan_name) { +'sample::single_task' }
         let(:plan_params) { { 'nodes' => targets.map(&:host).join(',') } }
         let(:options) {
@@ -2056,9 +2061,13 @@ describe "Bolt::CLI" do
         let(:task_t) { task_type('sample::echo', %r{modules/sample/tasks/echo.sh$}, nil) }
 
         before :each do
-          allow(executor).to receive(:report_function_call)
-          allow(executor).to receive(:report_bundled_content)
-          cli.config.modulepath = fixtures_path('modules')
+          cli.config.modulepath = modulepath
+          expect(executor).to receive(:start_plan)
+          expect(executor).to receive(:log_plan)
+          expect(executor).to receive(:run_plan)
+          expect(executor).to receive(:finish_plan)
+          # Just run whatever is passed to create_future
+          expect(executor).to receive(:create_future) { |&block| block.yield }
         end
 
         context 'with TargetSpec $nodes plan param' do
@@ -2070,11 +2079,6 @@ describe "Bolt::CLI" do
               .to receive(:run_task)
               .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), kind_of(Array))
               .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task', [])]))
-
-            expect(executor).to receive(:start_plan)
-            expect(executor).to receive(:log_plan)
-            expect(executor).to receive(:run_plan)
-            expect(executor).to receive(:finish_plan)
 
             cli.execute(options)
 
@@ -2099,11 +2103,6 @@ describe "Bolt::CLI" do
               .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), kind_of(Array))
               .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task', [])]))
 
-            expect(executor).to receive(:start_plan)
-            expect(executor).to receive(:log_plan)
-            expect(executor).to receive(:run_plan)
-            expect(executor).to receive(:finish_plan)
-
             cli.execute(options)
 
             expect(JSON.parse(output.string)).to eq(
@@ -2116,18 +2115,25 @@ describe "Bolt::CLI" do
           end
         end
 
-        it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
-          options[:targets] = targets.map(&:host)
-          options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
-          regex = /A plan's 'targets' parameter can be specified using the --targets option/
-          expect { cli.execute(options) }.to raise_error(regex)
-        end
+        context "with invalid target parameters" do
+          before :each do
+            # Unset the executor plan function expectations
+            RSpec::Mocks.space.proxy_for(executor).reset
+          end
 
-        it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
-          options[:targets] = targets.map(&:host)
-          options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
-          regex = /A plan's 'targets' parameter can be specified using the --targets option/
-          expect { cli.execute(options) }.to raise_error(regex)
+          it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
+            options[:targets] = targets.map(&:host)
+            options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
+            regex = /A plan's 'targets' parameter can be specified using the --targets option/
+            expect { cli.execute(options) }.to raise_error(regex)
+          end
+
+          it "errors when the --targets option(s) and the 'targets' plan parameter are both specified" do
+            options[:targets] = targets.map(&:host)
+            options[:task_options] = { 'targets' => targets.map(&:host).join(',') }
+            regex = /A plan's 'targets' parameter can be specified using the --targets option/
+            expect { cli.execute(options) }.to raise_error(regex)
+          end
         end
 
         context "when a plan has both $targets and $nodes neither is populated with --targets" do
@@ -2135,11 +2141,6 @@ describe "Bolt::CLI" do
           it "warns when --targets does not populate both $targets and $nodes" do
             plan_params.clear
             options[:targets] = targets.map(&:host)
-
-            expect(executor).to receive(:start_plan)
-            expect(executor).to receive(:log_plan)
-            expect(executor).to receive(:run_plan)
-            expect(executor).to receive(:finish_plan)
 
             cli.execute(options)
             regex = /Plan parameters include both 'nodes' and 'targets' with type 'TargetSpec'/
@@ -2152,11 +2153,6 @@ describe "Bolt::CLI" do
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), [/single_task.pp/, 9])
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'yes', '', 0, 'some_task', [])]))
-
-          expect(executor).to receive(:start_plan)
-          expect(executor).to receive(:log_plan)
-          expect(executor).to receive(:run_plan)
-          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -2174,11 +2170,6 @@ describe "Bolt::CLI" do
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), [/single_task.pp/, 9])
             .and_raise("Could not connect to target")
 
-          expect(executor).to receive(:start_plan)
-          expect(executor).to receive(:log_plan)
-          expect(executor).to receive(:run_plan)
-          expect(executor).to receive(:finish_plan)
-
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not connect to target/)
         end
@@ -2188,11 +2179,6 @@ describe "Bolt::CLI" do
             .to receive(:run_task)
             .with(targets, task_t, { 'message' => 'hi there' }, kind_of(Hash), kind_of(Array))
             .and_return(Bolt::ResultSet.new([Bolt::Result.for_task(target, 'no', '', 1, 'some_task', ['/fail', 2])]))
-
-          expect(executor).to receive(:start_plan)
-          expect(executor).to receive(:log_plan)
-          expect(executor).to receive(:run_plan)
-          expect(executor).to receive(:finish_plan)
 
           cli.execute(options)
           expect(JSON.parse(output.string)).to eq(
@@ -2220,9 +2206,10 @@ describe "Bolt::CLI" do
 
         it "errors for non-existent plans" do
           plan_name.replace 'sample::dne'
-
-          expect(executor).to receive(:start_plan)
-          expect(executor).to receive(:finish_plan)
+          # Unset the executor plan function expectations
+          mock = RSpec::Mocks.space.proxy_for(executor)
+          mock.instance_variable_get(:@method_doubles)[:log_plan].reset
+          mock.instance_variable_get(:@method_doubles)[:run_plan].reset
 
           expect(cli.execute(options)).to eq(1)
           expect(JSON.parse(output.string)['msg']).to match(/Could not find a plan named 'sample::dne'/)
@@ -2311,10 +2298,15 @@ describe "Bolt::CLI" do
     end
 
     describe "execute with noop" do
-      let(:executor) { double('executor', noop: true, subscribe: nil, shutdown: nil, in_parallel: false) }
-      let(:cli) { Bolt::CLI.new({}) }
-      let(:targets) { [target] }
-      let(:output) { StringIO.new }
+      let(:executor) {
+        double('executor', noop: true,
+                           subscribe: nil,
+                           shutdown: nil,
+                           in_parallel?: false)
+      }
+      let(:cli)             { Bolt::CLI.new({}) }
+      let(:targets)         { [target] }
+      let(:output)          { StringIO.new }
       let(:bundled_content) { ['test'] }
 
       before :each do

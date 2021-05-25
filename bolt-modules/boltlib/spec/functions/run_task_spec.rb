@@ -413,10 +413,8 @@ describe 'run_task' do
     it 'executes in a thread if the executor is in parallel mode' do
       inventory.expects(:get_target).with(hostname).returns([target])
 
-      Concurrent::Future.expects(:execute).returns(future)
-      future.expects(:incomplete?).returns(false)
-      future.expects(:value).returns(result_set)
-      executor.expects(:in_parallel).returns(true)
+      executor.expects(:in_parallel?).returns(true)
+      executor.expects(:run_in_thread).returns(result_set)
 
       is_expected.to run
         .with_params('Test::Echo', hostname, default_args)

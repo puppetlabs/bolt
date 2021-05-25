@@ -105,6 +105,16 @@ module Bolt
     end
   end
 
+  class FutureTimeoutError < Bolt::Error
+    def initialize(name, timeout)
+      details = {
+        'future' => name
+      }
+      message = "Future '#{name}' timed out after #{timeout} seconds."
+      super(message, 'bolt/future-timeout-error', details)
+    end
+  end
+
   class ParallelFailure < Bolt::Error
     def initialize(results, failed_indices)
       details = {
@@ -162,7 +172,7 @@ module Bolt
 
   class InvalidParallelResult < Error
     def initialize(result_str, file, line)
-      super("Parallel block returned an invalid result: #{result_str}",
+      super("Background block returned an invalid result: #{result_str}",
             'bolt/invalid-plan-result',
             { 'file' => file,
               'line' => line,

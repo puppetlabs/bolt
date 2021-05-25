@@ -87,23 +87,13 @@ Puppet::Functions.create_function(:run_command) do
       call_function('debug', "Simulating run_command('#{command}') - no targets given - no action taken")
       Bolt::ResultSet.new([])
     else
-      r = if executor.in_parallel
-            require 'concurrent'
-            require 'fiber'
-            future = Concurrent::Future.execute do
-              executor.run_command(targets,
-                                   command,
-                                   options,
-                                   Puppet::Pops::PuppetStack.top_of_stack)
+      file_line = Puppet::Pops::PuppetStack.top_of_stack
+      r = if executor.in_parallel?
+            executor.run_in_thread do
+              executor.run_command(targets, command, options, file_line)
             end
-
-            Fiber.yield('unfinished') while future.incomplete?
-            future.value || future.reason
           else
-            executor.run_command(targets,
-                                 command,
-                                 options,
-                                 Puppet::Pops::PuppetStack.top_of_stack)
+            executor.run_command(targets, command, options, file_line)
           end
 
       if !r.ok && !options[:catch_errors]
