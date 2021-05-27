@@ -30,7 +30,7 @@ module BoltServer
     end
 
     def required_keys
-      super + %w[file-server-uri]
+      super + %w[file-server-uri projects-dir]
     end
 
     def service_name
