@@ -155,7 +155,7 @@ describe 'lookup' do
     end
 
     context 'with invalid plan_hierarchy' do
-      let(:hiera_config) { File.join(project, 'plan_hiera_interpolations.yaml') }
+      let(:hiera_config) { File.join(project, 'plan_hiera_facts.yaml') }
       let(:plan)         { 'test::plan_lookup' }
       let(:uri)          { 'localhost' }
 
@@ -172,107 +172,151 @@ describe 'lookup' do
   context 'command', ssh: true do
     include BoltSpec::Conn
 
-    let(:opts)   { %W[--project #{project} --hiera-config #{hiera_config} -t #{target}] }
-    let(:target) { 'puppet_7_node' }
+    context 'without --plan-hierarchy' do
+      let(:opts)   { %W[--project #{project} --hiera-config #{hiera_config} -t #{target}] }
+      let(:target) { 'puppet_7_node' }
 
-    around(:each) do |example|
-      inventory = docker_inventory.merge('vars' => { 'lookup' => 'var' }).to_json
+      around(:each) do |example|
+        inventory = docker_inventory.merge('vars' => { 'lookup' => 'var' }).to_json
 
-      env_vars = {
-        'BOLT_INVENTORY'         => inventory,
-        'BOLT_PKCS7_PUBLIC_KEY'  => File.read(File.expand_path('../keys/public_key.pkcs7.pem', project)),
-        'BOLT_PKCS7_PRIVATE_KEY' => File.read(File.expand_path('../keys/private_key.pkcs7.pem', project))
-      }
+        env_vars = {
+          'BOLT_INVENTORY'         => inventory,
+          'BOLT_PKCS7_PUBLIC_KEY'  => File.read(File.expand_path('../keys/public_key.pkcs7.pem', project)),
+          'BOLT_PKCS7_PRIVATE_KEY' => File.read(File.expand_path('../keys/private_key.pkcs7.pem', project))
+        }
 
-      with_env_vars(env_vars) do
-        example.run
+        with_env_vars(env_vars) do
+          example.run
+        end
       end
-    end
 
-    it 'looks up a value' do
-      result, = run_cli_json(%w[lookup environment] + opts)
-      expect(result).to include(
-        'object' => 'environment',
-        'value'  => { 'value' => 'environment data/common.yaml' }
-      )
-    end
-
-    context 'with interpolations' do
-      let(:hiera_config) { File.join(project, 'hiera_interpolations.yaml') }
-
-      it 'looks up a value with facts' do
-        result, = run_cli_json(%w[lookup os] + opts)
+      it 'looks up a value' do
+        result, = run_cli_json(%w[lookup environment] + opts)
         expect(result).to include(
-          'object' => 'os',
-          'value'  => { 'value' => 'os data/os/Ubuntu.yaml' }
+          'object' => 'environment',
+          'value'  => { 'value' => 'environment data/common.yaml' }
         )
       end
 
-      it 'looks up a value with vars' do
-        result, = run_cli_json(%w[lookup var] + opts)
+      context 'with interpolations' do
+        let(:hiera_config) { File.join(project, 'hiera_interpolations.yaml') }
+
+        it 'looks up a value with facts' do
+          result, = run_cli_json(%w[lookup os] + opts)
+          expect(result).to include(
+            'object' => 'os',
+            'value'  => { 'value' => 'os data/os/Ubuntu.yaml' }
+          )
+        end
+
+        it 'looks up a value with vars' do
+          result, = run_cli_json(%w[lookup var] + opts)
+          expect(result).to include(
+            'object' => 'var',
+            'value'  => { 'value' => 'var data/var.yaml' }
+          )
+        end
+
+        it 'looks up a value with a trusted fact' do
+          result, = run_cli_json(%w[lookup certname] + opts)
+          expect(result).to include(
+            'object' => 'certname',
+            'value'  => { 'value' => 'certname data/puppet_7_node.yaml' }
+          )
+        end
+
+        context 'with plan vars interpolated' do
+          let(:hiera_config) { File.join(project, 'hiera_plan_var.yaml') }
+
+          it 'looks up a value with plan vars interpolated' do
+            result = run_cli_json(%w[lookup plan_var plan_var=plan_var] + opts)
+            expect(result.first['value']['value']).to eq("plan_var data/plan_var.yaml")
+          end
+        end
+      end
+
+      it 'looks up a value in the module hierarchy' do
+        result, = run_cli_json(%w[lookup test::module] + opts)
         expect(result).to include(
-          'object' => 'var',
-          'value'  => { 'value' => 'var data/var.yaml' }
+          'object' => 'test::module',
+          'value'  => { 'value' => 'test::module modules/test/data/common.yaml' }
         )
       end
 
-      it 'looks up a value with a trusted fact' do
-        result, = run_cli_json(%w[lookup certname] + opts)
+      it 'errors with a missing key' do
+        result, = run_cli_json(%w[lookup fizzbuzz] + opts)
+
+        expect(result.dig('value', '_error', 'msg')).to eq(
+          "Function lookup() did not find a value for the name 'fizzbuzz'"
+        )
+      end
+
+      it 'looks up a value with a built-in backend' do
+        result, = run_cli_json(%w[lookup test::secret] + opts)
         expect(result).to include(
-          'object' => 'certname',
-          'value'  => { 'value' => 'certname data/puppet_7_node.yaml' }
+          'object' => 'test::secret',
+          'value'  => { 'value' => 'test::secret data/secret.eyaml' }
         )
+      end
+
+      it 'looks up a value with a custom backend' do
+        result, = run_cli_json(%w[lookup test::custom] + opts)
+        expect(result).to include(
+          'object' => 'test::custom',
+          'value'  => { 'value' => 'test::custom data/custom.txt' }
+        )
+      end
+
+      context 'with a missing backend' do
+        let(:hiera_config) { File.join(project, 'hiera_missing_backend.yaml') }
+
+        it 'returns an error' do
+          result, = run_cli_json(%w[lookup test::backends] + opts)
+          expect(result.dig('value', '_error', 'msg')).to match(
+            /Unable to find 'data_hash' function named 'missing_backend'/
+          )
+        end
+      end
+
+      it 'looks up the same value as a plan lookup' do
+        plan_result     = run_cli_json(%W[plan run #{plan} key=environment] + opts)
+        command_result, = run_cli_json(%w[lookup environment] + opts)
+
+        expect(command_result.dig('value', 'value')).to eq(plan_result)
       end
     end
 
-    it 'looks up a value in the module hierarchy' do
-      result, = run_cli_json(%w[lookup test::module] + opts)
-      expect(result).to include(
-        'object' => 'test::module',
-        'value'  => { 'value' => 'test::module modules/test/data/common.yaml' }
-      )
-    end
+    context 'with --plan-hierarchy' do
+      let(:hiera_config) { File.join(project, 'plan_hiera.yaml') }
+      let(:opts)   { %W[--project #{project} --hiera-config #{hiera_config} --plan-hierarchy] }
 
-    it 'errors with a missing key' do
-      result, = run_cli_json(%w[lookup fizzbuzz] + opts)
-
-      expect(result.dig('value', '_error', 'msg')).to eq(
-        "Function lookup() did not find a value for the name 'fizzbuzz'"
-      )
-    end
-
-    it 'looks up a value with a built-in backend' do
-      result, = run_cli_json(%w[lookup test::secret] + opts)
-      expect(result).to include(
-        'object' => 'test::secret',
-        'value'  => { 'value' => 'test::secret data/secret.eyaml' }
-      )
-    end
-
-    it 'looks up a value with a custom backend' do
-      result, = run_cli_json(%w[lookup test::custom] + opts)
-      expect(result).to include(
-        'object' => 'test::custom',
-        'value'  => { 'value' => 'test::custom data/custom.txt' }
-      )
-    end
-
-    context 'with a missing backend' do
-      let(:hiera_config) { File.join(project, 'hiera_missing_backend.yaml') }
-
-      it 'returns an error' do
-        result, = run_cli_json(%w[lookup test::backends] + opts)
-        expect(result.dig('value', '_error', 'msg')).to match(
-          /Unable to find 'data_hash' function named 'missing_backend'/
-        )
+      it 'looks up a value' do
+        result = run_cli_json(%w[lookup pop] + opts)
+        expect(result).to eq("goes the weasel")
       end
-    end
 
-    it 'looks up the same value as a plan lookup' do
-      plan_result     = run_cli_json(%W[plan run #{plan} key=environment] + opts)
-      command_result, = run_cli_json(%w[lookup environment] + opts)
+      context 'with plan variable interpolations interpolations' do
+        let(:hiera_config) { File.join(project, 'plan_hiera_var.yaml') }
 
-      expect(command_result.dig('value', 'value')).to eq(plan_result)
+        it 'looks up a value with vars interpolated' do
+          result = run_cli_json(%w[lookup var interpolate=var] + opts)
+          expect(result).to eq("var data/var.yaml")
+        end
+      end
+
+      context 'with invalid plan_hierarchy' do
+        let(:hiera_config) { File.join(project, 'plan_hiera_facts.yaml') }
+
+        it 'raises a validation error' do
+          expect { run_cli_json(%w[lookup environment] + opts) }
+            .to raise_error(Bolt::PAL::PALError, /Interpolations are not supported in lookups/)
+        end
+      end
+
+      it 'errors with a missing key' do
+        expect { run_cli_json(%w[lookup fizzbuzz] + opts) }
+          .to raise_error(Bolt::PAL::PALError, "Function lookup() did not find a value for the name 'fizzbuzz'")
+      end
     end
   end
 end

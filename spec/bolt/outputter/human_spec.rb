@@ -374,6 +374,12 @@ describe "Bolt::Outputter::Human" do
     expect(output.string).to eq(guide)
   end
 
+  it 'prints a plan-hierarchy lookup result' do
+    value = 'peanut butter'
+    outputter.print_plan_lookup(value)
+    expect(output.string.strip).to eq(value)
+  end
+
   it 'does not spin when spinner is set to false' do
     outputter.start_spin
     sleep(0.3)
@@ -439,12 +445,12 @@ describe "Bolt::Outputter::Human" do
       expect(output.string).to match(/2 total, 1 from inventory, 1 adhoc/)
     end
 
-    it 'prints suggestion to use a targetting option if one was not provided' do
+    it 'prints suggestion to use a targeting option if one was not provided' do
       outputter.print_targets(target_list, inventoryfile, nil, false)
       expect(output.string).to match(/Use the .* option to view specific targets/)
     end
 
-    it 'does not print suggestion to use a targetting option if one was provided' do
+    it 'does not print suggestion to use a targeting option if one was provided' do
       outputter.print_targets(target_list, inventoryfile, nil, true)
       expect(output.string).not_to match(/Use the .* option to view specific targets/)
     end
@@ -465,12 +471,12 @@ describe "Bolt::Outputter::Human" do
       }
     end
 
-    it 'prints suggestion to use a targetting option if one was not provided' do
+    it 'prints suggestion to use a targeting option if one was not provided' do
       outputter.print_target_info(target_list, inventoryfile, nil, false)
       expect(output.string).to match(/Use the .* option to view specific targets/)
     end
 
-    it 'does not print suggestion to use a targetting option if one was provided' do
+    it 'does not print suggestion to use a targeting option if one was provided' do
       outputter.print_target_info(target_list, inventoryfile, nil, true)
       expect(output.string).not_to match(/Use the .* option to view specific targets/)
     end

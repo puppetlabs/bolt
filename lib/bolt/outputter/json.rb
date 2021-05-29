@@ -98,6 +98,10 @@ module Bolt
         }.to_json)
       end
 
+      def print_plan_lookup(value)
+        @stream.puts(value.to_json)
+      end
+
       def print_puppetfile_result(success, puppetfile, moduledir)
         @stream.puts({ success: success,
                        puppetfile: puppetfile,

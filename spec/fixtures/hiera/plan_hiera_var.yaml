@@ -1,0 +1,5 @@
+version: 5
+
+plan_hierarchy:
+  - name: Common
+    path: "%{interpolate}.yaml"

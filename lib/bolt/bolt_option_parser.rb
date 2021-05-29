@@ -67,7 +67,7 @@ module Bolt
         { flags: OPTIONS[:global] + %w[format],
           banner: GUIDE_HELP }
       when 'lookup'
-        { flags: ACTION_OPTS + %w[hiera-config],
+        { flags: ACTION_OPTS + %w[hiera-config plan-hierarchy],
           banner: LOOKUP_HELP }
       when 'module'
         case action
@@ -407,7 +407,7 @@ module Bolt
           lookup
 
       #{colorize(:cyan, 'Usage')}
-          bolt lookup <key> {--targets TARGETS | --query QUERY | --rerun FILTER}
+          bolt lookup <key> {--targets TARGETS | --query QUERY | --rerun FILTER | --plan-hierarchy}
             [options]
 
       #{colorize(:cyan, 'Description')}
@@ -418,6 +418,7 @@ module Bolt
 
       #{colorize(:cyan, 'Examples')}
           bolt lookup password --targets servers
+          bolt lookup password --plan-hierarchy variable=value
     HELP
 
     MODULE_HELP = <<~HELP
@@ -986,6 +987,11 @@ module Bolt
              'Use --no-resolve to install modules listed in the Puppetfile without resolving modules configured',
              'in Bolt project configuration.') do |resolve|
         @options[:resolve] = resolve
+      end
+
+      separator "\n#{self.class.colorize(:cyan, 'Lookup options')}"
+      define('--plan-hierarchy', 'Look up a value with Hiera in the context of a specific plan.') do |_|
+        @options[:plan_hierarchy] = true
       end
 
       separator "\n#{self.class.colorize(:cyan, 'Plan options')}"

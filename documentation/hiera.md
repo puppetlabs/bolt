@@ -43,82 +43,6 @@ The module layer sets default values and merge behavior for a module’s class
 parameters. The module layer comes last in Hiera’s lookup order, so environment
 data set by a user overrides the default data set by the module’s author.
 
-## Look up data from the command line
-
-You can use the `bolt lookup` command and `Invoke-BoltLookup` PowerShell cmdlet
-to look up data from the command line. The `lookup` command looks up data in the
-context of a target, allowing you to interpolate target facts and variables in
-your hierarchy.
-
-> **Note:** The `bolt lookup` and `Invoke-BoltLookup` commands only look up data
-> using the `hierarchy` key in the Hiera configuration file. `plan_hierarchy`
-> is not supported from the command line.
-
-When you run the `bolt lookup` and `Invoke-BoltLookup` commands, Bolt first
-runs an `apply_prep` on each of the targets specified. This installs the
-`puppet-agent` package on the target, collects facts, and then stores the facts
-on the target to be used in interpolations.
-
-Looking up data from the command line is particularly useful if you need to
-debug a plan that includes calls to the `lookup()` function, or if you need to
-look up target-specific data such as a password for authenticating connections
-to the target.
-
-Given the following Hiera configuration at `<PROJECT DIRECTORY>/hiera.yaml`:
-
-```yaml
-# hiera.yaml
-version: 5
-
-hierarchy:
-  - name: "Per-OS defaults"
-    path: "os/%{facts.os.name}.yaml"
-  - name: "Common data"
-    path: "common.yaml"
-```
-
-And the following data source at `<PROJECT DIRECTORY>/data/os/Windows.yaml`:
-
-```yaml
-# data/os/Windows.yaml
-password: Bolt!
-```
-
-And the following data source at `<PROJECT DIRECTORY>/data/os/Ubuntu.yaml`:
-
-```yaml
-# data/os/Ubuntu.yaml
-password: Puppet!
-```
-
-You can look up the value for the `password` key from the command line using
-facts collected from your targets:
-
-_\*nix shell command_
-
-```shell
-bolt lookup password --targets windows_target,ubuntu_target
-```
-
-_PowerShell cmdlet_
-
-```powershell
-Invoke-BoltLooup -Key 'password' -Targets 'windows_target,ubuntu_target'
-```
-
-Bolt prints the value for the key to the console:
-
-```shell
-Starting: install puppet and gather facts on windows_target, ubuntu_target
-Finished: install puppet and gather facts with 0 failures in 6.7 sec
-Finished on windows_target:
-  Bolt!
-Finished on ubuntu_target:
-  Puppet!
-Successful on 2 targets: windows_target, ubuntu_target
-Ran on 2 targets
-```
-
 ## Look up data in plans
 
 You can use the [Puppet `lookup()`
@@ -365,3 +289,104 @@ plan other_plan(
 
 Bolt would error, because `$application` is not in scope in `other_plan` and the
 interpolation in the Hiera configuration would fail.
+
+## Look up data from the command line
+
+You can use the `bolt lookup` command and `Invoke-BoltLookup` PowerShell cmdlet
+to look up Hiera data from the command line.  By default, Bolt uses the `hierarchy`
+key in your `hiera.yaml` file to look up data and performs the lookup inside an apply
+block. If you need to look up data outside of an apply block, see
+[Outside apply blocks](#outside-apply-blocks).
+
+### With target context (inside apply blocks)
+
+Without additional options, the `lookup` command looks up data in the context of a target, allowing
+you to interpolate target facts and variables in your hierarchy.
+
+When you run the `bolt lookup` and `Invoke-BoltLookup` commands, Bolt first
+runs an `apply_prep` on each of the targets specified. This installs the
+`puppet-agent` package on the target, collects facts, and then stores the facts
+on the target to be used in interpolations.
+
+Looking up data from the command line is particularly useful if you need to
+debug a plan that includes calls to the `lookup()` function, or if you need to
+look up target-specific data such as a password for authenticating connections
+to the target.
+
+Given the following Hiera configuration at `<PROJECT DIRECTORY>/hiera.yaml`:
+
+```yaml
+# hiera.yaml
+version: 5
+
+hierarchy:
+  - name: "Per-OS defaults"
+    path: "os/%{facts.os.name}.yaml"
+  - name: "Common data"
+    path: "common.yaml"
+```
+
+And the following data source at `<PROJECT DIRECTORY>/data/os/Windows.yaml`:
+
+```yaml
+# data/os/Windows.yaml
+password: Bolt!
+```
+
+And the following data source at `<PROJECT DIRECTORY>/data/os/Ubuntu.yaml`:
+
+```yaml
+# data/os/Ubuntu.yaml
+password: Puppet!
+```
+
+You can look up the value for the `password` key from the command line using
+facts collected from your targets:
+
+_\*nix shell command_
+
+```shell
+bolt lookup password --targets windows_target,ubuntu_target
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltLooup -Key 'password' -Targets 'windows_target,ubuntu_target'
+```
+
+Bolt prints the value for the key to the console:
+
+```shell
+Starting: install puppet and gather facts on windows_target, ubuntu_target
+Finished: install puppet and gather facts with 0 failures in 6.7 sec
+Finished on windows_target:
+  Bolt!
+Finished on ubuntu_target:
+  Puppet!
+Successful on 2 targets: windows_target, ubuntu_target
+Ran on 2 targets
+```
+
+### With plan context (outside apply blocks)
+
+To look up data from Hiera's `plan_hierarchy` key, use the `lookup` command with
+the `--plan-hierarchy` option.  This mimics performing a lookup outside an apply block
+in a Bolt plan.
+
+Because `plan_hierarchy` values are not specific to individual targets, this command performs
+just one lookup and returns the bare value. You can't use the `--plan-hierarchy` option
+with the `--targets`, `--rerun`, or `--query` options.
+
+If your `plan_hierarchy` contains [interpolations from plan
+variables](#interpolations-outside-apply-blocks), you can pass values to interpolate to `lookup`:
+
+_\*nix shell command_
+```
+bolt lookup key --plan-hierarchy plan_var=interpolate_me
+```
+
+_PowerShell cmdlet_
+```
+Invoke-BoltLookup -Key key -PlanHierarchy plan_var=interpolate_me
+```

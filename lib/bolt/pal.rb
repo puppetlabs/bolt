@@ -163,9 +163,10 @@ module Bolt
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
-    def in_bolt_compiler
+    def in_bolt_compiler(compiler_params: {})
       # TODO: If we always call this inside a bolt_executor we can remove this here
       setup
+      compiler_params = compiler_params.merge(set_local_facts: false)
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath, facts: {}) do |pal|
         # Only load the project if it a) exists, b) has a name it can be loaded with
         Puppet.override(bolt_project: @project,
@@ -174,7 +175,7 @@ module Bolt
           # of modules, it must happen *after* we have overridden
           # bolt_project or the project will be ignored
           detect_project_conflict(@project, Puppet.lookup(:environments).get('bolt'))
-          pal.with_script_compiler(set_local_facts: false) do |compiler|
+          pal.with_script_compiler(**compiler_params) do |compiler|
             alias_types(compiler)
             register_resource_types(Puppet.lookup(:loaders)) if @resource_types
             begin
@@ -632,7 +633,21 @@ module Bolt
       Bolt::PlanResult.new(e, 'failure')
     end
 
-    def lookup(key, targets, inventory, executor, _concurrency)
+    def plan_hierarchy_lookup(key, plan_vars: {})
+      # Do a lookup with a script compiler, which uses the 'plan_hierarchy' key in
+      # Hiera config.
+      with_puppet_settings do
+        # We want all of the setup and teardown that `in_bolt_compiler` does,
+        # but also want to pass keys to the script compiler.
+        in_bolt_compiler(compiler_params: { variables: plan_vars }) do |compiler|
+          compiler.call_function('lookup', key)
+        end
+      rescue Puppet::Error => e
+        raise PALError.from_error(e)
+      end
+    end
+
+    def lookup(key, targets, inventory, executor, plan_vars: {})
       # Install the puppet-agent package and collect facts. Facts are
       # automatically added to the targets.
       in_plan_compiler(executor, inventory, nil) do |compiler|
@@ -654,21 +669,29 @@ module Bolt
 
         trusted = Puppet::Context::TrustedInformation.local(node).to_h
 
+        # Separate environment configuration from interpolation data the same
+        # way we do when compiling Puppet catalogs.
         env_conf = {
           modulepath: @modulepath.full_modulepath,
-          facts:      target.facts,
-          variables:  target.vars
+          facts:      target.facts
+        }
+
+        interpolations = {
+          variables:        plan_vars,
+          target_variables: target.vars
         }
 
         with_puppet_settings do
           Puppet::Pal.in_tmp_environment(target.name, **env_conf) do |pal|
             Puppet.override(overrides) do
               Puppet.lookup(:pal_current_node).trusted_data = trusted
-              pal.with_catalog_compiler do |compiler|
+              pal.with_catalog_compiler(**interpolations) do |compiler|
                 Bolt::Result.for_lookup(target, key, compiler.call_function('lookup', key))
               rescue StandardError => e
                 Bolt::Result.from_exception(target, e)
               end
+            rescue Puppet::Error => e
+              raise PALError.from_error(e)
             end
           end
         end

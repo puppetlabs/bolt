@@ -1,0 +1,9 @@
+---
+version: 5 
+
+defaults:
+  data_hash: yaml_data
+
+hierarchy:
+  - name: "Plan var interpolations"
+    path: "%{plan_var}.yaml"
