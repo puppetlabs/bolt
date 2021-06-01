@@ -96,6 +96,13 @@ describe "BoltSpec::Run", ssh: true do
       expect(result['status']).to eq('failure')
       expect(result['value']['kind']).to eq('bolt/run-failure')
     end
+
+    it 'runs a plan that downloads a file' do
+      result = run_plan('sample::download_file', 'nodes' => 'ssh')
+      expect(result['status']).to eq('success')
+      data = result['value'][0]
+      expect(data['value']['path']).to match(%r{^/tmp/})
+    end
   end
 
   context 'with a target that has a puppet-agent installed' do
