@@ -175,6 +175,9 @@ Puppet::Functions.create_function(:run_task_with) do
       end
     end
 
+    # Report whether the task was run in noop mode.
+    executor.report_noop_mode(executor.noop || options[:noop])
+
     if targets.empty?
       Bolt::ResultSet.new([])
     else
