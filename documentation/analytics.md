@@ -60,6 +60,7 @@ with a randomly generated, non-identifiable user UUID:
 - IDs of any deprecation warnings
 - Whether the source file for `upload_file`, `run_script`, or `file::read` plan
   functions uses an absolute path or a module path.
+- Whether a task is run in no-operation mode.
 
 ## Viewing collected data
 

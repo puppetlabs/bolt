@@ -1325,6 +1325,7 @@ describe "Bolt::CLI" do
         allow(cli).to receive(:config).and_return(Bolt::Config.default)
         allow(executor).to receive(:report_function_call)
         allow(executor).to receive(:report_bundled_content)
+        allow(executor).to receive(:report_noop_mode)
         allow(Bolt::Executor).to receive(:new).and_return(executor)
         allow(executor).to receive(:log_plan) { |_plan_name, &block| block.call }
         allow(executor).to receive(:run_plan) do |scope, plan, params|
@@ -2323,6 +2324,7 @@ describe "Bolt::CLI" do
         outputter = Bolt::Outputter::JSON.new(false, false, false, false, output)
         allow(cli).to receive(:outputter).and_return(outputter)
         allow(executor).to receive(:report_bundled_content)
+        allow(executor).to receive(:report_noop_mode)
         allow(cli).to receive(:config).and_return(Bolt::Config.default)
       end
 

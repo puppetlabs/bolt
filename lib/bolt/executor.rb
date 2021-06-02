@@ -242,6 +242,10 @@ module Bolt
       @analytics&.event('Plan', plan_function, label: label)
     end
 
+    def report_noop_mode(noop)
+      @analytics&.event('Task', 'noop', label: (!!noop).to_s)
+    end
+
     def report_apply(statement_count, resource_counts)
       data = { statement_count: statement_count }
 

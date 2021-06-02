@@ -321,6 +321,8 @@ module BoltSpec
 
       def report_yaml_plan(_plan); end
 
+      def report_noop_mode(_mode); end
+
       def shutdown; end
 
       def start_plan(_plan_context); end
