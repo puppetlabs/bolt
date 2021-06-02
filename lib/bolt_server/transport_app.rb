@@ -10,6 +10,7 @@ require 'bolt/target'
 require 'bolt_server/file_cache'
 require 'bolt_server/plugin'
 require 'bolt_server/plugin/puppet_connect_data'
+require 'bolt_server/request_error'
 require 'bolt/task/puppet_server'
 require 'json'
 require 'json-schema'
@@ -51,10 +52,6 @@ module BoltServer
     # See the `orchestrator.bolt.codedir` tk config setting.
     DEFAULT_BOLT_CODEDIR = '/opt/puppetlabs/server/data/orchestration-services/code'
 
-    MISSING_VERSIONED_PROJECT_RESPONSE = [
-      400, Bolt::ValidationError.new('`versioned_project` is a required argument').to_json
-    ].freeze
-
     def initialize(config)
       @config = config
       @schemas = Hash[REQUEST_SCHEMAS.map do |basename|
@@ -84,40 +81,29 @@ module BoltServer
       result
     end
 
-    def error_result(error)
-      {
-        'status' => 'failure',
-        'value' => { '_error' => error.to_h }
-      }
-    end
-
     def validate_schema(schema, body)
       schema_error = JSON::Validator.fully_validate(schema, body)
       if schema_error.any?
-        Bolt::Error.new("There was an error validating the request body.",
-                        'boltserver/schema-error',
-                        schema_error)
+        raise BoltServer::RequestError.new("There was an error validating the request body.",
+                                           schema_error)
       end
     end
 
     # Turns a Bolt::ResultSet object into a status hash that is fit
-    # to return to the client in a response.
-    #
-    # If the `result_set` has more than one result, the status hash
-    # will have a `status` value and a list of target `results`.
-    # If the `result_set` contains only one item, it will be returned
-    # as a single result object. Set `aggregate` to treat it as a set
-    # of results with length 1 instead.
+    # to return to the client in a response. In the case of every action
+    # *except* check_node_connections the response will be a single serialized Result.
+    # In the check_node_connections case the response will be a hash with the top level "status"
+    # of the result and the serialized individual target results.
     def result_set_to_data(result_set, aggregate: false)
+      # use ResultSet#ok method to determine status of a (potentially) aggregate result before serializing
+      result_set_status = result_set.ok ? 'success' : 'failure'
       scrubbed_results = result_set.map do |result|
         scrub_stack_trace(result.to_data)
       end
 
-      if aggregate || scrubbed_results.length > 1
-        # For actions that act on multiple targets, construct a status hash for the aggregate result
-        all_succeeded = scrubbed_results.all? { |r| r['status'] == 'success' }
+      if aggregate
         {
-          status: all_succeeded ? 'success' : 'failure',
+          status: result_set_status,
           result: scrubbed_results
         }
       else
@@ -127,33 +113,26 @@ module BoltServer
     end
 
     def run_task(target, body)
-      error = validate_schema(@schemas["action-run_task"], body)
-      return [], error unless error.nil?
-
+      validate_schema(@schemas["action-run_task"], body)
       task_data = body['task']
       task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
       parameters = body['parameters'] || {}
-      task_result = @executor.run_task(target, task, parameters)
-      task_result.each do |result|
+      @executor.run_task(target, task, parameters).each do |result|
         value = result.value
         next unless value.is_a?(Hash)
         next unless value.key?('_sensitive')
         value['_sensitive'] = value['_sensitive'].unwrap
       end
-      [task_result, nil]
     end
 
     def run_command(target, body)
-      error = validate_schema(@schemas["action-run_command"], body)
-      return [], error unless error.nil?
-
+      validate_schema(@schemas["action-run_command"], body)
       command = body['command']
-      [@executor.run_command(target, command), nil]
+      @executor.run_command(target, command)
     end
 
     def check_node_connections(targets, body)
-      error = validate_schema(@schemas["action-check_node_connections"], body)
-      return [], error unless error.nil?
+      validate_schema(@schemas["action-check_node_connections"], body)
 
       # Puppet Enterprise's orchestrator service uses the
       # check_node_connections endpoint to check whether nodes that should be
@@ -161,13 +140,11 @@ module BoltServer
       # because the endpoint is meant to be used for a single check of all
       # nodes; External implementations of wait_until_available (like
       # orchestrator's) should contact the endpoint in their own loop.
-      [@executor.wait_until_available(targets, wait_time: 0), nil]
+      @executor.wait_until_available(targets, wait_time: 0)
     end
 
     def upload_file(target, body)
-      error = validate_schema(@schemas["action-upload_file"], body)
-      return [], error unless error.nil?
-
+      validate_schema(@schemas["action-upload_file"], body)
       files = body['files']
       destination = body['destination']
       job_id = body['job_id']
@@ -190,8 +167,7 @@ module BoltServer
           # Create directory in cache so we can move files in.
           FileUtils.mkdir_p(path)
         else
-          return [400, Bolt::Error.new("Invalid `kind` of '#{kind}' supplied. Must be `file` or `directory`.",
-                                       'boltserver/schema-error').to_json]
+          raise BoltServer::RequestError, "Invalid kind: '#{kind}' supplied. Must be 'file' or 'directory'."
         end
       end
       # We need to special case the scenario where only one file was
@@ -205,17 +181,14 @@ module BoltServer
                       else
                         cache_dir
                       end
-      [@executor.upload_file(target, upload_source, destination), nil]
+      @executor.upload_file(target, upload_source, destination)
     end
 
     def run_script(target, body)
-      error = validate_schema(@schemas["action-run_script"], body)
-      return [], error unless error.nil?
-
+      validate_schema(@schemas["action-run_script"], body)
       # Download the file onto the machine.
       file_location = @file_cache.update_file(body['script'])
-
-      [@executor.run_script(target, file_location, body['arguments'])]
+      @executor.run_script(target, file_location, body['arguments'])
     end
 
     # This function is nearly identical to Bolt::Pal's `with_puppet_settings` with the
@@ -248,16 +221,14 @@ module BoltServer
       codedir = @config['environments-codedir'] || DEFAULT_BOLT_CODEDIR
       environmentpath = @config['environmentpath'] || "#{codedir}/environments"
       basemodulepath = @config['basemodulepath'] || "#{codedir}/modules:/opt/puppetlabs/puppet/modules"
-      modulepath_dirs = nil
       with_pe_pal_init_settings(codedir, environmentpath, basemodulepath) do
         environment = Puppet.lookup(:environments).get!(environment_name)
-        modulepath_dirs = environment.modulepath
+        environment.modulepath
       end
-      modulepath_dirs
     end
 
     def in_pe_pal_env(environment)
-      return [400, '`environment` is a required argument'] if environment.nil?
+      raise BoltServer::RequestError, "'environment' is a required argument" if environment.nil?
       @pal_mutex.synchronize do
         modulepath_obj = Bolt::Config::Modulepath.new(
           modulepath_from_environment(environment),
@@ -266,18 +237,16 @@ module BoltServer
         pal = Bolt::PAL.new(modulepath_obj, nil, nil)
         yield pal
       rescue Puppet::Environments::EnvironmentNotFound
-        [400, {
-          "class" => 'bolt/unknown-environment',
-          "message" => "Environment #{environment} not found"
-        }.to_json]
-      rescue Bolt::Error => e
-        [400, e.to_json]
+        raise BoltServer::RequestError, "environment: '#{environment}' does not exist"
       end
     end
 
     def config_from_project(versioned_project)
       project_dir = File.join(@config['projects-dir'], versioned_project)
-      raise Bolt::ValidationError, "`versioned_project`: #{project_dir} does not exist" unless Dir.exist?(project_dir)
+      unless Dir.exist?(project_dir)
+        raise BoltServer::RequestError,
+              "versioned_project: '#{project_dir}' does not exist"
+      end
       project = Bolt::Project.create_project(project_dir)
       Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
     end
@@ -383,12 +352,15 @@ module BoltServer
         pal = pal_from_project_bolt_config(bolt_config)
         pal.in_bolt_compiler do
           mod = Puppet.lookup(:current_environment).module(module_name)
-          raise ArgumentError, "`module_name`: #{module_name} does not exist" unless mod
+          raise BoltServer::RequestError, "module_name: '#{module_name}' does not exist" unless mod
           mod.file(file)
         end
       end
 
-      raise ArgumentError, "`file`: #{file} does not exist inside the module's 'files' directory" unless abs_file_path
+      unless abs_file_path
+        raise BoltServer::RequestError,
+              "file: '#{file}' does not exist inside the module's 'files' directory"
+      end
 
       fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
       Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
@@ -466,17 +438,15 @@ module BoltServer
       content_type :json
       body = JSON.parse(request.body.read)
 
-      error = validate_schema(@schemas["transport-ssh"], body)
-      return [400, error_result(error).to_json] unless error.nil?
+      validate_schema(@schemas["transport-ssh"], body)
 
       targets = (body['targets'] || [body['target']]).map do |target|
         make_ssh_target(target)
       end
 
-      result_set, error = method(params[:action]).call(targets, body)
-      return [400, error.to_json] unless error.nil?
+      result_set = method(params[:action]).call(targets, body)
 
-      aggregate = body['target'].nil?
+      aggregate = params[:action] == 'check_node_connections'
       [200, result_set_to_data(result_set, aggregate: aggregate).to_json]
     end
 
@@ -506,17 +476,15 @@ module BoltServer
       content_type :json
       body = JSON.parse(request.body.read)
 
-      error = validate_schema(@schemas["transport-winrm"], body)
-      return [400, error_result(error).to_json] unless error.nil?
+      validate_schema(@schemas["transport-winrm"], body)
 
       targets = (body['targets'] || [body['target']]).map do |target|
         make_winrm_target(target)
       end
 
-      result_set, error = method(params[:action]).call(targets, body)
-      return [400, error.to_json] if error
+      result_set = method(params[:action]).call(targets, body)
 
-      aggregate = body['target'].nil?
+      aggregate = params[:action] == 'check_node_connections'
       [200, result_set_to_data(result_set, aggregate: aggregate).to_json]
     end
 
@@ -534,14 +502,12 @@ module BoltServer
     #
     # @param versioned_project [String] the project to fetch the plan from
     get '/project_plans/:module_name/:plan_name' do
-      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       in_bolt_project(params['versioned_project']) do |context|
         plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
         plan_info = allowed_helper(context[:pal], plan_info, context[:config].project.plans)
         [200, plan_info.to_json]
       end
-    rescue Bolt::Error => e
-      [400, e.to_json]
     end
 
     # Fetches the metadata for a single task
@@ -561,7 +527,7 @@ module BoltServer
     #
     # @param bolt_versioned_project [String] the reference to the bolt-project directory to load task metadata from
     get '/project_tasks/:module_name/:task_name' do
-      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       in_bolt_project(params['versioned_project']) do |context|
         ps_parameters = {
           'versioned_project' => params['versioned_project']
@@ -570,8 +536,6 @@ module BoltServer
         task_info = allowed_helper(context[:pal], task_info, context[:config].project.tasks)
         [200, task_info.to_json]
       end
-    rescue Bolt::Error => e
-      [400, e.to_json]
     end
 
     # Fetches the list of plans for an environment, optionally fetching all metadata for each plan
@@ -602,7 +566,7 @@ module BoltServer
     #
     # @param versioned_project [String] the project to fetch the list of plans from
     get '/project_plans' do
-      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       in_bolt_project(params['versioned_project']) do |context|
         plans_response = plan_list(context[:pal])
 
@@ -615,8 +579,6 @@ module BoltServer
         # to bolt-server smaller/simpler.
         [200, plans_response.to_json]
       end
-    rescue Bolt::Error => e
-      [400, e.to_json]
     end
 
     # Fetches the list of tasks for an environment
@@ -638,7 +600,7 @@ module BoltServer
     #
     # @param versioned_project [String] the project to fetch the list of tasks from
     get '/project_tasks' do
-      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       in_bolt_project(params['versioned_project']) do |context|
         tasks_response = task_list(context[:pal])
 
@@ -651,34 +613,28 @@ module BoltServer
         # to bolt-server smaller/simpler.
         [200, tasks_response.to_json]
       end
-    rescue Bolt::Error => e
-      [400, e.to_json]
     end
 
     # Implements puppetserver's file_metadatas endpoint for projects.
     #
     # @param versioned_project [String] the versioned_project to fetch the file metadatas from
     get '/project_file_metadatas/:module_name/*' do
-      versioned_project = params['versioned_project']
-      return MISSING_VERSIONED_PROJECT_RESPONSE if versioned_project.nil?
+      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       file = params[:splat].first
-      metadatas = file_metadatas(versioned_project, params[:module_name], file)
+      metadatas = file_metadatas(params['versioned_project'], params[:module_name], file)
       [200, metadatas.to_json]
-    rescue Bolt::Error => e
-      [400, e.to_json]
     rescue ArgumentError => e
-      [400, e.message]
+      [500, e.message]
     end
 
     # Returns a list of targets parsed from a Project inventory
     #
     # @param versioned_project [String] the versioned_project to compute the inventory from
     post '/project_inventory_targets' do
-      return MISSING_VERSIONED_PROJECT_RESPONSE if params['versioned_project'].nil?
+      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       content_type :json
       body = JSON.parse(request.body.read)
-      error = validate_schema(@schemas["connect-data"], body)
-      return [400, error_result(error).to_json] unless error.nil?
+      validate_schema(@schemas["connect-data"], body)
       in_bolt_project(params['versioned_project']) do |context|
         if context[:config].inventoryfile &&
            context[:config].project.inventory_file.to_s !=
@@ -717,14 +673,26 @@ module BoltServer
 
         [200, target_list.to_json]
       end
-    rescue Bolt::Error => e
-      [500, e.to_json]
     end
 
     error 404 do
       err = Bolt::Error.new("Could not find route #{request.path}",
                             'boltserver/not-found')
       [404, err.to_json]
+    end
+
+    error BoltServer::RequestError do |err|
+      [400, err.to_json]
+    end
+
+    error Bolt::Error do |err|
+      # In order to match the request code pattern, unknown plan/task content should 400. This also
+      # gives us an opportunity to trim the message instructing users to use CLI to show available content.
+      if ['bolt/unknown-plan', 'bolt/unknown-task'].include?(err.kind)
+        [404, BoltServer::RequestError.new(err.msg.split('.').first).to_json]
+      else
+        [500, err.to_json]
+      end
     end
 
     error StandardError do

@@ -86,7 +86,7 @@ describe "BoltServer::TransportApp" do
       }
     end
     let(:action) { 'run_task' }
-    let(:result) { double(Bolt::Result, to_data: { status: 'test_status' }) }
+    let(:result) { double(Bolt::Result, to_data: { status: 'test_status' }, ok?: true) }
 
     before(:each) do
       allow_any_instance_of(BoltServer::TransportApp)
@@ -129,9 +129,12 @@ describe "BoltServer::TransportApp" do
       end
       context 'with non-existant plan' do
         let(:path) { '/plans/foo/bar?environment=production' }
-        it 'returns 400 if an unknown plan error is thrown' do
+        it 'returns 404 if an unknown plan error is thrown' do
           get(path)
-          expect(last_response.status).to eq(400)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a plan named 'foo::bar'")
         end
       end
     end
@@ -152,6 +155,17 @@ describe "BoltServer::TransportApp" do
           it 'returns 400 if an environment not found error is thrown' do
             get(path)
             expect(last_response.status).to eq(400)
+          end
+        end
+
+        context 'with a non existant environment' do
+          let(:path) { "/plans" }
+          it 'returns 400 if an environment query parameter not supplied' do
+            get(path)
+            expect(last_response.status).to eq(400)
+            resp = JSON.parse(last_response.body)
+            expect(resp['kind']).to eq('bolt-server/request-error')
+            expect(resp['msg']).to eq("'environment' is a required argument")
           end
         end
       end
@@ -230,10 +244,13 @@ describe "BoltServer::TransportApp" do
       end
 
       context 'with non-existant plan' do
-        let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
-        it 'returns 400 if an unknown plan error is thrown' do
+        let(:path) { "/project_plans/foo/bar?versioned_project=bolt_server_test_project" }
+        it 'returns 404 if an unknown plan error is thrown' do
           get(path)
-          expect(last_response.status).to eq(400)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a plan named 'foo::bar'")
         end
       end
     end
@@ -257,8 +274,8 @@ describe "BoltServer::TransportApp" do
           let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
           it 'returns 400 if an versioned_project not found error is thrown' do
             get(path)
-            error = last_response.body
-            expect(error).to include("#{project_dir}/not_a_real_project does not exist")
+            error = JSON.parse(last_response.body)
+            expect(error['msg']).to match(/not_a_real_project' does not exist/)
             expect(last_response.status).to eq(400)
           end
         end
@@ -266,7 +283,7 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/tasks' do
-      context 'with a non existant project' do
+      context 'with a non existant environment' do
         let(:path) { "/tasks?environment=production" }
         it 'returns just the list of task names' do
           get(path)
@@ -275,11 +292,22 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with a non existant project' do
+      context 'with a non existant environment' do
         let(:path) { "/tasks?environment=not_a_real_env" }
         it 'returns 400 if an environment not found error is thrown' do
           get(path)
           expect(last_response.status).to eq(400)
+        end
+      end
+
+      context 'with a non existant environment' do
+        let(:path) { "/tasks" }
+        it 'returns 400 if an environment query parameter not supplied' do
+          get(path)
+          expect(last_response.status).to eq(400)
+          resp = JSON.parse(last_response.body)
+          expect(resp['kind']).to eq('bolt-server/request-error')
+          expect(resp['msg']).to eq("'environment' is a required argument")
         end
       end
     end
@@ -364,6 +392,17 @@ describe "BoltServer::TransportApp" do
           expect(resp).to eq(expected_response)
         end
       end
+
+      context 'with non-existant task' do
+        let(:path) { "/tasks/foo/bar?environment=production" }
+        it 'returns 404 if an unknown task error is thrown' do
+          get(path)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a task named 'foo::bar'")
+        end
+      end
     end
 
     describe '/project_tasks/:module_name/:task_name' do
@@ -433,6 +472,17 @@ describe "BoltServer::TransportApp" do
           expect(resp).to eq(expected_response)
         end
       end
+
+      context 'with non-existant task' do
+        let(:path) { "/project_tasks/foo/bar?versioned_project=bolt_server_test_project" }
+        it 'returns 404 if an unknown task error is thrown' do
+          get(path)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a task named 'foo::bar'")
+        end
+      end
     end
 
     describe '/ssh/*' do
@@ -462,8 +512,7 @@ describe "BoltServer::TransportApp" do
 
         result = JSON.parse(last_response.body)
         regex = %r{The property '#/target' of type object matched more than one of the required schemas}
-        expect(result['value']['_error']['details'].join).to match(regex)
-        expect(result['status']).to eq('failure')
+        expect(result['details'].join).to match(regex)
       end
 
       it 'fails if no authorization is present' do
@@ -1116,8 +1165,9 @@ describe "BoltServer::TransportApp" do
 
       it 'errors when versioned_project is invalid' do
         post_to_project_inventory_targets('foo')
-        expect(last_response.status).to eq(500)
-        expect(last_response.body).to match(/foo does not exist/)
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/foo' does not exist/)
       end
     end
 
@@ -1126,30 +1176,30 @@ describe "BoltServer::TransportApp" do
 
       it 'returns 400 if versioned_project is not specified' do
         get('/project_file_metadatas/foo_module/foo_file')
-        error = last_response.body
-        expect(error).to include("`versioned_project` is a required argument")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match("'versioned_project' is a required argument")
       end
 
       it 'returns 400 if versioned_project does not exist' do
         get("/project_file_metadatas/bar/foo?versioned_project=not_a_real_project")
-        error = last_response.body
-        expect(error).to include("#{project_dir}/not_a_real_project does not exist")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_project' does not exist/)
       end
 
       it 'returns 400 if module_name does not exist' do
         get("/project_file_metadatas/bar/foo?versioned_project=#{versioned_project}")
-        error = last_response.body
-        expect(error).to include("bar does not exist")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/bar' does not exist/)
       end
 
       it 'returns 400 if file does not exist in the module' do
         get("/project_file_metadatas/project_module/not_a_real_file?versioned_project=#{versioned_project}")
-        error = last_response.body
-        expect(error).to include("not_a_real_file does not exist")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_file' does not exist/)
       end
 
       context "with a valid filepath to one file", ssh: true do
