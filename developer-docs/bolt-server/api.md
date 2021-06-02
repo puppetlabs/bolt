@@ -1,87 +1,18 @@
-# Bolt API Servers
+# Bolt Server API
 
 ## Overview
-Bolt has 2 API servers which provide services to run bolt tasks and plans over SSH and WinRM. Services are exposed via APIs as described in this document. Both servers work as a standalone service - the API server for tasks is available in PE Johnson and greater as `pe-bolt-server`, while the server for plans is still in the works as the `plan-executor`. The tasks server is referred to as 'bolt server', while the plan server is referred to as 'plan executor'
+Bolt has an API service (`pe-bolt-server`) that provides the ability to run tasks and plans over SSH/WinRM, retrieve task and plan metadata, and resolve project inventory.
 
-## Configuration
-Bolt server can be configured by defining content in HOCON format at one of the following expected configuration file path locations.
-
-**Bolt Server Config**: `/etc/puppetlabs/bolt-server/conf.d/bolt-server.conf`
-
-**Plan Executor Config**: `/etc/puppetlabs/plan-executor/conf.d/plan-executor.conf`
-
-**Shared Options**
-
-Most options are shared by the bolt server and plan executor applications
-- `host`: String, *optional* - Hostname for server (default "127.0.0.1").
-- `port`: Integer, *optional* - The port the bolt server will run on (default 62658).
-- `ssl-cert`: String, *required* - Path to the cert file.
-- `ssl-key`: String, *required* - Path to the key file.
-- `ssl-ca-cert`: String, *required* - Path to the ca cert file.
-- `ssl-cipher-suites`: Array, *optional* - TLS cipher suites in order of preference ([default](#default-ssl-cipher-suites)).
-- `loglevel`: String, *optional* - Bolt log level, acceptable values are `debug`, `info`, `notice`, `warn`, `error` (default `notice`).
-- `logfile`: String, *optional* - Path to log file.
-- `whitelist`: Array, *optional* - A list of hosts which can connect to pe-bolt-server.
-
-**Bolt Server Only Options**
-- `concurrency`: Integer, *optional* - The maximum number of server threads (default `100`).
-- `projects-dir`: String, *optional* - Path to bolt-projects dir managed by code manager when serving bolt-project content for team console.
-
-**Plan Executor Only Options**
-- `modulepath`: String, *required* - The path to modules to read plans from
-- `orchestrator-url`: String, *required* - The hostname of the orchestrator service
-- `workers`: Integer, *optional* - The number of worker processes to create (default `1`).
-
-**Environment Variable Options**
-The following configuration options can be set with environment variables. 
-- `BOLT_SSL_CERT`
-- `BOLT_SSL_KEY`
-- `BOLT_SSL_CA_CERT`
-- `BOLT_LOGLEVEL`
-- `BOLT_CONCURRENCY`
-- `BOLT_FILE_SERVER_CONN_TIMEOUT`
-- `BOLT_FILE_SERVER_URI`
-
-**Note**: Configuration options set with environment variables will override those defined in `bolt-server.conf`
-
-### Default SSL Cipher Suites
-Based on https://wiki.mozilla.org/Security/Server_Side_TLS#Modern_compatibility
-```
-ECDHE-ECDSA-AES256-GCM-SHA384
-ECDHE-RSA-AES256-GCM-SHA384
-ECDHE-ECDSA-CHACHA20-POLY1305
-ECDHE-RSA-CHACHA20-POLY1305
-ECDHE-ECDSA-AES128-GCM-SHA256
-ECDHE-RSA-AES128-GCM-SHA256
-ECDHE-ECDSA-AES256-SHA384
-ECDHE-RSA-AES256-SHA384
-ECDHE-ECDSA-AES128-SHA256
-ECDHE-RSA-AES128-SHA256
-```
-
-**Example**
-```
-bolt-server: {
-    port: 62658
-    ssl-cert: /etc/puppetlabs/bolt-server/ssl/cert.pem
-    ssl-key: /etc/puppetlabs/bolt-server/ssl/private_key.pem
-    ssl-ca-cert: /etc/puppetlabs/bolt-server/ssl/ca.pem
-}
-```
-
-## Bolt Server API Endpoints
-Each API endpoint accepts a request as described below. The request body must be a JSON object.
-
-### POST /ssh/run_task
+## POST /ssh/run_task
 - `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
 - `task`: [Task Object](#task-object), *required* - Task to run on target.
 - `parameters`: Object, *optional* - JSON formatted parameters to be provided to task.
 
-For example, the following runs the 'echo' task on linux_target.net:
+For example, the following runs the 'echo' task on linux-target.example.com:
 ```
 {
   "target": {
-    "hostname": "linux_target.net",
+    "hostname": "linux-target.example.com",
     "user": "marauder",
     "password": "I solemnly swear that I am up to no good",
     "host-key-check": false,
@@ -107,21 +38,21 @@ For example, the following runs the 'echo' task on linux_target.net:
 }
 ```
 
-#### Response
+### Response
 If the task runs, the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
 
-### POST /winrm/run_task
+## POST /winrm/run_task
 - `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
 - `task`: [Task Object](#task-object), *required* - Task to run on target.
 - `parameters`: Object, *optional* - JSON formatted parameters to be provided to task.
 
-For example, the following runs 'sample::complex_params' task on localhost:
+For example, the following runs 'sample::complex\_params' task on windows-target.example.com:
 ```
 {
   "target": {
-    "hostname": "windows_target.net",
+    "hostname": "windows-target.example.com",
     "user": "Administrator",
     "password": "Secret",
     "ssl": false,
@@ -138,7 +69,7 @@ For example, the following runs 'sample::complex_params' task on localhost:
         "path":"/puppet/v3/file_content/tasks/sample/complex_params.ps1",
         "params":{
           "environment":"production"}
-      }   
+      }
     }]
   },
   "parameters": {
@@ -147,21 +78,20 @@ For example, the following runs 'sample::complex_params' task on localhost:
 }
 ```
 
-#### Response
+### Response
 If the task runs, the response will have status 200.
 The response will be a standard bolt Result JSON object.
 
 
-
-### POST /ssh/run_command
+## POST /ssh/run_command
 - `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
 - `command`: String, *required* - Command to run on target.
 
-For example, the following runs "echo 'hi'" on linux_target.net:
+For example, the following runs "echo 'hi'" on linux-target.example.com:
 ```
 {
   "target": {
-    "hostname": "linux_target.net",
+    "hostname": "linux-target.example.com",
     "user": "marauder",
     "password": "I solemnly swear that I am up to no good",
     "host-key-check": false,
@@ -171,15 +101,15 @@ For example, the following runs "echo 'hi'" on linux_target.net:
 }
 ```
 
-### POST /winrm/run_command
+## POST /winrm/run_command
 - `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
 - `command`: String, *required* - Command to run on target.
 
-For example, the following runs "echo 'hi'" on localhost:
+For example, the following runs "echo 'hi'" on windows-target.example.com:
 ```
 {
   "target": {
-    "hostname": "windows_target.net",
+    "hostname": "windows-target.example.com",
     "user": "Administrator",
     "password": "Secret",
     "ssl": false,
@@ -189,7 +119,7 @@ For example, the following runs "echo 'hi'" on localhost:
 }
 ```
 
-### POST /ssh/upload_file
+## POST /ssh/upload_file
 - `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run task on.
 - `files`: Object, *required* - Which file(s) to upload, and where.
     - `relative_path`: String, *required* - The destination for the file.
@@ -201,11 +131,11 @@ For example, the following runs "echo 'hi'" on localhost:
 - `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files might be returned.
 - `destination`: String, *required* - Where to put the files on the target machine.
 
-For example, the following uploads file 'abc' on linux_target.net:
+For example, the following uploads file 'abc' on linux-target.example.com:
 ```
 {
   "target": {
-    "hostname": "linux_target.net",
+    "hostname": "linux-target.example.com",
     "user": "marauder",
     "password": "I solemnly swear that I am up to no good",
     "host-key-check": false,
@@ -225,7 +155,7 @@ For example, the following uploads file 'abc' on linux_target.net:
 }
 ```
 
-### POST /winrm/upload_file
+## POST /winrm/upload_file
 - `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run task on.
 - `files`: Object, *required* - Which file(s) to upload, and where.
     - `relative_path`: String, *required* - The destination for the file.
@@ -237,11 +167,11 @@ For example, the following uploads file 'abc' on linux_target.net:
 - `job_id`: Integer, *required* - An identifier for the job. If this matches an existing ID, cached files might be returned.
 - `destination`: String, *required* - Where to put the files on the target machine.
 
-For example, the following uploads file 'abc' on windows_target.net:
+For example, the following uploads file 'abc' on windows-target.example.com:
 ```
 {
   "target": {
-    "hostname": "windows_target.net",
+    "hostname": "windows-target.example.com",
     "user": "Administrator",
     "password": "Secret",
     "ssl": false,
@@ -261,7 +191,7 @@ For example, the following uploads file 'abc' on windows_target.net:
 }
 ```
 
-### POST /ssh/run_script
+## POST /ssh/run_script
 - `target`: [SSH Target Object](#ssh-target-object), *required* - Target information to run script on.
 - `script`: Object, *required* - The script being executed.
     - `filename`: String, *required* - The destination for the script on the target.
@@ -271,11 +201,11 @@ For example, the following uploads file 'abc' on windows_target.net:
     - `sha256`: String, *required* - The SHA256 value for the script.
 - `arguments`: Array, *optional* - Which arguments to pass to the script.
 
-For example, the following runs script 'file.sh' on linux_target.net:
+For example, the following runs script 'file.sh' on linux-target.example.com:
 ```
 {
   "target": {
-    "hostname": "linux_target.net",
+    "hostname": "linux-target.example.com",
     "user": "marauder",
     "password": "I solemnly swear that I am up to no good",
     "host-key-check": false,
@@ -293,7 +223,7 @@ For example, the following runs script 'file.sh' on linux_target.net:
 }
 ```
 
-### POST /winrm/run_script
+## POST /winrm/run_script
 - `target`: [WinRM Target Object](#winrm-target-object), *required* - Target information to run script on.
 - `script`: Object, *required* - The script being executed.
     - `filename`: String, *required* - The destination for the script on the target.
@@ -303,11 +233,11 @@ For example, the following runs script 'file.sh' on linux_target.net:
     - `sha256`: String, *required* - The SHA256 value for the script.
 - `arguments`: Array, *optional* - Which arguments to pass to the script.
 
-For example, the following runs script 'file.sh' on windows_target.net:
+For example, the following runs script 'file.sh' on windows-target.example.com:
 ```
 {
   "target": {
-    "hostname": "windows_target.net",
+    "hostname": "windows-target.example.com",
     "user": "Administrator",
     "password": "Secret",
     "ssl": false,
@@ -325,7 +255,7 @@ For example, the following runs script 'file.sh' on windows_target.net:
 }
 ```
 
-### POST /ssh/check_node_connections
+## POST /ssh/check_node_connections
 - `targets`: An array of [SSH Target Objects](#ssh-target-object), *required* - A set of targets to check once for connectivity over SSH.
 
 Example request for a single connectivity check on two nodes over SSH:
@@ -333,13 +263,13 @@ Example request for a single connectivity check on two nodes over SSH:
 {
   "targets": [
       {
-        "hostname": "first.ssh_node.net",
+        "hostname": "first-sshnode.example.com",
         "user": "marauder",
         "password": "I solemnly swear that I am up to no good",
         "host-key-check": false,
         "run-as": "george_weasley"
       }, {
-        "hostname": "second.ssh_node.net",
+        "hostname": "second-sshnode.example.com",
         "user": "marauder",
         "password": "I solemnly swear that I am up to no good",
         "host-key-check": false,
@@ -348,7 +278,7 @@ Example request for a single connectivity check on two nodes over SSH:
   ]
 }
 ```
-#### Response
+### Response
 
 This returns a JSON object of the shape:
 ```
@@ -371,24 +301,24 @@ This returns a JSON object of the shape:
 - This endpoint returns 200 when the checks were successfully conducted, even if some or all of the individual checks failed.
 - If at least one check failed, the parent result `status` will be set to `failure`.
 
-### POST /winrm/check_node_connections
+## POST /winrm/check_node_connections
 - `targets`: An array of [WinRM Target Objects](#winrm-target-object), *required* - A set of targets to check once for connectivity over WinRM.
 
 This endpoint behaves identically to the /ssh/check_node_connections endpoint, but acts over WinRM instead.
 
-### POST /project_inventory_targets
+## POST /project_inventory_targets
 
 This endpoint parses a project inventory and returns a list of target hashes. Note that the only accepetable inventory file location is the default `inventory.yaml` at the root of the project.
 
-#### Query parameters
+### Query parameters
 
 - `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
-#### POST body
+### POST body
 
 - `connect_data`: Hash, *required* - Data for the Connect plugin to look up. Keys are the lookup in the inventory file which points to a hash with a required "value" key that points to the value to look up.
 
-#### Request
+### Request
 
 ```
 {
@@ -400,7 +330,7 @@ This endpoint parses a project inventory and returns a list of target hashes. No
 }
 ```
 
-#### Response
+### Response
 
 Returns a list of targets parsed from project inventory
 ```
@@ -441,10 +371,10 @@ Returns a list of targets parsed from project inventory
 
 
 ```
-### GET /tasks
+## GET /tasks
 - `environment`: String
 
-#### Response
+### Response
 
 This returns a JSON array of this shape:
 
@@ -459,10 +389,10 @@ This returns a JSON array of this shape:
 ]
 ```
 
-### GET /tasks/:module/:taskname
+## GET /tasks/:module/:taskname
 - `environment`: String
 
-#### Response
+### Response
 
 This returns a JSON object of this shape:
 
@@ -573,10 +503,10 @@ This returns a JSON object of this shape:
 }
 ```
 
-### GET /project_tasks
+## GET /project_tasks
 - `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
-#### Response
+### Response
 
 ```
 [
@@ -591,10 +521,10 @@ This returns a JSON object of this shape:
 ]
 ```
 
-### GET /project_tasks/:module_name/:task_name
+## GET /project_tasks/:module_name/:task_name
 - `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
-#### Response
+### Response
 
 ```
 {
@@ -704,10 +634,10 @@ This returns a JSON object of this shape:
 }
 ```
 
-### GET /plans
+## GET /plans
 - `environment`: String
 
-#### Response
+### Response
 
 This returns a JSON array of this shape:
 
@@ -722,10 +652,10 @@ This returns a JSON array of this shape:
 ]
 ```
 
-### GET /plans/:module/:planname
+## GET /plans/:module/:planname
 - `environment`: String
 
-#### Response
+### Response
 
 This returns a JSON object of this shape:
 
@@ -743,10 +673,10 @@ This returns a JSON object of this shape:
 
 ```
 
-### GET /project_plans
+## GET /project_plans
 - `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
-#### Response
+### Response
 
 ```
 [
@@ -761,10 +691,10 @@ This returns a JSON object of this shape:
 ]
 ```
 
-### GET /project_plans/:module_name/:plan_name
+## GET /project_plans/:module_name/:plan_name
 - `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
-#### Response
+### Response
 
 ```
 {
@@ -781,10 +711,10 @@ This returns a JSON object of this shape:
 
 ```
 
-### GET /project_file_metadatas/:module_name/path/to/file
+## GET /project_file_metadatas/:module_name/path/to/file
 - `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
 
-#### Response
+### Response
 
 ```
 [
@@ -901,149 +831,40 @@ The files array is required, and contains details about the files the task needs
 - `filename`: String, *required* - File name including extension
 - `size`: Number, *optional* - Size of file in Bytes
 
+## Error responses
 
-## Plan Executor API Endpoints
-Each API endpoint accepts a request as described below. The request body must be a JSON object.
+Error responses follow the standard `kind`, `msg`, `details` object structure. Some examples:
 
-### POST /plan/run
-- `plan_name`: String, *required* - The plan to run
-- `environment`: String, *optional* - The environment the plan runs in (default: `production`)
-- `job_id`: String, *required* - The ID of the plan_job this plan runs as, from the Orchestrator database.
-- `description`: String, *optional* - A description of the plan job being run
-- `params`: Hash, *required* - Key-value pairs of parameters to pass to the plan.
-
-For example, the following runs the `canary` plan:
 ```
 {
-  "plan_name" : "canary",
-  "environment": "production",
-  "job_id": "123842",
-  "description" : "Start the canary plan on node1 and node2",
-  "params" : {
-  "nodes" : ["node1.example.com", "node2.example.com"],
-  "command" : "whoami",
-  "canary" : 1
-  }
+  "kind": "bolt/unknown-plan",
+  "msg": "Could not find a plan named 'defaults'. For a list of available plans, run 'bolt plan show'.",
+  "details": {}
 }
 ```
-#### Response
-
-If successful, this will return
-```
-{"status": "running"}
-```
-
-## Running Bolt Server in a container
-*Recommended*
-
-From your checkout of bolt, start the spec docker-compose to run puppet-server and some targets then
-run the bolt server docker compose file to start bolt-server connected to that network.
 
 ```
-docker-compose -f spec/docker-compose.yml up -d --build
-docker-compose -f ./docker-compose-bolt-server.yml up --build
+{
+  "kind": "bolt-server/request-error",
+  "msg": "environment: 'prod' does not exist",
+  "details": {}
+}
 ```
 
-Setup your environment for running commands with
 ```
-export BOLT_CACERT=spec/fixtures/ssl/ca.pem
-export BOLT_CERT=spec/fixtures/ssl/cert.pem
-export BOLT_KEY=spec/fixtures/ssl/key.pem
-export BOLT_ROOT=https://localhost:62658
-```
-
-You can now make a curl request to bolt which should have an empty response
-```
-curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
+{
+  "kind": "bolt-server/request-error",
+  "msg": "'environment' is a required argument",
+  "details": {}
+}
 ```
 
-## Running from source
-
-From your checkout of bolt, run
-
 ```
-BOLT_SERVER_CONF=config/local.conf bundle exec puma -C puppet_config.rb
-```
-
-Setup your environment for running commands with
-```
-export BOLT_CACERT=spec/fixtures/ssl/ca.pem
-export BOLT_CERT=spec/fixtures/ssl/cert.pem
-export BOLT_KEY=spec/fixtures/ssl/key.pem
-export BOLT_ROOT=https://localhost:62658
-```
-
-You can now make a curl request to bolt which should have an empty response
-```
-curl -v --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT
-```
-
-## Making requests
-
-### With the ruby client
-
-There is a simple ruby client that can be used to make requests to a local
-bolt server during development at `scripts/server_client.rb`. This server
-expects to use the puppet-server container and target nodes from bolts spec
-environment so follow instructions in the [running in a
-container](#running-in-a-container) section first!
-
-```
-bundle exec scripts/server_client.rb sample::echo <TARGET> '{"message": "hey"}'
-```
-
-Where `<TARGET>` is either:
-* A vmpooler VM. To use this, replace `<TARGET>` above with the hostname.
-* One of the containers brought up by the `docker-compose` in the `spec` directory. To use these, you'll want to:
-
-    * get the IP that the **bolt-server container** believes it is hosted on (for example the IP of the developer laptop hosting the bolt-server container):
-      ```
-      bolt command run "/sbin/ip route" -t docker://bolt_boltserver_1 | awk '/default/ { print $3 }'
-      # Should return an IP such as 172.20.0.1
-      ```
-    * Append the port of one of the 3 containers to that IP: `20022` (for an ubuntu node with no agent), `20023` (for a puppet 5 agent), or `20024` (for a puppet 6 agent). It's also helpful to include the protocol (`ssh`), user (`bolt`), and password (`bolt`) in the URI.
-
-So your request will be something like:
-```
-bundle exec scripts/server_client.rb sample::echo ssh://bolt:bolt@172.20.0.1:20022 '{"message": "hey"}'
-```
-
-**Note**: All tasks in the `bolt/spec/fixtures/modules` directory will be available from the puppetserver container to run.
-
-### With cURL
-
-The following is an example request body. There are other request examples in the `developer-docs/examples` directory. Note that all tasks in the `bolt/spec/fixtures/modules` are available from the puppetserver container, so a JSON request can be constructed using those tasks and the JSON structure below.
-
-```
-{"task":{
-  "metadata":{},
-  "name":"sample::echo",
-  "files":[{
-    "filename":"echo.sh",
-    "sha256":"c5abefbdecee006bd65ef6f625e73f0ebdd1ef3f1b8802f22a1b9644a516ce40",
-    "size_bytes":64,
-    "uri":{
-      "path":"/puppet/v3/file_content/tasks/sample/echo.sh",
-      "params":{
-        "environment":"production"}}}]},
-"target":{
-  "hostname":"172.20.0.1",
-  "user":"bolt",
-  "password":"bolt",
-  "port": 20022,
-  "host-key-check":false},
-"parameters":{
-  "message":"hey"}}
-```
-**Verify that the target information** is correct, and change it if you want to use a different target. You can find other example requests in the `examples` directory.
-
-You should then be able to post it with:
-```
-curl -X POST -H "Content-Type: application/json" -d @developer-docs/examples/ssh-echo.json --cacert $BOLT_CACERT --cert $BOLT_CERT --key $BOLT_KEY $BOLT_ROOT/ssh/run_task
-```
-expected output
-```
-{"node":"172.18.0.1",
-"status":"success",
-"result":{"_output":"ac80223bd3b4 got passed the message: hey\n"}}
+{
+  "kind": "bolt-server/request-error",
+  "msg": "There was an error validating the request body.",
+  "details": [
+    "The property '#/target' contains additional properties [\"ssl\", \"ssl-verify\"] outside of the schema when none are allowed in schema partial:target-ssh"
+  ]
+}
 ```
