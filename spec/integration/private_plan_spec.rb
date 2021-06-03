@@ -36,25 +36,6 @@ describe "with private plans" do
       result = run_cli_json(%W[plan show private::yaml -m #{modulepath}])
       expect(result).to include(data)
     end
-
-    context 'with a project' do
-      let(:project)       { @project }
-      let(:config_flags)  { %W[--project #{project.path}] }
-
-      around :each do |example|
-        with_project do |project|
-          @project = project
-          example.run
-        end
-      end
-
-      it 'does not update the cache if local plans have not been modified' do
-        run_cli(%w[module generate-types] + config_flags)
-        original_mtime = File.mtime(project.plan_cache_file)
-        run_cli(%w[plan show] + config_flags)
-        expect(original_mtime).to eq(File.mtime(project.plan_cache_file))
-      end
-    end
   end
 
   context 'with a private Puppet plan' do

@@ -6,7 +6,7 @@ require 'bolt/util'
 
 module Bolt
   class PlanResult
-    attr_accessor :value, :status
+    attr_accessor :status, :value
 
     # This must be called from inside a compiler
     def self.from_pcore(result, status)

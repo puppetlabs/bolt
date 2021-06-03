@@ -9,7 +9,6 @@ describe Bolt::PlanCreator do
 
   let(:project)   { @project }
   let(:plan_name) { 'project' }
-  let(:outputter) { double('outputter', print_message: true) }
 
   around :each do |example|
     with_project(plan_name) do |project|
@@ -60,14 +59,14 @@ describe Bolt::PlanCreator do
   context "#create_plan" do
     it "creates a missing 'plans' directory" do
       expect(Dir.exist?(project.plans_path)).to eq(false)
-      subject.create_plan(project.plans_path, plan_name, outputter, nil)
+      subject.create_plan(project.plans_path, plan_name, nil)
       expect(Dir.exist?(project.plans_path)).to eq(true)
     end
 
     it 'creates a missing directory structure' do
       plan_name = "#{project.name}::foo::bar"
       expect(Dir.exist?(project.plans_path + 'foo')).to eq(false)
-      subject.create_plan(project.plans_path, plan_name, outputter, nil)
+      subject.create_plan(project.plans_path, plan_name, nil)
       expect(Dir.exist?(project.plans_path + 'foo')).to eq(true)
     end
 
@@ -76,19 +75,19 @@ describe Bolt::PlanCreator do
       FileUtils.mkdir(project.plans_path)
       FileUtils.touch(project.plans_path + 'foo')
 
-      expect { subject.create_plan(project.plans_path, plan_name, outputter, nil) }
+      expect { subject.create_plan(project.plans_path, plan_name, nil) }
         .to raise_error(Bolt::Error, /unable to create plan directory/)
     end
 
     it "creates an 'init' plan when the plan name matches the project name" do
-      subject.create_plan(project.plans_path, plan_name, outputter, nil)
+      subject.create_plan(project.plans_path, plan_name, nil)
       expect(File.exist?(project.plans_path + 'init.yaml')).to eq(true)
     end
 
     it 'creates a yaml plan by default' do
       plan_name = "#{project.name}::foo"
 
-      subject.create_plan(project.plans_path, plan_name, outputter, nil)
+      subject.create_plan(project.plans_path, plan_name, nil)
       expect(File.read(project.plans_path + 'foo.yaml'))
         .to eq(subject.yaml_plan(plan_name))
     end
@@ -96,32 +95,16 @@ describe Bolt::PlanCreator do
     it 'creates a puppet plan when the flag is provided' do
       plan_name = "#{project.name}::foo"
 
-      subject.create_plan(project.plans_path, plan_name, outputter, true)
+      subject.create_plan(project.plans_path, plan_name, true)
       expect(File.read(project.plans_path + 'foo.pp'))
         .to eq(subject.puppet_plan(plan_name))
     end
 
-    it 'outputs the path to the plan and other helpful information' do
-      if Bolt::Util.powershell?
-        show_command = 'Get-BoltPlan -Name '
-        run_command  = 'Invoke-BoltPlan -Name '
-      else
-        show_command = 'bolt plan show'
-        run_command  = 'bolt plan run'
-      end
-
-      allow(outputter).to receive(:print_message) do |output|
-        expect(output).to match(
-          /Created plan '#{plan_name}' at '#{project.plans_path + 'init.yaml'}'/
-        )
-        expect(output).to match(
-          /#{show_command} #{plan_name}/
-        )
-        expect(output).to match(
-          /#{run_command} #{plan_name}/
-        )
-      end
-      subject.create_plan(project.plans_path, plan_name, outputter, nil)
+    it 'returns the name and path to the plan' do
+      expect(subject.create_plan(project.plans_path, plan_name, nil)).to include(
+        name: plan_name,
+        path: project.plans_path + 'init.yaml'
+      )
     end
   end
 end
