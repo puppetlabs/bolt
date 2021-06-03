@@ -32,6 +32,7 @@ module Bolt
 
       # Generate a Bolt::Pal::PALError for non-bolt errors
       def self.from_error(err)
+        puts err.backtrace
         # Use the original error message if available
         message = err.cause ? err.cause.message : err.message
         e = new(message)

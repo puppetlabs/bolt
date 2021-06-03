@@ -30,7 +30,6 @@ module Bolt
     }.freeze
 
     def self.build_client(enabled = true)
-      logger = Bolt::Logger.logger(self)
       begin
         config_file = config_path
         config = load_config(config_file)
@@ -39,7 +38,7 @@ module Bolt
       end
 
       if !enabled || config['disabled'] || ENV['BOLT_DISABLE_ANALYTICS']
-        logger.debug "Analytics opt-out is set, analytics will be disabled"
+        Bolt::Logger.debug "Analytics opt-out is set, analytics will be disabled"
         NoopClient.new
       else
         unless config.key?('user-id')
@@ -50,7 +49,7 @@ module Bolt
         Client.new(config['user-id'])
       end
     rescue StandardError => e
-      logger.debug "Failed to initialize analytics client, analytics will be disabled: #{e}"
+      Bolt::Logger.debug "Failed to initialize analytics client, analytics will be disabled: #{e}"
       NoopClient.new
     end
 

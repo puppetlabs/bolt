@@ -1127,5 +1127,15 @@ module Bolt
     rescue JSON::ParserError => e
       raise Bolt::CLIError, "Unable to parse --params value as JSON: #{e}"
     end
+
+    def permute(args)
+      super(args)
+    rescue OptionParser::MissingArgument => e
+      raise Bolt::CLIError, "Option '#{e.args.first}' needs a parameter"
+    rescue OptionParser::InvalidArgument => e
+      raise Bolt::CLIError, "Invalid parameter specified for option '#{e.args.first}': #{e.args[1]}"
+    rescue OptionParser::InvalidOption, OptionParser::AmbiguousOption => e
+      raise Bolt::CLIError, "Unknown argument '#{e.args.first}'"
+    end
   end
 end

@@ -56,8 +56,8 @@ module Bolt
         @stream.puts task.to_h.merge(module_dir: module_dir).to_json
       end
 
-      def print_tasks(tasks, modulepath)
-        print_table('tasks' => tasks, 'modulepath' => modulepath)
+      def print_tasks(**kwargs)
+        print_table(**kwargs)
       end
 
       def print_plugin_list(plugins, modulepath)
@@ -75,11 +75,11 @@ module Bolt
         @stream.puts plan.to_json
       end
 
-      def print_plans(plans, modulepath)
-        print_table('plans' => plans, 'modulepath' => modulepath)
+      def print_plans(**kwargs)
+        print_table(**kwargs)
       end
 
-      def print_apply_result(apply_result, _elapsed_time)
+      def print_apply_result(apply_result)
         @stream.puts apply_result.to_json
       end
 
@@ -113,35 +113,19 @@ module Bolt
                        moduledir: moduledir.to_s }.to_json)
       end
 
-      def print_targets(target_list, inventory_source, default_inventory, _target_flag)
-        @stream.puts ::JSON.pretty_generate(
-          inventory: {
-            targets: target_list[:inventory].map(&:name),
-            count: target_list[:inventory].count,
-            file: (inventory_source || default_inventory).to_s
-          },
-          adhoc: {
-            targets: target_list[:adhoc].map(&:name),
-            count: target_list[:adhoc].count
-          },
-          targets: target_list.values.flatten.map(&:name),
-          count: target_list.values.flatten.count
-        )
+      def print_targets(target_data, _target_flag)
+        target_data[:adhoc][:targets]     = target_data[:adhoc][:targets].map { |t| t['name'] }
+        target_data[:inventory][:targets] = target_data[:inventory][:targets].map { |t| t['name'] }
+        target_data[:targets]             = target_data[:targets].map { |t| t['name'] }
+        @stream.puts target_data.to_json
       end
 
-      def print_target_info(target_list, _inventory_source, _default_inventory, _target_flag)
-        targets = target_list.values.flatten
-
-        @stream.puts ::JSON.pretty_generate(
-          targets: targets.map(&:detail),
-          count: targets.count
-        )
+      def print_target_info(target_data, _target_flag)
+        @stream.puts target_data.to_json
       end
 
-      def print_groups(groups, _inventory_source, _default_inventory)
-        count = groups.count
-        @stream.puts({ groups: groups,
-                       count: count }.to_json)
+      def print_groups(group_data)
+        @stream.puts group_data.slice(:count, :groups).to_json
       end
 
       def fatal_error(err)

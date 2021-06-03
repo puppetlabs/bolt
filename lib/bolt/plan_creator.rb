@@ -51,7 +51,7 @@ module Bolt
       end
     end
 
-    def self.create_plan(plans_path, plan_name, outputter, is_puppet)
+    def self.create_plan(plans_path, plan_name, is_puppet)
       _, name_segments, basename = segment_plan_name(plan_name)
       dir_path = plans_path.join(*name_segments)
 
@@ -85,7 +85,7 @@ module Bolt
         run_command  = 'bolt plan run'
       end
 
-      output = <<~OUTPUT
+      <<~OUTPUT
         Created plan '#{plan_name}' at '#{plan_path}'
 
         Show this plan with:
@@ -93,9 +93,6 @@ module Bolt
         Run this plan with:
             #{run_command} #{plan_name}
       OUTPUT
-
-      outputter.print_message(output)
-      0
     end
 
     def self.segment_plan_name(plan_name)

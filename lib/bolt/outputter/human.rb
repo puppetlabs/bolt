@@ -297,7 +297,7 @@ module Bolt
         )
       end
 
-      def print_tasks(tasks, modulepath)
+      def print_tasks(tasks:, modulepath:)
         command = Bolt::Util.powershell? ? 'Get-BoltTask -Name <TASK NAME>' : 'bolt task show <TASK NAME>'
 
         tasks = tasks.map do |name, description|
@@ -430,7 +430,7 @@ module Bolt
         @stream.puts info
       end
 
-      def print_plans(plans, modulepath)
+      def print_plans(plans:, modulepath:)
         command = Bolt::Util.powershell? ? 'Get-BoltPlan -Name <PLAN NAME>' : 'bolt plan show <PLAN NAME>'
 
         plans = plans.map do |name, description|
@@ -492,11 +492,11 @@ module Bolt
         end
       end
 
-      def print_plugin_list(plugin_list, modulepath)
+      def print_plugin_list(plugin_data)
         info   = +''
-        length = plugin_list.values.map(&:keys).flatten.map(&:length).max + 4
+        length = plugin_data[:plugins].values.map(&:keys).flatten.map(&:length).max + 4
 
-        plugin_list.each do |hook, plugins|
+        plugin_data[:plugins].each do |hook, plugins|
           next if plugins.empty?
           next if hook == :validate_resolve_reference
 
@@ -512,7 +512,7 @@ module Bolt
         end
 
         info << colorize(:cyan, "Modulepath\n")
-        info << indent(2, "#{modulepath.join(File::PATH_SEPARATOR)}\n\n")
+        info << indent(2, "#{plugin_data[:modulepath].join(File::PATH_SEPARATOR)}\n\n")
 
         info << colorize(:cyan, "Additional information\n")
         info << indent(2, "For more information about using plugins see https://pup.pt/bolt-plugins")
@@ -520,12 +520,12 @@ module Bolt
         @stream.puts info.chomp
       end
 
-      def print_targets(target_list, inventory_source, default_inventory, target_flag)
+      def print_targets(target_data, target_flag)
         adhoc = colorize(:yellow, "(Not found in inventory file)")
 
         targets  = []
-        targets += target_list[:inventory].map { |target| [target.name, nil] }
-        targets += target_list[:adhoc].map { |target| [target.name, adhoc] }
+        targets += target_data[:inventory][:targets].map { |target| [target['name'], nil] }
+        targets += target_data[:adhoc][:targets].map { |target| [target['name'], adhoc] }
 
         info = +''
 
@@ -538,16 +538,23 @@ module Bolt
                 end
         info << "\n\n"
 
-        info << format_inventory_source(inventory_source, default_inventory)
-        info << format_target_summary(target_list[:inventory].count, target_list[:adhoc].count, target_flag, false)
+        info << format_inventory_source(
+          target_data.dig(:inventory, :file),
+          target_data.dig(:inventory, :default)
+        )
+        info << format_target_summary(
+          target_data.dig(:inventory, :count),
+          target_data.dig(:adhoc, :count),
+          target_flag,
+          false
+        )
 
         @stream.puts info
       end
 
-      def print_target_info(target_list, inventory_source, default_inventory, target_flag)
-        adhoc_targets     = target_list[:adhoc].map(&:name).to_set
-        inventory_targets = target_list[:inventory].map(&:name).to_set
-        targets           = target_list.values.flatten.sort_by(&:name)
+      def print_target_info(target_data, target_flag)
+        adhoc_targets = target_data[:adhoc][:targets].to_set
+        targets       = target_data[:targets].sort_by { |t| t['name'] }
 
         info = +''
 
@@ -555,10 +562,10 @@ module Bolt
           adhoc = colorize(:yellow, " (Not found in inventory file)")
 
           targets.each do |target|
-            info << colorize(:cyan, target.name)
-            info << adhoc if adhoc_targets.include?(target.name)
+            info << colorize(:cyan, target['name'])
+            info << adhoc if adhoc_targets.include?(target)
             info << "\n"
-            info << indent(2, target.detail.to_yaml.lines.drop(1).join)
+            info << indent(2, target.to_yaml.lines.drop(1).join)
             info << "\n"
           end
         else
@@ -566,8 +573,16 @@ module Bolt
           info << indent(2, "No targets\n\n")
         end
 
-        info << format_inventory_source(inventory_source, default_inventory)
-        info << format_target_summary(inventory_targets.count, adhoc_targets.count, target_flag, true)
+        info << format_inventory_source(
+          target_data.dig(:inventory, :file),
+          target_data.dig(:inventory, :default)
+        )
+        info << format_target_summary(
+          target_data.dig(:inventory, :count),
+          target_data.dig(:adhoc, :count),
+          target_flag,
+          false
+        )
 
         @stream.puts info
       end
@@ -613,27 +628,27 @@ module Bolt
         info
       end
 
-      def print_groups(groups, inventory_source, default_inventory)
+      def print_groups(group_data)
         info = +''
 
         # Add group list
         info << colorize(:cyan, "Groups\n")
-        info << indent(2, groups.join("\n"))
+        info << indent(2, group_data[:groups].join("\n"))
         info << "\n\n"
 
         # Add inventory file source
-        info << format_inventory_source(inventory_source, default_inventory)
+        info << format_inventory_source(group_data.dig(:inventory, :source), group_data.dig(:inventory, :default))
 
         # Add group count summary
         info << colorize(:cyan, "Group count\n")
-        info << indent(2, "#{groups.count} total")
+        info << indent(2, "#{group_data[:count]} total")
 
         @stream.puts info
       end
 
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
-      def print_apply_result(apply_result, elapsed_time)
-        print_summary(apply_result, elapsed_time)
+      def print_apply_result(apply_result)
+        print_summary(apply_result, apply_result.elapsed_time)
       end
 
       # @param [Bolt::PlanResult] plan_result A PlanResult object
