@@ -7,8 +7,9 @@ describe 'installing modules' do
   include BoltSpec::Integration
   include BoltSpec::Project
 
-  let(:command) { %w[module install] }
-  let(:project) { @project }
+  let(:command)        { %w[module install] }
+  let(:project)        { @project }
+  let(:project_config) { {} }
 
   around(:each) do |example|
     with_project(config: project_config) do |project|
@@ -20,6 +21,40 @@ describe 'installing modules' do
   # Suppress output
   before(:each) do
     allow($stderr).to receive(:puts)
+  end
+
+  context 'adding modules' do
+    it 'installs a new module' do
+      output = run_cli_json(%w[module add puppetlabs-yaml], project: project)
+      expect(output.keys).to match_array(%w[moduledir puppetfile success])
+      expect(output['moduledir']).to eq((project.path + '.modules').to_s)
+      expect(output['puppetfile']).to eq((project.path + 'Puppetfile').to_s)
+      expect(output['success']).to be
+
+      puppetfile_content = File.read(project.puppetfile)
+
+      expect(puppetfile_content.lines).to include(
+        %r{mod 'puppetlabs/yaml'}
+      )
+    end
+  end
+
+  context 'with a puppetfile' do
+    before(:each) do
+      File.write(project.puppetfile, "mod 'puppetlabs/yaml'\n")
+    end
+
+    it 'installs from the puppetfile without resolving' do
+      before = File.read(project.puppetfile)
+
+      output = run_cli_json(%w[module install --no-resolve], project: project)
+      expect(output.keys).to match_array(%w[moduledir puppetfile success])
+      expect(output['moduledir']).to eq((project.path + '.modules').to_s)
+      expect(output['puppetfile']).to eq((project.path + 'Puppetfile').to_s)
+      expect(output['success']).to be
+
+      expect(before).to eq(File.read(project.puppetfile))
+    end
   end
 
   context 'with install configuration' do
