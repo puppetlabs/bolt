@@ -274,7 +274,7 @@ module BoltSpec
           local = Puppet::Parser::Scope::LocalScope.new
 
           # Compress the current scopes into a single vars hash to add to the new scope
-          scope.to_hash.each_pair { |k, v| local[k] = v }
+          scope.to_hash(true, true).each_pair { |k, v| local[k] = v }
           newscope.push_ephemerals([local])
         end
 

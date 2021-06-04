@@ -1,10 +1,11 @@
 plan background::variables(
-  TargetSpec $targets
+  TargetSpec $targets,
+  Optional[String] $undef = undef
 ) {
   $var = 'Before background'
   $future = background() || {
     out::message("Inside background: $var")
-    out::message("Targets: ${$targets}")
+    out::message("Undef: $undef")
     out::message("Foo: $foo")
   }
   $foo = 'After background'
