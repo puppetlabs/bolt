@@ -18,6 +18,9 @@ jobs:
       run:
         shell: powershell
 
+    env:
+      BOLT_DISABLE_PWSH_WARNING: 'true'
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
