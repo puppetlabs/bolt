@@ -83,16 +83,17 @@ Plan completed successfully}
       expect(output).to match(regex)
     end
 
-    it "includes variables from the plan in scope" do
+    it "includes variables, including undef vars, from the plan in scope" do
       regex = %r{Starting: plan background::variables
 In main plan: After background
 Finished: plan background::variables.*
 Inside background: Before background
-Targets}
+Undef:}
       output = run_cli(%w[plan run background::variables] + config_flags,
                        outputter: Bolt::Outputter::Human)
       expect(output).to match(regex)
       expect(output).to match(/Unknown variable: 'foo'/)
+      expect(output).not_to match(/Unknown variable: 'undef'/)
     end
 
     it "returns from a 'return' statement'" do
