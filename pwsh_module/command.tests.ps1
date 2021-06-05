@@ -34,7 +34,7 @@ Describe "test bolt module" {
 
     it "has the correct number of exported functions" {
       # should count of pwsh functions
-      @($commands).Count | Should -Be 24
+      @($commands).Count | Should -Be 25
     }
   }
 }
@@ -210,6 +210,13 @@ Describe "test all bolt command examples" {
     It "bolt plan show" {
       $result = Get-BoltPlan
       $result | Should -Be "bolt plan show"
+    }
+  }
+
+  Context "bolt plugin" {
+    It "bolt plugin show" {
+      $result = Get-BoltPlugin
+      $result | Should -Be "bolt plugin show"
     }
   }
 

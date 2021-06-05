@@ -1,7 +1,8 @@
 {
-    "parameters": {
-        "optional_config": {
-            "type": "Optional[String]"
-        }
+  "description": "My custom plugin",
+  "parameters": {
+    "optional_config": {
+      "type": "Optional[String]"
     }
+  }
 }

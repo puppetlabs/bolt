@@ -488,6 +488,34 @@ module Bolt
         end
       end
 
+      def print_plugin_list(plugin_list, modulepath)
+        info   = +''
+        length = plugin_list.values.map(&:keys).flatten.map(&:length).max + 4
+
+        plugin_list.each do |hook, plugins|
+          next if plugins.empty?
+          next if hook == :validate_resolve_reference
+
+          info << colorize(:cyan, "#{hook}\n")
+
+          plugins.each do |name, description|
+            info << indent(2, name.ljust(length))
+            info << truncate(description, 80 - length) if description
+            info << "\n"
+          end
+
+          info << "\n"
+        end
+
+        info << colorize(:cyan, "Modulepath\n")
+        info << indent(2, "#{modulepath.join(File::PATH_SEPARATOR)}\n\n")
+
+        info << colorize(:cyan, "Additional information\n")
+        info << indent(2, "For more information about using plugins see https://pup.pt/bolt-plugins")
+
+        @stream.puts info.chomp
+      end
+
       def print_targets(target_list, inventory_source, default_inventory, target_flag)
         adhoc = colorize(:yellow, "(Not found in inventory file)")
 

@@ -105,6 +105,15 @@ module Bolt
           { flags: OPTIONS[:global],
             banner: PLAN_HELP }
         end
+      when 'plugin'
+        case action
+        when 'show'
+          { flags: OPTIONS[:global] + %w[color format modulepath project],
+            banner: PLUGIN_SHOW_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: PLUGIN_HELP }
+        end
       when 'project'
         case action
         when 'init'
@@ -192,6 +201,7 @@ module Bolt
           module            Manage Bolt project modules
           lookup            Look up a value with Hiera
           plan              Convert, create, show, and run Bolt plans
+          plugin            Show available plugins
           project           Create and migrate Bolt projects
           script            Upload a local script and run it remotely
           secret            Create encryption keys and encrypt and decrypt values
@@ -606,6 +616,37 @@ module Bolt
             bolt plan show
           Display documentation for the aggregate::count plan
             bolt plan show aggregate::count
+    HELP
+
+    PLUGIN_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          plugin
+
+      #{colorize(:cyan, 'Usage')}
+          bolt plugin <action> [options]
+
+      #{colorize(:cyan, 'Description')}
+          Show available plugins.
+
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt plugins at https://pup.pt/bolt-plugins.
+
+      #{colorize(:cyan, 'Actions')}
+          show          Show available plugins
+    HELP
+
+    PLUGIN_SHOW_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          show
+
+      #{colorize(:cyan, 'Usage')}
+          bolt plugin show [options]
+
+      #{colorize(:cyan, 'Description')}
+          Show available plugins.
+
+      #{colorize(:cyan, 'Documentation')}
+          Learn more about Bolt plugins at https://pup.pt/bolt-plugins.
     HELP
 
     PROJECT_HELP = <<~HELP

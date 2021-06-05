@@ -4,7 +4,15 @@ module Bolt
   class Plugin
     class Task
       def hooks
-        %i[validate_resolve_reference puppet_library resolve_reference]
+        hook_descriptions.keys
+      end
+
+      def hook_descriptions
+        {
+          puppet_library: 'Run a task to install the Puppet agent package.',
+          resolve_reference: 'Run a task as a plugin.',
+          validate_resolve_reference: nil
+        }
       end
 
       def name

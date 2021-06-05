@@ -24,7 +24,7 @@ module Bolt
         end
       end
 
-      attr_reader :config
+      attr_reader :config, :hook_map
 
       def initialize(mod:, context:, config:, **_opts)
         @module = mod

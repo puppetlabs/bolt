@@ -46,8 +46,26 @@ describe Bolt::Plugin do
     hooks = plugins.by_name('my_plug').hooks
 
     expect(hooks).to include(:resolve_reference)
-    expect(hooks).to include(:createkeys)
-    expect(hooks).not_to include(:decrypt)
+    expect(hooks).to include(:secret_createkeys)
+    expect(hooks).not_to include(:secret_decrypt)
+  end
+
+  context 'listing plugins' do
+    let(:modulepath) { [fixtures_path('modules')] }
+
+    it 'returns a list of all plugin hooks' do
+      plugin_hooks = plugins.list_plugins
+      plugin_names = plugin_hooks.values.map(&:keys).flatten.uniq
+
+      expect(plugin_hooks.keys).to match_array(Bolt::Plugin::KNOWN_HOOKS),
+                                   "Does not include all known hooks"
+      expect(plugin_names).to include('env_var'),
+                              "Does not include built-in Ruby plugins"
+      expect(plugin_names).to include('plugin'),
+                              "Does not include custom module plugins"
+      expect(plugin_hooks.dig(:resolve_reference, 'plugin')).to eq('My custom plugin'),
+                                                                "Does not include descriptions"
+    end
   end
 
   context 'evaluating plugin config' do

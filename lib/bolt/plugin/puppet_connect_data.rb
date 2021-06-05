@@ -49,7 +49,14 @@ module Bolt
       end
 
       def hooks
-        %i[resolve_reference validate_resolve_reference]
+        hook_descriptions.keys
+      end
+
+      def hook_descriptions
+        {
+          resolve_reference: nil,
+          validate_resolve_reference: nil
+        }
       end
 
       def resolve_reference(opts)
