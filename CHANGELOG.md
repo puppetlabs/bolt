@@ -1,5 +1,38 @@
 # Changelog
 
+## Bolt 3.9.1 (2021-06-07)
+
+### New features
+
+* **Ship PuppetBolt PowerShell module to PowerShell Gallery**
+  ([#2550](https://github.com/puppetlabs/bolt/issues/2550))
+
+  The PuppetBolt PowerShell module is now shipped to the [PowerShell
+  Gallery](https://www.powershellgallery.com/packages/PuppetBolt). For more
+  information about installing the PuppetBolt PowerShell module, see the
+  [documentation](bolt_installing.md#puppetbolt-powershell-module).
+
+* **Report whether tasks are run in no-operation mode**
+  ([#2840](https://github.com/puppetlabs/bolt/issues/2840))
+
+  Bolt now reports whether or not a task is run in no-operation mode when it
+  collects analytics.
+
+### Bug fixes
+
+* **Provide project for BoltSpec::Run::Runner#pal**
+  ([#2858](https://github.com/puppetlabs/bolt/pull/2858))
+
+  Fixes a project null reference in the invocation of the download_file()
+  function in a plan driven by the BoltSpec::Run runner.
+
+* **Undef variables are now included in Future block scopes**
+  ([#2866](https://github.com/puppetlabs/bolt/issues/2866))
+
+  Previously, Bolt would not include variables with a value `undef` in Future
+  block scopes, leading them to be undefined. Bolt now includes those variables
+  when creating the new scope for Future blocks.
+
 ## Bolt 3.9.0 (2021-05-25)
 
 ### New features
