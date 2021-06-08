@@ -81,7 +81,7 @@ describe Bolt::Transport::Podman, podman: true do
     }
     let(:target) { Bolt::Target.from_hash(target_data, inventory) }
 
-    it 'uses the specified shell' do
+    it 'uses the specified run-as user' do
       result = podman.run_command(target, 'whoami')
       expect(result.value['stdout'].strip).to eq('root')
     end
