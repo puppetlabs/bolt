@@ -42,6 +42,7 @@ module Bolt
       'lookup'    => %w[],
       'module'    => %w[add generate-types install show],
       'plan'      => %w[show run convert new],
+      'plugin'    => %w[show],
       'project'   => %w[init migrate],
       'script'    => %w[run],
       'secret'    => %w[encrypt decrypt createkeys],
@@ -487,6 +488,8 @@ module Bolt
           list_groups
         when 'module'
           list_modules
+        when 'plugin'
+          list_plugins
         end
         return 0
       when 'convert'
@@ -825,6 +828,10 @@ module Bolt
 
     def list_modules
       outputter.print_module_list(pal.list_modules)
+    end
+
+    def list_plugins
+      outputter.print_plugin_list(plugins.list_plugins, pal.user_modulepath)
     end
 
     def generate_types

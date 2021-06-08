@@ -505,4 +505,35 @@ describe "Bolt::Outputter::Human" do
       expect(output.string).to match(/Group count.*3 total/m)
     end
   end
+
+  context '#print_plugin_list' do
+    let(:modulepath) { ['path/to/module', 'other/path/to/module'] }
+
+    let(:plugins) do
+      {
+        puppet_library: {
+          'task' => 'Install the Puppet agent package by running a custom task as a plugin'
+        },
+        resolve_reference: {
+          'custom_plugin' => 'My custom plugin',
+          'quiet_plugin'  => nil
+        }
+      }
+    end
+
+    it 'prints a list of plugins' do
+      outputter.print_plugin_list(plugins, modulepath)
+
+      expect(output.string).to match(/puppet_library.*resolve_reference/m),
+                               'Does not print hook names'
+      expect(output.string).to match(/task.*custom_plugin.*quiet_plugin/m),
+                               'Does not print plugin names'
+      expect(output.string).to match(/My custom plugin/),
+                               'Does not print descriptions'
+      expect(output.string).to match(/Install the Puppet agent package.*\.\.\./),
+                               'Does not truncate descriptions'
+      expect(output.string).to match(/Modulepath.*#{modulepath.join(File::PATH_SEPARATOR)}/m),
+                               'Does not print modulepath'
+    end
+  end
 end

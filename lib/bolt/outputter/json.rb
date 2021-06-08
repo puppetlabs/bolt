@@ -60,6 +60,11 @@ module Bolt
         print_table('tasks' => tasks, 'modulepath' => modulepath)
       end
 
+      def print_plugin_list(plugins, modulepath)
+        plugins.delete(:validate_resolve_reference)
+        print_table('plugins' => plugins, 'modulepath' => modulepath)
+      end
+
       def print_plan_info(plan)
         path = plan.delete('module')
         plan['module_dir'] = if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)

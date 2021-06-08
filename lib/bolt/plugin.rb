@@ -250,6 +250,44 @@ module Bolt
       end
     end
 
+    # Loads all plugins and returns a map of plugin names to hooks.
+    #
+    def list_plugins
+      load_all_plugins
+
+      hooks = KNOWN_HOOKS.map { |hook| [hook, {}] }.to_h
+
+      @plugins.sort.each do |name, plugin|
+        # Don't show the Puppet Connect plugin for now.
+        next if name == 'puppet_connect_data'
+
+        case plugin
+        when Bolt::Plugin::Module
+          plugin.hook_map.each do |hook, spec|
+            next unless hooks.include?(hook)
+            hooks[hook][name] = spec['task'].description
+          end
+        else
+          plugin.hook_descriptions.each do |hook, description|
+            hooks[hook][name] = description
+          end
+        end
+      end
+
+      hooks
+    end
+
+    # Loads all plugins available to the project.
+    #
+    private def load_all_plugins
+      modules.each do |name, mod|
+        next unless mod.plugin?
+        by_name(name)
+      end
+
+      RUBY_PLUGINS.each { |name| by_name(name) }
+    end
+
     def puppetdb_client
       by_name('puppetdb').puppetdb_client
     end

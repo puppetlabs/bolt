@@ -219,4 +219,29 @@ describe "Bolt::Outputter::JSON" do
       )
     end
   end
+
+  context '#print_plugin_list' do
+    let(:modulepath) { ['path/to/module', 'other/path/to/module'] }
+
+    let(:plugins) do
+      {
+        puppet_library: {
+          'task' => 'Install the Puppet agent package by running a custom task as a plugin'
+        },
+        resolve_reference: {
+          'custom_plugin' => 'My custom plugin',
+          'quiet_plugin'  => nil
+        }
+      }
+    end
+
+    it 'prints a list of plugins' do
+      outputter.print_plugin_list(plugins, modulepath)
+
+      expect(JSON.parse(output.string)).to eq(
+        'plugins'    => plugins.transform_keys(&:to_s),
+        'modulepath' => modulepath
+      )
+    end
+  end
 end
