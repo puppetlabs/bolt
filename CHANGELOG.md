@@ -1,5 +1,15 @@
 # Changelog
 
+## Bolt 3.9.2 (2021-06-08)
+
+### Bug fixes
+
+* **Do not error when using `--run-as` on a Windows controller**
+  ([#2874](https://github.com/puppetlabs/bolt/pull/2874))
+
+  Bolt no longer raises an error when using the `--run-as` command-line
+  option on a Windows controller.
+
 ## Bolt 3.9.1 (2021-06-07)
 
 ### New features
@@ -20,11 +30,11 @@
 
 ### Bug fixes
 
-* **Provide project for BoltSpec::Run::Runner#pal**
+* **Provide project for `BoltSpec::Run::Runner#pal`**
   ([#2858](https://github.com/puppetlabs/bolt/pull/2858))
 
-  Fixes a project null reference in the invocation of the download_file()
-  function in a plan driven by the BoltSpec::Run runner.
+  Fixes a project null reference in the invocation of the `download_file()`
+  function in a plan driven by the `BoltSpec::Run` runner.
 
 * **Undef variables are now included in Future block scopes**
   ([#2866](https://github.com/puppetlabs/bolt/issues/2866))
