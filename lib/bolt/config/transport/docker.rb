@@ -27,10 +27,6 @@ module Bolt
           if @config['interpreters']
             @config['interpreters'] = normalize_interpreters(@config['interpreters'])
           end
-
-          if Bolt::Util.windows? && @config['run-as']
-            raise Bolt::ValidationError, "run-as is not supported when using PowerShell"
-          end
         end
       end
     end
