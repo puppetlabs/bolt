@@ -5,8 +5,9 @@ built-in key-value configuration data lookup system, which lets you separate
 data from your code. There are some key differences in how Bolt and Puppet use
 Hiera, which this page covers in more detail.
 
-Before you start using Hiera in Bolt, get familiar with [how to use
-Hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html).
+Before you start using Hiera in Bolt, get familiar with:
+- [How to use Hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html).
+- [Applying Puppet code](applying_manifest_blocks.html) with Bolt.
 
 ## Hiera configuration layers
 
@@ -28,12 +29,6 @@ You can specify a different configuration file for the project layer by setting
 the `hiera-config` option in your project configuration, or by using the
 `--hiera-config` command-line option.
 
-📖  **Related information**
-
-- [bolt-project.yaml options](bolt_project_reference.md#hiera-config)
-- [*nix shell commands](bolt_command_reference.md)
-- [PowerShell cmdlets](bolt_cmdlet_reference.md)
-
 ### Module layer
 
 The configuration for a module layer is located, by default, in the module's
@@ -43,13 +38,17 @@ The module layer sets default values and merge behavior for a module’s class
 parameters. The module layer comes last in Hiera’s lookup order, so environment
 data set by a user overrides the default data set by the module’s author.
 
+📖  **Related information**
+
+- [bolt-project.yaml options](bolt_project_reference.md#hiera-config)
+- [*nix shell commands](bolt_command_reference.md)
+- [PowerShell cmdlets](bolt_cmdlet_reference.md)
 ## Look up data in plans
 
 You can use the [Puppet `lookup()`
 function](https://puppet.com/docs/puppet/latest/hiera_automatic.html#puppet_lookup)
 in plans to look up data. It's useful to think of looking up Hiera data in Bolt
-plans in two different contexts: [inside apply
-blocks](applying_manifest_blocks.md) and outside apply blocks.
+plans in two different contexts: inside apply blocks and outside apply blocks.
 
 ### Inside apply blocks
 
@@ -206,8 +205,8 @@ And the following data source at `<PROJECT DIRECTORY>/data/static.yaml`:
 api_key: 12345
 ```
 
-The previous plan will now run successfully, as Hiera will look up the `api_key`
-key using the `plan_hierarchy`, which does not include interpolations.
+The plan run now succeeds, because Hiera uses the `plan_hierarchy` key to look
+up the static value for `api_key`.
 
 By specifying both keys in the same Hiera configuration, you can look up data
 inside and outside apply blocks in the same plan. This allows you to use your
@@ -217,8 +216,8 @@ apply block.
 
 ### Interpolations outside apply blocks
 
-Interpolations are not well supported in the `plan_hierarchy` hierarchy. Target
-level data such as facts are not available to lookups outside of apply blocks,
+Interpolations are not well supported in the `plan_hierarchy` hierarchy.
+Target-level data such as facts are not available to lookups outside of apply blocks,
 so the normal hierarchy interpolation does not work. The `lookup()` function
 only interpolates based on the variables currently in scope.
 
@@ -236,14 +235,14 @@ plan_hierarchy:
     path: "%{application}.yaml"
 ```
 
-And the following data source at `<PROJECT DIRECTORY>/data/kittycats.yaml`:
+A data source at `<PROJECT DIRECTORY>/data/kittycats.yaml`:
 
 ```yaml
 # data/kittycats.yaml
 site_path: /var/www/kittycats.tld/public_html
 ```
 
-And the following data source at `<PROJECT DIRECTORY>/data/doggos.yaml`:
+And a data source at `<PROJECT DIRECTORY>/data/doggos.yaml`:
 
 ```yaml
 # data/doggos.yaml
@@ -263,8 +262,8 @@ plan plan_lookup(
 }
 ```
 
-Note that if you tried to call `lookup('site_path')` from a subplan of
-`plan_lookup`, like so:
+Note that if you tried to call `lookup('site_path')` from a sub-plan of
+`plan_lookup`:
 
 ```puppet
 # plans/plan_lookup.pp
@@ -293,15 +292,16 @@ interpolation in the Hiera configuration would fail.
 ## Look up data from the command line
 
 You can use the `bolt lookup` command and `Invoke-BoltLookup` PowerShell cmdlet
-to look up Hiera data from the command line.  By default, Bolt uses the `hierarchy`
+to look up Hiera data from the command line. By default, Bolt uses the `hierarchy`
 key in your `hiera.yaml` file to look up data and performs the lookup inside an apply
-block. If you need to look up data outside of an apply block, see
-[Outside apply blocks](#outside-apply-blocks).
+block. Similar to looking up data outside of an apply block in a plan, you can use
+the `--plan-hierarchy` or `-PlanHierarchy` command options to look up data from 
+the `plan_hierarchy` key. 
 
-### With target context (inside apply blocks)
+### Inside apply blocks
 
-Without additional options, the `lookup` command looks up data in the context of a target, allowing
-you to interpolate target facts and variables in your hierarchy.
+Without additional options, the `lookup` command looks up data in the context of a target,
+allowing you to interpolate target facts and variables in your hierarchy.
 
 When you run the `bolt lookup` and `Invoke-BoltLookup` commands, Bolt first
 runs an `apply_prep` on each of the targets specified. This installs the
@@ -326,14 +326,14 @@ hierarchy:
     path: "common.yaml"
 ```
 
-And the following data source at `<PROJECT DIRECTORY>/data/os/Windows.yaml`:
+A data source at `<PROJECT DIRECTORY>/data/os/Windows.yaml`:
 
 ```yaml
 # data/os/Windows.yaml
 password: Bolt!
 ```
 
-And the following data source at `<PROJECT DIRECTORY>/data/os/Ubuntu.yaml`:
+And a data source at `<PROJECT DIRECTORY>/data/os/Ubuntu.yaml`:
 
 ```yaml
 # data/os/Ubuntu.yaml
@@ -368,10 +368,10 @@ Successful on 2 targets: windows_target, ubuntu_target
 Ran on 2 targets
 ```
 
-### With plan context (outside apply blocks)
+### Outside apply blocks
 
 To look up data from Hiera's `plan_hierarchy` key, use the `lookup` command with
-the `--plan-hierarchy` option.  This mimics performing a lookup outside an apply block
+the `--plan-hierarchy` option. This mimics performing a lookup outside an apply block
 in a Bolt plan.
 
 Because `plan_hierarchy` values are not specific to individual targets, this command performs
