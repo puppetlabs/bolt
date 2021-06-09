@@ -416,10 +416,17 @@ bolt script run ./scripts/configure.sh --targets servers arg1 arg2
 
 _PowerShell cmdlet_
 
-To pass arguments to a script, use the `-Arguments` parameter:
+To pass arguments to a script, specify them after the command:
 
 ```powershell
-Invoke-BoltScript -Script ./scripts/configure.sh -Targets servers -Arguments arg1 arg2
+Invoke-BoltScript -Script ./scripts/configure.sh -Targets servers arg1 arg2
+```
+
+You can also use the `-Arguments` parameter and provide a comma-separated
+list of arguments:
+
+```powershell
+Invoke-BoltScript -Script ./scripts/configure.sh -Targets servers -Arguments arg1,arg2
 ```
 
 > 🔩 **Tip:** If an argument contains spaces or special characters, wrap them
