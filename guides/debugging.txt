@@ -1,0 +1,28 @@
+TOPIC
+    debugging
+
+DESCRIPTION
+    When Bolt isn't behaving as expected, there are a few helpful commands and
+    logs that can help identify common issues. The first place to look is in
+    `<PROJECT>/bolt-debug.log`, which contains debug-level logs from the last Bolt
+    run. This log file includes where the Bolt project was loaded from, the
+    location of any configuration or inventory files that were loaded, and the
+    modulepath that modules were loaded from.
+
+    If you're having issues with loading targets or target configuration, you
+    can see the list of resolved Bolt target names by running `bolt inventory
+    show` on *nix systems or `Get-BoltInventory` in PowerShell. To see the
+    resolved configuration for each target, run the command with the `--detail` or
+    `-Detail` options.
+
+    Lastly, if you're having trouble loading Bolt content you can use `bolt
+    module show` on *nix systems or `Get-BoltModule` in PowerShell to see the list
+    of loaded modules, including where they were loaded from. You can also use
+    `bolt task show` or `Get-BoltTask` to list loaded tasks, and `bolt plan show`
+    or `Get-BoltPlan` to list loaded plans.
+
+    Visit the linked documentation for more in-depth troubleshooting help for
+    specific issues.
+
+DOCUMENTATION
+    https://pup.pt/bolt-troubleshooting
