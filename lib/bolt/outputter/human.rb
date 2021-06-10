@@ -460,6 +460,10 @@ module Bolt
         @stream.puts(guide)
       end
 
+      def print_plan_lookup(value)
+        @stream.puts(value)
+      end
+
       def print_module_list(module_list)
         module_list.each do |path, modules|
           if (mod = modules.find { |m| m[:internal_module_group] })

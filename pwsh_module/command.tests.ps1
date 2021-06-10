@@ -318,5 +318,10 @@ Describe "test all bolt command examples" {
       $results = Invoke-BoltLookup -key 'key' -targets 'target1,target2'
       $results | Should -Be "bolt lookup key --targets target1,target2"
     }
+
+    It "bolt lookup key --plan-hierarchy" {
+      $results = Invoke-BoltLookup -key 'key' -PlanHierarchy
+      $results | Should -Be "bolt lookup key --plan-hierarchy"
+    }
   }
 }

@@ -170,7 +170,8 @@ describe "Bolt::CLI" do
   end
 
   context 'lookup' do
-    let(:pal)     { double('pal', lookup: results) }
+    let(:pal)     { double('pal', lookup: results, plan_hierarchy_lookup: value) }
+    let(:value)   { 'value' }
     let(:results) { Bolt::ResultSet.new([]) }
 
     it 'errors without a key' do
@@ -180,7 +181,7 @@ describe "Bolt::CLI" do
       )
     end
 
-    it 'errors without a targeting option' do
+    it 'errors without a targeting option or plan-hierarchy' do
       cli = Bolt::CLI.new(%w[lookup key])
 
       expect { cli.execute(cli.parse) }.to raise_error(
@@ -189,12 +190,33 @@ describe "Bolt::CLI" do
       )
     end
 
-    it 'calls Bolt::PAL#lookup' do
-      allow(Bolt::PAL).to receive(:new).and_return(pal)
-      expect(pal).to receive(:lookup)
+    it 'errors with both a targeting option and plan-hierarchy' do
+      cli = Bolt::CLI.new(%w[lookup key --plan-hierarchy --rerun all])
 
-      cli = Bolt::CLI.new(%w[lookup key --targets foo])
-      cli.execute(cli.parse)
+      expect { cli.execute(cli.parse) }.to raise_error(
+        Bolt::CLIError,
+        /accepts either targeting option OR --plan-hierarchy/
+      )
+    end
+
+    context 'without plan-hierarchy' do
+      it 'calls Bolt::PAL#lookup' do
+        allow(Bolt::PAL).to receive(:new).and_return(pal)
+        expect(pal).to receive(:lookup)
+
+        cli = Bolt::CLI.new(%w[lookup key --targets foo])
+        cli.execute(cli.parse)
+      end
+    end
+
+    context 'with plan-hierarchy' do
+      it 'calls Bolt::PAL#plan_hierarchy_lookup' do
+        allow(Bolt::PAL).to receive(:new).and_return(pal)
+        expect(pal).to receive(:plan_hierarchy_lookup)
+
+        cli = Bolt::CLI.new(%w[lookup key --plan-hierarchy])
+        cli.execute(cli.parse)
+      end
     end
   end
 

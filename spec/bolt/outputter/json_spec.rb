@@ -166,6 +166,13 @@ describe "Bolt::Outputter::JSON" do
     expect(parsed['guide']).to eq(guide)
   end
 
+  it 'prints a plan-hierarchy lookup value' do
+    value = 'peanut butter'
+    outputter.print_plan_lookup(value)
+    expect { JSON.parse(output.string) }.not_to raise_error
+    expect(output.string.strip).to eq("\"#{value}\"")
+  end
+
   context '#print_targets' do
     let(:inventoryfile) { '/path/to/inventory' }
 

@@ -33,7 +33,7 @@ describe 'plans' do
       end
     end
 
-    it "returns from a return statement" do
+    it "returns from a return statement", ssh: true do
       before_time = Time.now
       results = run_cli_json(%w[plan run parallel::return] + config_flags)
       wall_time = Time.now - before_time

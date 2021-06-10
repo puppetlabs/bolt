@@ -355,10 +355,16 @@ module Bolt
                               "the project, run '#{command} #{options[:object]}'."
       end
 
-      if options[:subcommand] != 'file' && options[:subcommand] != 'script' &&
+      if !%w[file script lookup].include?(options[:subcommand]) &&
          !options[:leftovers].empty?
         raise Bolt::CLIError,
               "Unknown argument(s) #{options[:leftovers].join(', ')}"
+      end
+
+      target_opts = options.keys.select { |opt| TARGETING_OPTIONS.include?(opt) }
+      if options[:subcommand] == 'lookup' &&
+         target_opts.any? && options[:plan_hierarchy]
+        raise Bolt::CLIError, "The 'lookup' command accepts either targeting option OR --plan-hierarchy."
       end
 
       if options[:noop] &&
@@ -433,10 +439,11 @@ module Bolt
       end
 
       # Initialize inventory and targets. Errors here are better to catch early.
-      # options[:target_args] will contain a string/array version of the targetting options this is passed to plans
+      # options[:target_args] will contain a string/array version of the targeting options this is passed to plans
       # options[:targets] will contain a resolved set of Target objects
       unless %w[guide module project secret].include?(options[:subcommand]) ||
-             %w[convert new show].include?(options[:action])
+             %w[convert new show].include?(options[:action]) ||
+             options[:plan_hierarchy]
         update_targets(options)
       end
 
@@ -519,7 +526,13 @@ module Bolt
           code = Bolt::ProjectManager.new(config, outputter, pal).migrate
         end
       when 'lookup'
-        code = lookup(options[:object], options[:targets])
+        plan_vars = Hash[options[:leftovers].map { |a| a.split('=', 2) }]
+        # Validate functions verifies one of these was passed
+        if options[:targets]
+          code = lookup(options[:object], options[:targets], plan_vars: plan_vars)
+        elsif options[:plan_hierarchy]
+          code = plan_lookup(options[:object], plan_vars: plan_vars)
+        end
       when 'plan'
         case options[:action]
         when 'new'
@@ -697,10 +710,19 @@ module Bolt
       outputter.print_groups(inventory.group_names.sort, inventory.source, config.default_inventoryfile)
     end
 
-    # Looks up a value with Hiera, using targets as the contexts to perform the
-    # look ups in.
+    # Looks up a value with Hiera as if in a plan outside an apply block, using
+    # provided variable values for interpolations
     #
-    def lookup(key, targets)
+    def plan_lookup(key, plan_vars: {})
+      result = pal.plan_hierarchy_lookup(key, plan_vars: plan_vars)
+      outputter.print_plan_lookup(result)
+      0
+    end
+
+    # Looks up a value with Hiera, using targets as the contexts to perform the
+    # look ups in. This should return the same value as a lookup in an apply block.
+    #
+    def lookup(key, targets, plan_vars: {})
       executor = Bolt::Executor.new(
         config.concurrency,
         analytics,
@@ -709,7 +731,7 @@ module Bolt
         config.future
       )
 
-      executor.subscribe(outputter) if options.fetch(:format, 'human') == 'human'
+      executor.subscribe(outputter) if config.format == 'human'
       executor.subscribe(log_outputter)
       executor.publish_event(type: :plan_start, plan: nil)
 
@@ -719,7 +741,7 @@ module Bolt
           targets,
           inventory,
           executor,
-          config.concurrency
+          plan_vars: plan_vars
         )
       end
 
