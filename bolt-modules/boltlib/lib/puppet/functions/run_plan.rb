@@ -125,6 +125,17 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
       params = wrap_sensitive_parameters(params, closure.parameters)
     end
 
+    # This can be anything as long as it's unique
+    plan_instance_id = SecureRandom.uuid
+
+    # Add the plan invocation ID to the plan_stack for the PlanFuture the plan is
+    # running in so that we know the PlanFuture is running in a new plan
+    # invocation. This can be nil in test cases and when `wait()` isn't
+    # supported.
+    current_future = executor.get_current_future(fiber: Fiber.current)
+    # Safe operator to make testing easier
+    current_future&.plan_stack&.unshift(plan_instance_id)
+
     # wrap plan execution in logging messages
     executor.log_plan(plan_name) do
       result = nil
@@ -150,6 +161,8 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
           raise e
         end
       ensure
+        # Pop the plan invocation ID off of the plan_id stack for the Future.
+        current_future&.plan_stack&.shift
         if run_as
           executor.run_as = old_run_as
         end

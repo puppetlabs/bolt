@@ -5,18 +5,19 @@ require 'bolt/plan_future'
 
 module Bolt
   class FiberExecutor
-    attr_reader :plan_futures
+    attr_reader :active_futures, :finished_futures
 
     def initialize
       @logger = Bolt::Logger.logger(self)
       @id = 0
-      @plan_futures = []
+      @active_futures = []
+      @finished_futures = []
     end
 
     # Whether there is more than one fiber running in parallel.
     #
     def in_parallel?
-      plan_futures.length > 1
+      active_futures.length > 1
     end
 
     # Creates a new Puppet scope from the current Plan scope so that variables
@@ -24,7 +25,7 @@ module Bolt
     # Then creates a new Fiber to execute the block, wraps the Fiber in a
     # Bolt::PlanFuture, and returns the Bolt::PlanFuture.
     #
-    def create_future(scope: nil, name: nil)
+    def create_future(plan_id:, scope: nil, name: nil)
       newscope = nil
       if scope
         # Save existing variables to the new scope before starting the future
@@ -46,13 +47,16 @@ module Bolt
       end
 
       # PlanFutures are assigned an ID, which is just a global incrementing
-      # integer. The main plan should always have ID 0.
+      # integer. The main plan should always have ID 0. They also have a
+      # plan_id, which identifies which plan spawned them. This is used for
+      # tracking which Futures to wait on when `wait()` is called without
+      # arguments.
       @id += 1
-      future = Bolt::PlanFuture.new(future, @id, name)
+      future = Bolt::PlanFuture.new(future, @id, name: name, plan_id: plan_id)
       @logger.trace("Created future #{future.name}")
 
       # Register the PlanFuture with the FiberExecutor to be executed
-      plan_futures << future
+      active_futures << future
       future
     end
 
@@ -63,7 +67,7 @@ module Bolt
     # the PlanFuture and remove the PlanFuture from the FiberExecutor.
     #
     def round_robin
-      plan_futures.each do |future|
+      active_futures.each do |future|
         # If the Fiber is still running and can be resumed, then resume it
         @logger.trace("Checking future '#{future.name}'")
         if future.alive?
@@ -78,19 +82,19 @@ module Bolt
 
         # If the future errored and the main plan has already exited, log the
         # error at warn level.
-        unless plan_futures.map(&:id).include?(0) || future.state == "done"
+        unless active_futures.map(&:id).include?(0) || future.state == "done"
           Bolt::Logger.warn('errored_futures', "Error in future '#{future.name}': #{future.value}")
         end
 
         # Remove the PlanFuture from the FiberExecutor.
-        plan_futures.delete(future)
+        finished_futures.push(active_futures.delete(future))
       end
 
       # If the Fiber immediately returned or if the Fiber is blocking on a
       # `wait` call, Bolt should pause for long enough that something can
       # execute before checking again. This mitigates CPU
       # thrashing.
-      return unless plan_futures.all? { |f| %i[returned_immediately unfinished].include?(f.value) }
+      return unless active_futures.all? { |f| %i[returned_immediately unfinished].include?(f.value) }
       @logger.trace("Nothing can be resumed. Rechecking in 0.5 seconds.")
 
       sleep(0.5)
@@ -101,12 +105,53 @@ module Bolt
     # Bolt can exit.
     #
     def plan_complete?
-      plan_futures.empty?
+      active_futures.empty?
+    end
+
+    def all_futures
+      active_futures + finished_futures
+    end
+
+    # Get the PlanFuture object that is currently executing
+    #
+    def get_current_future(fiber:)
+      all_futures.select { |f| f.fiber == fiber }.first
+    end
+
+    # Get the plan invocation ID for the PlanFuture that is currently executing
+    #
+    def get_current_plan_id(fiber:)
+      get_current_future(fiber: fiber).current_plan
+    end
+
+    # Get the Future objects associated with a particular plan invocation.
+    #
+    def get_futures_for_plan(plan_id:)
+      all_futures.select { |f| f.original_plan == plan_id }
     end
 
     # Block until the provided PlanFuture objects have finished, or the timeout is reached.
     #
     def wait(futures, timeout: nil, catch_errors: false, **_kwargs)
+      if futures.nil?
+        results = []
+        plan_id = get_current_plan_id(fiber: Fiber.current)
+        # Recollect the futures for this plan until all of the futures have
+        # finished. This ensures that we include futures created inside of
+        # futures being waited on.
+        until (futures = get_futures_for_plan(plan_id: plan_id)).map(&:alive?).none?
+          if futures.map(&:fiber).include?(Fiber.current)
+            msg = "The wait() function cannot be called with no arguments inside a "\
+                  "background block in the same plan."
+            raise Bolt::Error.new(msg, 'bolt/infinite-wait')
+          end
+          # Wait for all the futures we know about so far before recollecting
+          # Futures for the plan and waiting again
+          results = wait(futures, timeout: timeout, catch_errors: catch_errors)
+        end
+        return results
+      end
+
       if timeout.nil?
         Fiber.yield(:unfinished) until futures.map(&:alive?).none?
       else

@@ -9,14 +9,14 @@ require 'bolt/plan_result'
 describe 'parallelize' do
   include PuppetlabsSpec::Fixtures
   let(:array) { %w[a b c d a b a] }
-  let(:future) { Bolt::PlanFuture.new(nil, 1, 'name') }
+  let(:future) { Bolt::PlanFuture.new(nil, 1, name: 'name', plan_id: 1234) }
   let(:executor) { Bolt::Executor.new }
   let(:result_array) { %w[ea eb ec ed ea eb ea] }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_executor: executor) do
+    Puppet.override(bolt_executor: executor, plan_stack: []) do
       example.run
     end
   end

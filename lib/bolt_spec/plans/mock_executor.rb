@@ -38,6 +38,7 @@ module BoltSpec
         # plans that are allowed to be executed by the @executor_real
         @allowed_exec_plans = {}
         @id = 0
+        @plan_futures = []
       end
 
       def module_file_id(file)
@@ -266,7 +267,7 @@ module BoltSpec
         false
       end
 
-      def create_future(scope: nil, name: nil)
+      def create_future(plan_id:, scope: nil, name: nil)
         newscope = nil
         if scope
           # Create the new scope
@@ -281,13 +282,18 @@ module BoltSpec
         # Execute "futures" serially when running in BoltSpec
         result = yield newscope
         @id += 1
-        future = Bolt::PlanFuture.new(nil, @id, name: name)
+        future = Bolt::PlanFuture.new(nil, @id, name: name, plan_id: plan_id)
         future.value = result
+        @plan_futures << future
         future
       end
 
-      def wait(results, **_kwargs)
-        results
+      def get_futures_for_plan(plan_id:)
+        @plan_futures.select { |future| future.plan_id == plan_id }
+      end
+
+      def wait(futures, **_kwargs)
+        futures.map(&:value)
       end
 
       # Since Futures are executed immediately once created, this will always
@@ -296,8 +302,12 @@ module BoltSpec
         true
       end
 
-      def plan_futures
-        []
+      def get_current_future(fiber)
+        @plan_futures.select { |f| f.fiber == fiber }&.first
+      end
+
+      def get_current_plan_id(fiber)
+        get_current_future(fiber)&.current_plan
       end
 
       # Public methods on Bolt::Executor that need to be mocked so there aren't

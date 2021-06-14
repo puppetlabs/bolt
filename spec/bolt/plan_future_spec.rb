@@ -4,7 +4,7 @@ require 'spec_helper'
 require 'bolt/plan_future'
 
 describe Bolt::PlanFuture do
-  let(:future) { Bolt::PlanFuture.new(fiber, 'Test future') }
+  let(:future) { Bolt::PlanFuture.new(fiber, 'Test future', plan_id: 1234) }
   let(:fiber) { double('fiber', alive?: true) }
 
   describe :resume do
