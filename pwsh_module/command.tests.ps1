@@ -266,6 +266,16 @@ Describe "test all bolt command examples" {
       # This does work without quotes being explicitly added here
       $result | Should -Be "bolt script run myscript.sh echo hello --targets target1,target2"
     }
+
+    It "bolt script run myscript.sh foo bar --targets target1,target2" {
+      $result = Invoke-BoltScript -script 'myscript.sh' 'foo' 'bar' -targets 'target1,target2'
+      $result | Should -Be "bolt script run myscript.sh --targets target1,target2 foo bar"
+    }
+
+    It "bolt script run myscript.sh foo bar --targets target1,target2" {
+      $result = Invoke-BoltScript -script 'myscript.sh' -arguments 'foo','bar' -targets 'target1,target2'
+      $result | Should -Be "bolt script run myscript.sh foo bar --targets target1,target2"
+    }
   }
 
   Context "bolt secret" {

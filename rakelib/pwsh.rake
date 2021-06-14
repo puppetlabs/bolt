@@ -161,14 +161,15 @@ namespace :pwsh do
             validate_not_null_or_empty: true
           }
           @pwsh_command[:options] << {
-            name:       'Arguments',
-            ruby_short: 'a',
-            help_msg:   'The arguments to the script',
-            type:       'string',
-            switch:     false,
-            mandatory:  false,
-            position:   1,
-            ruby_arg:   'bare'
+            name:                           'Arguments',
+            ruby_short:                     'a',
+            help_msg:                       'The arguments to the script',
+            type:                           'string[]',
+            switch:                         false,
+            mandatory:                      false,
+            position:                       1,
+            ruby_arg:                       'bare',
+            value_from_remaining_arguments: true
           }
         when 'task'
           # bolt task show|run <task> [parameters] [options]
