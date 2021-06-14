@@ -646,7 +646,7 @@ module Bolt
     end
 
     def list_tasks
-      tasks = filter_content(pal.list_tasks(filter_content: true), options[:filter])
+      tasks = filter_content(pal.list_tasks_with_cache(filter_content: true), options[:filter])
       outputter.print_tasks(tasks, pal.user_modulepath)
     end
 

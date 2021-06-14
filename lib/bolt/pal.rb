@@ -300,6 +300,49 @@ module Bolt
       end
     end
 
+    def list_tasks_with_cache(filter_content: false)
+      # Don't filter content yet, so that if users update their task filters
+      # we don't need to refresh the cache
+      task_names = list_tasks(filter_content: false).map(&:first)
+      task_cache = if @project
+                     Bolt::Util.read_optional_json_file(@project.task_cache_file, 'Task cache file')
+                   else
+                     {}
+                   end
+      updated = false
+
+      task_list = task_names.each_with_object([]) do |task_name, list|
+        data = task_cache[task_name] || get_task_info(task_name, with_mtime: true)
+
+        # Make sure all the keys are strings - if we get data from
+        # get_task_info they will be symbols
+        data = Bolt::Util.walk_keys(data, &:to_s)
+
+        # If any files in the task were updated, refresh the cache
+        if data['files']&.any?
+          # For all the files that are part of the task
+          data['files'].each do |f|
+            # If any file has been updated since we last cached, update the
+            # cache
+            next if File.mtime(f['path']).to_s == f['mtime']
+            data = get_task_info(task_name, with_mtime: true)
+            data = Bolt::Util.walk_keys(data, &:to_s)
+            # Tell Bolt to write to the cache file once we're done
+            updated = true
+            # Update the cache data
+            task_cache[task_name] = data
+          end
+        end
+        metadata = data['metadata'] || {}
+        # Don't add tasks to the list to return if they are private
+        list << [task_name, metadata['description']] unless metadata['private']
+      end
+
+      # Write the cache if any entries were updated
+      File.write(@project.task_cache_file, task_cache.to_json) if updated
+      filter_content ? filter_content(task_list, @project&.tasks) : task_list
+    end
+
     def list_tasks(filter_content: false)
       in_bolt_compiler do |compiler|
         tasks = compiler.list_tasks.map(&:name).sort.each_with_object([]) do |task_name, data|
@@ -351,14 +394,20 @@ module Bolt
       end
     end
 
-    def get_task(task_name)
+    def get_task(task_name, with_mtime: false)
       task = task_signature(task_name)
 
       if task.nil?
         raise Bolt::Error.unknown_task(task_name)
       end
 
-      Bolt::Task.from_task_signature(task)
+      task = Bolt::Task.from_task_signature(task)
+      task.add_mtimes if with_mtime
+      task
+    end
+
+    def get_task_info(task_name, with_mtime: false)
+      get_task(task_name, with_mtime: with_mtime).to_h
     end
 
     def list_plans_with_cache(filter_content: false)
@@ -373,20 +422,20 @@ module Bolt
       updated = false
 
       plan_list = plan_names.each_with_object([]) do |plan_name, list|
-        info = plan_cache[plan_name] || get_plan_info(plan_name, with_mtime: true)
+        data = plan_cache[plan_name] || get_plan_info(plan_name, with_mtime: true)
 
         # If the plan is a 'local' plan (in the project itself, or the
         # modules/ directory) then verify it hasn't been updated since we
         # cached it. If it has been updated, refresh the cache and use the
         # new data.
-        if info['file'] &&
-           (File.mtime(info.dig('file', 'path')) <=> info.dig('file', 'mtime')) != 0
-          info = get_plan_info(plan_name, with_mtime: true)
+        if data['file'] &&
+           File.mtime(data.dig('file', 'path')).to_s != data.dig('file', 'mtime')
+          data = get_plan_info(plan_name, with_mtime: true)
           updated = true
-          plan_cache[plan_name] = info
+          plan_cache[plan_name] = data
         end
 
-        list << [plan_name, info['description']] unless info['private']
+        list << [plan_name, data['description']] unless data['private']
       end
 
       File.write(@project.plan_cache_file, plan_cache.to_json) if updated
@@ -586,6 +635,7 @@ module Bolt
         inputs = generator.find_inputs(:pcore)
         FileUtils.mkdir_p(@resource_types)
         cache_plan_info if @project && cache
+        cache_task_info if @project && cache
         generator.generate(inputs, @resource_types, true)
       end
     end
@@ -599,6 +649,17 @@ module Bolt
 
       FileUtils.touch(@project.plan_cache_file)
       File.write(@project.plan_cache_file, plans_info.to_json)
+    end
+
+    def cache_task_info
+      # task_name is an array here
+      tasks_info = list_tasks(filter_content: false).map do |task_name,|
+        data = get_task_info(task_name, with_mtime: true)
+        { task_name => data }
+      end.reduce({}, :merge)
+
+      FileUtils.touch(@project.task_cache_file)
+      File.write(@project.task_cache_file, tasks_info.to_json)
     end
 
     def run_task(task_name, targets, params, executor, inventory, description = nil)

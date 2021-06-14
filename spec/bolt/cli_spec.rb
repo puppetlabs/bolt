@@ -1464,10 +1464,12 @@ describe "Bolt::CLI" do
         end
 
         it "only includes tasks set in bolt-project.yaml" do
+          cache_path = Bolt::Util.windows? ? 'C:\Temp\cache_path' : '/tmp/cache_path'
           mocks = {
             type: '',
             resource_types: '',
             tasks: ['facts'],
+            task_cache_file: cache_path,
             project_file?: true,
             load_as_module?: true,
             name: nil,

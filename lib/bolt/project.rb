@@ -14,7 +14,7 @@ module Bolt
     attr_reader :path, :data, :inventory_file, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types, :project_file,
                 :downloads, :plans_path, :modulepath, :managed_moduledir,
-                :backup_dir, :plugin_cache_file, :plan_cache_file
+                :backup_dir, :plugin_cache_file, :plan_cache_file, :task_cache_file
 
     def self.default_project
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
@@ -114,6 +114,7 @@ module Bolt
       @backup_dir        = @path + '.bolt-bak'
       @plugin_cache_file = @path + '.plugin_cache.json'
       @plan_cache_file   = @path + '.plan_cache.json'
+      @task_cache_file   = @path + '.task_cache.json'
       @modulepath        = [(@path + 'modules').to_s]
 
       if (tc = Bolt::Config::INVENTORY_OPTIONS.keys & data.keys).any?
