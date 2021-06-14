@@ -286,7 +286,7 @@ module BoltSpec
         future
       end
 
-      def wait(results, _timeout, **_kwargs)
+      def wait(results, **_kwargs)
         results
       end
 
