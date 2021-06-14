@@ -1,5 +1,63 @@
 # Changelog
 
+## Bolt 3.10.0 (2021-06-14)
+
+### New features
+
+* **Add `plugin show` command**
+  ([#2872](https://github.com/puppetlabs/bolt/pull/2872))
+
+  The `bolt plugin show` command and `Get-BoltPlugin` PowerShell cmdlet
+  can be used to list plugins available to the current project.
+
+* **Lookup hiera `plan_hierarchy` values from the CLI**
+  ([#2815](https://github.com/puppetlabs/bolt/issues/2815))
+
+  The `bolt lookup` command now has a `--plan-hierarchy` flag that will
+  lookup values from Hiera's `plan_hierarchy`.
+
+* **New Bolt debugging guide**
+  ([#2871](https://github.com/puppetlabs/bolt/pull/2871))
+
+  Bolt has a new guide with common debugging tips that can be accessed
+  by running `bolt guide debugging`.
+
+* **Builtin tab completion**
+  ([#2869](https://github.com/puppetlabs/bolt/pull/2869))
+
+  Bolt now supports tab completion for Bolt commands, subcommands, and
+  any flags available for a command. It also supports tab completing tasks
+  and plans for certain project types when tasks and plans have been
+  cached.
+
+### Bug fixes
+
+* **Test plans that use `parallelize()` plan function in BoltSpec**
+  ([#2882](https://github.com/puppetlabs/bolt/pull/2882))
+
+  BoltSpec no longer fails when testing plans that include the
+  `parallelize()` plan function. Previously, testing plans that used
+  this function would cause the plan to fail with an argument mismatch
+  error.
+
+* **Pass remaining arguments to PowerShell `-Arguments` parameter**
+  ([#2788](https://github.com/puppetlabs/bolt/issues/2788))
+
+  The PuppetBolt PowerShell module now correctly supports passing
+  multiple arguments to the `-Arguments` parameter. Previously, any
+  unbound arguments were not passed to this parameter, causing the
+  PowerShell parser to error.
+
+### Deprecations
+
+* **PuppetBolt PowerShell module will not ship with Bolt packages in a
+  future release**
+  ([#2550](https://github.com/puppetlabs/bolt/issues/2550))
+
+  The PuppetBolt PowerShell module will no longer ship with Bolt
+  packages on Windows in a future release. The PuppetBolt PowerShell
+  module should instead be installed from PowerShell Gallery.
+
 ## Bolt 3.9.2 (2021-06-08)
 
 ### Bug fixes
