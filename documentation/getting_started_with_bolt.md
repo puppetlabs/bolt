@@ -428,7 +428,7 @@ steps:
   - name: start_apache
     script: apache/start_apache.sh
     targets: $targets
-    description: "Starting Apache service" 
+    description: "Starting Apache service"
 ```
 
 Run the plan again:
