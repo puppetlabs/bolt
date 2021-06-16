@@ -174,11 +174,22 @@ module Bolt
           if result.message?
             @stream.puts(remove_trail(indent(2, result.message)))
           end
-
           case result.action
           when 'command', 'script'
             safe_value = result.safe_value
-            @stream.puts(indent(2, safe_value['merged_output'])) unless safe_value['merged_output'].strip.empty?
+            if safe_value["merged_output"]
+              @stream.puts(indent(2, safe_value['merged_output'])) unless safe_value['merged_output'].strip.empty?
+
+            else # output stdout or stderr
+              unless safe_value['stdout'].nil? || safe_value['stdout'].strip.empty?
+                @stream.puts(indent(2, "STDOUT:"))
+                @stream.puts(indent(4, safe_value['stdout']))
+              end
+              unless safe_value['stderr'].nil? || safe_value['stderr'].strip.empty?
+                @stream.puts(indent(2, "STDERR:"))
+                @stream.puts(indent(4, safe_value['stderr']))
+              end
+            end
           when 'lookup'
             @stream.puts(indent(2, result['value']))
           else
