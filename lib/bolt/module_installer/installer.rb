@@ -30,7 +30,7 @@ module Bolt
 
         settings = R10K::Settings.global_settings.evaluate(@config)
         R10K::Initializers::GlobalInitializer.new(settings).call
-        install_action = R10K::Action::Puppetfile::Install.new(r10k_opts, nil)
+        install_action = R10K::Action::Puppetfile::Install.new(r10k_opts, nil, {})
 
         # Override the r10k logger with a proxy to our own logger
         R10K::Logging.instance_variable_set(:@outputter, Bolt::R10KLogProxy.new)

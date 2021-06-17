@@ -2416,7 +2416,7 @@ describe "Bolt::CLI" do
         expect(R10K::Action::Puppetfile::Install).to receive(:new)
           .with({ root: File.dirname(puppetfile),
                   puppetfile: puppetfile.to_s,
-                  moduledir: project.managed_moduledir.to_s }, nil)
+                  moduledir: project.managed_moduledir.to_s }, nil, {})
 
         allow(action_stub).to receive(:call).and_return(true)
 
