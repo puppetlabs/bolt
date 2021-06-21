@@ -718,7 +718,7 @@ module Bolt
           Run a script on the specified targets.
 
       #{colorize(:cyan, 'Documentation')}
-          Learn more about running scrips at https://pup.pt/bolt-commands.
+          Learn more about running scripts at https://pup.pt/bolt-commands.
 
       #{colorize(:cyan, 'Actions')}
           run         Run a script on the specified targets.
@@ -740,7 +740,7 @@ module Bolt
           be quoted.
 
       #{colorize(:cyan, 'Documentation')}
-          Learn more about running scrips at https://pup.pt/bolt-commands.
+          Learn more about running scripts at https://pup.pt/bolt-commands.
 
       #{colorize(:cyan, 'Examples')}
           bolt script run myscript.sh 'echo hello' --targets target1,target2
