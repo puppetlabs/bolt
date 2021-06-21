@@ -170,7 +170,7 @@ describe "Bolt::Outputter::Human" do
     option = (Bolt::Util.powershell? ? '[-Noop]' : '[--noop]')
 
     outputter.print_task_info(Bolt::Task.new(name, metadata, files))
-    expect(output.string).to match(/#{option}/)
+    expect(output.string).to match(Regexp.escape(option))
   end
 
   it 'prints modulepath as builtin for builtin modules' do
