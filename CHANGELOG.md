@@ -1,5 +1,57 @@
 # Changelog
 
+## Bolt 3.11.0 (2021-06-21)
+
+### New features
+
+* **macOS 11 packages**
+  ([#2855](https://github.com/puppetlabs/bolt/issues/2855))
+
+  Bolt now ships packages for macOS 11 (Big Sur).
+
+* **Update bundled modules to latest versions**
+  ([#2883](https://github.com/puppetlabs/bolt/pull/2883))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [pkcs7 0.1.2](https://forge.puppet.com/puppetlabs/pkcs7/0.1.2/changelog)
+
+  - [puppet_agent 4.7.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.7.0/changelog)
+    
+    The `puppet_agent::install` task now supports running in `noop` mode.
+
+  - [scheduled_task 3.0.1](https://forge.puppet.com/puppetlabs/scheduled_task/3.0.1/changelog)
+
+  - [stdlib 7.1.0](https://forge.puppet.com/puppetlabs/stdlib/7.1.0/changelog)
+
+* **Ship with Puppet 7.7.0**
+  ([#2864](https://github.com/puppetlabs/bolt/issues/2864))
+
+  Bolt now ships with Puppet 7.7.0.
+
+### Bug fixes
+
+* **Handle printing command and script results with no output**
+  ([#2863](https://github.com/puppetlabs/bolt/issues/2863))
+
+  Bolt no longer errors when printing results from a command or script when the
+  result does not include output on `stdout` or `stderr`. Previously, Bolt would
+  error with an undefined method message.
+
+* **Handle printing command and script results with `pcp` transport**
+  ([#2863](https://github.com/puppetlabs/bolt/issues/2863))
+
+  Bolt no longer errors when printing command and script results when using the
+  `pcp` transport. Previously, Bolt would error with an undefined method
+  message.
+
+* **Install modules when using Bolt as a gem**
+  ([#2891](https://github.com/puppetlabs/bolt/pull/2891))
+
+  Bolt no longer errors when installing modules using the `bolt` gem.
+  Previously, Bolt would error with a missing parameter message.
+
 ## Bolt 3.10.0 (2021-06-14)
 
 ### New features
