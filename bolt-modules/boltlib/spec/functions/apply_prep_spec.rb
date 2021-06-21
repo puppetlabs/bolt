@@ -146,7 +146,7 @@ describe 'apply_prep' do
              .returns(task_hook)
 
       is_expected.to run.with_params(hostnames).and_raise_error(
-        Bolt::RunFailure, "Plan aborted: run_task 'custom_facts_task' failed on #{targets.count} targets"
+        Bolt::RunFailure, "run_task 'custom_facts_task' failed on #{targets.count} targets"
       )
     end
 

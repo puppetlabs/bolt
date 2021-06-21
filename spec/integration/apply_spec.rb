@@ -497,7 +497,7 @@ describe 'apply', expensive: true do
           result = run_cli_json(%w[plan run prep -t all], project: project)
 
           expect(result['kind']).to eq('bolt/run-failure')
-          expect(result['msg']).to eq("Plan aborted: apply_prep failed on 3 targets")
+          expect(result['msg']).to eq("apply_prep failed on 3 targets")
 
           result_set = result['details']['result_set']
           task_error = result_set.select { |h| h['target'] == 'error' }[0]['value']['_error']

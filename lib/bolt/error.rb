@@ -69,7 +69,7 @@ module Bolt
         'value' => result.value,
         'object' => result.object
       }
-      message = "Plan aborted: Running container '#{result.object}' failed."
+      message = "Running container '#{result.object}' failed."
       super(message, 'bolt/container-failure', details)
       @result = result
       @error_code = 2
@@ -86,7 +86,7 @@ module Bolt
         'result_set' => result_set
       }
       object_msg = " '#{object}'" if object
-      message = "Plan aborted: #{action}#{object_msg} failed on #{result_set.error_set.length} target"
+      message = "#{action}#{object_msg} failed on #{result_set.error_set.length} target"
       message += "s" unless result_set.error_set.length == 1
       super(message, 'bolt/run-failure', details)
       @result_set = result_set
@@ -122,7 +122,7 @@ module Bolt
         'failed_indices' => failed_indices,
         'results' => results
       }
-      message = "Plan aborted: parallel block failed on #{failed_indices.length} target"
+      message = "parallel block failed on #{failed_indices.length} target"
       message += "s" unless failed_indices.length == 1
       super(message, 'bolt/parallel-failure', details)
       @error_code = 2

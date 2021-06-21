@@ -266,7 +266,7 @@ describe 'using module based plugins' do
         result = run_cli_json(command, rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
+        expect(result['msg']).to match(/apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /Plugin identity does not support puppet_library/
         )
@@ -286,7 +286,7 @@ describe 'using module based plugins' do
         result = run_cli_json(command, rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
+        expect(result['msg']).to match(/apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(/Unknown plugin:/)
       end
     end
@@ -304,7 +304,7 @@ describe 'using module based plugins' do
         result = run_cli_json(command, rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
+        expect(result['msg']).to match(/apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /The task failed with exit code 1/
         )

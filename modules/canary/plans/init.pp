@@ -88,7 +88,7 @@ plan canary(
       $message = "Plan failed for ${merged_result.error_set.count} targets."
     }
     else {
-      $message = "Plan aborted. ${canr.error_set.count} canary target failures. ${restr.count} targets skipped."
+      $message = "${canr.error_set.count} canary target failures. ${restr.count} targets skipped."
     }
     $details = {'action' => $action,
                 'object' => $object,

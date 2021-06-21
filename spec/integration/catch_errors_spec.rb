@@ -78,7 +78,6 @@ describe "catch_errors", ssh: true do
       result = run_cli_json(%W[plan run #{plan} --params #{params}] + config_flags)
 
       expect(result).to include('kind')
-      expect(result['msg']).to include("Plan aborted")
     end
   end
 

@@ -149,7 +149,7 @@ Undef:}
         output = run_cli(%w[plan run wait::error] + config_flags,
                          outputter: Bolt::Outputter::Human)
         expect(output).to include("Who's on first\nI don't know's on third")
-        expect(output).to include("\"msg\": \"Plan aborted: parallel block failed on 1 target")
+        expect(output).to include("\"msg\": \"parallel block failed on 1 target")
         expect(output).not_to include("Finished main plan.")
       end
 
@@ -157,7 +157,7 @@ Undef:}
         output = run_cli(%w[plan run wait::error catch_errors=true] + config_flags,
                          outputter: Bolt::Outputter::Human)
         expect(output).to include("Who's on first\nI don't know's on third")
-        expect(output).to include("Plan aborted: run_command 'exit 1' failed")
+        expect(output).to include("run_command 'exit 1' failed")
         expect(output).to include("Finished main plan.")
       end
     end
@@ -173,7 +173,7 @@ Undef:}
         params = { 'timeout' => 0.1, 'sleep' => 0.5 }.to_json
         output = run_cli_json(%W[plan run wait::timeout --params #{params}] + config_flags)
         expect(output['kind']).to eq("bolt/parallel-failure")
-        expect(output['msg']).to match(/Plan aborted: parallel block failed/)
+        expect(output['msg']).to match(/parallel block failed/)
         expect(output['details']).to include({ "action" => "parallelize", "failed_indices" => [1] })
       end
 
@@ -201,7 +201,7 @@ Undef:}
 
     it "finishes executing the block then raises an error when there's an error" do
       expected_err = { "kind" => "bolt/parallel-failure",
-                       "msg" => "Plan aborted: parallel block failed on 1 target" }
+                       "msg" => "parallel block failed on 1 target" }
       expected_details = { "action" => "parallelize",
                            "failed_indices" => [1] }
       expected_results = [[{ "target" => 'ubuntu_node',
@@ -210,7 +210,7 @@ Undef:}
                              "status" => "success",
                              "value" => { "_output" => "a\n" } }],
                           { "kind" => "bolt/run-failure",
-                            "msg" => "Plan aborted: run_task 'error::fail' failed on 1 target",
+                            "msg" => "run_task 'error::fail' failed on 1 target",
                             "details" =>
                           { "action" => "run_task",
                             "object" => "error::fail",
