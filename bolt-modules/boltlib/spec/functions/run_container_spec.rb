@@ -84,7 +84,7 @@ describe 'run_container' do
       it 'raises an error if the container fails' do
         is_expected.to run
           .with_params(image, { 'cmd' => 'foo', 'rm' => true })
-          .and_raise_error(Bolt::ContainerFailure, /Plan aborted: Running container '#{image}' failed/)
+          .and_raise_error(Bolt::ContainerFailure, /Running container '#{image}' failed/)
       end
 
       it 'returns a ContainerResult with errors with _catch_errors' do
