@@ -255,6 +255,19 @@ describe "Bolt::Outputter::Human" do
     expect(output.string).to match(/Finished on #{target}.*value/m)
   end
 
+  it "doesn't stacktrace when merged_output is nil" do
+    value = {
+      'stdout'        => 'stdout',
+      'stderr'        => 'stderr',
+      'merged_output' => nil,
+      'exit_code'     => 2
+    }
+    expect {
+      outputter.print_result(Bolt::Result.for_command(target, value, 'command', "executed", []))
+    }.not_to raise_error
+    expect(output.string).to match(/stdout.*stderr/m)
+  end
+
   it "prints empty results from a plan" do
     outputter.print_plan_result(Bolt::PlanResult.new([], 'success'))
     expect(output.string).to eq("[\n\n]\n")
