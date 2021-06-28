@@ -372,12 +372,13 @@ describe "Bolt::Outputter::Human" do
   it 'prints a list of guide topics' do
     outputter.print_topics(%w[apple banana carrot])
     expect(output.string).to eq(<<~OUTPUT)
-      Available topics are:
-      apple
-      banana
-      carrot
+      Topics
+        apple
+        banana
+        carrot
 
-      Use 'bolt guide <TOPIC>' to view a specific guide.
+      Additional information
+        Use 'bolt guide <TOPIC>' to view a specific guide.
     OUTPUT
   end
 

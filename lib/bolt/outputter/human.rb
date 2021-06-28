@@ -462,9 +462,11 @@ module Bolt
       end
 
       def print_topics(topics)
-        print_message("Available topics are:")
-        print_message(topics.join("\n"))
-        print_message("\nUse 'bolt guide <TOPIC>' to view a specific guide.")
+        info = +"#{colorize(:cyan, 'Topics')}\n"
+        info << indent(2, topics.join("\n"))
+        info << "\n\n#{colorize(:cyan, 'Additional information')}\n"
+        info << indent(2, "Use 'bolt guide <TOPIC>' to view a specific guide.")
+        @stream.puts info
       end
 
       def print_guide(guide, _topic)
