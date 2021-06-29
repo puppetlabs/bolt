@@ -61,6 +61,14 @@ describe 'apply', expensive: true do
         expect(result.dig('value', 'report', 'resource_statuses')).to include(/Notify\[Hello .*\]/)
       end
     end
+
+    it 'warns about exported resources with an ID' do
+      allow(Bolt::Logger).to receive(:warn)
+      expect(Bolt::Logger).to receive(:warn).with('exported_resources', /the export is ignored/).at_least(:once)
+      expect(Bolt::Logger).to receive(:warn).with('exported_resources',
+                                                  /the collection will be ignored/).at_least(:once)
+      run_cli_json(%W[plan run basic::exported_resources -t #{targets}], project: project)
+    end
   end
 
   describe 'over ssh', ssh: true do
