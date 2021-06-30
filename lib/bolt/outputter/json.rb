@@ -23,6 +23,8 @@ module Bolt
           print_result(event[:result])
         when :message
           print_message(event[:message])
+        when :verbose
+          print_message(event[:message]) if @verbose
         end
       end
 

@@ -29,6 +29,7 @@ module BoltSpec
         @modulepath = [modulepath].flatten.map { |path| File.absolute_path(path) }
         MOCKED_ACTIONS.each { |action| instance_variable_set(:"@#{action}_doubles", {}) }
         @stub_out_message = nil
+        @stub_out_verbose = nil
         @transport_features = ['puppet-agent']
         @executor_real = Bolt::Executor.new
         # by default, we want to execute any plan that we come across without error
@@ -187,6 +188,7 @@ module BoltSpec
           end
         end
         @stub_out_message.assert_called('out::message') if @stub_out_message
+        @stub_out_verbose.assert_called('out::verbose') if @stub_out_verbose
       end
 
       MOCKED_ACTIONS.each do |action|
@@ -197,6 +199,10 @@ module BoltSpec
 
       def stub_out_message
         @stub_out_message ||= ActionDouble.new(:PublishStub)
+      end
+
+      def stub_out_verbose
+        @stub_out_verbose ||= ActionDouble.new(:PublishStub)
       end
 
       def stub_apply
@@ -220,12 +226,20 @@ module BoltSpec
       end
 
       def publish_event(event)
-        if event[:type] == :message
+        case event[:type]
+        when :message
           unless @stub_out_message
             @error_message = "Unexpected call to 'out::message(#{event[:message]})'"
             raise UnexpectedInvocation, @error_message
           end
           @stub_out_message.process(event[:message])
+
+        when :verbose
+          unless @stub_out_verbose
+            @error_message = "Unexpected call to 'out::verbose(#{event[:message]})'"
+            raise UnexpectedInvocation, @error_message
+          end
+          @stub_out_verbose.process(event[:message])
         end
       end
 

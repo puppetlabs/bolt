@@ -191,6 +191,15 @@ module BoltSpec
       allow_out_message.expect_call
     end
 
+    def allow_out_verbose
+      executor.stub_out_verbose.add_stub
+    end
+    alias allow_any_out_verbose allow_out_verbose
+
+    def expect_out_verbose
+      allow_out_verbose.expect_call
+    end
+
     # Example helpers to mock other run functions
     # The with_targets method makes sense for all stubs
     # with_params could be reused for options
