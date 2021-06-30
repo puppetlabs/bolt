@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util/format'
+
 # Log a debugging message.
 #
 # Messages logged at this level typically include detailed information about
@@ -13,7 +15,7 @@ Puppet::Functions.create_function(:'log::debug') do
   # Log a debugging message.
   # @param message The message to log.
   # @example Log a debugging message
-  #   log::trace("Function frogsay returned: ${result}")
+  #   log::debug("Function frogsay returned: ${result}")
   dispatch :log_debug do
     param 'Any', :message
     return_type 'Undef'
@@ -29,7 +31,7 @@ Puppet::Functions.create_function(:'log::debug') do
 
     Puppet.lookup(:bolt_executor).tap do |executor|
       executor.report_function_call(self.class.name)
-      executor.publish_event(type: :log, level: :debug, message: message)
+      executor.publish_event(type: :log, level: :debug, message: Bolt::Util::Format.stringify(message))
     end
 
     nil

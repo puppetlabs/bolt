@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util/format'
+
 # Log a trace message.
 #
 # Messages logged at this level typically include the most detailed information
@@ -29,7 +31,7 @@ Puppet::Functions.create_function(:'log::trace') do
 
     Puppet.lookup(:bolt_executor).tap do |executor|
       executor.report_function_call(self.class.name)
-      executor.publish_event(type: :log, level: :trace, message: message)
+      executor.publish_event(type: :log, level: :trace, message: Bolt::Util::Format.stringify(message))
     end
 
     nil

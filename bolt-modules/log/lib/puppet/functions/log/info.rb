@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util/format'
+
 # Log an info message.
 #
 # Messages logged at this level typically include high-level information about
@@ -29,7 +31,7 @@ Puppet::Functions.create_function(:'log::info') do
 
     Puppet.lookup(:bolt_executor).tap do |executor|
       executor.report_function_call(self.class.name)
-      executor.publish_event(type: :log, level: :info, message: message)
+      executor.publish_event(type: :log, level: :info, message: Bolt::Util::Format.stringify(message))
     end
 
     nil

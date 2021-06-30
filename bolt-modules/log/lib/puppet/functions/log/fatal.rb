@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'bolt/util/format'
+
 # Log a fatal message.
 #
 # Messages logged at this level indicate that the plan encountered an error that
@@ -30,7 +32,7 @@ Puppet::Functions.create_function(:'log::fatal') do
 
     Puppet.lookup(:bolt_executor).tap do |executor|
       executor.report_function_call(self.class.name)
-      executor.publish_event(type: :log, level: :fatal, message: message)
+      executor.publish_event(type: :log, level: :fatal, message: Bolt::Util::Format.stringify(message))
     end
 
     nil

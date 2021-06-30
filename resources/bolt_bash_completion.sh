@@ -47,7 +47,7 @@ _bolt_complete() {
     next=$(compgen -f -d "" -- $cur)
   # Handle tab completing enumerable CLI options
   elif [ "$prev" == "--log-level" ]; then
-    next="trace debug info warn error fatal any"
+    next="trace debug info warn error fatal"
   elif [ "$prev" == "--transport" ]; then
     next="docker local lxd pcp podman remote ssh winrm"
   elif [ "$prev" == "--format" ]; then
