@@ -902,9 +902,10 @@ describe "BoltServer::TransportApp" do
       let(:targets) { %w[one two three] }
       let(:bolt_inventory) { { 'targets' => targets } }
 
-      def post_to_project_inventory_targets(versioned_project, connect_data = { 'puppet_connect_data' => {} })
-        path = "/project_inventory_targets?versioned_project=#{versioned_project}"
-        post(path, JSON.generate(connect_data), 'CONTENT_TYPE' => 'text/json')
+      def post_to_project_inventory_targets(versioned_project, connect_data = {})
+        path = "/project_inventory_targets"
+        body = { 'puppet_connect_data' => connect_data, 'versioned_project' => versioned_project }
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
       end
 
       it 'parses inventory' do
@@ -1039,13 +1040,11 @@ describe "BoltServer::TransportApp" do
 
         it 'looks up data included in request' do
           connect_data = {
-            'puppet_connect_data' => {
-              'target_name' => {
-                'value' => 'foo'
-              },
-              'target_password' => {
-                'value' => 'bar'
-              }
+            'target_name' => {
+              'value' => 'foo'
+            },
+            'target_password' => {
+              'value' => 'bar'
             }
           }
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
@@ -1061,13 +1060,11 @@ describe "BoltServer::TransportApp" do
 
         it 'connect plugin fails when "key" is not specified in inventoryfile' do
           connect_data = {
-            'puppet_connect_data' => {
-              'target_name' => {
-                'value' => 'foo'
-              },
-              'target_password' => {
-                'value' => 'bar'
-              }
+            'target_name' => {
+              'value' => 'foo'
+            },
+            'target_password' => {
+              'value' => 'bar'
             }
           }
           targets.first['name'].delete('key')
@@ -1080,10 +1077,10 @@ describe "BoltServer::TransportApp" do
         end
 
         it 'errors when connect_data is not included in the request' do
-          connect_data = {}
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(versioned_project, connect_data)
+            body = JSON.generate('versioned_project' => versioned_project)
+            post('/project_inventory_targets', body, 'CONTENT_TYPE' => 'text/json')
             expect(last_response.status).to eq(400)
             expect(last_response.body).to match(/did not contain a required property of 'puppet_connect_data'/)
           end
@@ -1091,10 +1088,8 @@ describe "BoltServer::TransportApp" do
 
         it 'errors when connect_data entry does not have a "value"' do
           connect_data = {
-            'puppet_connect_data' => {
-              'oops_missing_value' => {
-                'not_value' => 'foo'
-              }
+            'oops_missing_value' => {
+              'not_value' => 'foo'
             }
           }
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
