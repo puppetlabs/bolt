@@ -1088,7 +1088,7 @@ module Bolt
       end
       define('--log-level LEVEL',
              "Set the log level for the console. Available options are",
-             "trace, debug, info, warn, error, fatal, any.") do |level|
+             "trace, debug, info, warn, error, fatal.") do |level|
         @options[:log] = { 'console' => { 'level' => level } }
       end
       define('--clear-cache',

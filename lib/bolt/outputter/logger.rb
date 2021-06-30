@@ -24,6 +24,8 @@ module Bolt
           log_container_start(event)
         when :container_finish
           log_container_finish(event)
+        when :log
+          log_message(**event)
         end
       end
 
@@ -64,6 +66,10 @@ module Bolt
         else
           @logger.info("Finished: run container '#{result.object}' failed.")
         end
+      end
+
+      def log_message(level:, message:, **_kwargs)
+        @logger.send(level, message)
       end
     end
   end

@@ -85,6 +85,20 @@ describe 'plans' do
       end
     end
 
+    it 'logs messages' do
+      with_project do |project|
+        run_cli_json(%W[plan run logs -m #{modulepath}], project: project)
+        expect(@log_output.readlines).to include(
+          /TRACE.*This is a trace message/,
+          /DEBUG.*This is a debug message/,
+          /WARN.*This is a warn message/,
+          /INFO.*This is an info message/,
+          /ERROR.*This is an error message/,
+          /FATAL.*This is a fatal message/
+        )
+      end
+    end
+
     it 'runs a yaml plan', ssh: true do
       result = run_cli(['plan', 'run', 'sample::yaml', '--targets', target] + config_flags)
       expect(JSON.parse(result)).to eq(
