@@ -637,11 +637,10 @@ module BoltServer
     #
     # @param versioned_project [String] the versioned_project to compute the inventory from
     post '/project_inventory_targets' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       content_type :json
       body = JSON.parse(request.body.read)
       validate_schema(@schemas["connect-data"], body)
-      in_bolt_project(params['versioned_project']) do |context|
+      in_bolt_project(body['versioned_project']) do |context|
         if context[:config].inventoryfile &&
            context[:config].project.inventory_file.to_s !=
            context[:config].inventoryfile
