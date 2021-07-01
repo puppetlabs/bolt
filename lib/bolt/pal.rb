@@ -324,7 +324,7 @@ module Bolt
           data['files'].each do |f|
             # If any file has been updated since we last cached, update the
             # cache
-            next if File.mtime(f['path']).to_s == f['mtime']
+            next unless file_modified?(f['path'], f['mtime'])
             data = get_task_info(task_name, with_mtime: true)
             data = Bolt::Util.walk_keys(data, &:to_s)
             # Tell Bolt to write to the cache file once we're done
@@ -423,13 +423,10 @@ module Bolt
 
       plan_list = plan_names.each_with_object([]) do |plan_name, list|
         data = plan_cache[plan_name] || get_plan_info(plan_name, with_mtime: true)
-
-        # If the plan is a 'local' plan (in the project itself, or the
-        # modules/ directory) then verify it hasn't been updated since we
-        # cached it. If it has been updated, refresh the cache and use the
-        # new data.
-        if data['file'] &&
-           File.mtime(data.dig('file', 'path')).to_s != data.dig('file', 'mtime')
+        # If the plan is a 'local' plan (in the project itself, or the modules/
+        # directory) then verify it hasn't been updated since we cached it. If
+        # it has been updated, refresh the cache and use the new data.
+        if file_modified?(data.dig('file', 'path'), data.dig('file', 'mtime'))
           data = get_plan_info(plan_name, with_mtime: true)
           updated = true
           plan_cache[plan_name] = data
@@ -441,6 +438,16 @@ module Bolt
       File.write(@project.plan_cache_file, plan_cache.to_json) if updated
 
       filter_content ? filter_content(plan_list, @project&.plans) : plan_list
+    end
+
+    # Returns true if a file has been modified or no longer exists, false
+    # otherwise.
+    #
+    # @param path [String] The path to the file.
+    # @param mtime [String] The last time the file was modified.
+    #
+    private def file_modified?(path, mtime)
+      path && !(File.exist?(path) && File.mtime(path).to_s == mtime)
     end
 
     def list_plans(filter_content: false)
