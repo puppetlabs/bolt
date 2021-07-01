@@ -122,7 +122,13 @@ module Bolt
         logs.each do |log|
           bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[log['level'].to_sym]
           message = log['message'].chomp
-          @logger.send(bolt_level, "#{target.name}: #{message}")
+
+          case bolt_level
+          when :warn
+            handle_warning(target, message)
+          else
+            @logger.send(bolt_level, "#{target.name}: #{message}")
+          end
         end
       end
 
@@ -136,6 +142,22 @@ module Bolt
       end
 
       result
+    end
+
+    # Handles logging Puppet warnings, some of which are suppressable.
+    #
+    # @param target [Bolt::Target] The target the apply ran on.
+    # @param message [String] The log message.
+    #
+    private def handle_warning(target, message)
+      # Messages about exported resource declaration and collection, which are
+      # not supported in manifest blocks.
+      if message.include?(Puppet::Pops::Issues::RT_NO_STORECONFIGS_EXPORT.format) ||
+         message.include?(Puppet::Pops::Issues::RT_NO_STORECONFIGS.format)
+        Bolt::Logger.warn('exported_resources', "#{target.name}: #{message}")
+      else
+        @logger.send(:warn, "#{target.name}: #{message}")
+      end
     end
 
     def validate_hiera_config(hiera_config)
