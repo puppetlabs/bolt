@@ -1,5 +1,32 @@
 # Changelog
 
+## Bolt 3.12.0 (2021-07-06)
+
+### New features
+
+* **Support macOS 11 in `puppet_agent::install task**
+  ([#2901](https://github.com/puppetlabs/bolt/pull/2901))
+
+  The `puppet_agent::install` task now supports installing the
+  puppet-agent package on macOS 11.
+
+* **Disable 'exported resources' warnings from Puppet**
+  ([#2889](https://github.com/puppetlabs/bolt/issues/2889))
+
+  Warnings logged by Puppet when declaring or collecting exported
+  resources in a manifest can now be disabled. To disable these warnings
+  add the `exported_resources` ID under the `disable-warnings`
+  configuration option.
+
+### Bug fixes
+
+* **Do not stacktrace with non-existent files in plan or task cache**
+  ([#2912](https://github.com/puppetlabs/bolt/pull/2912))
+
+  Bolt no longer errors with a stacktrace when listing plans or tasks
+  when the plan or task cache include paths to files that no longer
+  exist.
+
 ## Bolt 3.11.0 (2021-06-21)
 
 ### New features
