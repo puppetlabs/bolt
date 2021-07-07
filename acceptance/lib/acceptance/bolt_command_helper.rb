@@ -18,7 +18,16 @@ module Acceptance
 
       case host['platform']
       when /windows/
-        execute_powershell_script_on(host, bolt_command, opts)
+        # Set the PATH environment variable before running the Bolt command. Ideally this
+        # would be set during the setup process, but the PATH is not preserved between
+        # sessions on the SUT.
+        script = <<~PS
+          $boltpath = [IO.Path]::Combine($env:ProgramFiles, 'Puppet Labs', 'Bolt', 'bin')
+          $env:Path = $boltpath + ";" + $env:Path
+          #{bolt_command}
+        PS
+
+        execute_powershell_script_on(host, script, opts)
       when /osx/
         # Ensure Bolt runs with UTF-8 under macOS. Otherwise we get issues with
         # UTF-8 content in task results.
