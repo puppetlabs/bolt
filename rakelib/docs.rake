@@ -71,6 +71,8 @@ begin
     # list.
     desc ''
     task :generate_strings do
+      modules = Dir.children("#{__dir__}/../bolt-modules").map { |dir| dir.prepend('bolt-modules/') }
+
       @puppet_strings ||= begin
         FileUtils.mkdir_p('tmp')
         tmpfile = 'tmp/boltlib.json'
@@ -80,13 +82,7 @@ begin
           markup: 'markdown',
           json: true,
           path: tmpfile,
-          yard_args: ['bolt-modules/boltlib',
-                      'bolt-modules/ctrl',
-                      'bolt-modules/dir',
-                      'bolt-modules/file',
-                      'bolt-modules/out',
-                      'bolt-modules/prompt',
-                      'bolt-modules/system']
+          yard_args: modules
         )
 
         JSON.parse(File.read(tmpfile))

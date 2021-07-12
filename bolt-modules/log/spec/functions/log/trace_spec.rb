@@ -2,7 +2,7 @@
 
 require 'spec_helper'
 
-describe 'out::message' do
+describe 'log::trace' do
   let(:executor)      { stub('executor', report_function_call: nil, publish_event: nil) }
   let(:tasks_enabled) { true }
 
@@ -16,24 +16,25 @@ describe 'out::message' do
 
   it 'sends a log event to the executor' do
     executor.expects(:publish_event).with(
-      type:    :message,
-      message: 'This is a message'
+      type:    :log,
+      level:   :trace,
+      message: 'This is a trace message'
     )
 
-    is_expected.to run.with_params('This is a message')
+    is_expected.to run.with_params('This is a trace message')
   end
 
   it 'reports function call to analytics' do
-    executor.expects(:report_function_call).with('out::message')
-    is_expected.to run.with_params('This is a message')
+    executor.expects(:report_function_call).with('log::trace')
+    is_expected.to run.with_params('This is a trace message')
   end
 
   context 'without tasks enabled' do
     let(:tasks_enabled) { false }
 
-    it 'fails and reports that out::message is not available' do
-      is_expected.to run.with_params('This is a message')
-                        .and_raise_error(/Plan language function 'out::message' cannot be used/)
+    it 'fails and reports that log::trace is not available' do
+      is_expected.to run.with_params('This is a trace message')
+                        .and_raise_error(/Plan language function 'log::trace' cannot be used/)
     end
   end
 end

@@ -128,23 +128,30 @@ the following ways:
 
 ## Puppet log functions are not logging to the console
 
-The default log level for the console is `warn`. If you use a `notice` function
-in a plan, Bolt does not print it to the console. When you have messages
-you want to be printed to the console regardless of log level you should use the
-`out::message` plan function. The
-[`out::message`](plan_functions.md#outmessage) function is not
-available for use in an apply block and only accepts string values.
+Puppet logs might not be printing to the console because they are logged at a
+lower level than Bolt is configured to print at. By default, Bolt prints all
+logs at the `warn` level or higher to the console.
 
-If you need to send a message that is not a string value or is in an apply
-block, you can use the `warning` Puppet log function. 
+Additionally, Puppet logs are printed at a different level in Bolt than they
+would be in Puppet. For example, Puppet `notice` level logs are equivalent to
+the `info` level in Bolt. As a result, if you use the `notice()` Puppet log
+function, Bolt does not print the contents of `notice` to the console by
+default. You can see which Bolt log level each Puppet log level maps to in
+[Puppet log functions in Bolt](writing_plans.md#puppet-log-functions-in-bolt).
 
-If you only wish to see the output in the console when executing your plan with
-the `--log-level debug` command-line option, use the `notice` Puppet log
-function. The `notice` function sets the console log level to `debug` for that
-run.
+To print logs and messages in Bolt to the console you can do one or more of the
+following:
 
-For more information, see the docs for configuring [Bolt's log
-level](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#log-file-configuration-options).
+- When you want to view all logs at a specific level on the console, [set the
+  log level](logs.md#setting-log-level) from the command line or in your
+  configuration file.
+
+- When you have messages you want to log directly from Bolt, use Bolt's [log
+  plan functions](writing_plans.md#log-functions).
+
+- When you have messages you want printed to the console regardless of log
+  level, you should use the [`out::message` plan
+  function](plan_functions.md#outmessage).
 
 ## 'Extensions are not built' error message
 If you see a `gem` related error similar to the following: 

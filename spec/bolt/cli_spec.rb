@@ -2459,7 +2459,7 @@ describe "Bolt::CLI" do
         cli.parse
         modules = cli.list_modules
         expect(modules.keys.first).to match(/bolt-modules/)
-        expect(modules.values.first.map { |h| h[:name] }).to eq(%w[boltlib ctrl dir file out prompt system])
+        expect(modules.values.first.map { |h| h[:name] }).to match_array(Dir.children("#{__dir__}/../../bolt-modules"))
         expect(modules.values[1].map { |h| h[:name] })
           .to include("aggregate", "canary", "puppetdb_fact", "puppetlabs/yaml")
       end

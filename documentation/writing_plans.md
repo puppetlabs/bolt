@@ -866,7 +866,7 @@ run_task('my_task', $targets, 'Better description', 'param1' => 'val')
 ```
 
 If your plan contains many small actions, you might want to suppress these
-messages and use explicit calls to the Puppet log functions instead. This can be
+messages and use explicit calls to the log functions instead. This can be
 accomplished by wrapping actions in a `without_default_logging` block, which
 causes the action messages to be logged at info level instead of notice. For
 example to loop over a series of targets without logging each action:
@@ -896,11 +896,25 @@ without_default_logging { run_command('echo hi', $targets) }
 
 For information on configuring log levels, see [Logs](logs.md).
 
+### Log functions
+
+Bolt ships with built-in functions for logging at each of Bolt's log levels.
+
+| Log level | Plan function |
+| --- | --- |
+| `trace` | [`log::trace`](plan_functions.md#logtrace) |
+| `debug` | [`log::debug`](plan_functions.md#logdebug) |
+| `info` | [`log::info`](plan_functions.md#loginfo) |
+| `warn` | [`log::warn`](plan_functions.md#logwarn) |
+| `error` | [`log::error`](plan_functions.md#logtrace) |
+| `fatal` | [`log::fatal`](plan_functions.md#logfatal) |
+
 ### Puppet log functions in Bolt
 
 You can use Puppet log functions in Bolt plans, but Bolt log levels do not map
 directly to Puppet log levels. For example, a `notice` function in a plan logs
-at the `info` level in Bolt. Log levels map as follows:
+at the `info` level in Bolt. Whenever possible, use Bolt log functions instead
+of Puppet log functions. Log levels map as follows:
 
 | Puppet log level | Bolt log level |
 | --- | --- |
@@ -909,6 +923,9 @@ at the `info` level in Bolt. Log levels map as follows:
 | `notice` | `info` |
 | `warning` | `warn` |
 | `err` | `error` |
+| `alert` | `error` |
+| `emerg` | `fatal` |
+| `crit` | `fatal` |
 
 ## Documenting plans
 
