@@ -10,7 +10,7 @@ and Microsoft Windows.
 | Operating system          | Versions            |
 | ------------------------- | ------------------- |
 | Debian                    | 9, 10               |
-| Fedora                    | 30, 31, 32          |
+| Fedora                    | 30, 31, 32, 34      |
 | macOS                     | 10.14, 10.15, 11    |
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
@@ -88,6 +88,13 @@ have installed:
 
   ```shell
   sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-32.noarch.rpm
+  sudo dnf install puppet-bolt
+  ```
+
+- _Fedora 34_
+
+  ```shell
+  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-34.noarch.rpm
   sudo dnf install puppet-bolt
   ```
 
