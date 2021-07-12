@@ -1,5 +1,28 @@
 # Changelog
 
+## Bolt 3.13.0 (2021-07-12)
+
+### New features
+
+* **Add built-in `log` module**
+  ([#2899](https://github.com/puppetlabs/bolt/issues/2899))
+
+  Bolt now ships with a new built-in `log` module that includes plan
+  functions for logging messages at each of Bolt's log levels. The new
+  plan functions include `log::trace`, `log::debug`, `log::warn`,
+  `log::info`, `log::error`, and `log::fatal`.
+
+* **Fedora 34 packages**
+  ([#2903](https://github.com/puppetlabs/bolt/issues/2903))
+
+  Bolt now ships packages for Fedora 34.
+
+* **Add `out::verbose` plan function** 
+  ([#2879](https://github.com/puppetlabs/bolt/issues/2879))
+
+  Bolt now has `out::verbose` plan function, which allows for 
+  printing output when run in verbose mode.
+
 ## Bolt 3.12.0 (2021-07-06)
 
 ### New features
