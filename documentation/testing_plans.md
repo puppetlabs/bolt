@@ -271,7 +271,8 @@ documentation.
 | [`apply`](plan_functions.md#apply) | [`allow_apply`](boltspec_reference.md#allow-apply) | - |
 | [`apply_prep`](plan_functions.md#apply-prep) | [`allow_apply_prep`](boltspec_reference.md#allow-apply-prep) | - |
 | [`download_file`](plan_functions.md#download-file) | [`allow_download`](boltspec_reference.md#allow-download) | [`expect_download`](boltspec_reference.md#expect_download) |
-| [`out::message`](plan_functions.md#out::message) | [`allow_out_message`](boltspec_reference.md#allow-out-message) | [`expect_out_message`](boltspec_reference.md#expect-out-message) |
+| [`out::message`](plan_functions.md#outmessage) | [`allow_out_message`](boltspec_reference.md#allow-out-message) | [`expect_out_message`](boltspec_reference.md#expect-out-message) |
+| [`out::verbose`](plan_functions.md#outverbose) | [`allow_out_verbose`](boltspec_reference.md#allow-out-verbose) | [`expect_out_verbose`](boltspec_reference.md#expect-out-verbose) |
 | [`run_command`](plan_functions.md#run-command) | [`allow_command`](boltspec_reference.md#allow-command) | [`expect_command`](boltspec_reference.md#expect-command) |
 | [`run_plan`](plan_functions.md#run-plan) | [`allow_plan`](boltspec_reference.md#allow-plan) | [`expect_plan`](boltspec_reference.md#expect-plan) |
 | [`run_script`](plan_functions.md#run-script) | [`allow_script`](boltspec_reference.md#allow-script) | [`expect_script`](boltspec_reference.md#expect-script) |

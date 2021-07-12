@@ -787,8 +787,8 @@ module Bolt
       if %w[human rainbow].include?(options.fetch(:format, 'human'))
         executor.subscribe(outputter)
       else
-        # Only subscribe to out::message events for JSON outputter
-        executor.subscribe(outputter, [:message])
+        # Only subscribe to out module events for JSON outputter
+        executor.subscribe(outputter, %i[message verbose])
       end
 
       executor.subscribe(log_outputter)

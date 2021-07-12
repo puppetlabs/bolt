@@ -260,6 +260,42 @@ The `expect_out_message` function accepts the following modifiers:
   expect_out_message.with_params('This is not the example you are looking for.')
   ```
 
+### `expect_out_verbose`
+
+The `expect_out_verbose` function mocks the [`out::verbose` function](plan_functions.md#outverbose). It does not accept any parameters.
+
+```ruby
+expect_out_verbose
+```
+
+The `expect_out_verbose` function accepts the following modifiers:
+
+- `be_called_times(number)`
+
+  The test fails if `out::verbose` is not invoked exactly _number_ times.
+
+  ```ruby
+  expect_out_verbose.be_called_times(3)
+  ```
+
+- `not_be_called`
+
+  The test fails if `out::verbose` is invoked.
+
+  ```ruby
+  expect_out_verbose.not_be_called
+  ```
+
+- `with_params(params)`
+
+  The message that must be passed to the `out::verbose` function. The test fails if
+  the function is not invoked with the message.
+
+  ```ruby
+  expect_out_verbose.with_params('This is not the example you are looking for.')
+  ```
+
+
 ### `expect_plan`
 
 The `expect_plan` function mocks the [`run_plan` function](plan_functions.md#run-plan).
@@ -820,6 +856,41 @@ The `allow_out_message` function accepts the following stub modifiers:
 
   ```ruby
   allow_out_message.with_params('This is not the example you are looking for.')
+  ```
+
+### `allow_out_verbose`
+
+The `allow_out_verbose` function stubs the [`out::verbose` function](plan_functions.md#outverbose). It does not accept any parameters.
+
+```ruby
+allow_out_verbose
+```
+
+The `allow_out_verbose` function accepts the following stub modifiers:
+
+- `be_called_times(number)`
+
+  The test fails if `out::verbose` is invoked more than _number_ times.
+
+  ```ruby
+  allow_out_verbose.be_called_times(3)
+  ```
+
+- `not_be_called`
+
+  The test fails if `out::verbose` is invoked.
+
+  ```ruby
+  allow_out_verbose.not_be_called
+  ```
+
+- `with_params(params)`
+
+  The message that can be passed to the `out::verbose` function. The test fails if
+  the function is invoked with a different message.
+
+  ```ruby
+  allow_out_verbose.with_params('This is not the example you are looking for.')
   ```
 
 ### `allow_plan`

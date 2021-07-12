@@ -78,6 +78,27 @@ describe 'plans' do
       let(:config_flags) { ['--no-host-key-check'] }
       let(:opts)         { { outputter: Bolt::Outputter::Human, project: @project } }
 
+      context 'output' do
+        let(:output)    { StringIO.new }
+        let(:outputter) { Bolt::Outputter::Human.new(true, true, true, true, output) }
+
+        before(:each) do
+          allow(Bolt::Outputter::Human).to receive(:new).and_return(outputter)
+        end
+
+        it 'outputs message with verbose flag' do
+          run_cli(%W[plan run output::verbose --targets #{target} --verbose] + config_flags,
+                  outputter: Bolt::Outputter::Human, project: @project)
+          expect(output.string).to match(/Hi, I'm Dave/)
+        end
+
+        it 'doesnt output without verbose flag' do
+          result = run_cli(%W[plan run output::verbose --targets #{target}] + config_flags,
+                           outputter: Bolt::Outputter::Human, project: @project)
+          expect(result).not_to match(/Hi, I'm Dave/)
+        end
+      end
+
       it "prints the spinner when running executor functions", ssh: true do
         expect_any_instance_of(Bolt::Outputter::Human).to receive(:start_spin).at_least(:once)
         run_cli(%w[plan run sample::noop --targets #{target}] + config_flags, **opts)

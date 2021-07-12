@@ -78,6 +78,8 @@ module Bolt
           @disable_depth += 1
         when :message
           print_message(event[:message])
+        when :verbose
+          print_message(event[:message]) if @verbose
         end
 
         if enabled?
