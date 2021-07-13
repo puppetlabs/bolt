@@ -7,7 +7,7 @@ Hiera, which this page covers in more detail.
 
 Before you start using Hiera in Bolt, get familiar with:
 - [How to use Hiera](https://puppet.com/docs/puppet/latest/hiera_intro.html).
-- [Applying Puppet code](applying_manifest_blocks.html) with Bolt.
+- [Applying Puppet code](applying_manifest_blocks.md) with Bolt.
 
 ## Hiera configuration layers
 
