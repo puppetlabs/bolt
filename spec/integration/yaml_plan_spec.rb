@@ -5,12 +5,14 @@ require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/logger'
+require 'bolt_spec/project'
 
 describe "running YAML plans", ssh: true do
   include BoltSpec::Integration
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Logger
+  include BoltSpec::Project
 
   after(:each) { Puppet.settings.send(:clear_everything_for_tests) }
   # Don't print error messages to the console
@@ -165,6 +167,29 @@ describe "running YAML plans", ssh: true do
     result = run_plan('yaml::param_passing')
 
     expect(result).to eq([24, 36, 60, "60"])
+  end
+
+  context 'using the human outputter' do
+    around(:each) do |example|
+      with_project(config: { 'modulepath' => [modulepath] }) do |project|
+        @project = project
+        example.run
+      end
+    end
+
+    let(:project) { @project }
+
+    it 'outputs verbose messages in verbose mode' do
+      result = run_cli(%w[plan run yaml::verbose --verbose], outputter: Bolt::Outputter::Human,
+                                                             project: project)
+      expect(result).to match(/hershey/)
+    end
+
+    it 'does not output verbose messages when not in verbose mode' do
+      result = run_cli(%w[plan run yaml::verbose], outputter: Bolt::Outputter::Human,
+                                                   project: project)
+      expect(result).not_to match(/hershey/)
+    end
   end
 
   context 'evaluating Puppet code' do

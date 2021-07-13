@@ -17,8 +17,9 @@ module BoltSpec
       allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
       allow(cli).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
 
+      verbose = arguments.include?('--verbose')
       output =  StringIO.new
-      outputter = outputter.new(false, false, false, false, output)
+      outputter = outputter.new(false, verbose, false, false, output)
       allow(cli).to receive(:outputter).and_return(outputter)
 
       # Don't allow tests to override the captured log config

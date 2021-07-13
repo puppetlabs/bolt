@@ -77,24 +77,18 @@ describe 'plans' do
 
       let(:config_flags) { ['--no-host-key-check'] }
       let(:opts)         { { outputter: Bolt::Outputter::Human, project: @project } }
+      let(:project)      { @project }
 
-      context 'output' do
-        let(:output)    { StringIO.new }
-        let(:outputter) { Bolt::Outputter::Human.new(true, true, true, true, output) }
-
-        before(:each) do
-          allow(Bolt::Outputter::Human).to receive(:new).and_return(outputter)
+      context 'out::verbose' do
+        it 'outputs verbose messages in verbose mode' do
+          result = run_cli(%w[plan run output::verbose --verbose], outputter: Bolt::Outputter::Human,
+                                                                   project: project)
+          expect(result).to match(/Hi, I'm Dave/)
         end
 
-        it 'outputs message with verbose flag' do
-          run_cli(%W[plan run output::verbose --targets #{target} --verbose] + config_flags,
-                  outputter: Bolt::Outputter::Human, project: @project)
-          expect(output.string).to match(/Hi, I'm Dave/)
-        end
-
-        it 'doesnt output without verbose flag' do
-          result = run_cli(%W[plan run output::verbose --targets #{target}] + config_flags,
-                           outputter: Bolt::Outputter::Human, project: @project)
+        it 'does not output verbose messages when not in verbose mode' do
+          result = run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human,
+                                                         project: project)
           expect(result).not_to match(/Hi, I'm Dave/)
         end
       end

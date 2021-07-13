@@ -46,6 +46,19 @@ describe Bolt::PAL::YamlPlan::Step do
       end
     end
 
+    context 'with verbose step' do
+      let(:step_body) do
+        {
+          "verbose" => make_string("hello world")
+        }
+      end
+      let(:output) { "  out::verbose('hello world')\n" }
+
+      it 'stringifies a message step' do
+        expect(step.transpile).to eq(output)
+      end
+    end
+
     context 'with command step' do
       let(:step_body) do
         { "command" => make_string("echo peanut butter"),
