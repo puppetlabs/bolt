@@ -79,17 +79,35 @@ describe 'plans' do
       let(:opts)         { { outputter: Bolt::Outputter::Human, project: @project } }
       let(:project)      { @project }
 
-      context 'out::verbose' do
-        it 'outputs verbose messages in verbose mode' do
-          result = run_cli(%w[plan run output::verbose --verbose], outputter: Bolt::Outputter::Human,
-                                                                   project: project)
-          expect(result).to match(/Hi, I'm Dave/)
+      context 'output' do
+        context 'out::message' do
+          it 'outputs messages' do
+            result = run_cli(%w[plan run output], outputter: Bolt::Outputter::Human, project: project)
+            expect(result).to match(/Outputting a message/)
+          end
+
+          it 'logs messages at the info level' do
+            run_cli(%w[plan run output], outputter: Bolt::Outputter::Human, project: project)
+            expect(@log_output.readlines).to include(/INFO.*Outputting a message/)
+          end
         end
 
-        it 'does not output verbose messages when not in verbose mode' do
-          result = run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human,
-                                                         project: project)
-          expect(result).not_to match(/Hi, I'm Dave/)
+        context 'out::verbose' do
+          it 'outputs verbose messages in verbose mode' do
+            result = run_cli(%w[plan run output::verbose --verbose], outputter: Bolt::Outputter::Human,
+                                                                     project: project)
+            expect(result).to match(/Hi, I'm Dave/)
+          end
+
+          it 'does not output verbose messages' do
+            result = run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human, project: project)
+            expect(result).not_to match(/Hi, I'm Dave/)
+          end
+
+          it 'logs verbose messages at the debug level' do
+            run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human, project: project)
+            expect(@log_output.readlines).to include(/DEBUG.*Hi, I'm Dave/)
+          end
         end
       end
 

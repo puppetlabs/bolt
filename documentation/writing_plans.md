@@ -264,21 +264,24 @@ plan mymodule::myplan {
 By default, Bolt does not print verbose logs for each plan execution to stdout.
 However, you can use one of the following methods to investigate a plan
 execution:
+
 - Each time you run a Bolt command, Bolt prints a debug log to a
   `bolt-debug.log` file in the root of your project directory.
 - You can use the `--verbose` CLI option for verbose logging to stdout.
-- You can print a message to stdout using the `out::message` function. 
+- You can print a message to stdout and the `info` log level using the
+  `out::message` function. 
 - You can adjust your log level for detailed information on how Bolt is
   executing your plan.
 
 ### Using `out::message` to debug a plan
 
-You can print a message, or a variable, to stdout using the `out::message`
-function. If the variable contains a valid plan result, Bolt formats the plan
-result using a JSON representation of the result object. If the object is not a
-plan result, Bolt prints the object as a string.
+You can print a message, or a variable, to stdout and to the `info` log level
+using the `out::message` function. If the variable contains a valid plan result,
+Bolt formats the plan result using a JSON representation of the result object.
+If the object is not a plan result, Bolt prints the object as a string.
 
-To print a variable to stdout with `out::message`, use the following syntax:
+To print a variable to stdout and the `info` log level with `out::message`, use
+the following syntax:
 
 ```puppet
 out::message($variable) 
@@ -849,9 +852,9 @@ plan pdb_discover {
 
 ## Plan logging
 
-Print message strings to `STDOUT` using the plan function `out::message`. This
-function always prints messages regardless of the log level and doesn't log them
-to the log file.
+Print message strings to stdout using the `out::message` plan function. This
+function prints messages at the `info` level and always prints messages to
+stdout regardless of the log level.
 
 ### Default action logging
 

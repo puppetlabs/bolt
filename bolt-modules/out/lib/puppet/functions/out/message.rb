@@ -5,7 +5,9 @@ require 'bolt/util/format'
 # Output a message for the user.
 #
 # This will print a message to stdout when using the human output format,
-# and print to stderr when using the json output format
+# and print to stderr when using the json output format. Messages are
+# also logged at the `info` level. For more information about logs, see
+# [Logs](logs.md).
 #
 # > **Note:** Not available in apply block
 Puppet::Functions.create_function(:'out::message') do
@@ -26,7 +28,7 @@ Puppet::Functions.create_function(:'out::message') do
 
     Puppet.lookup(:bolt_executor).tap do |executor|
       executor.report_function_call(self.class.name)
-      executor.publish_event(type: :message, message: Bolt::Util::Format.stringify(message))
+      executor.publish_event(type: :message, message: Bolt::Util::Format.stringify(message), level: :info)
     end
 
     nil
