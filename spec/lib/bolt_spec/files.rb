@@ -26,5 +26,46 @@ module BoltSpec
       end
     end
     module_function :fixtures_path
+
+    # Stubs a path so it looks like a directory.
+    #
+    # @param path [String] The path to the directory.
+    #
+    def stub_directory(path)
+      double('stat', readable?: true, file?: false, directory?: true).tap do |double|
+        allow(Bolt::Util).to receive(:file_stat).with(path).and_return(double)
+      end
+    end
+
+    # Stubs a path so it looks like a file.
+    #
+    # @param path [String] The path to the file.
+    #
+    def stub_file(path)
+      double('stat', readable?: true, file?: true, directory?: false).tap do |double|
+        allow(Bolt::Util).to receive(:file_stat).with(path).and_return(double)
+      end
+    end
+
+    # Stubs a path so it looks like a nonexistent file.
+    #
+    # @param path [String] The path to the nonexistent file.
+    #
+    def stub_nonexistent_file(path)
+      allow(Bolt::Util).to receive(:file_stat).with(path).and_raise(
+        Errno::ENOENT, "No such file or directory @ rb_file_s_stat - #{path}"
+      )
+      nil
+    end
+
+    # Stubs a path so it looks like an unreadable file.
+    #
+    # @param path [String] The path to the unreadable file.
+    #
+    def stub_unreadable_file(path)
+      double('stat', readable?: false, file?: true).tap do |double|
+        allow(Bolt::Util).to receive(:file_stat).with(path).and_return(double)
+      end
+    end
   end
 end

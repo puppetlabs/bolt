@@ -22,6 +22,22 @@ describe Bolt::Config do
     end
   end
 
+  describe "defaults" do
+    let(:config) { Bolt::Config.new(project, {}) }
+
+    it 'sets concurrency to 100' do
+      expect(config.concurrency).to eq(100)
+    end
+
+    it 'sets compile-concurrency to number of processors' do
+      expect(config.compile_concurrency).to eq(Etc.nprocessors)
+    end
+
+    it 'sets transport to ssh' do
+      expect(config.transport).to eq('ssh')
+    end
+  end
+
   describe "when initializing" do
     it "accepts string values for config data" do
       config = Bolt::Config.new(project, 'concurrency' => 200)

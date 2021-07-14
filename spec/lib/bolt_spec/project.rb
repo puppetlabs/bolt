@@ -24,7 +24,7 @@ module BoltSpec
         File.write(config_path, cfg.to_yaml)
         File.write(inventory_path, inventory.to_yaml) unless inventory.nil?
 
-        yield(project_path)
+        yield(project_path, cfg)
       end
     end
 
@@ -32,9 +32,8 @@ module BoltSpec
     # instance.
     #
     def with_project(name = 'project', **kwargs)
-      with_project_directory(name, **kwargs) do |project_path|
-        project = Bolt::Project.create_project(project_path)
-        yield(project)
+      with_project_directory(name, **kwargs) do |path, config|
+        yield(Bolt::Project.new(config, path))
       end
     end
 
@@ -42,7 +41,7 @@ module BoltSpec
     # working directory to the project. Yields a Bolt::Project instance.
     #
     def in_project(name = 'project', **kwargs)
-      with_project(name, kwargs) do |project|
+      with_project(name, **kwargs) do |project|
         Dir.chdir(project.path) do
           yield(project)
         end

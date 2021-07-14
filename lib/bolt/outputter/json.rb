@@ -48,7 +48,11 @@ module Bolt
       end
       alias print_module_list print_table
 
-      def print_task_info(task)
+      # Print information about a task.
+      #
+      # @param task [Bolt::Task] The task information.
+      #
+      def print_task_info(task:)
         path = task.files.first['path'].chomp("/tasks/#{task.files.first['name']}")
         module_dir = if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH)
                        "built-in module"
@@ -58,11 +62,16 @@ module Bolt
         @stream.puts task.to_h.merge(module_dir: module_dir).to_json
       end
 
-      def print_tasks(tasks, modulepath)
-        print_table('tasks' => tasks, 'modulepath' => modulepath)
+      # List available tasks.
+      #
+      # @param tasks [Array] A list of task names and descriptions.
+      # @param modulepath [Array] The modulepath.
+      #
+      def print_tasks(**kwargs)
+        print_table(**kwargs)
       end
 
-      def print_plugin_list(plugins, modulepath)
+      def print_plugin_list(plugins:, modulepath:)
         plugins.delete(:validate_resolve_reference)
         print_table('plugins' => plugins, 'modulepath' => modulepath)
       end
@@ -77,11 +86,15 @@ module Bolt
         @stream.puts plan.to_json
       end
 
-      def print_plans(plans, modulepath)
-        print_table('plans' => plans, 'modulepath' => modulepath)
+      def print_plans(**kwargs)
+        print_table(**kwargs)
       end
 
-      def print_apply_result(apply_result, _elapsed_time)
+      def print_new_plan(**kwargs)
+        print_table(**kwargs)
+      end
+
+      def print_apply_result(apply_result)
         @stream.puts apply_result.to_json
       end
 
@@ -94,15 +107,21 @@ module Bolt
         @stream.puts result_set.to_json
       end
 
-      def print_topics(topics)
-        print_table('topics' => topics)
+      # Print available guide topics.
+      #
+      # @param topics [Array] The available topics.
+      #
+      def print_topics(**kwargs)
+        print_table(kwargs)
       end
 
-      def print_guide(guide, topic)
-        @stream.puts({
-          'topic' => topic,
-          'guide' => guide
-        }.to_json)
+      # Print the guide for the specified topic.
+      #
+      # @param guide [String] The guide.
+      # @param topic [String] The topic.
+      #
+      def print_guide(**kwargs)
+        print_table(kwargs)
       end
 
       def print_plan_lookup(value)
@@ -115,35 +134,38 @@ module Bolt
                        moduledir: moduledir.to_s }.to_json)
       end
 
-      def print_targets(target_list, inventory_source, default_inventory, _target_flag)
-        @stream.puts ::JSON.pretty_generate(
-          inventory: {
-            targets: target_list[:inventory].map(&:name),
-            count: target_list[:inventory].count,
-            file: (inventory_source || default_inventory).to_s
-          },
-          adhoc: {
-            targets: target_list[:adhoc].map(&:name),
-            count: target_list[:adhoc].count
-          },
-          targets: target_list.values.flatten.map(&:name),
-          count: target_list.values.flatten.count
-        )
+      # Print target names and where they came from.
+      #
+      # @param adhoc [Hash] Adhoc targets provided on the command line.
+      # @param inventory [Hash] Targets provided from the inventory.
+      # @param targets [Array] All targets.
+      # @param count [Integer] Number of targets.
+      #
+      def print_targets(adhoc:, inventory:, targets:, count:, **_kwargs)
+        adhoc[:targets]     = adhoc[:targets].map { |t| t['name'] }
+        inventory[:targets] = inventory[:targets].map { |t| t['name'] }
+        targets             = targets.map { |t| t['name'] }
+        @stream.puts({ adhoc: adhoc, inventory: inventory, targets: targets, count: count }.to_json)
       end
 
-      def print_target_info(target_list, _inventory_source, _default_inventory, _target_flag)
-        targets = target_list.values.flatten
-
-        @stream.puts ::JSON.pretty_generate(
-          targets: targets.map(&:detail),
-          count: targets.count
-        )
+      # Print target names and where they came from.
+      #
+      # @param adhoc [Hash] Adhoc targets provided on the command line.
+      # @param inventory [Hash] Targets provided from the inventory.
+      # @param targets [Array] All targets.
+      # @param count [Integer] Number of targets.
+      #
+      def print_target_info(adhoc:, inventory:, targets:, count:, **_kwargs)
+        @stream.puts({ adhoc: adhoc, inventory: inventory, targets: targets, count: count }.to_json)
       end
 
-      def print_groups(groups, _inventory_source, _default_inventory)
-        count = groups.count
-        @stream.puts({ groups: groups,
-                       count: count }.to_json)
+      # Print inventory group information.
+      #
+      # @param count [Integer] Number of groups in the inventory.
+      # @param groups [Array] Names of groups in the inventory.
+      #
+      def print_groups(count:, groups:, **_kwargs)
+        @stream.puts({ count: count, groups: groups }.to_json)
       end
 
       def fatal_error(err)

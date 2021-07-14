@@ -424,39 +424,39 @@ describe 'validating config' do
       {
         'puppetdb' => {
           'cacert' => {
-            '_plugin' => 'envvar',
+            '_plugin' => 'env_var',
             'var' => 'BOLT_PUPPETDB_CACERT',
             'default' => '/path/to/cacert'
           },
           'cert' => {
-            '_plugin' => 'envvar',
+            '_plugin' => 'env_var',
             'var' => 'BOLT_PUPPETDB_CERT',
             'default' => '/path/to/cert'
           },
           'connect-timeout' => {
-            '_plugin' => 'envvar',
+            '_plugin' => 'env_var',
             'var' => 'BOLT_PUPPETDB_CONNECT_TIMEOUT',
             'default' => 20
           },
           'key' => {
-            '_plugin' => 'envvar',
+            '_plugin' => 'env_var',
             'var' => 'BOLT_PUPPETDB_KEY',
             'default' => '/path/to/key'
           },
           'read-timeout' => {
-            '_plugin' => 'envvar',
+            '_plugin' => 'env_var',
             'var' => 'BOLT_PUPPETDB_READ_TIMEOUT',
             'default' => 10
           },
           'server_urls' => {
-            '_plugin' => 'envvar',
+            '_plugin' => 'env_var',
             'var' => 'BOLT_PUPPETDB_SERVER_URLS',
             'default' => [
               'https://example.com'
             ]
           },
           'token' => {
-            '_plugin' => 'envvar',
+            '_plugin' => 'env_var',
             'var' => 'BOLT_PUPPETDB_TOKEN',
             'default' => '/path/to/token'
           }

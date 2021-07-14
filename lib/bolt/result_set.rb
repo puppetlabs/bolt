@@ -2,7 +2,8 @@
 
 module Bolt
   class ResultSet
-    attr_reader :results
+    attr_accessor :elapsed_time
+    attr_reader   :results
 
     include Enumerable
 

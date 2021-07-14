@@ -30,7 +30,6 @@ module Bolt
     }.freeze
 
     def self.build_client(enabled = true)
-      logger = Bolt::Logger.logger(self)
       begin
         config_file = config_path
         config = load_config(config_file)
@@ -39,7 +38,7 @@ module Bolt
       end
 
       if !enabled || config['disabled'] || ENV['BOLT_DISABLE_ANALYTICS']
-        logger.debug "Analytics opt-out is set, analytics will be disabled"
+        Bolt::Logger.debug "Analytics opt-out is set, analytics will be disabled"
         NoopClient.new
       else
         unless config.key?('user-id')
@@ -50,7 +49,7 @@ module Bolt
         Client.new(config['user-id'])
       end
     rescue StandardError => e
-      logger.debug "Failed to initialize analytics client, analytics will be disabled: #{e}"
+      Bolt::Logger.debug "Failed to initialize analytics client, analytics will be disabled: #{e}"
       NoopClient.new
     end
 
@@ -139,18 +138,6 @@ module Bolt
         end
       end
 
-      def plan_counts(plans_path)
-        pp_count, yaml_count = if File.exist?(plans_path)
-                                 %w[pp yaml].map do |extension|
-                                   Find.find(plans_path.to_s).grep(/.*\.#{extension}/).length
-                                 end
-                               else
-                                 [0, 0]
-                               end
-
-        { puppet_plan_count: pp_count, yaml_plan_count: yaml_count }
-      end
-
       def event(category, action, label: nil, value: nil, **kwargs)
         custom_dimensions = Bolt::Util.walk_keys(kwargs) do |k|
           CUSTOM_DIMENSIONS[k] || raise("Unknown analytics key '#{k}'")
@@ -235,10 +222,6 @@ module Bolt
       end
 
       def report_bundled_content(mode, name); end
-
-      def plan_counts(_)
-        {}
-      end
 
       def event(category, action, **_kwargs)
         @logger.trace "Skipping submission of '#{category} #{action}' event because analytics is disabled"

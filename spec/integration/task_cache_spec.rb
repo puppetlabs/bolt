@@ -44,14 +44,4 @@ describe "caching tasks" do
     run_cli(%w[task show] + flags)
     expect(original_mtime).to eq(File.mtime(project.task_cache_file))
   end
-
-  it 'updates the cache for local tasks if modified' do
-    run_cli(%w[module generate-types] + flags)
-    original_mtime = File.mtime(project.task_cache_file)
-
-    # Updates the mtime of the file
-    FileUtils.touch(fixtures_path('modules', 'sample', 'tasks', 'init.sh'))
-    run_cli(%w[task show] + flags)
-    expect(original_mtime).not_to eq(File.mtime(project.task_cache_file))
-  end
 end

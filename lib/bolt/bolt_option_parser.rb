@@ -894,7 +894,7 @@ module Bolt
       end
       define('--params PARAMETERS',
              "Parameters to a task or plan as json, a json file '@<file>', or on stdin '-'.") do |params|
-        @options[:task_options] = parse_params(params)
+        @options[:params] = parse_params(params)
       end
       define('-e', '--execute CODE',
              "Puppet manifest code to apply to the targets.") do |code|
@@ -1083,8 +1083,7 @@ module Bolt
         @options[:help] = true
       end
       define('--version', 'Display the version.') do |_|
-        puts Bolt::VERSION
-        raise Bolt::CLIExit
+        @options[:version] = true
       end
       define('--log-level LEVEL',
              "Set the log level for the console. Available options are",
@@ -1126,6 +1125,16 @@ module Bolt
       JSON.parse(json)
     rescue JSON::ParserError => e
       raise Bolt::CLIError, "Unable to parse --params value as JSON: #{e}"
+    end
+
+    def permute(args)
+      super(args)
+    rescue OptionParser::MissingArgument => e
+      raise Bolt::CLIError, "Option '#{e.args.first}' needs a parameter"
+    rescue OptionParser::InvalidArgument => e
+      raise Bolt::CLIError, "Invalid parameter specified for option '#{e.args.first}': #{e.args[1]}"
+    rescue OptionParser::InvalidOption, OptionParser::AmbiguousOption => e
+      raise Bolt::CLIError, "Unknown argument '#{e.args.first}'"
     end
   end
 end

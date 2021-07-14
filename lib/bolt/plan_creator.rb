@@ -51,7 +51,7 @@ module Bolt
       end
     end
 
-    def self.create_plan(plans_path, plan_name, outputter, is_puppet)
+    def self.create_plan(plans_path, plan_name, is_puppet)
       _, name_segments, basename = segment_plan_name(plan_name)
       dir_path = plans_path.join(*name_segments)
 
@@ -77,25 +77,7 @@ module Bolt
         )
       end
 
-      if Bolt::Util.powershell?
-        show_command = 'Get-BoltPlan -Name '
-        run_command  = 'Invoke-BoltPlan -Name '
-      else
-        show_command = 'bolt plan show'
-        run_command  = 'bolt plan run'
-      end
-
-      output = <<~OUTPUT
-        Created plan '#{plan_name}' at '#{plan_path}'
-
-        Show this plan with:
-            #{show_command} #{plan_name}
-        Run this plan with:
-            #{run_command} #{plan_name}
-      OUTPUT
-
-      outputter.print_message(output)
-      0
+      { name: plan_name, path: plan_path }
     end
 
     def self.segment_plan_name(plan_name)

@@ -14,12 +14,11 @@ module BoltSpec
       # prevent tests from reading users config
       allow(Bolt::Project).to receive(:find_boltdir).and_return(project)
       allow(Bolt::Config).to receive(:load_defaults).and_return([])
-      allow(cli).to receive(:puppetdb_client).and_return(pdb_client)
-      allow(cli).to receive(:analytics).and_return(Bolt::Analytics::NoopClient.new)
+      allow(Bolt::PuppetDB::Client).to receive(:new).and_return(pdb_client)
 
       output =  StringIO.new
       outputter = outputter.new(false, false, false, false, output)
-      allow(cli).to receive(:outputter).and_return(outputter)
+      allow(Bolt::Outputter).to receive(:for_format).and_return(outputter)
 
       # Don't allow tests to override the captured log config
       allow(Bolt::Logger).to receive(:configure)

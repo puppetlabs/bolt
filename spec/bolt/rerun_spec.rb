@@ -21,7 +21,7 @@ describe 'rerun' do
 
   let(:config)      { {} }
   let(:executor)    { double('executor', noop: false, subscribe: nil, shutdown: nil, publish_event: nil) }
-  let(:pal)         { double('pal') }
+  let(:pal)         { double('pal').as_null_object }
   let(:target_spec) { %w[node1 node2] }
   let(:targets)     { target_spec.map { |uri| Bolt::Target.new(uri) } }
   let(:result_vals) { [{}, { '_error' => {} }] }
@@ -43,9 +43,12 @@ describe 'rerun' do
   let(:output) { StringIO.new }
 
   before(:each) do
+    allow($stdout).to receive(:puts)
+    allow($stderr).to receive(:puts)
+
     allow(Bolt::Project).to receive(:find_boltdir).and_return(@project)
     allow(Bolt::Executor).to receive(:new).and_return(executor)
-    allow_any_instance_of(Bolt::CLI).to receive(:pal).and_return(pal)
+    allow(Bolt::PAL).to receive(:new).and_return(pal)
 
     # Don't allow tests to override the captured log config
     allow(Bolt::Logger).to receive(:configure)

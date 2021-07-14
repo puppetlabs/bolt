@@ -310,7 +310,12 @@ module Bolt
         )
       end
 
-      def print_tasks(tasks, modulepath)
+      # List available tasks.
+      #
+      # @param tasks [Array] A list of task names and descriptions.
+      # @param modulepath [Array] The modulepath.
+      #
+      def print_tasks(tasks:, modulepath:)
         command = Bolt::Util.powershell? ? 'Get-BoltTask -Name <TASK NAME>' : 'bolt task show <TASK NAME>'
 
         tasks = tasks.map do |name, description|
@@ -330,8 +335,11 @@ module Bolt
         @stream.puts indent(2, "Use '#{command}' to view details and parameters for a specific task.")
       end
 
-      # @param [Hash] task A hash representing the task
-      def print_task_info(task)
+      # Print information about a task.
+      #
+      # @param task [Bolt::Task] The task information.
+      #
+      def print_task_info(task:)
         params = (task.parameters || []).sort
 
         info = +''
@@ -443,7 +451,7 @@ module Bolt
         @stream.puts info
       end
 
-      def print_plans(plans, modulepath)
+      def print_plans(plans:, modulepath:)
         command = Bolt::Util.powershell? ? 'Get-BoltPlan -Name <PLAN NAME>' : 'bolt plan show <PLAN NAME>'
 
         plans = plans.map do |name, description|
@@ -463,7 +471,11 @@ module Bolt
         @stream.puts indent(2, "Use '#{command}' to view details and parameters for a specific plan.")
       end
 
-      def print_topics(topics)
+      # Print available guide topics.
+      #
+      # @param topics [Array] The available topics.
+      #
+      def print_topics(topics:, **_kwargs)
         info = +"#{colorize(:cyan, 'Topics')}\n"
         info << indent(2, topics.join("\n"))
         info << "\n\n#{colorize(:cyan, 'Additional information')}\n"
@@ -471,7 +483,11 @@ module Bolt
         @stream.puts info
       end
 
-      def print_guide(guide, _topic)
+      # Print the guide for the specified topic.
+      #
+      # @param guide [String] The guide.
+      #
+      def print_guide(guide:, **_kwargs)
         @stream.puts(guide)
       end
 
@@ -507,17 +523,17 @@ module Bolt
         end
       end
 
-      def print_plugin_list(plugin_list, modulepath)
+      def print_plugin_list(plugins:, modulepath:)
         info   = +''
-        length = plugin_list.values.map(&:keys).flatten.map(&:length).max + 4
+        length = plugins.values.map(&:keys).flatten.map(&:length).max + 4
 
-        plugin_list.each do |hook, plugins|
-          next if plugins.empty?
+        plugins.each do |hook, plugin|
+          next if plugin.empty?
           next if hook == :validate_resolve_reference
 
           info << colorize(:cyan, "#{hook}\n")
 
-          plugins.each do |name, description|
+          plugin.each do |name, description|
             info << indent(2, name.ljust(length))
             info << truncate(description, 80 - length) if description
             info << "\n"
@@ -535,12 +551,37 @@ module Bolt
         @stream.puts info.chomp
       end
 
-      def print_targets(target_list, inventory_source, default_inventory, target_flag)
-        adhoc = colorize(:yellow, "(Not found in inventory file)")
+      def print_new_plan(name:, path:)
+        if Bolt::Util.powershell?
+          show_command = 'Get-BoltPlan -Name '
+          run_command  = 'Invoke-BoltPlan -Name '
+        else
+          show_command = 'bolt plan show'
+          run_command  = 'bolt plan run'
+        end
+
+        print_message(<<~OUTPUT)
+          Created plan '#{name}' at '#{path}'
+  
+          Show this plan with:
+              #{show_command} #{name}
+          Run this plan with:
+              #{run_command} #{name}
+        OUTPUT
+      end
+
+      # Print target names and where they came from.
+      #
+      # @param adhoc [Hash] Adhoc targets provided on the command line.
+      # @param inventory [Hash] Targets provided from the inventory.
+      # @param flag [Boolean] Whether a targeting command-line option was used.
+      #
+      def print_targets(adhoc:, inventory:, flag:, **_kwargs)
+        adhoc_text = colorize(:yellow, "(Not found in inventory file)")
 
         targets  = []
-        targets += target_list[:inventory].map { |target| [target.name, nil] }
-        targets += target_list[:adhoc].map { |target| [target.name, adhoc] }
+        targets += inventory[:targets].map { |target| [target['name'], nil] }
+        targets += adhoc[:targets].map { |target| [target['name'], adhoc_text] }
 
         info = +''
 
@@ -553,27 +594,31 @@ module Bolt
                 end
         info << "\n\n"
 
-        info << format_inventory_source(inventory_source, default_inventory)
-        info << format_target_summary(target_list[:inventory].count, target_list[:adhoc].count, target_flag, false)
+        info << format_inventory_source(inventory[:file], inventory[:default])
+        info << format_target_summary(inventory[:count], adhoc[:count], flag, false)
 
         @stream.puts info
       end
 
-      def print_target_info(target_list, inventory_source, default_inventory, target_flag)
-        adhoc_targets     = target_list[:adhoc].map(&:name).to_set
-        inventory_targets = target_list[:inventory].map(&:name).to_set
-        targets           = target_list.values.flatten.sort_by(&:name)
+      # Print detailed target information.
+      #
+      # @param adhoc [Hash] Adhoc targets provided on the command line.
+      # @param inventory [Hash] Targets provided from the inventory.
+      # @param flag [Boolean] Whether a targeting command-line option was used.
+      #
+      def print_target_info(adhoc:, inventory:, flag:, **_kwargs)
+        targets = (adhoc[:targets] + inventory[:targets]).sort_by { |t| t['name'] }
 
         info = +''
 
         if targets.any?
-          adhoc = colorize(:yellow, " (Not found in inventory file)")
+          adhoc_text = colorize(:yellow, " (Not found in inventory file)")
 
           targets.each do |target|
-            info << colorize(:cyan, target.name)
-            info << adhoc if adhoc_targets.include?(target.name)
+            info << colorize(:cyan, target['name'])
+            info << adhoc_text if adhoc[:targets].include?(target)
             info << "\n"
-            info << indent(2, target.detail.to_yaml.lines.drop(1).join)
+            info << indent(2, target.to_yaml.lines.drop(1).join)
             info << "\n"
           end
         else
@@ -581,8 +626,8 @@ module Bolt
           info << indent(2, "No targets\n\n")
         end
 
-        info << format_inventory_source(inventory_source, default_inventory)
-        info << format_target_summary(inventory_targets.count, adhoc_targets.count, target_flag, true)
+        info << format_inventory_source(inventory[:file], inventory[:default])
+        info << format_target_summary(inventory[:count], adhoc[:count], flag, true)
 
         @stream.puts info
       end
@@ -628,7 +673,13 @@ module Bolt
         info
       end
 
-      def print_groups(groups, inventory_source, default_inventory)
+      # Print inventory group information.
+      #
+      # @param count [Integer] Number of groups in the inventory.
+      # @param groups [Array] Names of groups in the inventory.
+      # @param inventory [Hash] Where the inventory was loaded from.
+      #
+      def print_groups(count:, groups:, inventory:)
         info = +''
 
         # Add group list
@@ -637,18 +688,18 @@ module Bolt
         info << "\n\n"
 
         # Add inventory file source
-        info << format_inventory_source(inventory_source, default_inventory)
+        info << format_inventory_source(inventory[:source], inventory[:default])
 
         # Add group count summary
         info << colorize(:cyan, "Group count\n")
-        info << indent(2, "#{groups.count} total")
+        info << indent(2, "#{count} total")
 
         @stream.puts info
       end
 
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
-      def print_apply_result(apply_result, elapsed_time)
-        print_summary(apply_result, elapsed_time)
+      def print_apply_result(apply_result)
+        print_summary(apply_result, apply_result.elapsed_time)
       end
 
       # @param [Bolt::PlanResult] plan_result A PlanResult object

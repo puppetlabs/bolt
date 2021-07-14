@@ -63,7 +63,7 @@ describe "Bolt::Outputter::JSON" do
       'metadata' => metadata,
       'module_dir' => '/path/to/cinnamony/goodness'
     }
-    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    outputter.print_task_info(task: Bolt::Task.new(name, metadata, files))
     expect(JSON.parse(output.string)).to eq(result)
   end
 
@@ -80,7 +80,7 @@ describe "Bolt::Outputter::JSON" do
       'module_dir' => 'built-in module'
     }
 
-    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    outputter.print_task_info(task: Bolt::Task.new(name, metadata, files))
     expect(JSON.parse(output.string)).to eq(result)
   end
 
@@ -149,7 +149,7 @@ describe "Bolt::Outputter::JSON" do
   it 'prints a list of guides' do
     topics = %w[apple banana carrot]
 
-    outputter.print_topics(topics)
+    outputter.print_topics(topics: topics)
     parsed = JSON.parse(output.string)
 
     expect(parsed['topics']).to match_array(topics)
@@ -159,7 +159,7 @@ describe "Bolt::Outputter::JSON" do
     topic = 'boltymcboltface'
     guide = "The trials and tribulations of Bolty McBoltface.\n"
 
-    outputter.print_guide(guide, 'boltymcboltface')
+    outputter.print_guide(guide: guide, topic: 'boltymcboltface')
     parsed = JSON.parse(output.string)
 
     expect(parsed['topic']).to eq(topic)
@@ -175,27 +175,40 @@ describe "Bolt::Outputter::JSON" do
 
   context '#print_targets' do
     let(:inventoryfile) { '/path/to/inventory' }
+    let(:target)        { { 'name' => 'target' } }
 
-    let(:target_list) do
+    let(:data) do
       {
-        inventory: [double('target', name: 'target')],
-        adhoc:     [double('target', name: 'target')]
+        adhoc: {
+          count: 1,
+          targets: [target]
+        },
+        inventory: {
+          count: 1,
+          targets: [target],
+          file: inventoryfile,
+          default: inventoryfile
+        },
+        targets: [target, target],
+        count: 2,
+        flag: true
       }
     end
 
     it 'outputs inventory targets with count and file' do
-      outputter.print_targets(target_list, inventoryfile, inventoryfile, true)
+      outputter.print_targets(**data)
       parsed = JSON.parse(output.string)
 
       expect(parsed['inventory']).to eq(
         'targets' => ['target'],
         'count'   => 1,
-        'file'    => inventoryfile
+        'file'    => inventoryfile,
+        'default' => inventoryfile
       )
     end
 
     it 'outputs adhoc targets with count' do
-      outputter.print_targets(target_list, inventoryfile, inventoryfile, true)
+      outputter.print_targets(**data)
       parsed = JSON.parse(output.string)
 
       expect(parsed['adhoc']).to eq(
@@ -205,7 +218,7 @@ describe "Bolt::Outputter::JSON" do
     end
 
     it 'outputs all targets with count' do
-      outputter.print_targets(target_list, inventoryfile, inventoryfile, true)
+      outputter.print_targets(**data)
       parsed = JSON.parse(output.string)
 
       expect(parsed['targets']).to match_array(%w[target target])
@@ -218,7 +231,7 @@ describe "Bolt::Outputter::JSON" do
     let(:groups)        { %w[apple banana carrot] }
 
     it 'outputs groups, count, and inventoryfile' do
-      outputter.print_groups(groups, inventoryfile, inventoryfile)
+      outputter.print_groups(count: groups.count, groups: groups, inventory: inventoryfile)
 
       expect(JSON.parse(output.string)).to eq(
         'groups' => groups,
@@ -243,7 +256,7 @@ describe "Bolt::Outputter::JSON" do
     end
 
     it 'prints a list of plugins' do
-      outputter.print_plugin_list(plugins, modulepath)
+      outputter.print_plugin_list(plugins: plugins, modulepath: modulepath)
 
       expect(JSON.parse(output.string)).to eq(
         'plugins'    => plugins.transform_keys(&:to_s),

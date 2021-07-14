@@ -73,6 +73,12 @@ RSpec.configure do |config|
     allow(Net::SSH::Config).to receive(:for).and_return(conf)
   end
 
+  # Reset logger after every test.
+  config.after :each do
+    Bolt::Logger.stream    = nil
+    Bolt::Logger.analytics = nil
+  end
+
   # This will be default in future rspec, leave it on
   config.shared_context_metadata_behavior = :apply_to_host_groups
 

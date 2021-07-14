@@ -209,12 +209,5 @@ module Bolt
         Bolt::Logger.warn("missing_project_name", message)
       end
     end
-
-    def check_deprecated_file
-      if (@path + 'project.yaml').file?
-        msg = "Project configuration file 'project.yaml' is deprecated; use 'bolt-project.yaml' instead."
-        Bolt::Logger.warn("project_yaml", msg)
-      end
-    end
   end
 end

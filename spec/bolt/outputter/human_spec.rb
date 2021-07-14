@@ -129,7 +129,7 @@ describe "Bolt::Outputter::Human" do
                 'bolt task run cinnamon_roll --targets <targets> icing=<value>'
               end
 
-    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    outputter.print_task_info(task: Bolt::Task.new(name, metadata, files))
     expect(output.string).to match(/cinnamon_roll.*A delicious sweet bun/m),
                              'Does not print name and description'
     expect(output.string).to match(/Usage.*#{Regexp.escape(command)}/m),
@@ -152,7 +152,7 @@ describe "Bolt::Outputter::Human" do
       }
     }
 
-    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    outputter.print_task_info(task: Bolt::Task.new(name, metadata, files))
     expect(output.string).to match(/flavor.*Any/)
   end
 
@@ -169,7 +169,7 @@ describe "Bolt::Outputter::Human" do
 
     option = (Bolt::Util.powershell? ? '[-Noop]' : '[--noop]')
 
-    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    outputter.print_task_info(task: Bolt::Task.new(name, metadata, files))
     expect(output.string).to match(Regexp.escape(option))
   end
 
@@ -179,7 +179,7 @@ describe "Bolt::Outputter::Human" do
                'path' => "#{Bolt::Config::Modulepath::MODULES_PATH}/monkey/bread" }]
     metadata = {}
 
-    outputter.print_task_info(Bolt::Task.new(name, metadata, files))
+    outputter.print_task_info(task: Bolt::Task.new(name, metadata, files))
     expect(output.string).to match(/Module.*built-in module/m)
   end
 
@@ -190,7 +190,7 @@ describe "Bolt::Outputter::Human" do
                     'path' => "#{Bolt::Config::Modulepath::MODULES_PATH}/monkey/bread" }],
       'metadata' => {}
     }
-    outputter.print_tasks([task], %w[path1 path2])
+    outputter.print_tasks(tasks: [task], modulepath: %w[path1 path2])
     expect(output.string).to include("path1#{File::PATH_SEPARATOR}path2")
   end
 
@@ -370,7 +370,7 @@ describe "Bolt::Outputter::Human" do
   end
 
   it 'prints a list of guide topics' do
-    outputter.print_topics(%w[apple banana carrot])
+    outputter.print_topics(topics: %w[apple banana carrot])
     expect(output.string).to eq(<<~OUTPUT)
       Topics
         apple
@@ -384,7 +384,7 @@ describe "Bolt::Outputter::Human" do
 
   it 'prints a guide' do
     guide = "The trials and tribulations of Bolty McBoltface\n"
-    outputter.print_guide(guide, 'boltymcboltface')
+    outputter.print_guide(guide: guide, topic: 'boltymcboltface')
     expect(output.string).to eq(guide)
   end
 
@@ -429,75 +429,83 @@ describe "Bolt::Outputter::Human" do
     end
   end
 
-  context '#print_targets' do
+  context 'targets' do
     let(:inventoryfile) { '/path/to/inventory' }
+    let(:target)        { { 'name' => 'target' } }
 
-    let(:target_list) do
+    let(:data) do
       {
-        inventory: [double('target', name: 'target')],
-        adhoc:     [double('target', name: 'target')]
+        adhoc: {
+          count: 1,
+          targets: [target]
+        },
+        inventory: {
+          count: 1,
+          targets: [target],
+          file: inventoryfile,
+          default: inventoryfile
+        },
+        targets: [target, target],
+        count: 2,
+        flag: true
       }
     end
 
-    it 'prints adhoc targets' do
-      outputter.print_targets(target_list, inventoryfile, nil, true)
-      expect(output.string).to match(/target\s*\(Not found in inventory file\)/)
+    context '#print_targets' do
+      it 'prints adhoc targets' do
+        outputter.print_targets(**data)
+        expect(output.string).to match(/target\s*\(Not found in inventory file\)/)
+      end
+
+      it 'prints the inventory source' do
+        outputter.print_targets(**data)
+        expect(output.string).to match(/Inventory source.*#{inventoryfile}/m)
+      end
+
+      it 'prints a message that the inventory file does not exist' do
+        data[:inventory][:file] = nil
+        outputter.print_targets(**data)
+        expect(output.string).to match(/Inventory source.*does not exist/m)
+      end
+
+      it 'prints target counts' do
+        outputter.print_targets(**data)
+        expect(output.string).to match(/2 total, 1 from inventory, 1 adhoc/)
+      end
+
+      it 'prints suggestion to use a targeting option if one was not provided' do
+        data[:flag] = false
+        outputter.print_targets(**data)
+        expect(output.string).to match(/Use the .* option to view specific targets/)
+      end
+
+      it 'does not print suggestion to use a targeting option if one was provided' do
+        outputter.print_targets(**data)
+        expect(output.string).not_to match(/Use the .* option to view specific targets/)
+      end
+
+      it 'prints suggestion to use detail option' do
+        outputter.print_targets(**data)
+        expect(output.string).to match(/Use the .* option to view target configuration and data/)
+      end
     end
 
-    it 'prints the inventory source' do
-      outputter.print_targets(target_list, inventoryfile, nil, true)
-      expect(output.string).to match(/Inventory source.*#{inventoryfile}/m)
-    end
+    context '#print_target_info' do
+      it 'prints suggestion to use a targeting option if one was not provided' do
+        data[:flag] = false
+        outputter.print_target_info(**data)
+        expect(output.string).to match(/Use the .* option to view specific targets/)
+      end
 
-    it 'prints a message that the inventory file does not exist' do
-      outputter.print_targets(target_list, nil, inventoryfile, true)
-      expect(output.string).to match(/Inventory source.*does not exist/m)
-    end
+      it 'does not print suggestion to use a targeting option if one was provided' do
+        outputter.print_target_info(**data)
+        expect(output.string).not_to match(/Use the .* option to view specific targets/)
+      end
 
-    it 'prints target counts' do
-      outputter.print_targets(target_list, inventoryfile, nil, true)
-      expect(output.string).to match(/2 total, 1 from inventory, 1 adhoc/)
-    end
-
-    it 'prints suggestion to use a targeting option if one was not provided' do
-      outputter.print_targets(target_list, inventoryfile, nil, false)
-      expect(output.string).to match(/Use the .* option to view specific targets/)
-    end
-
-    it 'does not print suggestion to use a targeting option if one was provided' do
-      outputter.print_targets(target_list, inventoryfile, nil, true)
-      expect(output.string).not_to match(/Use the .* option to view specific targets/)
-    end
-
-    it 'prints suggestion to use detail option' do
-      outputter.print_targets(target_list, inventoryfile, nil, true)
-      expect(output.string).to match(/Use the .* option to view target configuration and data/)
-    end
-  end
-
-  context '#print_target_info' do
-    let(:inventoryfile) { '/path/to/inventory' }
-
-    let(:target_list) do
-      {
-        inventory: [double('target', name: 'target', detail: {})],
-        adhoc:     [double('target', name: 'target', detail: {})]
-      }
-    end
-
-    it 'prints suggestion to use a targeting option if one was not provided' do
-      outputter.print_target_info(target_list, inventoryfile, nil, false)
-      expect(output.string).to match(/Use the .* option to view specific targets/)
-    end
-
-    it 'does not print suggestion to use a targeting option if one was provided' do
-      outputter.print_target_info(target_list, inventoryfile, nil, true)
-      expect(output.string).not_to match(/Use the .* option to view specific targets/)
-    end
-
-    it 'does not print suggestion to use detail option' do
-      outputter.print_target_info(target_list, inventoryfile, nil, true)
-      expect(output.string).not_to match(/Use the .* option to view target configuration and data/)
+      it 'does not print suggestion to use detail option' do
+        outputter.print_target_info(**data)
+        expect(output.string).not_to match(/Use the .* option to view target configuration and data/)
+      end
     end
   end
 
@@ -505,23 +513,35 @@ describe "Bolt::Outputter::Human" do
     let(:inventoryfile) { '/path/to/inventory' }
     let(:groups)        { %w[apple banana carrot] }
 
+    let(:data) do
+      {
+        groups:    groups,
+        inventory: {
+          source:  inventoryfile,
+          default: inventoryfile
+        },
+        count:     groups.count
+      }
+    end
+
     it 'prints groups' do
-      outputter.print_groups(groups, inventoryfile, nil)
+      outputter.print_groups(**data)
       expect(output.string).to match(/Groups.*apple.*banana.*carrot/m)
     end
 
     it 'prints the inventory source' do
-      outputter.print_groups(groups, inventoryfile, nil)
+      outputter.print_groups(**data)
       expect(output.string).to match(/Inventory source.*#{inventoryfile}/m)
     end
 
     it 'prints that the inventory file does not exist' do
-      outputter.print_groups(groups, nil, inventoryfile)
+      data[:inventory][:source] = nil
+      outputter.print_groups(**data)
       expect(output.string).to match(/Inventory source.*but the file does not exist/m)
     end
 
     it 'prints the group count' do
-      outputter.print_groups(groups, inventoryfile, nil)
+      outputter.print_groups(**data)
       expect(output.string).to match(/Group count.*3 total/m)
     end
   end
@@ -542,7 +562,7 @@ describe "Bolt::Outputter::Human" do
     end
 
     it 'prints a list of plugins' do
-      outputter.print_plugin_list(plugins, modulepath)
+      outputter.print_plugin_list(plugins: plugins, modulepath: modulepath)
 
       expect(output.string).to match(/puppet_library.*resolve_reference/m),
                                'Does not print hook names'

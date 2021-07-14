@@ -1,0 +1,13 @@
+{
+  "description": "An unsuccessful task",
+  "implementations": [
+    {
+      "name": "error.sh",
+      "requirements": ["shell"]
+    },
+    {
+      "name": "error.ps1",
+      "requirements": ["powershell"]
+    }
+  ]
+}
