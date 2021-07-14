@@ -16,6 +16,18 @@ module Bolt
             _default: false,
             _example: true
           },
+          "batch-mode" => {
+            type: [TrueClass, FalseClass],
+            description: "Whether to disable password querying. When set to `false`, SSH will fall back to "\
+                         "prompting for a password if key authentication fails. This might cause Bolt to hang. "\
+                         "To prevent Bolt from hanging, you can configure `ssh-command` to use an SSH utility "\
+                         "such as sshpass that supports providing a password non-interactively. For more "\
+                         "information, see [Providing a password non-interactively using "\
+                         "`native-ssh`](troubleshooting.md#providing-a-password-non-interactively-using-native-ssh).",
+            _plugin: true,
+            _default: true,
+            _example: false
+          },
           "bundled-ruby" => {
             description: "Whether to use the Ruby bundled with Bolt packages for local targets.",
             type: [TrueClass, FalseClass],
