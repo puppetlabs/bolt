@@ -441,7 +441,7 @@ module BoltServer
         'uri' => target_hash['hostname'],
         'config' => {
           'transport' => 'ssh',
-          'ssh' => opts
+          'ssh' => opts.slice(*Bolt::Config::Transport::SSH.options)
         }
       }
 
@@ -479,7 +479,7 @@ module BoltServer
         'uri' => target_hash['hostname'],
         'config' => {
           'transport' => 'winrm',
-          'winrm' => opts
+          'winrm' => opts.slice(*Bolt::Config::Transport::WinRM.options)
         }
       }
 
