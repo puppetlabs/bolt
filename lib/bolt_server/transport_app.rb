@@ -766,6 +766,26 @@ module BoltServer
       [200, plugins_tarball.to_json]
     end
 
+    # Returns the base64 encoded tar archive of _all_ plugin code for a project
+    #
+    # @param versioned_project [String] the versioned_project to build the plugin tarball from
+    get '/project_plugin_tarball' do
+      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
+      content_type :json
+
+      plugins_tarball = build_project_plugins_tarball(params['versioned_project']) do |mod|
+        search_dirs = []
+        search_dirs << mod.plugins if mod.plugins?
+        search_dirs << mod.pluginfacts if mod.pluginfacts?
+        search_dirs << mod.files if mod.files?
+        type_files = "#{mod.path}/types"
+        search_dirs << type_files if File.exist?(type_files)
+        search_dirs
+      end
+
+      [200, plugins_tarball.to_json]
+    end
+
     error 404 do
       err = Bolt::Error.new("Could not find route #{request.path}",
                             'boltserver/not-found')

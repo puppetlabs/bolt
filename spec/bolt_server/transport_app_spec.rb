@@ -50,6 +50,23 @@ describe "BoltServer::TransportApp" do
     end
   end
 
+  def unpack_tarball(base64_encoding, tmpdir)
+    plugins = File.join(tmpdir, "plugins.tar.gz")
+    File.binwrite(plugins, Base64.decode64(base64_encoding))
+    user = Etc.getpwuid.nil? ? Etc.getlogin : Etc.getpwuid.name
+    moduledir = File.join(tmpdir, "modules")
+    Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, user)
+    moduledir
+  end
+
+  # Returns all files under dir relative to dir
+  def list_all_files(dir)
+    parent = Pathname.new(dir)
+    Find.find(dir)
+        .select { |file| File.file?(file) }
+        .map { |file| Pathname.new(file).relative_path_from(parent).to_s }
+  end
+
   it 'responds ok' do
     get '/'
     expect(last_response).to be_ok
@@ -1348,23 +1365,6 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/project_facts_plugin_tarball' do
-      def unpack_tarball(base64_encoding, tmpdir)
-        plugins = File.join(tmpdir, "plugins.tar.gz")
-        File.binwrite(plugins, Base64.decode64(base64_encoding))
-        user = Etc.getpwuid.nil? ? Etc.getlogin : Etc.getpwuid.name
-        moduledir = File.join(tmpdir, "modules")
-        Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, user)
-        moduledir
-      end
-
-      # Returns all files under dir relative to dir
-      def list_all_files(dir)
-        parent = Pathname.new(dir)
-        Find.find(dir)
-            .select { |file| File.file?(file) }
-            .map { |file| Pathname.new(file).relative_path_from(parent).to_s }
-      end
-
       let(:versioned_project) { 'bolt_server_test_project' }
 
       it 'returns 400 if versioned_project is not specified' do
@@ -1391,6 +1391,61 @@ describe "BoltServer::TransportApp" do
           expected_plugin_files = [
             'plugin_module/lib/puppet/functions/some_function.rb',
             'pluginfacts_module/facts.d/external_fact.sh'
+          ]
+          expect(unpacked_plugin_files.sort).to eql(expected_plugin_files.sort)
+
+          # Make sure the contents also match
+          unpacked_plugin_files.each do |plugin_file|
+            file_fixture_path = File.join(
+              project_dir,
+              versioned_project,
+              'modules',
+              plugin_file
+            )
+            file_unpacked_path = File.join(
+              unpacked_pluginsdir,
+              plugin_file
+            )
+
+            expected_content = File.read(file_fixture_path)
+            actual_content = File.read(file_unpacked_path)
+
+            expect(expected_content).to eql(actual_content)
+          end
+        end
+      end
+    end
+
+    describe '/project_plugin_tarball' do
+      let(:versioned_project) { 'bolt_server_test_project' }
+
+      it 'returns 400 if versioned_project is not specified' do
+        get('/project_plugin_tarball')
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match("'versioned_project' is a required argument")
+      end
+
+      it 'returns 400 if versioned_project does not exist' do
+        get("/project_plugin_tarball?versioned_project=not_a_real_project")
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_project' does not exist/)
+      end
+
+      it "returns a base64 encoded tar archive of the project's plugin code" do
+        get("/project_plugin_tarball?versioned_project=#{versioned_project}")
+        expect(last_response.status).to eq(200)
+        Dir.mktmpdir("project_plugin_tarball_test") do |tmpdir|
+          unpacked_pluginsdir = unpack_tarball(JSON.parse(last_response.body), tmpdir)
+
+          unpacked_plugin_files = list_all_files(unpacked_pluginsdir)
+          expected_plugin_files = [
+            'plugin_module/lib/puppet/functions/some_function.rb',
+            'plugin_module/types/some_alias.pp',
+            'pluginfacts_module/facts.d/external_fact.sh',
+            'project_module/files/test_dir/test_dir_file',
+            'project_module/files/test_file'
           ]
           expect(unpacked_plugin_files.sort).to eql(expected_plugin_files.sort)
 
