@@ -389,6 +389,63 @@ module BoltServer
       end
     end
 
+    # The provided block takes a module object and returns the list
+    # of directories to search through. This is similar to
+    # Bolt::Applicator.build_plugin_tarball.
+    def build_project_plugins_tarball(versioned_project, &block)
+      start_time = Time.now
+
+      # Fetch the plugin files
+      plugin_files = in_bolt_project(versioned_project) do |context|
+        files = {}
+
+        # Bolt also sets plugin_modulepath to user modulepath so do it here too for
+        # consistency
+        plugin_modulepath = context[:pal].user_modulepath
+        Puppet.lookup(:current_environment).override_with(modulepath: plugin_modulepath).modules.each do |mod|
+          search_dirs = block.call(mod)
+
+          files[mod] ||= []
+          Find.find(*search_dirs).each do |file|
+            files[mod] << file if File.file?(file)
+          end
+        end
+
+        files
+      end
+
+      # Pack the plugin files
+      sio = StringIO.new
+      begin
+        output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
+
+        plugin_files.each do |mod, files|
+          tar_dir = Pathname.new(mod.name)
+          mod_dir = Pathname.new(mod.path)
+
+          files.each do |file|
+            tar_path = tar_dir + Pathname.new(file).relative_path_from(mod_dir)
+            stat = File.stat(file)
+            content = File.binread(file)
+            output.tar.add_file_simple(
+              tar_path.to_s,
+              data: content,
+              size: content.size,
+              mode: stat.mode & 0o777,
+              mtime: stat.mtime
+            )
+          end
+        end
+
+        duration = Time.now - start_time
+        @logger.trace("Packed plugins in #{duration * 1000} ms")
+      ensure
+        output.close
+      end
+
+      Base64.encode64(sio.string)
+    end
+
     get '/' do
       200
     end
@@ -699,60 +756,14 @@ module BoltServer
       raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       content_type :json
 
-      # Inspired by Bolt::Applicator.build_plugin_tarball
-      start_time = Time.now
-
-      # Fetch the plugin files
-      plugin_files = in_bolt_project(params['versioned_project']) do |context|
-        files = {}
-
-        # Bolt also sets plugin_modulepath to user modulepath so do it here too for
-        # consistency
-        plugin_modulepath = context[:pal].user_modulepath
-        Puppet.lookup(:current_environment).override_with(modulepath: plugin_modulepath).modules.each do |mod|
-          search_dirs = []
-          search_dirs << mod.plugins if mod.plugins?
-          search_dirs << mod.pluginfacts if mod.pluginfacts?
-
-          files[mod] ||= []
-          Find.find(*search_dirs).each do |file|
-            files[mod] << file if File.file?(file)
-          end
-        end
-
-        files
+      plugins_tarball = build_project_plugins_tarball(params['versioned_project']) do |mod|
+        search_dirs = []
+        search_dirs << mod.plugins if mod.plugins?
+        search_dirs << mod.pluginfacts if mod.pluginfacts?
+        search_dirs
       end
 
-      # Pack the plugin files
-      sio = StringIO.new
-      begin
-        output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
-
-        plugin_files.each do |mod, files|
-          tar_dir = Pathname.new(mod.name)
-          mod_dir = Pathname.new(mod.path)
-
-          files.each do |file|
-            tar_path = tar_dir + Pathname.new(file).relative_path_from(mod_dir)
-            stat = File.stat(file)
-            content = File.binread(file)
-            output.tar.add_file_simple(
-              tar_path.to_s,
-              data: content,
-              size: content.size,
-              mode: stat.mode & 0o777,
-              mtime: stat.mtime
-            )
-          end
-        end
-
-        duration = Time.now - start_time
-        @logger.trace("Packed plugins in #{duration * 1000} ms")
-      ensure
-        output.close
-      end
-
-      [200, Base64.encode64(sio.string).to_json]
+      [200, plugins_tarball.to_json]
     end
 
     error 404 do
