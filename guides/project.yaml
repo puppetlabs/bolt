@@ -1,7 +1,6 @@
-TOPIC
-    project
-
-DESCRIPTION
+---
+topic: project
+guide: |
     A Bolt project is a directory that serves as the launching point for Bolt
     and allows you to create a shareable orchestration application. Projects
     typically include a project configuration file, an inventory file, and any
@@ -17,6 +16,6 @@ DESCRIPTION
     and content, including inventory files, unless the data and content are part
     of a project.
 
-DOCUMENTATION
-    https://pup.pt/bolt-projects
-    https://pup.pt/bolt-project-reference
+documentation:
+  - https://pup.pt/bolt-projects
+  - https://pup.pt/bolt-project-reference

@@ -1,7 +1,6 @@
-TOPIC
-    transports
-
-DESCRIPTION
+---
+topic: transports
+guide: |
     Bolt uses transports (also known as protocols) to establish a connection
     with a target in order to run actions on the target. The default transport is
     SSH, and you can see available transports along with their configuration
@@ -18,6 +17,6 @@ DESCRIPTION
     Finally, you can set the transport for a target in the inventory. For more
     information about the Bolt inventory, run 'bolt guide inventory'.
 
-DOCUMENTATION
-    https://pup.pt/bolt-commands#specify-a-transport
-    http://pup.pt/bolt-inventory#transport-configuration
+documentation:
+  - https://pup.pt/bolt-commands#specify-a-transport
+  - http://pup.pt/bolt-inventory#transport-configuration

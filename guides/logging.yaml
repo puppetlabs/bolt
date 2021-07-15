@@ -1,7 +1,6 @@
-TOPIC
-    logging
-
-DESCRIPTION
+---
+topic: logging
+guide: |
     Bolt prints messages both to the console and to log files. Messages can
     either come from Bolt's 'outputter', which logs user-facing messages like
     progress and results, or from the 'logger', which logs warnings, errors, and
@@ -14,5 +13,5 @@ DESCRIPTION
 
     To learn more about projects, see the 'project' guide.
 
-DOCUMENTATION
-    https://pup.pt/bolt-logging
+documentation:
+  - https://pup.pt/bolt-logging

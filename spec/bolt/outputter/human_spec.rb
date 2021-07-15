@@ -383,9 +383,10 @@ describe "Bolt::Outputter::Human" do
   end
 
   it 'prints a guide' do
+    topic = 'boltymcboltface'
     guide = "The trials and tribulations of Bolty McBoltface\n"
-    outputter.print_guide(guide, 'boltymcboltface')
-    expect(output.string).to eq(guide)
+    outputter.print_guide(guide: guide, topic: topic)
+    expect(output.string).to eq("#{topic}\n  #{guide}")
   end
 
   it 'prints a plan-hierarchy lookup result' do
