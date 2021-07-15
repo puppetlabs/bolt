@@ -56,6 +56,10 @@
     "smb-port": {
       "type": "integer",
       "description": "Port for SMB protocol"
+    },
+    "plugin_hooks": {
+      "type": "object",
+      "description": "Configuration for plugins to use"
     }
   },
   "required": ["hostname", "user", "password"],
