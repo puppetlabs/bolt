@@ -1053,7 +1053,8 @@ describe Bolt::Inventory::Inventory do
       }
       let(:inventory) { Bolt::Inventory::Inventory.new(data, transport, transports, plugins) }
       let(:expected_options) {
-        { "connect-timeout" => 10,
+        { "batch-mode" => true,
+          "connect-timeout" => 10,
           "tty" => false,
           "load-config" => true,
           "disconnect-timeout" => 11,
@@ -1267,6 +1268,7 @@ describe Bolt::Inventory::Inventory do
         'config' => {
           'transport' => 'ssh',
           'ssh' => {
+            'batch-mode' => true,
             'connect-timeout' => 10,
             'tty' => false,
             'load-config' => true,

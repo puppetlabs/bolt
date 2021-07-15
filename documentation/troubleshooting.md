@@ -92,6 +92,42 @@ By default, Bolt tries to connect over the standard SSH port 22. If you need to
 connect over a different port, either include the port in the name of the target
 (`hostname.example.com:2345`) or set it in your Bolt config or inventory.
 
+### Providing a password non-interactively using `native-ssh`
+
+By default, the `native-ssh` transport enables `BatchMode` when establishing
+connections to targets. When `BatchMode` is enabled, SSH does not fall back to
+querying for a password, which might make it impossible to connect to a target
+if you are unable to authenticate using keys.
+
+You can disable `BatchMode` in your transport configuration using the
+`batch-mode` setting, which allows SSH to fall back to querying for a password
+when key authentication fails. However, `native-ssh` uses the `ssh` client by
+default, which prompts for passwords interactively and causes Bolt to hang. 
+
+To avoid hanging when `BatchMode` is disabled, you can configure `ssh-command`
+to use an SSH utility like `sshpass` to provide a password to the SSH client
+non-interactively. Additionally, ensure the `user` is configured and
+`host-key-check` is disabled.
+
+The following configuration shows how to disable `BatchMode` and provide a
+password to the SSH client using the `prompt` plugin.
+
+```yaml
+# inventory.yaml
+config:
+  ssh:
+    native-ssh: true
+    host-key-check: false
+    batch-mode: false
+    user: root
+    ssh-command:
+      - sshpass
+      - -p
+      - _plugin: prompt
+        message: Enter your SSH password
+      - ssh
+```
+
 ## Bolt can't connect to my Windows hosts
 
 ### Timeout or connection refused

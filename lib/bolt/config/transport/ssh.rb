@@ -34,6 +34,7 @@ module Bolt
 
         # Options available when using the native ssh transport
         NATIVE_OPTIONS = %w[
+          batch-mode
           cleanup
           copy-command
           host
@@ -49,6 +50,7 @@ module Bolt
         ].concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {
+          "batch-mode"         => true,
           "cleanup"            => true,
           "connect-timeout"    => 10,
           "disconnect-timeout" => 5,
