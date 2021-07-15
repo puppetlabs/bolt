@@ -8,7 +8,7 @@ require 'bolt/plan_future'
 describe 'wait' do
   include PuppetlabsSpec::Fixtures
   let(:name)      { "Pluralize" }
-  let(:future)    { Bolt::PlanFuture.new('foo', name) }
+  let(:future)    { Bolt::PlanFuture.new('foo', name, plan_id: 1234) }
   let(:executor)  { Bolt::Executor.new }
   let(:result)    { ['return'] }
   let(:timeout)   { 2 }
@@ -28,6 +28,42 @@ describe 'wait' do
 
     is_expected.to(run
       .with_params(future))
+  end
+
+  context 'with no futures' do
+    it "passes 'nil' to the executor" do
+      executor.expects(:wait).with(nil).returns(result)
+
+      is_expected.to(run
+        .and_return(result))
+    end
+
+    it 'accepts just a timeout' do
+      executor.expects(:wait)
+              .with(nil, timeout: 2).returns(result)
+
+      is_expected.to(run
+        .with_params(2)
+        .and_return(result))
+    end
+
+    it 'accepts just options' do
+      executor.expects(:wait)
+              .with(nil, catch_errors: true).returns(result)
+
+      is_expected.to(run
+        .with_params('_catch_errors' => true)
+        .and_return(result))
+    end
+
+    it 'accepts a timeout and options' do
+      executor.expects(:wait)
+              .with(nil, timeout: 2, catch_errors: true).returns(result)
+
+      is_expected.to(run
+        .with_params(2, '_catch_errors' => true)
+        .and_return(result))
+    end
   end
 
   it 'turns a single object into an array' do

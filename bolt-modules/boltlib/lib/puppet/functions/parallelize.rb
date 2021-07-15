@@ -34,7 +34,11 @@ Puppet::Functions.create_function(:parallelize, Puppet::Functions::InternalFunct
     executor.report_function_call(self.class.name)
 
     futures = data.map do |object|
-      executor.create_future(scope: scope) do |newscope|
+      # We're going to immediately wait for these futures, *and* don't want
+      # their results to be returned as part of `wait()`, so use a 'dummy'
+      # value as the plan_id. This could also be nil, though in general we want
+      # to require Futures to have a plan stack so that they don't get lost.
+      executor.create_future(scope: scope, plan_id: 'parallel') do |newscope|
         # Catch 'return' calls inside the block
         result = catch(:return) do
           # Add the object to the block parameters

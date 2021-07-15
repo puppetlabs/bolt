@@ -683,7 +683,10 @@ module Bolt
         # Create a Fiber for the main plan. This will be run along with any
         # other Fibers created during the plan run in the round_robin, with the
         # main plan always taking precedence in being resumed.
-        future = executor.create_future(name: plan_name) do |_scope|
+        #
+        # Every future except for the main plan needs to have a plan id in
+        # order to be tracked for the `wait()` function with no arguments.
+        future = executor.create_future(name: plan_name, plan_id: 1) do |_scope|
           r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
           Bolt::PlanResult.from_pcore(r, 'success')
         rescue Bolt::Error => e

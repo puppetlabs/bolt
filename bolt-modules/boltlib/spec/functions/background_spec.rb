@@ -9,10 +9,11 @@ describe 'background' do
   include PuppetlabsSpec::Fixtures
   let(:name)      { "Pluralize" }
   let(:object)    { "noodle" }
-  let(:future)    { Bolt::PlanFuture.new('foo', name) }
+  let(:future)    { Bolt::PlanFuture.new('foo', name, plan_id: 1234) }
   let(:executor)  { Bolt::Executor.new }
 
   around(:each) do |example|
+    executor.expects(:get_current_plan_id).returns(1234)
     Puppet[:tasks] = true
     Puppet.override(bolt_executor: executor) do
       example.run

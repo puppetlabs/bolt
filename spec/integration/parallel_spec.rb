@@ -115,6 +115,32 @@ Undef:}
   end
 
   shared_examples "#wait()" do
+    context "without futures" do
+      it "waits for Futures from the calling plan to finish" do
+        result = run_cli_json(%w[plan run wait::no_future::basic] + config_flags)
+        expect(result)
+          .to include("Who's on first", "What's on second", "I don't know's on third", "Run immediately")
+      end
+
+      # `wait()` will return the results from everything it waited on, so
+      # instead of checking timing checking the result should guarantee that
+      # these Futures were the only ones waited on.
+      it "does not wait for Futures from other plans executing in parallel" do
+        result = run_cli_json(%w[plan run wait::no_future::subplan] + config_flags)
+        expect(result).to eq(["Just a subplan, hold the mustard"])
+      end
+
+      it "errors when called inside a `background()` in the same plan" do
+        run_cli_json(%w[plan run wait::no_future::infinite_loop] + config_flags)
+        expect(@log_output.readlines).to include(/The wait\(\) function cannot be called/)
+      end
+
+      it "waits on any Futures created inside a `background()` block in the same plan" do
+        result = run_cli_json(%w[plan run wait::no_future::inner_bg] + config_flags)
+        expect(result).to contain_exactly("Thing 1", "Thing 2")
+      end
+    end
+
     context "without a timeout" do
       it 'blocks until all futures have finished' do
         expected = <<~OUT

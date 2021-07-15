@@ -1311,6 +1311,7 @@ describe "Bolt::CLI" do
                shutdown: nil,
                in_parallel?: false,
                plan_complete?: true,
+               get_current_future: nil,
                future: {})
       }
       let(:cli)         { Bolt::CLI.new({}) }
