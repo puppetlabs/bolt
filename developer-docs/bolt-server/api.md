@@ -383,6 +383,20 @@ This endpoint returns the base64 encoded tar archive of plugin code that is need
 "H4sIAI7ot2AAA+2UywqDMBBFXfsVAfcm0RihPxOiRhtIY8gDSr++UbCrQtGF\nLSVnN7O5A5czRoVJ6pH33rHbPAQl4DqUAxR3L6zmii2L0l2zo6AIJeTtfqVC\nGSaoaVpa4xZnCDe4ohlAhxN3EJznNp5yRtYPUoCtZrDUnH/7nsS5mNX/TX0l\nO2iCMcLDMejey1k76OabYNtY2m53xkf/G/ryn9Qk+k9bXCf/z6AAo50fQjPn\nrdQTUzJ+A64uwNsg8gIs5YOt/PQdEolE4m94AocSIJ4ADAAA\n"
 ```
 
+## GET /project_plugin_tarball
+
+This endpoint returns the base64 encoded tar archive of _all_ plugin code for a project.
+
+### Query parameters
+
+- `versioned_project`: String, *required* - Reference to the bolt project (in the form [PROJECT NAME]\_[REF])
+
+### Response
+
+```
+"H4sIAI7ot2AAA+2UywqDMBBFXfsVAfcm0RihPxOiRhtIY8gDSr++UbCrQtGF\nLSVnN7O5A5czRoVJ6pH33rHbPAQl4DqUAxR3L6zmii2L0l2zo6AIJeTtfqVC\nGSaoaVpa4xZnCDe4ohlAhxN3EJznNp5yRtYPUoCtZrDUnH/7nsS5mNX/TX0l\nO2iCMcLDMejey1k76OabYNtY2m53xkf/G/ryn9Qk+k9bXCf/z6AAo50fQjPn\nrdQTUzJ+A64uwNsg8gIs5YOt/PQdEolE4m94AocSIJ4ADAAA\n"
+```
+
 ## GET /tasks
 - `environment`: String
 
