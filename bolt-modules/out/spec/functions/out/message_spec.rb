@@ -14,10 +14,11 @@ describe 'out::message' do
     end
   end
 
-  it 'sends a log event to the executor' do
+  it 'sends a message event to the executor' do
     executor.expects(:publish_event).with(
       type:    :message,
-      message: 'This is a message'
+      message: 'This is a message',
+      level:   :info
     )
 
     is_expected.to run.with_params('This is a message')

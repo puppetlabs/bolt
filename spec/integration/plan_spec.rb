@@ -77,25 +77,37 @@ describe 'plans' do
 
       let(:config_flags) { ['--no-host-key-check'] }
       let(:opts)         { { outputter: Bolt::Outputter::Human, project: @project } }
+      let(:project)      { @project }
 
       context 'output' do
-        let(:output)    { StringIO.new }
-        let(:outputter) { Bolt::Outputter::Human.new(true, true, true, true, output) }
+        context 'out::message' do
+          it 'outputs messages' do
+            result = run_cli(%w[plan run output], outputter: Bolt::Outputter::Human, project: project)
+            expect(result).to match(/Outputting a message/)
+          end
 
-        before(:each) do
-          allow(Bolt::Outputter::Human).to receive(:new).and_return(outputter)
+          it 'logs messages at the info level' do
+            run_cli(%w[plan run output], outputter: Bolt::Outputter::Human, project: project)
+            expect(@log_output.readlines).to include(/INFO.*Outputting a message/)
+          end
         end
 
-        it 'outputs message with verbose flag' do
-          run_cli(%W[plan run output::verbose --targets #{target} --verbose] + config_flags,
-                  outputter: Bolt::Outputter::Human, project: @project)
-          expect(output.string).to match(/Hi, I'm Dave/)
-        end
+        context 'out::verbose' do
+          it 'outputs verbose messages in verbose mode' do
+            result = run_cli(%w[plan run output::verbose --verbose], outputter: Bolt::Outputter::Human,
+                                                                     project: project)
+            expect(result).to match(/Hi, I'm Dave/)
+          end
 
-        it 'doesnt output without verbose flag' do
-          result = run_cli(%W[plan run output::verbose --targets #{target}] + config_flags,
-                           outputter: Bolt::Outputter::Human, project: @project)
-          expect(result).not_to match(/Hi, I'm Dave/)
+          it 'does not output verbose messages' do
+            result = run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human, project: project)
+            expect(result).not_to match(/Hi, I'm Dave/)
+          end
+
+          it 'logs verbose messages at the debug level' do
+            run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human, project: project)
+            expect(@log_output.readlines).to include(/DEBUG.*Hi, I'm Dave/)
+          end
         end
       end
 

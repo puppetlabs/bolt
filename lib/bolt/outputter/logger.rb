@@ -24,7 +24,7 @@ module Bolt
           log_container_start(event)
         when :container_finish
           log_container_finish(event)
-        when :log
+        when :log, :message, :verbose
           log_message(**event)
         end
       end

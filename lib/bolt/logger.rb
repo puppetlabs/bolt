@@ -147,6 +147,18 @@ module Bolt
       Logging.reset
     end
 
+    # Checks if the specified level logs to the console.
+    #
+    def self.log_to_console?(level)
+      configured? && console_level <= Logging.level_num(level)
+    end
+
+    # Returns the log level for the console.
+    #
+    def self.console_level
+      Logging.logger[:root].appenders.select { |appender| appender.name == 'console' }.first&.level
+    end
+
     # The following methods are used in place of the Logging.logger
     # methods of the same name when logging warning messages or logging
     # any messages prior to the logger being configured. If the logger

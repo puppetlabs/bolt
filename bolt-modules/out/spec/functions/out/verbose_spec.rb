@@ -17,7 +17,8 @@ describe 'out::verbose' do
   it 'sends a verbose event to the executor' do
     executor.expects(:publish_event).with(
       type:    :verbose,
-      message: 'This is a message'
+      message: 'This is a message',
+      level:   :debug
     )
 
     is_expected.to run.with_params('This is a message')
