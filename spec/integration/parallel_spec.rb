@@ -149,7 +149,7 @@ Undef:}
         output = run_cli(%w[plan run wait::error] + config_flags,
                          outputter: Bolt::Outputter::Human)
         expect(output).to include("Who's on first\nI don't know's on third")
-        expect(output).to include("\"msg\": \"parallel block failed on 1 target")
+        expect(output).to include("parallel block failed on 1 target")
         expect(output).not_to include("Finished main plan.")
       end
 
