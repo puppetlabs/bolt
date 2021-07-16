@@ -266,18 +266,18 @@ is a stub or a mock.
 You can stub or mock the following functions. Click on each function to view its
 documentation.
 
-| plan function | Stub function | Mock function |
+| plan function | Stub function | Global stub function | Mock function
 | --- | --- | --- |
-| [`apply`](plan_functions.md#apply) | [`allow_apply`](boltspec_reference.md#allow-apply) | - |
-| [`apply_prep`](plan_functions.md#apply-prep) | [`allow_apply_prep`](boltspec_reference.md#allow-apply-prep) | - |
-| [`download_file`](plan_functions.md#download-file) | [`allow_download`](boltspec_reference.md#allow-download) | [`expect_download`](boltspec_reference.md#expect_download) |
-| [`out::message`](plan_functions.md#outmessage) | [`allow_out_message`](boltspec_reference.md#allow-out-message) | [`expect_out_message`](boltspec_reference.md#expect-out-message) |
-| [`out::verbose`](plan_functions.md#outverbose) | [`allow_out_verbose`](boltspec_reference.md#allow-out-verbose) | [`expect_out_verbose`](boltspec_reference.md#expect-out-verbose) |
-| [`run_command`](plan_functions.md#run-command) | [`allow_command`](boltspec_reference.md#allow-command) | [`expect_command`](boltspec_reference.md#expect-command) |
-| [`run_plan`](plan_functions.md#run-plan) | [`allow_plan`](boltspec_reference.md#allow-plan) | [`expect_plan`](boltspec_reference.md#expect-plan) |
+| [`apply`](plan_functions.md#apply) | [`allow_apply`](boltspec_reference.md#allow-apply) | - | - |
+| [`apply_prep`](plan_functions.md#apply-prep) | [`allow_apply_prep`](boltspec_reference.md#allow-apply-prep) | - | - |
+| [`download_file`](plan_functions.md#download-file) | [`allow_download`](boltspec_reference.md#allow-download) | - | [`expect_download`](boltspec_reference.md#expect_download) |
+| [`out::message`](plan_functions.md#outmessage) | [`allow_out_message`](boltspec_reference.md#allow-out-message) | - | [`expect_out_message`](boltspec_reference.md#expect-out-message) |
+| [`out::verbose`](plan_functions.md#outverbose) | [`allow_out_verbose`](boltspec_reference.md#allow-out-verbose) | - | [`expect_out_verbose`](boltspec_reference.md#expect-out-verbose) |
+| [`run_command`](plan_functions.md#run-command) | [`allow_command`](boltspec_reference.md#allow-command) | - | [`expect_command`](boltspec_reference.md#expect-command) |
+| [`run_plan`](plan_functions.md#run-plan) | [`allow_plan`](boltspec_reference.md#allow-plan) | [`allow_any_plan`](plan_functions.md#run-any-plan) | [`expect_plan`](boltspec_reference.md#expect-plan) |
 | [`run_script`](plan_functions.md#run-script) | [`allow_script`](boltspec_reference.md#allow-script) | [`expect_script`](boltspec_reference.md#expect-script) |
-| [`run_task`](plan_functions.md#run-task) | [`allow_task`](boltspec_reference.md#allow-task) | [`expect_task`](boltspec_reference.md#expect-task) |
-| [`upload_file`](plan_functions.md#upload-file) | [`allow_upload`](boltspec_reference.md#allow-upload) | [`expect_upload`](boltspec_reference.md#expect-upload) |
+| [`run_task`](plan_functions.md#run-task) | [`allow_task`](boltspec_reference.md#allow-task) | [`allow_any_task`](plan_functions.md#run-any-task) | [`expect_task`](boltspec_reference.md#expect-task) |
+| [`upload_file`](plan_functions.md#upload-file) | [`allow_upload`](boltspec_reference.md#allow-upload) | - | [`expect_upload`](boltspec_reference.md#expect-upload) |
 
 ### Modifiers
 

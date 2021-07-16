@@ -4,45 +4,6 @@ The `BoltSpec` helper library includes several functions to help write unit
 tests for plans. For more information about writing unit tests for plans, and
 how to use these functions, see [Testing plans](testing_plans.md).
 
-## Execution modes
-
-Plans often execute sub-plans with the `run_plan` function to build complex
-workflows. When testing these plans, it might be helpful to execute any
-sub-plans as well without needing to stub or mock the plan. To support this,
-`BoltSpec` offers two different execution modes:
-
-### `execute_any_plan`
-
-  **Default mode.** When running in this mode, `BoltSpec` runs any plan invoked
-  with the`run_plan` function as long as that plan is not stubbed or mocked. If
-  a plan is stubbed or mocked while running in this mode, `BoltSpec` honors the
-  stub or mock and does not execute the plan.
-
-  ```ruby
-  it 'executes a task' do
-    execute_any_plan
-
-    # Test code . . .
-  end
-  ```
-
-### `execute_no_plan`
-
-  If a test is run in `execute_no_plan` mode, `BoltSpec` does not run any plan
-  that is invoked with the `run_plan` function. If `BoltSpec` encounters a
-  `run_plan` function and it is not stubbed or mocked, the test fails. This mode
-  is useful for ensuring that your plan is not running any unexpected sub-plans.
-  Test authors should stub or mock all sub-plans that might be invoked during a
-  test.
-
-  ```ruby
-  it 'executes a task' do
-    execute_no_plan
-
-    # Test code . . .
-  end
-  ```
-
 ## Mocks
 
 Mocks serve two purposes when you are writing tests for your plans: they allow
@@ -1225,6 +1186,206 @@ The `allow_upload` function accepts the following modifiers:
   ```ruby
   allow_upload('sshd_config').error_with('msg' => 'Not authorized')
   ```
+  
+## Any stubs
+
+Stubs serve two purposes when you are writing tests for your plans: they allow
+plan functions to be invoked during a plan run and also allow you to set
+their return values. For example, you might use a stub to allow the `run_task`
+function to be invoked any number of times during a test. `allow_any_*` stubs 
+allow you to stub _all_ related function invocations. This can be useful in larger
+plans. For example, `allow_any_task` can be used in place of invoking `run_task` 
+for each individual task.
+
+### `allow_any_plan`
+
+The `allow_any_plan` function stubs all invocations of the [`run_plan`
+function](plan_functions.md#run-plan). It does not accept any parameters.
+
+The `allow_plan` function accepts the following modifiers:
+
+- `be_called_times(number)`
+
+  The test fails if any plan is run more than _number_ times. Each 
+
+  ```ruby
+  allow_any_plan.be_called_times(3)
+  ```
+
+- `not_be_called`
+
+  The test fails if any plan is run.
+
+  ```ruby
+  allow_any_plan.not_be_called
+  ```
+
+- `with_params(parameters)`
+
+  The parameters and [options](plan_functions.md#run-plan) that can be passed to
+  the `run_plan` function. The test fails if any plan is run with a different
+  set of parameters and options.
+
+  ```ruby
+  allow_any_plan.with_params({ 'fruit' => 'apple', '_run_as' => 'root' })
+  ```
+
+- `always_return(value)`
+
+  Sets the value for the `PlanResult` object returned by every plan. The
+  `PlanResult` object returned by this modifier always has a `success` status.
+
+  ```ruby
+  allow_any_plan.always_return(318)
+  ```
+
+- `return(&block) { |plan, params| ... }`
+
+  Invokes a block to construct the `PlanResult` returned by the `run_plan`
+  function.
+
+  ```ruby
+  allow_any_plan.return do |plan, params|
+    Bolt::PlanResult.new(100, 'success')
+  end
+  ```
+
+- `error_with(error)`
+
+  Sets the value for the `PlanResult` object returned by each plan. The
+  `PlanResult` object returned by this modifier always has a `failure` status.
+
+  ```ruby
+  allow_any_plan.error_with('Too many apples, buffer overflow!')
+  ```
+
+### `allow_any_task`
+
+The `allow_any_task` function stubs the [`run_task`
+function](plan_functions.md#run-task). It does not accept any parameters.
+
+The `allow_any_task` function accepts the following modifiers:
+
+- `be_called_times(number)`
+
+  The test fails if the any task is run more than _number_ times.
+
+  ```ruby
+  allow_any_task.be_called_times(3)
+  ```
+
+- `not_be_called`
+
+  The test fails if any task is run.
+
+  ```ruby
+  allow_any_task.not_be_called
+  ```
+
+- `with_targets(targets)`
+
+  The target or list of targets that any task can be run on. The test fails if
+  any task is run on a different list of targets.
+
+  ```ruby
+  allow_any_task.with_targets(['target1', 'target2', 'target3'])
+  ```
+
+- `with_params(parameters)`
+
+  The parameters and [options](plan_functions.md#run-script) that can be passed to the
+  `run_task` function. The test fails if any task is run with a different
+  set of parameters and options.
+
+  ```ruby
+  allow__any_task.with_params({ 'breed' => 'german shepherd' })
+  ```
+
+- `always_return(value)`
+
+  Sets the value for each target's `Result` for each task that is run. Returns a
+  `Bolt::ResultSet` object.
+
+  ```ruby
+  allow_any_task.always_return({ 'happy' => true })
+  ```
+
+- `return_for_targets(targets_to_values)`
+
+  Sets the value for each target's `Result` when each task is run. Accepts a
+  hash of key-value pairs where each key is a target and the value is the value
+  for that target's `Result`.
+
+  ```ruby
+  allow_any_task('pet_dog').return_for_targets(
+    'target1' => { 'happy' => true },
+    'target2' => { 'happy' => false }
+  )
+  ```
+
+- `return(&block) { |targets, task, params| ... }`
+
+  Invokes a block to construct the `ResultSet` returned by the `run_task`
+  function.
+
+  ```ruby
+  allow_any_task.return do |targets, task, params|
+    results = targets.map do |target|
+      Bolt::Result.new(target, value: { 'happy' => true })
+    end
+
+    Bolt::ResultSet.new(results)
+  end
+  ```
+
+- `error_with(error)`
+
+  Sets the error hash for each target's `Result` for each task that is run. Returns a
+  `Bolt::ResultSet` object.
+
+  ```ruby
+  allow_any_task.error_with('msg' => 'There are no German Shepherds to pet.')
+  ```
+
+## Execution modes
+
+Plans often execute sub-plans with the `run_plan` function to build complex
+workflows. When testing these plans, it might be helpful to execute any
+sub-plans as well without needing to stub or mock the plan. To support this,
+`BoltSpec` offers two different execution modes:
+
+### `execute_any_plan`
+
+  **Default mode.** When running in this mode, `BoltSpec` runs any plan invoked
+  with the`run_plan` function as long as that plan is not stubbed or mocked. If
+  a plan is stubbed or mocked while running in this mode, `BoltSpec` honors the
+  stub or mock and does not execute the plan.
+
+  ```ruby
+  it 'executes a task' do
+    execute_any_plan
+
+    # Test code . . .
+  end
+  ```
+
+### `execute_no_plan`
+
+  If a test is run in `execute_no_plan` mode, `BoltSpec` does not run any plan
+  that is invoked with the `run_plan` function. If `BoltSpec` encounters a
+  `run_plan` function and it is not stubbed or mocked, the test fails. This mode
+  is useful for ensuring that your plan is not running any unexpected sub-plans.
+  Test authors should stub or mock all sub-plans that might be invoked during a
+  test.
+
+  ```ruby
+  it 'executes a task' do
+    execute_no_plan
+
+    # Test code . . .
+  end
+  ```
+
 
 📖 **Related information**
 
