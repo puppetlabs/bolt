@@ -1,7 +1,6 @@
-TOPIC
-    links
-
-DESCRIPTION
+---
+topic: links
+guide: |
     Bolt documentation          https://bolt.guide
     Ask a question in #bolt     https://slack.puppet.com/
     Contribute at               https://github.com/puppetlabs/bolt/

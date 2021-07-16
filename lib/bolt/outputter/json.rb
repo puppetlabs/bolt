@@ -98,11 +98,8 @@ module Bolt
         print_table('topics' => topics)
       end
 
-      def print_guide(guide, topic)
-        @stream.puts({
-          'topic' => topic,
-          'guide' => guide
-        }.to_json)
+      def print_guide(**kwargs)
+        @stream.puts(kwargs.to_json)
       end
 
       def print_plan_lookup(value)

@@ -1,7 +1,6 @@
-TOPIC
-    modulepath
-
-DESCRIPTION
+---
+topic: modulepath
+guide: |
     The modulepath is an ordered list of directories that Bolt loads modules
     from. When Bolt runs a command, it automatically loads modules from the
     modulepath.
@@ -21,5 +20,5 @@ DESCRIPTION
 
     To learn more about modules, see the 'module' guide.
 
-DOCUMENTATION
-    https://pup.pt/bolt-project-reference#modulepath
+documentation:
+  - https://pup.pt/bolt-project-reference#modulepath

@@ -1,10 +1,9 @@
-TOPIC
-    debugging
-
-DESCRIPTION
+---
+topic: debugging
+guide: |
     When Bolt isn't behaving as expected, there are a few helpful commands and
     logs that can help identify common issues. The first place to look is in
-    `<PROJECT>/bolt-debug.log`, which contains debug-level logs from the last Bolt
+    `<PROJECT|/bolt-debug.log`, which contains debug-level logs from the last Bolt
     run. This log file includes where the Bolt project was loaded from, the
     location of any configuration or inventory files that were loaded, and the
     modulepath that modules were loaded from.
@@ -24,5 +23,5 @@ DESCRIPTION
     Visit the linked documentation for more in-depth troubleshooting help for
     specific issues.
 
-DOCUMENTATION
-    https://pup.pt/bolt-troubleshooting
+documentation:
+  - https://pup.pt/bolt-troubleshooting

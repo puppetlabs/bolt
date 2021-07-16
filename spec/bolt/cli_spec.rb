@@ -100,10 +100,10 @@ describe "Bolt::CLI" do
 
     context '#guides' do
       it 'returns a hash of topics and filepaths to guides' do
-        expect(Dir).to receive(:children).and_return(['milo.txt'])
+        expect(Dir).to receive(:children).and_return(['milo.yaml'])
         cli = Bolt::CLI.new(['guide'])
         expect(cli.guides).to match(
-          'milo' => %r{guides/milo.txt}
+          'milo' => %r{guides/milo.yaml}
         )
       end
     end
@@ -111,7 +111,7 @@ describe "Bolt::CLI" do
     context '#list_topics' do
       it 'lists topics' do
         cli = Bolt::CLI.new(['guide'])
-        expect(cli.outputter).to receive(:print_topics).with(cli.guides.keys - ['guide'])
+        expect(cli.outputter).to receive(:print_topics).with(cli.guides.keys)
         cli.list_topics
       end
 
@@ -128,13 +128,16 @@ describe "Bolt::CLI" do
 
       it 'prints a guide for a known topic' do
         Tempfile.create do |file|
-          content = "The trials and tribulations of Bolty McBoltface\n"
-          File.write(file, content)
+          topic = "bolty"
+          content = { 'topic' => topic,
+                      'guide' => "The trials and tribulations of Bolty McBoltface\n" }
+          File.write(file, content.to_yaml)
 
           cli = Bolt::CLI.new(['guide', topic])
           allow(cli).to receive(:guides).and_return(topic => file.path)
 
-          expect(cli.outputter).to receive(:print_guide).with(content, topic)
+          expect(cli.outputter).to receive(:print_guide)
+            .with(**Bolt::Util.symbolize_top_level_keys(content))
           cli.show_guide(topic)
         end
       end

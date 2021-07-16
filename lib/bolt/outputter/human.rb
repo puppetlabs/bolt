@@ -471,8 +471,16 @@ module Bolt
         @stream.puts info
       end
 
-      def print_guide(guide, _topic)
-        @stream.puts(guide)
+      def print_guide(topic:, guide:, documentation: nil)
+        info = +"#{colorize(:cyan, topic)}\n"
+        info << indent(2, guide)
+
+        if documentation
+          info << "\n#{colorize(:cyan, 'Documentation')}\n"
+          info << indent(2, documentation.join("\n"))
+        end
+
+        @stream.puts info
       end
 
       def print_plan_lookup(value)

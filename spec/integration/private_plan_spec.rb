@@ -74,34 +74,6 @@ describe "with private plans" do
           expect(original_mtime).not_to eq(File.mtime(project.plan_cache_file))
         end
       end
-
-      context 'with a downloaded plan' do
-        let(:config_flags) { %W[--project #{@root}] }
-        let(:plan_path) { File.join(@plans_dir, 'yaml.yaml') }
-        let(:cache_file) { File.join(@root, '.plan_cache.json') }
-
-        around :each do |example|
-          Dir.mktmpdir(nil, Dir.pwd) do |root|
-            @root = root
-            @plans_dir = File.join(root, 'modules', 'mymodule', 'plans')
-            FileUtils.mkdir_p(@plans_dir)
-            example.run
-          end
-        end
-
-        it 'does not update the cache if downloaded plans are modified' do
-          FileUtils.touch(plan_path)
-          File.write(plan_path, yaml_plan.to_yaml)
-          run_cli(%w[module generate-types] + config_flags)
-          original_mtime = File.mtime(cache_file)
-
-          yaml_plan['private'] = false
-          File.write(plan_path, yaml_plan.to_yaml)
-
-          run_cli(%w[plan show] + config_flags)
-          expect(original_mtime).not_to eq(File.mtime(cache_file))
-        end
-      end
     end
   end
 
