@@ -494,7 +494,11 @@ module Bolt
         when 'group'
           list_groups
         when 'module'
-          list_modules
+          if options[:object]
+            show_module(options[:object])
+          else
+            list_modules
+          end
         when 'plugin'
           list_plugins
         end
@@ -850,6 +854,10 @@ module Bolt
 
     def list_modules
       outputter.print_module_list(pal.list_modules)
+    end
+
+    def show_module(name)
+      outputter.print_module_info(**pal.show_module(name))
     end
 
     def list_plugins

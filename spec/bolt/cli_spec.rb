@@ -2457,11 +2457,8 @@ describe "Bolt::CLI" do
         allow(cli).to receive(:outputter)
           .and_return(Bolt::Outputter::Human.new(false, false, false, false, output))
         cli.parse
-        modules = cli.list_modules
-        expect(modules.keys.first).to match(/bolt-modules/)
-        expect(modules.values.first.map { |h| h[:name] }).to match_array(Dir.children("#{__dir__}/../../bolt-modules"))
-        expect(modules.values[1].map { |h| h[:name] })
-          .to include("aggregate", "canary", "puppetdb_fact", "puppetlabs/yaml")
+        cli.list_modules
+        expect(output.string).to match(/boltlib.*aggregate.*canary/m)
       end
     end
 
