@@ -107,7 +107,7 @@ Message steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `message` | `String` | The message to print. | ✓ |
+| `message` | `Any` | The message to print. | ✓ |
 
 For example:
 
@@ -123,6 +123,30 @@ prints the object as a string.
 
 For information on printing a step result with `message`, see [Debugging
 plans](#debugging-plans).
+
+### Verbose step
+
+Use a `verbose` step to print a message in verbose mode. The step prints a message to standard
+out (stdout) when using the `human` output format, and prints to standard error
+(stderr) when using the `json` output format. 
+
+Verbose steps support the following keys:
+
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `verbose` | `Any` | The message to print. | ✓ |
+
+For example:
+
+```yaml
+steps:
+  - verbose: hello world
+```
+
+You can pass variables to the verbose step to print them to stdout. If the 
+variable is a [Bolt datatype](bolt_types_reference.md) it will be formatted 
+as a Hash. Once the object is formatted, if it's a Hash or Array it is printed
+as JSON, otherwise Bolt prints the object as a string.
 
 ### Command step
 

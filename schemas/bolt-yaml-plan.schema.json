@@ -320,7 +320,24 @@
           "type": "string"
         }
       }
-    }
+    },
+    "verbose": {
+      "description": "Print a message only when run in verbose mode. This will print a message to standard out (stdout) when using the 'human' output format or standard error (stderr) when using the 'json' output format.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["verbose"],
+      "properties": {
+        "description": {
+          "$ref": "#/definitions/description"
+        },
+        "verbose": {
+          "description": "The message to print."
+        },
+        "name": {
+          "$ref": "#/definitions/name"
+        }
+      }
+    },
   },
   "definitions": {
     "catch_errors": {

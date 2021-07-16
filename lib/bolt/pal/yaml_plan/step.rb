@@ -13,6 +13,7 @@ module Bolt
           download
           eval
           message
+          verbose
           plan
           resources
           script
@@ -219,3 +220,4 @@ require 'bolt/pal/yaml_plan/step/task'
 require 'bolt/pal/yaml_plan/step/upload'
 require 'bolt/pal/yaml_plan/step/download'
 require 'bolt/pal/yaml_plan/step/message'
+require 'bolt/pal/yaml_plan/step/verbose'
