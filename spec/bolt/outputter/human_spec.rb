@@ -97,13 +97,16 @@ describe "Bolt::Outputter::Human" do
                 [{ name: "boltlib", version: nil, internal_module_group: "Plan Language Modules" },
                  { name: "ctrl", version: nil, internal_module_group: "Plan Language Modules" },
                  { name: "dir", version: nil, internal_module_group: "Plan Language Modules" }] }
+    command = Bolt::Util.powershell? ? 'Get-BoltModule -Name <MODULE>' : 'bolt module show <MODULE>'
     outputter.print_module_list(modules)
-    expect(output.string).to eq(<<~TABLE)
+    expect(output.string).to match(<<~TABLE)
     Plan Language Modules
       boltlib   (built-in)
       ctrl      (built-in)
       dir       (built-in)
 
+    Additional information
+      Use '#{command}' to view details for a specific module.
     TABLE
   end
 
