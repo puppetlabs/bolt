@@ -153,4 +153,59 @@ describe Bolt::PAL do
       end
     end
   end
+
+  describe :show_module do
+    let(:metadata)   { JSON.parse(File.read(fixtures_path('modules', 'sample', 'metadata.json'))) }
+    let(:modulepath) { Bolt::Config::Modulepath.new([fixtures_path('modules')]) }
+    let(:pal)        { Bolt::PAL.new(modulepath, nil, nil) }
+
+    it 'accepts short name' do
+      allow(pal).to receive_messages(list_plans_with_cache: [], list_tasks_with_cache: [])
+      expect { pal.show_module('sample') }.not_to raise_error
+    end
+
+    it 'accepts forge name with /' do
+      allow(pal).to receive_messages(list_plans_with_cache: [], list_tasks_with_cache: [])
+      expect { pal.show_module('bolt/sample') }.not_to raise_error
+    end
+
+    it 'accepts forge name with -' do
+      allow(pal).to receive_messages(list_plans_with_cache: [], list_tasks_with_cache: [])
+      expect { pal.show_module('bolt-sample') }.not_to raise_error
+    end
+
+    it 'errors with unknown module' do
+      expect { pal.show_module('abcdefg') }.to raise_error(
+        Bolt::Error,
+        /Could not find module 'abcdefg' on the modulepath/
+      )
+    end
+
+    it 'returns expected data' do
+      result = pal.show_module('bolt/sample')
+
+      expect(result.keys).to match_array(%i[metadata name path plans tasks]),
+                             'Does not return expected keys'
+
+      expect(result[:name]).to eq('bolt/sample'),
+                               'Does not return Forge name'
+
+      expect(result[:path]).to eq(fixtures_path('modules', 'sample')),
+                               'Does not return path to module'
+
+      expect(result[:plans]).to include(
+        ['sample::single_task', 'one line plan to show we can run a task by name'],
+        ['sample::yaml', nil]
+      ),
+                                'Does not return plan list'
+
+      expect(result[:tasks]).to include(
+        ['sample::multiline', 'Write a multiline string to the console']
+      ),
+                                'Does not return task list'
+
+      expect(result[:metadata]).to match(metadata),
+                                   'Does not return metadata'
+    end
+  end
 end

@@ -339,7 +339,7 @@ module Bolt
       end
 
       # Write the cache if any entries were updated
-      File.write(@project.task_cache_file, task_cache.to_json) if updated
+      File.write(@project.task_cache_file, task_cache.to_json) if updated && @project
       filter_content ? filter_content(task_list, @project&.tasks) : task_list
     end
 
@@ -435,7 +435,7 @@ module Bolt
         list << [plan_name, data['description']] unless data['private']
       end
 
-      File.write(@project.plan_cache_file, plan_cache.to_json) if updated
+      File.write(@project.plan_cache_file, plan_cache.to_json) if updated && @project
 
       filter_content ? filter_content(plan_list, @project&.plans) : plan_list
     end
@@ -633,6 +633,36 @@ module Bolt
           [path, values]
         end.to_h
       end
+    end
+
+    # Return information about a module.
+    #
+    # @param name [String] The name of the module.
+    # @return [Hash]
+    #
+    def show_module(name)
+      name = name.tr('-', '/')
+
+      data = in_bolt_compiler do |_compiler|
+        mod = Puppet.lookup(:current_environment).module(name.split(%r{[/-]}, 2).last)
+
+        unless mod && (mod.forge_name == name || mod.name == name)
+          raise Bolt::Error.new("Could not find module '#{name}' on the modulepath.", 'bolt/unknown-module')
+        end
+
+        {
+          name:     mod.forge_name || mod.name,
+          metadata: mod.metadata,
+          path:     mod.path,
+          plans:    mod.plans.map(&:name).sort,
+          tasks:    mod.tasks.map(&:name).sort
+        }
+      end
+
+      data[:plans] = list_plans_with_cache.to_h.slice(*data[:plans]).to_a
+      data[:tasks] = list_tasks_with_cache.to_h.slice(*data[:tasks]).to_a
+
+      data
     end
 
     def generate_types(cache: false)

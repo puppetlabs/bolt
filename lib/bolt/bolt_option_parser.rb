@@ -507,10 +507,13 @@ module Bolt
           show
 
       #{colorize(:cyan, 'Usage')}
-          bolt module show [options]
+          bolt module show [module name] [options]
 
       #{colorize(:cyan, 'Description')}
           List modules available to the Bolt project.
+
+          Providing the name of a module will display detailed documentation for
+          the module.
 
       #{colorize(:cyan, 'Documentation')}
           To learn more about Bolt modules, run 'bolt guide module'.
