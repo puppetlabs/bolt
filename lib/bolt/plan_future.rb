@@ -5,13 +5,28 @@ require 'fiber'
 module Bolt
   class PlanFuture
     attr_reader :fiber, :id
-    attr_accessor :value
+    attr_accessor :value, :plan_stack
 
-    def initialize(fiber, id, name = nil)
-      @fiber = fiber
-      @id    = id
-      @name  = name
-      @value = nil
+    def initialize(fiber, id, plan_id:, name: nil)
+      @fiber   = fiber
+      @id      = id
+      @name    = name
+      @value   = nil
+      # The plan invocation ID when the Future is created may be
+      # different from the plan ID of the Future when we switch to it if a new
+      # plan was run inside the Future, so keep track of the plans that a
+      # Future is executing in as a stack. When one plan finishes, pop it off
+      # since now we're in the calling plan. These IDs are unique to each plan
+      # invocation, not just plan names.
+      @plan_stack = [plan_id]
+    end
+
+    def original_plan
+      @plan_stack.last
+    end
+
+    def current_plan
+      @plan_stack.first
     end
 
     def name

@@ -79,7 +79,7 @@ Finished on docker://puppet_6_node:
   Hello!
 ```
 
-As you can see, when you configure output to stream, Bolt might print to the console twice:
+As you can see, when you configure output to stream, Bolt may print to the console twice:
 once as the actions are running, and again after Bolt prints the results. You can prevent
 Bolt from printing the results once the action has completed by specifying the `--no-verbose`
 command-line option.
@@ -190,7 +190,6 @@ of plan steps to execute in the background while other parts of the plan execute
 
 These two function invocations are equivalent:
 ```
-# 
 parallelize(['./file1', './file2']) |$file| {
   file_upload($file, '/home/user/', $targets)
   ...
@@ -219,20 +218,56 @@ Futures will continue to execute in parallel. However, Bolt itself will not exit
 have completed in order to ensure that all work is finished. Any errors raised after the calling
 plan has finished will be logged at warn level for visibility.
 
-The `wait()` plan function accepts a single Future object or an array of Futures and blocks until
-they finish, with an optional timeout. If provided a timeout, any unfinished Futures will raise a
-timeout error if they have not completed within the timeout. You can return errors
-instead of raising them by passing `_catch_errors => true` to `wait()`. The `wait()`
-function returns the results from the Future blocks once they've all finished. If a
-Future errors, Bolt only raises the error after all other Futures finish executing and
-return to `wait()`.
+The `wait()` plan function accepts either a single Future object, an array of Futures, or no
+Futures. If not provided any Futures, the function implicitly waits for all Futures created up
+to that point in the calling plan. The `wait()` function does not wait on any Futures created
+in subplans, even if the subplan is called inside a `background()` block. If you want a plan to wait
+on a Future object created in a subplan then you must call `wait()` in the subplan directly, or
+return Future objects to the calling plan to be explicitly passed to `wait()`.
+
+For example, the following plan runs the code block with three `run_command()` calls on
+the provided targets in the background, then executes a task in parallel. Once the task has
+finished, the commands may still be running in the background. Another task is kicked off in the
+background. Then the backgrounded commands and tasks are waited on before continuing.
+
+```
+# $targets = target1,target2,target3
+plan myplan(TargetSpec $targets) {
+  $binary_future = background("Run mycoolbinary") || {
+    # These commands execute sequentially per target. Bolt connects to the targets in 
+    # parallel, but waits for the cp command to finish before running chmod
+    run_command("cp /home/user/Downloads/mycoolbinary /home/user/bin", $targets)
+    run_command("chmod +x /home/user/bin/mycoolbinary", $targets)
+    run_command("mycoolbinary", $targets)
+  }
+
+  # This task runs while the commands above are running
+  run_task("mytask", $targets)
+  
+  # Once the task 'mytask' has finished, start more commands in the background
+  $status_future = background("Check service status") || {
+    $r = run_command("systemctl status myservice", $targets)
+    out::message($r)
+  }
+
+  # This is equivalent to wait() in this plan
+  wait([$binary_future, $status_future])
+}
+```
+
+The function blocks until the Futures finish, with an optional timeout. If provided a timeout,
+unfinished Futures raise a timeout error if they have not completed within the timeout. You can
+return errors instead of raising them by passing `_catch_errors => true` to `wait()`. The `wait()`
+function returns the results from the Future blocks once they've all finished. If a Future errors,
+Bolt only raises the error after all other Futures finish executing and return to `wait()`.
 
 ### `parallelize()` plan function
 
 The experimental `parallelize()` function accepts an array and a block,
 and runs the entire block on each array element in parallel. Inside a parallelize block, targets can
-run subsequent plan functions before all targets have finished each step. For example, here is the
-same plan with a parallelize block:
+run subsequent plan functions before all targets have finished each step. For example, this plan
+runs the block to execute two commands on each target in parallel, regardless of how long it takes
+the block to run on any one target:
 
 ```
 # $targets = target1,target2,target3
@@ -250,8 +285,8 @@ plan myplan(TargetSpec $targets) {
 Here, if `target3` completes running `hostname` before `target1` or `target2`, it can continue directly to
 running `whoami`.
 
-This functionality is particularly useful for plan functions that might take a long time on certain
-targets but not on others, or for plans where some long running process might fail on a target but the
+This functionality is particularly useful for plan functions that may take a long time on certain
+targets but not on others, or for plans where some long running process may fail on a target but the
 plan author wants the plan to be able to continue quickly on successful targets.
 
 

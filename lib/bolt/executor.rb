@@ -381,8 +381,16 @@ module Bolt
     # overloaded while also minimizing the Puppet lookups needed from plan
     # functions
     #
-    def create_future(scope: nil, name: nil, &block)
-      @fiber_executor.create_future(scope: scope, name: name, &block)
+    def create_future(plan_id:, scope: nil, name: nil, &block)
+      @fiber_executor.create_future(scope: scope, name: name, plan_id: plan_id, &block)
+    end
+
+    def get_current_future(fiber:)
+      @fiber_executor.get_current_future(fiber: fiber)
+    end
+
+    def get_current_plan_id(fiber:)
+      @fiber_executor.get_current_plan_id(fiber: fiber)
     end
 
     def plan_complete?
@@ -401,8 +409,8 @@ module Bolt
       @fiber_executor.wait(futures, **opts)
     end
 
-    def plan_futures
-      @fiber_executor.plan_futures
+    def get_futures_for_plan(plan_id:)
+      @fiber_executor.get_futures_for_plan(plan_id: plan_id)
     end
 
     # Execute a plan function concurrently. This function accepts the executor
