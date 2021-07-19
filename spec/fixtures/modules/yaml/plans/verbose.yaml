@@ -1,0 +1,9 @@
+parameters:
+  message:
+    type: String
+    default: hershey
+
+steps:
+  - name: verbose
+    verbose: $message
+    description: 'This will call out::verbose(hershey)'

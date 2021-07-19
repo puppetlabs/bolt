@@ -198,6 +198,19 @@ describe Bolt::PAL::YamlPlan::Evaluator do
     end
   end
 
+  describe "verbose step" do
+    let(:step_body) do
+      {
+        'verbose' => 'hello world'
+      }
+    end
+
+    it 'calls out::verbose' do
+      expect(scope).to receive(:call_function).with('out::verbose', ['hello world'])
+      step.evaluate(scope, subject)
+    end
+  end
+
   describe "task step" do
     let(:step_body) do
       { 'task' => 'package',
