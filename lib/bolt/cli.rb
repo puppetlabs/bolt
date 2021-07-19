@@ -238,8 +238,10 @@ module Bolt
       config.check_path_case('modulepath', config.modulepath)
       config.project.check_deprecated_file
 
-      if options[:clear_cache] && File.exist?(config.project.plugin_cache_file)
-        FileUtils.rm(config.project.plugin_cache_file)
+      if options[:clear_cache]
+        FileUtils.rm(config.project.plugin_cache_file) if File.exist?(config.project.plugin_cache_file)
+        FileUtils.rm(config.project.task_cache_file) if File.exist?(config.project.task_cache_file)
+        FileUtils.rm(config.project.plan_cache_file) if File.exist?(config.project.plan_cache_file)
       end
 
       warn_inventory_overrides_cli(options)

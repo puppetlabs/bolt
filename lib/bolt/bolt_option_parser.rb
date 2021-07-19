@@ -1095,7 +1095,7 @@ module Bolt
         @options[:log] = { 'console' => { 'level' => level } }
       end
       define('--clear-cache',
-             "Clear plugin cache before executing.") do |_|
+             "Clear plugin, plan, and task caches before executing.") do |_|
         @options[:clear_cache] = true
       end
       define('--plugin PLUGIN', 'Select the plugin to use.') do |plug|

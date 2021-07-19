@@ -40,6 +40,19 @@ You can resolve this by [configuring an alternate tmpdir](bolt_transports_refere
 transport you're using, or by talking to your administrator about updating permissions for the
 directory.
 
+## My `plan/task show` output is not correct
+
+Bolt caches task and plan metadata when listing plans and tasks, and only
+updates the cache when modules in the `<PROJECT DIRECTORY>/modules/` directory
+are modified. Try rerunning the command with `--clear-cache` to refresh the
+cache and update task and plan metadata.
+The task or plan may also be present at a higher precedence on the modulepath.
+To verify that the specific task or plan is being loaded from the place you
+expect, run `bolt task show [task name]`, `bolt plan show [plan name]`,
+`Get-BoltTask -Name <TASK NAME>`, or `Get-BoltPlan -Name <PLAN NAME>`to see
+the path the task or plan is loaded from.
+
+
 ## My task fails mysteriously
 
 Try running Bolt with `--log-level debug` to see the exact output from your task.

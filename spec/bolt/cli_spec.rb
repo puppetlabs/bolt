@@ -2695,6 +2695,28 @@ describe "Bolt::CLI" do
         cli.parse
       }.to raise_error(Bolt::FileError, /Could not parse/)
     end
+
+    context '--clear-cache' do
+      around(:each) do |example|
+        in_project(config: project_config) do |project|
+          @project = project
+          FileUtils.touch(@project.plugin_cache_file)
+          FileUtils.touch(@project.plan_cache_file)
+          FileUtils.touch(@project.task_cache_file)
+
+          example.run
+        end
+      end
+
+      it 'clears cache for plug-in, plan, and task cache' do
+        cli = Bolt::CLI.new(%w[plan show --clear-cache] + config_flags)
+        allow(FileUtils).to receive(:rm)
+        expect(FileUtils).to receive(:rm).with(@project.plugin_cache_file)
+        expect(FileUtils).to receive(:rm).with(@project.plan_cache_file)
+        expect(FileUtils).to receive(:rm).with(@project.task_cache_file)
+        cli.parse
+      end
+    end
   end
 
   describe 'inventoryfile' do
