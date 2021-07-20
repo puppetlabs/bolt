@@ -1,7 +1,6 @@
-TOPIC
-    targets
-
-DESCRIPTION
+---
+topic: targets
+guide: |
     A target is a device that Bolt connects to and runs actions on. Targets can
     be physical, such as servers, or virtual, such as containers or virtual
     machines.
@@ -25,5 +24,5 @@ DESCRIPTION
     project's inventory file. For more information about inventory files,
     see 'bolt guide inventory'.
 
-DOCUMENTATION
-    https://pup.pt/bolt-commands
+documentation:
+  - https://pup.pt/bolt-commands

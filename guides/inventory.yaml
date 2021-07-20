@@ -1,7 +1,6 @@
-TOPIC
-    inventory
-
-DESCRIPTION
+---
+topic: inventory
+guide: |
     The inventory describes the targets that you run Bolt commands on, along
     with any data and configuration for the targets. Targets in an inventory can
     belong to one or more groups, allowing you to share data and configuration
@@ -19,6 +18,6 @@ DESCRIPTION
     target in multiple groups, this might result in target configuration that
     is different than expected.
 
-DOCUMENTATION
-    https://pup.pt/bolt-inventory
-    https://pup.pt/bolt-inventory-reference
+documentation:
+  - https://pup.pt/bolt-inventory
+  - https://pup.pt/bolt-inventory-reference

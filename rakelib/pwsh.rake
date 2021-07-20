@@ -6,16 +6,33 @@ require 'fileutils'
 namespace :pwsh do
   desc "Generate the PowerShell module structure and supporting files"
   task generate_module: :generate_powershell_cmdlets do
-    # Move 'guides' to 'en-US' directory in module, renaming the text files
-    # so they are recognized by the PowerShell help system
-    source = File.expand_path(File.join(__dir__, '..', 'guides'))
-    dest   = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'PuppetBolt', 'en-US'))
-
+    dest = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'PuppetBolt', 'en-US'))
     FileUtils.mkdir_p(dest) unless File.exist?(dest)
 
-    Dir.glob('*.txt', base: source).each do |file|
-      topic = File.basename(file, '.txt')
-      FileUtils.cp(File.join(source, file), File.join(dest, "about_bolt_#{topic}.help.txt"))
+    begin
+      source = File.expand_path(File.join(__dir__, '..', 'guides'))
+      files  = Dir.children(source).sort.map { |f| File.join(source, f) }
+      files.each_with_object({}) do |file, _guides|
+        next if file !~ /\.(yaml|yml)\z/
+        info = Bolt::Util.read_yaml_hash(file, 'guide')
+
+        # Make sure both topic and guide keys are defined
+        unless (%w[topic guide] - info.keys).empty?
+          raise "Guide file #{file} must have a 'topic' key and 'guide' key, but has #{info.keys} keys."
+        end
+
+        txt = +"#{info['topic']}\n"
+        txt << info['guide'].gsub(/^/, '  ')
+
+        if info['documentation']
+          txt << "\nDocumentation\n"
+          txt << info['documentation'].join("\n").gsub(/^/, '  ')
+        end
+
+        File.write(File.join(dest, "about_bolt_#{info['topic']}.help.txt"), txt)
+      end
+    rescue SystemCallError => e
+      raise Bolt::FileError.new("#{e.message}: unable to load guides directory", source)
     end
 
     # pwsh_module.psm1 ==> PuppetBolt.psm1

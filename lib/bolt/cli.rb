@@ -958,8 +958,9 @@ module Bolt
         files     = Dir.children(root_path).sort
 
         files.each_with_object({}) do |file, guides|
-          next if file !~ /\.txt\z/
-          topic = File.basename(file, '.txt')
+          next if file !~ /\.(yaml|yml)\z/
+          # The ".*" here removes any suffix
+          topic = File.basename(file, ".*")
           guides[topic] = File.join(root_path, file)
         end
       rescue SystemCallError => e
@@ -969,7 +970,7 @@ module Bolt
 
     # Display the list of available Bolt guides.
     def list_topics
-      outputter.print_topics(guides.keys - ['guide'])
+      outputter.print_topics(guides.keys)
       0
     end
 
@@ -979,12 +980,18 @@ module Bolt
         analytics.event('Guide', 'known_topic', label: topic)
 
         begin
-          guide = File.read(guides[topic])
+          guide = Bolt::Util.read_yaml_hash(guides[topic], 'guide')
         rescue SystemCallError => e
           raise Bolt::FileError("#{e.message}: unable to load guide page", filepath)
         end
 
-        outputter.print_guide(guide, topic)
+        # Make sure both topic and guide keys are defined
+        unless (%w[topic guide] - guide.keys).empty?
+          msg = "Guide file #{guides[topic]} must have a 'topic' key and 'guide' key, but has #{guide.keys} keys."
+          raise Bolt::Error.new(msg, 'bolt/invalid-guide')
+        end
+
+        outputter.print_guide(**Bolt::Util.symbolize_top_level_keys(guide))
       else
         analytics.event('Guide', 'unknown_topic', label: topic)
         outputter.print_message("Did not find guide for topic '#{topic}'.\n\n")

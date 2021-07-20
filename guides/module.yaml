@@ -1,7 +1,6 @@
-TOPIC
-    module
-
-DESCRIPTION
+---
+topic: module
+guide: |
     Modules are shareable, reusable packages of Puppet content. They can include
     tasks, plans, functions, and other types of content that you can use in your
     project. You can download and install modules to your project from the
@@ -15,5 +14,5 @@ DESCRIPTION
     To learn more about managing modules in a project, see the documentation.
     To learn how modules are loaded by Bolt, see the 'modulepath' guide.
 
-DOCUMENTATION
-    https://pup.pt/bolt-modules
+documentation:
+  - https://pup.pt/bolt-modules

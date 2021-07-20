@@ -159,7 +159,7 @@ describe "Bolt::Outputter::JSON" do
     topic = 'boltymcboltface'
     guide = "The trials and tribulations of Bolty McBoltface.\n"
 
-    outputter.print_guide(guide, 'boltymcboltface')
+    outputter.print_guide(guide: guide, topic: topic)
     parsed = JSON.parse(output.string)
 
     expect(parsed['topic']).to eq(topic)
