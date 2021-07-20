@@ -5,17 +5,27 @@ PowerShell module.
 
 ## Bolt packages
 
-1. Generate the changelog using the changelog rake task, where `VERSION` is the next tagged version of Bolt.
+1. Generate the changelog using the `changelog` rake task.
 
    ```bash
-   $ rake 'changelog[VERSION]'
+   $ bundle exec rake changelog
+   ```
+
+   > **Note:** To use the rake task you must be a member of the `puppetlabs` organization and set the environment
+   variable `GITHUB_TOKEN` with a [personal access token](https://github.com/settings/tokens) that has
+   `admin:read:org` permissions.
+
+   Ensure all entries have a title, a link to the relevant issue or PR for the change,
+   and a description of the changes. Each entry should look like the following:
+
+   ```markdown
+   * **Descriptive title of changes**
+     ([#<ISSUE OR PR NUMBER>](<LINK TO ISSUE OR PR>)) 
+
+     Descriptive summary of changes.
    ```
    
    Open a PR against `puppetlabs/bolt` and merge the changes into `main`.
-
-   > **Note:** To use the rake task you must be a member of the `puppetlabs` organization and set the environment
-     variable `GITHUB_TOKEN` with a [personal access token](https://github.com/settings/tokens) that has
-     `admin:read:org` permissions.
 
 1. Ensure that the [Bolt pipelines](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/) are green.
 
