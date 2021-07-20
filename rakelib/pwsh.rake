@@ -263,7 +263,8 @@ namespace :pwsh do
         when 'module'
           # bolt module install
           # bolt module add [module]
-          if @pwsh_command[:verb] == 'Add'
+          case @pwsh_command[:verb]
+          when 'Add'
             @pwsh_command[:options] << {
               name:                       'Module',
               ruby_short:                 'md',
@@ -271,6 +272,19 @@ namespace :pwsh do
               mandatory:                  true,
               type:                       'string',
               switch:                     false,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          # bolt module show
+          when 'Get'
+            @pwsh_command[:options] << {
+              name:                       'Name',
+              ruby_short:                 'n',
+              help_msg:                   "The module to show",
+              type:                       'string',
+              switch:                     false,
+              mandatory:                  false,
               position:                   0,
               ruby_arg:                   'bare',
               validate_not_null_or_empty: true

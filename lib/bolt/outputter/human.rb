@@ -341,7 +341,7 @@ module Bolt
         info << if task.description
                   indent(2, task.description.chomp)
                 else
-                  indent(2, 'No description')
+                  indent(2, 'No description available.')
                 end
         info << "\n\n"
 
@@ -400,7 +400,7 @@ module Bolt
         info << if plan['description']
                   indent(2, plan['description'].chomp)
                 else
-                  indent(2, 'No description')
+                  indent(2, 'No description available.')
                 end
         info << "\n\n"
 
@@ -480,15 +480,19 @@ module Bolt
       end
 
       def print_module_list(module_list)
+        info = +''
+
         module_list.each do |path, modules|
-          if (mod = modules.find { |m| m[:internal_module_group] })
-            @stream.puts(colorize(:cyan, mod[:internal_module_group]))
-          else
-            @stream.puts(colorize(:cyan, path))
-          end
+          info << if (mod = modules.find { |m| m[:internal_module_group] })
+                    colorize(:cyan, mod[:internal_module_group])
+                  else
+                    colorize(:cyan, path)
+                  end
+
+          info << "\n"
 
           if modules.empty?
-            @stream.puts('(no modules installed)')
+            info << '(no modules installed)'
           else
             module_info = modules.map do |m|
               version = if m[:version].nil?
@@ -500,11 +504,87 @@ module Bolt
               [m[:name], version]
             end
 
-            @stream.puts format_table(module_info, 2, 1)
+            info << format_table(module_info, 2, 1).to_s
           end
 
-          @stream.write("\n")
+          info << "\n\n"
         end
+
+        command = Bolt::Util.powershell? ? 'Get-BoltModule -Name <MODULE>' : 'bolt module show <MODULE>'
+        info << colorize(:cyan, "Additional information\n")
+        info << indent(2, "Use '#{command}' to view details for a specific module.")
+
+        @stream.puts info
+      end
+
+      # Prints detailed module information.
+      #
+      # @param name [String] The module's short name.
+      # @param metadata [Hash] The module's metadata.
+      # @param path [String] The path to the module.
+      # @param plans [Array] The module's plans.
+      # @param tasks [Array] The module's tasks.
+      #
+      def print_module_info(name:, metadata:, path:, plans:, tasks:, **_kwargs)
+        info = +''
+
+        info << colorize(:cyan, name)
+
+        info << colorize(:dim, " [#{metadata['version']}]") if metadata['version']
+        info << "\n"
+
+        info << if metadata['summary']
+                  indent(2, wrap(metadata['summary'].strip, 76))
+                else
+                  indent(2, "No description available.\n")
+                end
+        info << "\n"
+
+        if tasks.any?
+          length = tasks.map(&:first).map(&:length).max
+          data   = tasks.map { |task, desc| [task, truncate(desc, 76 - length)] }
+          info << colorize(:cyan, "Tasks\n")
+          info << format_table(data, 2).to_s
+          info << "\n\n"
+        end
+
+        if plans.any?
+          length = plans.map(&:first).map(&:length).max
+          data   = plans.map { |plan, desc| [plan, truncate(desc, 76 - length)] }
+          info << colorize(:cyan, "Plans\n")
+          info << format_table(data, 2).to_s
+          info << "\n\n"
+        end
+
+        if metadata['operatingsystem_support']&.any?
+          supported = metadata['operatingsystem_support'].map do |os|
+            [os['operatingsystem'], os['operatingsystemrelease']&.join(', ')]
+          end
+
+          info << colorize(:cyan, "Operating system support\n")
+          info << format_table(supported, 2).to_s
+          info << "\n\n"
+        end
+
+        if metadata['dependencies']&.any?
+          dependencies = metadata['dependencies'].map do |dep|
+            [dep['name'], dep['version_requirement']]
+          end
+
+          info << colorize(:cyan, "Dependencies\n")
+          info << format_table(dependencies, 2).to_s
+          info << "\n\n"
+        end
+
+        info << colorize(:cyan, "Path\n")
+        info << if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH) ||
+                   path.start_with?(Bolt::Config::Modulepath::BOLTLIB_PATH)
+                  indent(2, 'built-in module')
+                else
+                  indent(2, path)
+                end
+
+        @stream.puts info
       end
 
       def print_plugin_list(plugin_list, modulepath)

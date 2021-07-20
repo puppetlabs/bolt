@@ -97,13 +97,16 @@ describe "Bolt::Outputter::Human" do
                 [{ name: "boltlib", version: nil, internal_module_group: "Plan Language Modules" },
                  { name: "ctrl", version: nil, internal_module_group: "Plan Language Modules" },
                  { name: "dir", version: nil, internal_module_group: "Plan Language Modules" }] }
+    command = Bolt::Util.powershell? ? 'Get-BoltModule -Name <MODULE>' : 'bolt module show <MODULE>'
     outputter.print_module_list(modules)
-    expect(output.string).to eq(<<~TABLE)
+    expect(output.string).to match(<<~TABLE)
     Plan Language Modules
       boltlib   (built-in)
       ctrl      (built-in)
       dir       (built-in)
 
+    Additional information
+      Use '#{command}' to view details for a specific module.
     TABLE
   end
 
@@ -554,6 +557,73 @@ describe "Bolt::Outputter::Human" do
                                'Does not truncate descriptions'
       expect(output.string).to match(/Modulepath.*#{modulepath.join(File::PATH_SEPARATOR)}/m),
                                'Does not print modulepath'
+    end
+  end
+
+  context '#print_module_info' do
+    let(:info) do
+      {
+        name: 'bolt/module',
+        path: '/path/to/module',
+        metadata: {
+          'summary' => 'A test module',
+          'version' => '1.0.0',
+          'dependencies' => [
+            {
+              'name' => 'puppetlabs/stdlib',
+              'version_requirement' => '>= 4.0.0 < 8.0.0'
+            }
+          ],
+          'operatingsystem_support' => [
+            {
+              'operatingsystem' => 'RedHat',
+              'operatingsystemrelease' => %w[
+                5
+                6
+                7
+              ]
+            },
+            {
+              'operatingsystem' => 'CentOS'
+            }
+          ]
+        },
+        plans: [
+          ['module::plan_one', 'a description'],
+          ['module::plan_two', nil]
+        ],
+        tasks: [
+          ['module::task_one', nil],
+          ['module::task_two', 'a description']
+        ]
+      }
+    end
+
+    it 'prints module information' do
+      outputter.print_module_info(**info)
+
+      expect(output.string).to eq(<<~OUTPUT)
+        bolt/module [1.0.0]
+          A test module
+
+        Tasks
+          module::task_one
+          module::task_two     a description
+        
+        Plans
+          module::plan_one     a description
+          module::plan_two
+
+        Operating system support
+          RedHat     5, 6, 7
+          CentOS
+
+        Dependencies
+          puppetlabs/stdlib     >= 4.0.0 < 8.0.0
+
+        Path
+          /path/to/module
+      OUTPUT
     end
   end
 end
