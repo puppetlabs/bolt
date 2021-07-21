@@ -59,6 +59,32 @@ describe Bolt::Analytics do
     expect(subject.build_client.user_id).to eq(uuid)
   end
 
+  context 'without analytics.yaml' do
+    before(:each) do
+      allow(subject).to receive(:load_config).and_call_original
+      allow(File).to receive(:exist?).and_return(false)
+      allow(subject).to receive(:write_config)
+    end
+
+    it 'warns when running with analytics enabled for the first time' do
+      expect(Bolt::Logger).to receive(:warn_once) do |id, message|
+        expect(id).to eq('analytics_opt_out')
+        expect(message).to match(/Bolt collects data about how you use it/)
+      end
+
+      subject.build_client(true)
+    end
+
+    it 'does not warn when running with analytics disabled' do
+      expect(Bolt::Logger).not_to receive(:warn_once) do |id, message|
+        expect(id).to eq('analytics_opt_out')
+        expect(message).to match(/Bolt collects data about how you use it/)
+      end
+
+      subject.build_client(false)
+    end
+  end
+
   context 'config file' do
     let(:path)     { File.expand_path(File.join('~', '.puppetlabs', 'etc', 'bolt', 'analytics.yaml')) }
     let(:old_path) { File.expand_path(File.join('~', '.puppetlabs', 'bolt', 'analytics.yaml')) }

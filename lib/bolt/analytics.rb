@@ -33,7 +33,7 @@ module Bolt
       logger = Bolt::Logger.logger(self)
       begin
         config_file = config_path
-        config = load_config(config_file)
+        config = enabled ? load_config(config_file) : {}
       rescue ArgumentError
         config = { 'disabled' => true }
       end
