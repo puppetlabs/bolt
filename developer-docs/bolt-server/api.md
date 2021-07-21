@@ -368,6 +368,7 @@ Returns a list of targets parsed from project inventory
     "port": null
   }
 ]
+```
 
 ## GET /project_facts_plugin_tarball
 
