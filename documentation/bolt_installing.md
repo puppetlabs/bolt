@@ -10,8 +10,8 @@ and Microsoft Windows.
 | Operating system          | Versions            |
 | ------------------------- | ------------------- |
 | Debian                    | 9, 10               |
-| Fedora                    | 30, 31, 32, 34      |
-| macOS                     | 10.14, 10.15, 11    |
+| Fedora                    | 32, 34              |
+| macOS                     | 10.15, 11           |
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
 | RHEL                      | 6, 7, 8             |
@@ -69,20 +69,6 @@ sudo apt remove puppet-bolt
 
 To install Bolt, run the appropriate command for the version of Fedora you
 have installed:
-
-- _Fedora 30_
-
-  ```shell
-  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-30.noarch.rpm
-  sudo dnf install puppet-bolt
-  ```
-
-- _Fedora 31_
-
-  ```shell
-  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-31.noarch.rpm
-  sudo dnf install puppet-bolt
-  ```
 
 - _Fedora 32_
 
@@ -162,7 +148,6 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS:
 
 1. Download the Bolt installer package for your macOS version.
 
-   - [10.14 (Mojave)](https://downloads.puppet.com/mac/puppet-tools/10.14/x86_64/puppet-bolt-latest.dmg)
    - [10.15 (Catalina)](https://downloads.puppet.com/mac/puppet-tools/10.15/x86_64/puppet-bolt-latest.dmg)
    - [11 (Big Sur)](https://downloads.puppet.com/mac/puppet-tools/11/x86_64/puppet-bolt-latest.dmg)
 
