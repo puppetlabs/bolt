@@ -753,6 +753,12 @@ module Bolt
           print_container_result(value.result)
         when Bolt::ResultSet
           print_result_set(value)
+        when Bolt::Result
+          print_result(value)
+        when Bolt::ApplyResult
+          print_apply_result(value)
+        when Bolt::Error
+          print_bolt_error(**value.to_h.transform_keys(&:to_sym))
         else
           @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
         end
@@ -790,6 +796,17 @@ module Bolt
 
       def print_error(message)
         @stream.puts(colorize(:red, message))
+      end
+
+      def print_bolt_error(msg:, details:, **_kwargs)
+        err = msg
+        if (f = details[:file])
+          err += "\n  (file: #{f}"
+          err += ", line: #{details[:line]}" if details[:line]
+          err += ", column: #{details[:column]}" if details[:column]
+          err += ")"
+        end
+        @stream.puts(colorize(:red, err))
       end
 
       def print_prompt(prompt)
