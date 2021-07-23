@@ -197,8 +197,9 @@ plugin-hooks:
       action: install
 ```
 
-**NOTE**: If you are configuring plugin hooks in an inventory file (see [inventory.yaml reference](bolt_inventory_reference.md#plugin_hooks)) you must use `plugin_hooks` instead of `plugin-hooks`.
-
+**NOTE**: If you are configuring plugin hooks in an inventory file, you must use `plugin_hooks`
+instead of `plugin-hooks`. For more information, see the [inventory.yaml reference]
+(bolt_inventory_reference.md#plugin_hooks).
 ## Configuring plugins
 
 Plugins that accept parameters can be configured in Bolt's configuration files.
