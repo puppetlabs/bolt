@@ -75,6 +75,19 @@ describe Bolt::Config::Transport::SSH do
       end
     end
 
+    context 'batch-mode' do
+      let(:data) do
+        {
+          'batch-mode' => false,
+          'native-ssh' => true
+        }
+      end
+
+      it 'errors without ssh-command set' do
+        expect { transport.new(data) }.to raise_error(Bolt::ValidationError)
+      end
+    end
+
     context "when using powershell" do
       before :each do
         data['login-shell'] = 'powershell'

@@ -1063,6 +1063,17 @@
                         }
                       ]
                     },
+                    "batch-mode": {
+                      "description": "Whether to disable password querying. When set to `false`, SSH will fall back to prompting for a password if key authentication fails. This might cause Bolt to hang. To prevent Bolt from hanging, you can configure `ssh-command` to use an SSH utility such as sshpass that supports providing a password non-interactively. For more information, see [Providing a password non-interactively using `native-ssh`](troubleshooting.md#providing-a-password-non-interactively-using-native-ssh).",
+                      "oneOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
                     "copy-command": {
                       "description": "The command to use when copying files using native SSH. Bolt runs `<copy-command> <src> <dest>`. This option is used when you need support for features or algorithms that are not supported by the net-ssh Ruby library. **This option is experimental.** You can read more about this option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
                       "oneOf": [
