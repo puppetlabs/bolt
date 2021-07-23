@@ -52,7 +52,7 @@ module Bolt
       # tracking which Futures to wait on when `wait()` is called without
       # arguments.
       @id += 1
-      future = Bolt::PlanFuture.new(future, @id, name: name, plan_id: plan_id)
+      future = Bolt::PlanFuture.new(future, @id, name: name, plan_id: plan_id, scope: newscope)
       @logger.trace("Created future #{future.name}")
 
       # Register the PlanFuture with the FiberExecutor to be executed
@@ -68,11 +68,15 @@ module Bolt
     #
     def round_robin
       active_futures.each do |future|
-        # If the Fiber is still running and can be resumed, then resume it
+        # If the Fiber is still running and can be resumed, then resume it.
+        # Override Puppet's global_scope to prevent ephemerals in other scopes
+        # from being popped off in the wrong order due to race conditions.
+        # This primarily happens when running executor functions from custom
+        # Puppet language functions, but may happen elsewhere.
         @logger.trace("Checking future '#{future.name}'")
         if future.alive?
           @logger.trace("Resuming future '#{future.name}'")
-          future.resume
+          Puppet.override(global_scope: future.scope) { future.resume }
         end
 
         # Once we've restarted the Fiber, check to see if it's finished again

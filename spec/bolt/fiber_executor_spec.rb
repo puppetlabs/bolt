@@ -28,7 +28,7 @@ describe "Bolt::FiberExecutor" do
 
     it "creates a new PlanFuture object with a name" do
       expect(Bolt::PlanFuture).to receive(:new)
-        .with(instance_of(Fiber), instance_of(Integer), name: 'name', plan_id: plan_id)
+        .with(instance_of(Fiber), instance_of(Integer), name: 'name', plan_id: plan_id, scope: anything)
         .and_call_original
       fiber_executor.create_future(name: 'name', plan_id: plan_id) { |_| return 0 }
     end
