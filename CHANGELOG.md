@@ -1,5 +1,67 @@
 # Changelog
 
+## Bolt 3.14.0 (2021-07-26)
+
+### New features
+
+* **`wait()` without arguments waits on all Futures from plan** ([#2877](https://github.com/puppetlabs/bolt/issues/2877))
+
+  Calling the `wait()` plan function without a list of Futures will now
+  wait on all Futures created so far in the plan.
+
+* **Ship puppetlabs/http_request 0.3.0**
+
+  Bolt now ships with the latest version of the http_request module,
+  which includes support for making `patch` requests.
+
+* **YAML plan verbose step**
+  ([#2926](https://github.com/puppetlabs/bolt/issues/2926))
+
+  YAML plans now support a verbose step that prints a message
+  when run in verbose mode.
+
+* **Log messages from `out::message` and `out::verbose`**
+  ([#2900](https://github.com/puppetlabs/bolt/issues/2900))
+
+  The `out::message` plan function now logs messages at the `info` level
+  and the `out::verbose` plan function now logs messages at the `debug`
+  level. Both functions continue to print messages to the console.
+
+* **Show detailed module information**
+
+  Bolt now supports showing detailed information about a module using
+  the `bolt module show <module>` command and `Get-BoltModule -Name
+  <module>` PowerShell cmdlet.
+
+* **Beautify `bolt guide` output** (hack)
+  This converts our existing guides from flat text to YAML so that they
+  can be pretty printed.
+
+* **Add `batch-mode` configuration option for `native-ssh` transport**
+  ([#2875](https://github.com/puppetlabs/bolt/issues/2875))
+
+  The `native-ssh` transport has a new `batch-mode` configuration option
+  that can be used to enable or disable `BatchMode`. For more
+  information, see [the
+  documentation](https://puppet.com/docs/bolt/latest/troubleshooting.html#providing-a-password-non-interactively-using-native-ssh).
+
+* **Format PlanResults if they are Bolt datatypes** (hack)
+
+  Bolt will now print a more human readable message for plan results
+  that are Bolt datatypes when using the human output format, rather than
+  printing JSON.
+
+### Bug fixes
+
+* **Do not warn about analytics when analytics is disabled**
+
+  Bolt no longer displays a warning about analytics collection when
+  analytics is disabled and the `analytics.yaml` file does not exist.
+
+### Removals
+
+* **Remove support for Fedora 30, Fedora 31, and MacOS 10.14**
+
 ## Bolt 3.13.0 (2021-07-12)
 
 ### New features
