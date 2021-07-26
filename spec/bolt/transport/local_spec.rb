@@ -148,5 +148,12 @@ describe Bolt::Transport::Local do
         .with(anything, /The local transport will default/)
       subject.with_connection(get_target(inventory, uri)) do |conn|; end
     end
+
+    it 'unbundles the env' do
+      expect(Bundler).to receive(:with_unbundled_env)
+      subject.with_connection(get_target(inventory, uri)) do |conn|
+        conn.execute('ls')
+      end
+    end
   end
 end
