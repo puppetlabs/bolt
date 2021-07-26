@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt 3.14.0 (2021-07-26)
+## Bolt 3.14.1 (2021-07-26)
 
 ### New features
 
