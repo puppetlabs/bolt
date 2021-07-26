@@ -186,6 +186,7 @@ describe 'rerun' do
 
     it 'updates the file when apply fails' do
       allow(pal).to receive(:in_plan_compiler)
+        .and_return(Bolt::ResultSet.new([Bolt::Result.new(targets[0])]))
       allow(pal).to receive(:with_bolt_executor)
         .and_return(Bolt::ResultSet.new([Bolt::ApplyResult.new(targets[0], error: { 'kind' => 'oops' })]))
       run_cli(['apply', '--targets', 'node1', '-e', 'include foo'])
@@ -194,6 +195,7 @@ describe 'rerun' do
 
     it 'updates the file when apply succeeds' do
       allow(pal).to receive(:in_plan_compiler)
+        .and_return(Bolt::ResultSet.new([Bolt::Result.new(targets[0])]))
       allow(pal).to receive(:with_bolt_executor)
         .and_return(Bolt::ResultSet.new([Bolt::ApplyResult.new(targets[0], report: {})]))
       run_cli(['apply', '--targets', 'node1', '-e', 'include foo'])

@@ -393,6 +393,20 @@ describe 'apply', expensive: true do
         expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
       end
 
+      it 'returns both failing and successful results' do
+        result = run_cli_json(%W[apply -e notice('hello') -t #{uri},foobar], project: project)
+
+        expect(result.size).to eq(2)
+        expect(result[0]).to include(
+          'target' => 'foobar',
+          'status' => 'failure'
+        )
+        expect(result[1]).to include(
+          'target' => uri,
+          'status' => 'success'
+        )
+      end
+
       context 'with plugin configured' do
         let(:inventory) do
           {
@@ -514,7 +528,9 @@ describe 'apply', expensive: true do
 
           param_error = result_set.select { |h| h['target'] == 'badparams' }[0]['value']['_error']
           expect(param_error['kind']).to eq('bolt/plugin-error')
-          expect(param_error['msg']).to include("Invalid parameters for Task puppet_agent::install")
+          expect(param_error['msg']).to match(
+            /Task puppet_agent::install.*parameter 'collection' expects an undef value/m
+          )
 
           plugin_error = result_set.select { |h| h['target'] == 'badplugin' }[0]['value']['_error']
           expect(plugin_error['kind']).to eq('bolt/unknown-plugin')
