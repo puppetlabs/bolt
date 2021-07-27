@@ -185,7 +185,8 @@ describe 'plans' do
                 "sensitive" => false,
                 "type" => "TargetSpec"
               }
-            }
+            },
+            "private" => false
           }
         }
 

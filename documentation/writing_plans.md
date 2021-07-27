@@ -1055,13 +1055,13 @@ MODULE:
 
 As a plan author, you might not want users to run your plan directly or know it exists. This is useful
 for plans that are used by other plans 'under the hood', but aren't designed to be run by a human.
-You can hide plans from `bolt plan show` and `Get-BoltPlan` output by specifying the `# @private
-true` Puppet strings tag. Private plans are still viewable with `bolt plan show <PLAN NAME>` and
+You can hide plans from `bolt plan show` and `Get-BoltPlan` output by specifying the `# @api
+private` Puppet strings tag. Private plans are still viewable with `bolt plan show <PLAN NAME>` and
 `Get-BoltPlan -Name <PLAN NAME>`, and can still be run with Bolt.
 
 ```
 # This plan isn't shown in plan list output
-# @private true
+# @api private
 # @param targets The list of targets to run the command on.
 plan single_command (
   TargetSpec $targets,
