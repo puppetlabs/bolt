@@ -838,13 +838,16 @@ module Bolt
 
       results = nil
       elapsed_time = Benchmark.realtime do
-        pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
-          compiler.call_function('apply_prep', targets)
+        apply_prep_results = pal.in_plan_compiler(executor, inventory, puppetdb_client) do |compiler|
+          compiler.call_function('apply_prep', targets, '_catch_errors' => true)
         end
 
-        results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
-          Puppet.lookup(:apply_executor).apply_ast(ast, targets, catch_errors: true, noop: noop)
+        apply_results = pal.with_bolt_executor(executor, inventory, puppetdb_client) do
+          Puppet.lookup(:apply_executor)
+                .apply_ast(ast, apply_prep_results.ok_set.targets, catch_errors: true, noop: noop)
         end
+
+        results = Bolt::ResultSet.new(apply_prep_results.error_set.results + apply_results.results)
       end
 
       executor.shutdown

@@ -60,10 +60,10 @@ describe 'apply_prep' do
       Puppet::Pal::ScriptCompiler.any_instance.stubs(:task_signature).with('service').returns(task3)
     end
 
-    it 'sets feature and gathers facts' do
+    it 'sets puppet-agent feature and gathers facts' do
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task)
-              .with(targets, custom_facts_task, includes('plugins'), {})
+              .with(anything, custom_facts_task, includes('plugins'), {})
               .returns(facts)
 
       plugins.expects(:get_hook)
@@ -71,25 +71,7 @@ describe 'apply_prep' do
              .with("puppet_agent", :puppet_library)
              .returns(task_hook)
 
-      is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
-      targets.each do |target|
-        expect(inventory.features(target)).to include('puppet-agent') unless target.transport == 'pcp'
-        expect(inventory.facts(target)).to eq(fact)
-      end
-    end
-
-    it 'installs the agent if not present' do
-      facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
-      executor.expects(:run_task)
-              .with(targets, custom_facts_task, includes('plugins'), {})
-              .returns(facts)
-
-      plugins.expects(:get_hook)
-             .twice
-             .with("puppet_agent", :puppet_library)
-             .returns(task_hook)
-
-      is_expected.to run.with_params(hostnames)
+      is_expected.to run.with_params(hostnames.join(','))
       targets.each do |target|
         expect(inventory.features(target)).to include('puppet-agent') unless target.transport == 'pcp'
         expect(inventory.facts(target)).to eq(fact)
@@ -99,7 +81,7 @@ describe 'apply_prep' do
     it 'escalates if provided _run_as' do
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task)
-              .with(targets, custom_facts_task, includes('plugins'), '_run_as' => 'root')
+              .with(anything, custom_facts_task, includes('plugins'), '_run_as' => 'root')
               .returns(facts)
 
       plugins.expects(:get_hook)
@@ -117,7 +99,7 @@ describe 'apply_prep' do
     it 'ignores unsupported metaparameters' do
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task)
-              .with(targets, custom_facts_task, includes('plugins'), {})
+              .with(anything, custom_facts_task, includes('plugins'), {})
               .returns(facts)
 
       plugins.expects(:get_hook)
@@ -125,7 +107,7 @@ describe 'apply_prep' do
              .with("puppet_agent", :puppet_library)
              .returns(task_hook)
 
-      is_expected.to run.with_params(hostnames, '_catch_errors' => true)
+      is_expected.to run.with_params(hostnames, '_noop' => true)
       targets.each do |target|
         expect(inventory.features(target)).to include('puppet-agent') unless target.transport == 'pcp'
         expect(inventory.facts(target)).to eq(fact)
@@ -137,7 +119,7 @@ describe 'apply_prep' do
         targets.map { |t| Bolt::Result.new(t, error: { 'msg' => 'could not gather facts' }) }
       )
       executor.expects(:run_task)
-              .with(targets, custom_facts_task, includes('plugins'), {})
+              .with(anything, custom_facts_task, includes('plugins'), {})
               .returns(results)
 
       plugins.expects(:get_hook)
@@ -233,7 +215,7 @@ describe 'apply_prep' do
               .with(targets, custom_facts_task, includes('plugins'), {})
               .returns(facts)
 
-      is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
+      is_expected.to run.with_params(hostnames.join(','))
       targets.each do |target|
         expect(inventory.features(target)).to include('puppet-agent') unless target.transport == 'pcp'
         expect(inventory.facts(target)).to eq(fact)
@@ -259,7 +241,7 @@ describe 'apply_prep' do
               .with(targets, custom_facts_task, includes('plugins'), {})
               .returns(facts)
 
-      is_expected.to run.with_params(hostnames.join(',')).and_return(nil)
+      is_expected.to run.with_params(hostnames.join(','))
       targets.each do |target|
         expect(inventory.features(target)).to include('puppet-agent')
         expect(inventory.facts(target)).to eq(fact)
@@ -282,13 +264,51 @@ describe 'apply_prep' do
     it 'only uses required plugins' do
       facts = Bolt::ResultSet.new(targets.map { |t| Bolt::Result.new(t, value: fact) })
       executor.expects(:run_task)
-              .with(targets, custom_facts_task, includes('plugins'), {})
+              .with(anything, custom_facts_task, includes('plugins'), {})
               .returns(facts)
 
       Puppet.expects(:debug).at_least(1)
       Puppet.expects(:debug).with("Syncing only required modules: non-existing-module.")
-      is_expected.to run.with_params(hostnames.join(','),
-                                     '_required_modules' => ['non-existing-module']).and_return(nil)
+      is_expected.to run.with_params(hostnames,
+                                     '_required_modules' => ['non-existing-module'])
+    end
+  end
+
+  context 'with _catch_errors specified' do
+    let(:custom_facts_task) { Bolt::Task.new('custom_facts_task') }
+    let(:host)              { 'target' }
+    let(:targets)           { inventory.get_targets([host]) }
+    let(:result)            { Bolt::Result.new(targets.first, value: task_result) }
+    let(:resultset)         { Bolt::ResultSet.new([result]) }
+
+    before(:each) do
+      applicator.stubs(:build_plugin_tarball).returns(:tarball)
+      applicator.stubs(:custom_facts_task).returns(custom_facts_task)
+
+      plugins.expects(:get_hook)
+             .with("puppet_agent", :puppet_library)
+             .returns(task_hook)
+    end
+
+    context 'with failing hook' do
+      let(:plugin_result) { { '_error' => { 'msg' => 'failure' } } }
+
+      it 'continues executing' do
+        is_expected.to run.with_params(host, '_catch_errors' => true)
+      end
+    end
+
+    context 'with failing fact retrieval' do
+      let(:plugin_result) { {} }
+      let(:task_result)   { { '_error' => { 'msg' => 'failure' } } }
+
+      it 'continues executing' do
+        executor.expects(:run_task)
+                .with(targets, custom_facts_task, includes('plugins'), '_catch_errors' => true)
+                .returns(resultset)
+
+        is_expected.to run.with_params(host, '_catch_errors' => true)
+      end
     end
   end
 

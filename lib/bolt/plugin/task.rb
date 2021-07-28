@@ -59,7 +59,7 @@ module Bolt
         run_opts = {}
         run_opts[:run_as] = opts['_run_as'] if opts['_run_as']
         begin
-          task = apply_prep.get_task(opts['task'], params)
+          task = @context.get_validated_task(opts['task'], params)
         rescue Bolt::Error => e
           raise Bolt::Plugin::PluginError::ExecutionError.new(e.message, name, 'puppet_library')
         end
