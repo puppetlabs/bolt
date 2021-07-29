@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/pal/yaml_plan'
-require 'bolt/pal/yaml_plan/evaluator'
+require_relative '../../../bolt/pal/yaml_plan'
+require_relative '../../../bolt/pal/yaml_plan/evaluator'
 require 'psych'
 
 module Bolt

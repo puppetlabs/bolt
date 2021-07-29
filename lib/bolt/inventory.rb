@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'set'
-require 'bolt/config'
-require 'bolt/inventory/group'
-require 'bolt/inventory/inventory'
-require 'bolt/inventory/options'
-require 'bolt/target'
-require 'bolt/util'
-require 'bolt/plugin'
-require 'bolt/validator'
+require_relative '../bolt/config'
+require_relative 'inventory/group'
+require_relative 'inventory/inventory'
+require_relative 'inventory/options'
+require_relative '../bolt/target'
+require_relative '../bolt/util'
+require_relative '../bolt/plugin'
+require_relative '../bolt/validator'
 require 'yaml'
 
 module Bolt

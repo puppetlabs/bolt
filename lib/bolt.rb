@@ -4,5 +4,5 @@
 require 'logging_extensions/logging'
 
 module Bolt
-  require 'bolt/executor'
+  require_relative 'bolt/executor'
 end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/r10k_log_proxy'
-require 'bolt/error'
+require_relative '../../bolt/r10k_log_proxy'
+require_relative '../../bolt/error'
 
 # This class is used to install modules from a Puppetfile to a module directory.
 #

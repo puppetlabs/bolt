@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/pal/yaml_plan'
+require_relative '../../../bolt/pal/yaml_plan'
 
 module Bolt
   class PAL

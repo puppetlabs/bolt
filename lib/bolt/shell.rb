@@ -101,5 +101,5 @@ module Bolt
   end
 end
 
-require 'bolt/shell/bash'
-require 'bolt/shell/powershell'
+require_relative 'shell/bash'
+require_relative 'shell/powershell'

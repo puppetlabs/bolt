@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/util'
-require 'bolt/version'
+require_relative '../bolt/util'
+require_relative '../bolt/version'
 require 'find'
 require 'json'
 require 'logging'

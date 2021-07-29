@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'bolt/applicator'
-require 'bolt/executor'
-require 'bolt/error'
-require 'bolt/plan_result'
-require 'bolt/util'
-require 'bolt/config/modulepath'
+require_relative '../bolt/applicator'
+require_relative '../bolt/executor'
+require_relative '../bolt/error'
+require_relative '../bolt/plan_result'
+require_relative '../bolt/util'
+require_relative '../bolt/config/modulepath'
 require 'etc'
 
 module Bolt
@@ -101,10 +101,10 @@ module Bolt
         raise Bolt::Error.new("Puppet must be installed to execute tasks", "bolt/puppet-missing")
       end
 
-      require 'bolt/pal/logging'
-      require 'bolt/pal/issues'
-      require 'bolt/pal/yaml_plan/loader'
-      require 'bolt/pal/yaml_plan/transpiler'
+      require_relative 'pal/logging'
+      require_relative 'pal/issues'
+      require_relative 'pal/yaml_plan/loader'
+      require_relative 'pal/yaml_plan/transpiler'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable

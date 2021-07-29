@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/logger'
-require 'bolt/plan_future'
+require_relative '../bolt/logger'
+require_relative '../bolt/plan_future'
 
 module Bolt
   class FiberExecutor

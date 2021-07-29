@@ -2,8 +2,8 @@
 
 require 'benchmark'
 
-require 'bolt/plan_creator'
-require 'bolt/util'
+require_relative '../bolt/plan_creator'
+require_relative '../bolt/util'
 
 module Bolt
   class Application

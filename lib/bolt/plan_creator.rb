@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/logger'
-require 'bolt/module'
-require 'bolt/util'
+require_relative '../bolt/error'
+require_relative '../bolt/logger'
+require_relative '../bolt/module'
+require_relative '../bolt/util'
 
 module Bolt
   module PlanCreator

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/shell/bash/tmpdir'
+require_relative 'bash/tmpdir'
 require 'shellwords'
 
 module Bolt

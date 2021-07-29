@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/project_manager/config_migrator'
-require 'bolt/project_manager/inventory_migrator'
-require 'bolt/project_manager/module_migrator'
+require_relative 'project_manager/config_migrator'
+require_relative 'project_manager/inventory_migrator'
+require_relative 'project_manager/module_migrator'
 
 module Bolt
   class ProjectManager
@@ -45,7 +45,7 @@ module Bolt
     # Creates a new project at the specified directory.
     #
     def create(path, name, modules)
-      require 'bolt/module_installer'
+      require_relative '../bolt/module_installer'
 
       project       = Pathname.new(File.expand_path(path))
       old_config    = project + 'bolt.yaml'

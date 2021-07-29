@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/inventory/group'
-require 'bolt/inventory/target'
+require_relative '../../bolt/inventory/group'
+require_relative '../../bolt/inventory/target'
 
 module Bolt
   class Inventory

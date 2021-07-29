@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/task/run'
+require_relative '../../bolt/task/run'
 
 module Bolt
   class Plugin

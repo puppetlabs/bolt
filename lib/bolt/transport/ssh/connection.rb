@@ -2,9 +2,9 @@
 
 require 'logging'
 require 'shellwords'
-require 'bolt/node/errors'
-require 'bolt/node/output'
-require 'bolt/util'
+require_relative '../../../bolt/node/errors'
+require_relative '../../../bolt/node/output'
+require_relative '../../../bolt/util'
 
 module Bolt
   module Transport

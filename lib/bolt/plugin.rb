@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'bolt/inventory'
-require 'bolt/executor'
-require 'bolt/module'
-require 'bolt/pal'
-require 'bolt/plugin/cache'
-require 'bolt/plugin/puppetdb'
+require_relative '../bolt/inventory'
+require_relative '../bolt/executor'
+require_relative '../bolt/module'
+require_relative '../bolt/pal'
+require_relative 'plugin/cache'
+require_relative 'plugin/puppetdb'
 
 module Bolt
   class Plugin
@@ -376,4 +376,4 @@ module Bolt
 end
 
 # references PluginError
-require 'bolt/plugin/module'
+require_relative 'plugin/module'

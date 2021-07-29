@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/container_result'
-require 'bolt/pal'
+require_relative '../../bolt/container_result'
+require_relative '../../bolt/pal'
 
 module Bolt
   class Outputter

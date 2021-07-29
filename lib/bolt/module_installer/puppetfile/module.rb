@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
+require_relative '../../../bolt/error'
 
 module Bolt
   class ModuleInstaller

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/util'
+require_relative '../../../bolt/util'
 
 module Bolt
   class PAL
@@ -211,13 +211,13 @@ module Bolt
   end
 end
 
-require 'bolt/pal/yaml_plan/step/command'
-require 'bolt/pal/yaml_plan/step/eval'
-require 'bolt/pal/yaml_plan/step/plan'
-require 'bolt/pal/yaml_plan/step/resources'
-require 'bolt/pal/yaml_plan/step/script'
-require 'bolt/pal/yaml_plan/step/task'
-require 'bolt/pal/yaml_plan/step/upload'
-require 'bolt/pal/yaml_plan/step/download'
-require 'bolt/pal/yaml_plan/step/message'
-require 'bolt/pal/yaml_plan/step/verbose'
+require_relative 'step/command'
+require_relative 'step/eval'
+require_relative 'step/plan'
+require_relative 'step/resources'
+require_relative 'step/script'
+require_relative 'step/task'
+require_relative 'step/upload'
+require_relative 'step/download'
+require_relative 'step/message'
+require_relative 'step/verbose'

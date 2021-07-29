@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/pal/yaml_plan/loader'
-require 'bolt/util'
+require_relative '../../../bolt/error'
+require_relative '../../../bolt/pal/yaml_plan/loader'
+require_relative '../../../bolt/util'
 
 module Bolt
   class PAL

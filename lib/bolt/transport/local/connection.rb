@@ -3,8 +3,8 @@
 require 'open3'
 require 'fileutils'
 require 'tempfile'
-require 'bolt/node/output'
-require 'bolt/util'
+require_relative '../../../bolt/node/output'
+require_relative '../../../bolt/util'
 
 module Bolt
   module Transport

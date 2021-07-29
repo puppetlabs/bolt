@@ -1,17 +1,17 @@
 # frozen_string_literal: true
 
-require 'bolt/apply_inventory'
-require 'bolt/apply_target'
-require 'bolt/config'
-require 'bolt/error'
-require 'bolt/inventory'
-require 'bolt/pal'
-require 'bolt/puppetdb'
-require 'bolt/util'
+require_relative '../bolt/apply_inventory'
+require_relative '../bolt/apply_target'
+require_relative '../bolt/config'
+require_relative '../bolt/error'
+require_relative '../bolt/inventory'
+require_relative '../bolt/pal'
+require_relative '../bolt/puppetdb'
+require_relative '../bolt/util'
 
 Bolt::PAL.load_puppet
 
-require 'bolt/catalog/logging'
+require_relative 'catalog/logging'
 
 module Bolt
   class Catalog

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'logging'
-require 'bolt/result'
+require_relative '../../bolt/result'
 
 module Bolt
   module Transport

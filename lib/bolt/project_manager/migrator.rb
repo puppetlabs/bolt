@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'fileutils'
-require 'bolt/error'
+require_relative '../../bolt/error'
 
 module Bolt
   class ProjectManager

@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'bolt/config/transport/docker'
-require 'bolt/config/transport/local'
-require 'bolt/config/transport/lxd'
-require 'bolt/config/transport/orch'
-require 'bolt/config/transport/podman'
-require 'bolt/config/transport/remote'
-require 'bolt/config/transport/ssh'
-require 'bolt/config/transport/winrm'
+require_relative '../../bolt/config/transport/docker'
+require_relative '../../bolt/config/transport/local'
+require_relative '../../bolt/config/transport/lxd'
+require_relative '../../bolt/config/transport/orch'
+require_relative '../../bolt/config/transport/podman'
+require_relative '../../bolt/config/transport/remote'
+require_relative '../../bolt/config/transport/ssh'
+require_relative '../../bolt/config/transport/winrm'
 
 module Bolt
   class Config

@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/module_installer/puppetfile/forge_module'
-require 'bolt/module_installer/puppetfile/git_module'
+require_relative '../../bolt/error'
+require_relative 'puppetfile/forge_module'
+require_relative 'puppetfile/git_module'
 
 # This class manages the logical contents of a Puppetfile. It includes methods
 # for parsing and generating a Puppetfile.

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/config'
+require_relative '../../bolt/config'
 
 module Bolt
   class Config

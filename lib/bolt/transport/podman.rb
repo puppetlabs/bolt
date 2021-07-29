@@ -2,7 +2,7 @@
 
 require 'json'
 require 'shellwords'
-require 'bolt/transport/base'
+require_relative '../../bolt/transport/base'
 
 module Bolt
   module Transport
@@ -16,4 +16,4 @@ module Bolt
   end
 end
 
-require 'bolt/transport/podman/connection'
+require_relative 'podman/connection'

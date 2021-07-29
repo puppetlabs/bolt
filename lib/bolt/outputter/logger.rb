@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/pal'
+require_relative '../../bolt/pal'
 
 module Bolt
   class Outputter

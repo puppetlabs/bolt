@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/logger'
-require 'bolt/module_installer/installer'
-require 'bolt/module_installer/puppetfile'
-require 'bolt/module_installer/resolver'
-require 'bolt/module_installer/specs'
+require_relative '../bolt/error'
+require_relative '../bolt/logger'
+require_relative 'module_installer/installer'
+require_relative 'module_installer/puppetfile'
+require_relative 'module_installer/resolver'
+require_relative 'module_installer/specs'
 
 module Bolt
   class ModuleInstaller

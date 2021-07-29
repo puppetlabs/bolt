@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'bolt/util'
+require_relative '../../bolt/util'
 
 module Bolt
   module PuppetDB

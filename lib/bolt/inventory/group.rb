@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'bolt/config/options'
-require 'bolt/inventory/group'
-require 'bolt/inventory/inventory'
-require 'bolt/inventory/target'
+require_relative '../../bolt/config/options'
+require_relative '../../bolt/inventory/group'
+require_relative '../../bolt/inventory/inventory'
+require_relative '../../bolt/inventory/target'
 
 module Bolt
   class Inventory
