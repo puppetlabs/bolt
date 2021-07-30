@@ -421,7 +421,7 @@ rescue ZeroDivisionError
   result[:_error] = { msg: "Cannot divide by zero",
                       # namespace the error to this module
                       kind: "puppetlabs-example_modules/dividebyzero",
-                      details: { divisor: divisor },
+                      details: { divisor: params['divisor'] },
                     }
 rescue Exception => e
   result[:_error] = { msg: e.message,
