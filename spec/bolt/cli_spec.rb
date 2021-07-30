@@ -1673,7 +1673,8 @@ describe "Bolt::CLI" do
                 "default_value" => "'foo'",
                 "sensitive" => false
               }
-            }
+            },
+            "private" => false
           )
         end
 
@@ -1696,7 +1697,8 @@ describe "Bolt::CLI" do
                 "default_value" => "typo",
                 "sensitive" => false
               }
-            }
+            },
+            "private" => false
           )
           expected_log = /parameter 'not_oops' does not exist.*sample::documented_param_typo/m
           expect(@log_output.readlines.join).to match(expected_log)
@@ -1730,7 +1732,8 @@ describe "Bolt::CLI" do
                 "default_value" => 'hello',
                 "sensitive" => false
               }
-            }
+            },
+            "private" => false
           )
         end
 

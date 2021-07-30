@@ -116,7 +116,8 @@ describe 'installing modules' do
               "sensitive" => false,
               "type" => "TargetSpec"
             }
-          }
+          },
+          "private" => false
         }
       }
 

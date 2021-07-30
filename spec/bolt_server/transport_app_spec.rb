@@ -120,7 +120,8 @@ describe "BoltServer::TransportApp" do
           {
             'name' => 'bolt_server_test::simple_plan',
             'description' => 'Simple plan testing',
-            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } }
+            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
+            'private' => false
           }
         }
         it '/plans/:module_name/:plan_name handles module::plan_name' do
@@ -136,7 +137,8 @@ describe "BoltServer::TransportApp" do
           {
             'name' => 'bolt_server_test',
             'description' => 'Init plan testing',
-            'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } }
+            'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } },
+            'private' => false
           }
         }
         it '/plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
@@ -195,7 +197,8 @@ describe "BoltServer::TransportApp" do
             'bolt_server_test' => {
               'name' => 'bolt_server_test',
               'description' => 'Init plan testing',
-              'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } }
+              'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } },
+              'private' => false
             }
           }
         }
@@ -215,7 +218,8 @@ describe "BoltServer::TransportApp" do
             'name' => 'bolt_server_test_project::simple_plan',
             'description' => 'Simple plan testing',
             'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
-            'allowed' => false
+            'allowed' => false,
+            'private' => false
           }
         }
         it '/project_plans/:module_name/:plan_name handles module::plan_name' do
@@ -232,7 +236,8 @@ describe "BoltServer::TransportApp" do
             'name' => 'bolt_server_test_project',
             'description' => 'Project plan testing',
             'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
-            'allowed' => true
+            'allowed' => true,
+            'private' => false
           }
         }
         it '/project_plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
@@ -251,7 +256,8 @@ describe "BoltServer::TransportApp" do
             'name' => 'bolt_server_test_project::allowlist_glob',
             'description' => 'Project plan testing',
             'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
-            'allowed' => true
+            'allowed' => true,
+            'private' => false
           }
         }
         it 'properly filters allowed and disallowed plans' do

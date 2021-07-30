@@ -58,11 +58,32 @@ describe "with private plans" do
   end
 
   context 'with a private Puppet plan' do
-    it 'does not show the private plan in plan show output' do
+    it "sets the plan to private with '@api private'" do
       result = run_cli_json(%W[plan show -m #{modulepath}])
       plans = result['plans'].map(&:first)
-      expect(plans).to include('facts')
+      expect(plans).to include('canary')
+      expect(plans).not_to include('private::api')
+    end
+
+    it "sets the plan to private with '@private true'" do
+      result = run_cli_json(%W[plan show -m #{modulepath}])
+      plans = result['plans'].map(&:first)
+      expect(plans).to include('canary')
       expect(plans).not_to include('private::puppet')
+    end
+
+    it "sets the plan to private with '@api private' and '@private false'" do
+      result = run_cli_json(%W[plan show -m #{modulepath}])
+      plans = result['plans'].map(&:first)
+      expect(plans).to include('canary')
+      expect(plans).not_to include('private::conflict')
+    end
+
+    it "warns when using the '@private' tag" do
+      run_cli_json(%W[plan show -m #{modulepath}])
+      expect(@log_output.readlines).to include(
+        /WARN.*Tag '@private true' in plan 'private::puppet' is deprecated, use '@api private' instead/
+      )
     end
 
     it 'shows the private plan in plan show <plan> output' do

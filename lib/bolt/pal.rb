@@ -447,7 +447,7 @@ module Bolt
     # @param mtime [String] The last time the file was modified.
     #
     private def file_modified?(path, mtime)
-      path && !(File.exist?(path) && File.mtime(path).to_s == mtime)
+      path && !(File.exist?(path) && File.mtime(path).to_s == mtime.to_s)
     end
 
     def list_plans(filter_content: false)
@@ -512,19 +512,14 @@ module Bolt
           end
         end
 
-        privie = plan.tag(:private)&.text
-        unless privie.nil? || %w[true false].include?(privie.downcase)
-          msg = "Plan #{plan_name} key 'private' must be a boolean, received: #{privie}"
-          raise Bolt::Error.new(msg, 'bolt/invalid-plan')
-        end
-
         pp_info = {
           'name'        => plan_name,
           'description' => description,
           'parameters'  => parameters,
-          'module'      => mod
+          'module'      => mod,
+          'private'     => private_plan?(plan)
         }
-        pp_info.merge!({ 'private' => privie&.downcase == 'true' }) unless privie.nil?
+
         pp_info.merge!(get_plan_mtime(plan.file)) if with_mtime
         pp_info
 
@@ -554,12 +549,37 @@ module Bolt
           'name'        => plan_name,
           'description' => plan.description,
           'parameters'  => parameters,
-          'module'      => mod
+          'module'      => mod,
+          'private'     => !!plan.private
         }
-        yaml_info.merge!({ 'private' => plan.private }) unless plan.private.nil?
+
         yaml_info.merge!(get_plan_mtime(yaml_path)) if with_mtime
         yaml_info
       end
+    end
+
+    # Returns true if the plan is private, false otherwise.
+    #
+    # @param plan [PuppetStrings::Yard::CodeObjects::Plan] The puppet-strings plan documentation.
+    # @return [Boolean]
+    #
+    private def private_plan?(plan)
+      if plan.tag(:private)
+        value     = plan.tag(:private).text
+        api_value = value.downcase == 'true' ? 'private' : 'public'
+
+        Bolt::Logger.deprecate(
+          'plan_private_tag',
+          "Tag '@private #{value}' in plan '#{plan.name}' is deprecated, use '@api #{api_value}' instead"
+        )
+
+        unless %w[true false].include?(plan.tag(:private).text.downcase)
+          msg = "Value for '@private' tag in plan '#{plan.name}' must be a boolean, received: #{value}"
+          raise Bolt::Error.new(msg, 'bolt/invalid-plan')
+        end
+      end
+
+      plan.tag(:api).text == 'private' || plan.tag(:private)&.text&.downcase == 'true'
     end
 
     def get_plan_mtime(path)
