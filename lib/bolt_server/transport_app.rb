@@ -43,6 +43,8 @@ module BoltServer
       transport-ssh
       transport-winrm
       connect-data
+      action-apply_prep
+      action-apply
     ].freeze
 
     # PE_BOLTLIB_PATH is intended to function exactly like the BOLTLIB_PATH used
@@ -118,12 +120,7 @@ module BoltServer
       end
     end
 
-    def run_task(target, body)
-      validate_schema(@schemas["action-run_task"], body)
-
-      task_data = body['task']
-      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
-      parameters = body['parameters'] || {}
+    def task_helper(target, task, parameters)
       # Wrap parameters marked with '"sensitive": true' in the task metadata with a
       # Sensitive wrapper type. This way it's not shown in logs.
       if (param_spec = task.parameters)
@@ -140,6 +137,84 @@ module BoltServer
         next unless value.key?('_sensitive')
         value['_sensitive'] = value['_sensitive'].unwrap
       end
+    end
+
+    def run_task(target, body)
+      validate_schema(@schemas["action-run_task"], body)
+
+      task_data = body['task']
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      task_helper(target, task, body['parameters'] || {})
+    end
+
+    def extract_install_task(target)
+      unless target.plugin_hooks['puppet_library']['task']
+        raise BoltServer::RequestError,
+              "Target must have 'task' plugin hook"
+      end
+      install_task = target.plugin_hooks['puppet_library']['task'].split('::', 2)
+      install_task << 'init' if install_task.count == 1
+      install_task
+    end
+
+    def apply_prep(target, body)
+      validate_schema(@schemas["action-apply_prep"], body)
+      plugins_tarball = if (tarball = @file_cache.get_cached_plugin_tarball(body['versioned_project'], 'fact_plugins'))
+                          tarball
+                        else
+                          new_tarball = build_project_plugins_tarball(body['versioned_project']) do |mod|
+                            search_dirs = []
+                            search_dirs << mod.plugins if mod.plugins?
+                            search_dirs << mod.pluginfacts if mod.pluginfacts?
+                            search_dirs
+                          end
+                          @file_cache.cache_plugin_tarball(body['versioned_project'], 'fact_plugins', new_tarball)
+                          new_tarball
+                        end
+      task_datas = in_bolt_project(body['versioned_project']) do |context|
+        ps_parameters = {
+          'versioned_project' => body['versioned_project']
+        }
+        install_task = extract_install_task(target.first)
+        {
+          'install_task_data' => pe_task_info(context[:pal], install_task[0], install_task[1], ps_parameters),
+          'facts_task_data' => pe_task_info(context[:pal], 'apply_helpers', 'custom_facts', ps_parameters)
+        }
+      end
+      task_data = task_datas['install_task_data']
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      install_task_result = task_helper(target, task, target.first.plugin_hooks['puppet_library']['parameters'] || {})
+      return install_task_result unless install_task_result.ok
+      task_data = task_datas['facts_task_data']
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      task_helper(target, task, { 'plugins' => plugins_tarball })
+    end
+
+    def apply(target, body)
+      validate_schema(@schemas["action-apply"], body)
+      plugins_tarball = if (tarball = @file_cache.get_cached_plugin_tarball(body['versioned_project'], 'all_plugins'))
+                          tarball
+                        else
+                          new_tarball = build_project_plugins_tarball(body['versioned_project']) do |mod|
+                            search_dirs = []
+                            search_dirs << mod.plugins if mod.plugins?
+                            search_dirs << mod.pluginfacts if mod.pluginfacts?
+                            search_dirs << mod.files if mod.files?
+                            type_files = "#{mod.path}/types"
+                            search_dirs << type_files if File.exist?(type_files)
+                            search_dirs
+                          end
+                          @file_cache.cache_plugin_tarball(body['versioned_project'], 'all_plugins', new_tarball)
+                          new_tarball
+                        end
+      task_data = in_bolt_project(body['versioned_project']) do |context|
+        ps_parameters = {
+          'versioned_project' => body['versioned_project']
+        }
+        pe_task_info(context[:pal], 'apply_helpers', 'apply_catalog', ps_parameters)
+      end
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      task_helper(target, task, body['parameters'].merge({ 'plugins' => plugins_tarball }))
     end
 
     def run_command(target, body)
@@ -476,6 +551,8 @@ module BoltServer
       run_task
       run_script
       upload_file
+      apply
+      apply_prep
     ].freeze
 
     def make_ssh_target(target_hash)
@@ -499,7 +576,8 @@ module BoltServer
         'config' => {
           'transport' => 'ssh',
           'ssh' => opts.slice(*Bolt::Config::Transport::SSH.options)
-        }
+        },
+        'plugin_hooks' => target_hash['plugin_hooks']
       }
 
       inventory = Bolt::Inventory.empty
@@ -537,7 +615,8 @@ module BoltServer
         'config' => {
           'transport' => 'winrm',
           'winrm' => opts.slice(*Bolt::Config::Transport::WinRM.options)
-        }
+        },
+        'plugin_hooks' => target_hash['plugin_hooks']
       }
 
       inventory = Bolt::Inventory.empty

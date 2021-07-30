@@ -7,6 +7,7 @@ require 'bolt/target'
 require 'bolt_server/transport_app'
 require 'bolt_server/config'
 require 'rack/test'
+require 'fileutils'
 
 describe "BoltServer::TransportApp", puppetserver: true do
   include BoltSpec::Conn
@@ -168,6 +169,187 @@ describe "BoltServer::TransportApp", puppetserver: true do
                                        conn_target('ssh', include_password: true))
           post('/ssh/run_command', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
         end
+      end
+    end
+
+    describe 'apply_prep' do
+      let(:path) { "/ssh/apply_prep" }
+
+      it 'apply_prep runs install task configured in plugin_hooks and gathers custom facts' do
+        # Target a spec container that already has an agent on it
+        inventory = Bolt::Inventory.empty
+        puppet_6_agent_container = inventory.get_target(conn_uri('ssh', include_password: true, override_port: 20024))
+        target = {
+          hostname: puppet_6_agent_container.host,
+          user: puppet_6_agent_container.user,
+          password: puppet_6_agent_container.password,
+          port: puppet_6_agent_container.port,
+          plugin_hooks: { 'puppet_library' => { 'plugin' => 'task', 'task' => 'fake_puppet_agent::install',
+                                                'parameters' => {} } }
+        }
+        body = {
+          versioned_project: 'bolt_server_test_project',
+          target: target
+        }
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response).to be_ok
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result['status']).to eq('success')
+        expect(result['value'].keys).to include('os')
+      end
+
+      it 'apply_prep fails when install task fails' do
+        # Target a spec container that already has an agent on it
+        inventory = Bolt::Inventory.empty
+        puppet_6_agent_container = inventory.get_target(conn_uri('ssh', include_password: true, override_port: 20024))
+        target = {
+          hostname: puppet_6_agent_container.host,
+          user: puppet_6_agent_container.user,
+          password: puppet_6_agent_container.password,
+          port: puppet_6_agent_container.port,
+          plugin_hooks: { 'puppet_library' => { 'plugin' => 'task', 'task' => 'fake_puppet_agent::install',
+                                                'parameters' => { 'fail' => true } } }
+        }
+        body = {
+          versioned_project: 'bolt_server_test_project',
+          target: target
+        }
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response).to be_ok
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result['status']).to eq('failure')
+        expect(result['object']).to eq('fake_puppet_agent::install')
+      end
+
+      it 'apply_prep fails when target does not define suitable puppet_library plugin_hook' do
+        # Target a spec container that already has an agent on it
+        inventory = Bolt::Inventory.empty
+        puppet_6_agent_container = inventory.get_target(conn_uri('ssh', include_password: true, override_port: 20024))
+        target = {
+          hostname: puppet_6_agent_container.host,
+          user: puppet_6_agent_container.user,
+          password: puppet_6_agent_container.password,
+          port: puppet_6_agent_container.port
+        }
+        body = {
+          versioned_project: 'bolt_server_test_project',
+          target: target
+        }
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response.status).to eq(400)
+        result = JSON.parse(last_response.body)
+        expect(result['kind']).to eq('bolt-server/request-error')
+        expect(result['msg']).to eq("Target must have 'task' plugin hook")
+      end
+    end
+
+    describe "apply" do
+      def cross_platform_catalog(certname)
+        {
+          "catalog" => {
+            "tags" => [
+              "settings"
+            ],
+            "name" => certname,
+            "version" => 1581636379,
+            "code_id" => nil,
+            "catalog_uuid" => "5a4372c6-253f-46df-be99-3c40c9922423",
+            "catalog_format" => 1,
+            "environment" => 'bolt_catalog',
+            "resources" => [
+              {
+                "type" => "Stage",
+                "title" => "main",
+                "tags" => %w[
+                  stage
+                  class
+                ],
+                "exported" => false,
+                "parameters" => {
+                  "name" => "main"
+                }
+              },
+              {
+                "type" => "Class",
+                "title" => "Settings",
+                "tags" => %w[
+                  class
+                  settings
+                ],
+                "exported" => false
+              },
+              {
+                "type" => "Class",
+                "title" => "main",
+                "tags" => [
+                  "class"
+                ],
+                "exported" => false,
+                "parameters" => {
+                  "name" => "main"
+                }
+              },
+              {
+                "type" => "Notify",
+                "title" => "hello world",
+                "tags" => %w[
+                  notify
+                  class
+                ],
+                "line" => 1,
+                "exported" => false
+              }
+            ],
+            "edges" => [
+              {
+                "source" => "Stage[main]",
+                "target" => "Class[Settings]"
+              },
+              {
+                "source" => "Stage[main]",
+                "target" => "Class[main]"
+              },
+              {
+                "source" => "Class[main]",
+                "target" => "Notify[hello world]"
+              }
+            ],
+            "classes" => [
+              "settings"
+            ]
+          }
+        }
+      end
+
+      it 'applies a catalog' do
+        # Target a spec container that already has an agent on it
+        path = 'ssh/apply'
+        inventory = Bolt::Inventory.empty
+        puppet_6_agent_container = inventory.get_target(conn_uri('ssh', include_password: true, override_port: 20024))
+        target = {
+          hostname: puppet_6_agent_container.host,
+          user: puppet_6_agent_container.user,
+          password: puppet_6_agent_container.password,
+          port: puppet_6_agent_container.port,
+          plugin_hooks: { 'puppet_library' => { 'plugin' => 'task', 'task' => 'fake_puppet_agent::install',
+                                                'parameters' => {} } }
+        }
+        body = {
+          versioned_project: 'bolt_server_test_project',
+          target: target,
+          parameters: {
+            catalog: cross_platform_catalog(target[:hostname])['catalog'],
+            apply_settings: {}
+          }
+        }
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
+        expect(last_response).to be_ok
+        expect(last_response.status).to eq(200)
+        result = JSON.parse(last_response.body)
+        expect(result['status']).to eq('success')
+        expect(result['value']['resource_statuses'].keys).to include('Notify[hello world]')
       end
     end
 
