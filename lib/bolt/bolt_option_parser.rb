@@ -1042,6 +1042,21 @@ module Bolt
       define('--pp', 'Create a new Puppet language plan.') do |_|
         @options[:puppet] = true
       end
+      define('--script SCRIPT', 'Create a new plan that wraps a script.') do |path|
+        # If the path is a relative, absolute, or not a scripts path, raise an
+        # error. This flag is intended to be used to create shareable plans.
+        #
+        # This also limits valid mounts to files and scripts, which we may want
+        # to expand in the future.
+        if File.exist?(path) || Pathname.new(path).absolute? ||
+           !%w[scripts files].include?(path.split(File::SEPARATOR)[1])
+          raise Bolt::CLIError, "The script must be a detailed Puppet file reference, " \
+            "for example 'mymodule/scripts/myscript.sh'. See http://pup.pt/bolt-scripts for " \
+            "more information on detailed Puppet file references."
+        end
+
+        @options[:plan_script] = path
+      end
 
       separator "\n#{self.class.colorize(:cyan, 'Display options')}"
       define('--filter FILTER', 'Filter tasks and plans by a matching substring.') do |filter|

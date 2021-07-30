@@ -2,6 +2,7 @@
 
 require 'benchmark'
 
+require 'bolt/plan_creator'
 require 'bolt/util'
 
 module Bolt
@@ -120,8 +121,7 @@ module Bolt
     # @return [Bolt::ResultSet]
     #
     def upload_file(source, destination, targets)
-      future  = executor.future&.fetch('file_paths', false)
-      source  = find_file(source, future)
+      source  = find_file(source)
       targets = inventory.get_targets(targets)
 
       Bolt::Util.validate_file('source file', source, true)
@@ -327,11 +327,26 @@ module Bolt
     #
     # @param name [String] The name of the new plan.
     # @param puppet [Boolean] Create a Puppet language plan.
+    # @param plan_script [String] Reference to the script to run in the new plan.
     # @return [Boolean]
     #
-    def new_plan(name, puppet: false)
-      Bolt::PlanCreator.validate_input(config.project, name)
-      Bolt::PlanCreator.create_plan(config.project.plans_path, name, puppet)
+    def new_plan(name, puppet: false, plan_script: nil)
+      Bolt::PlanCreator.validate_plan_name(config.project, name)
+
+      if plan_script && !config.future&.fetch('file_paths', false)
+        raise Bolt::CLIError,
+              "The --script flag can only be used if future.file_paths is " \
+              "configured in bolt-project.yaml."
+      end
+
+      if plan_script
+        Bolt::Util.validate_file('script', find_file(plan_script))
+      end
+
+      Bolt::PlanCreator.create_plan(config.project.plans_path,
+                                    name,
+                                    is_puppet: puppet,
+                                    script: plan_script)
     end
 
     # Run a plan.
@@ -434,8 +449,7 @@ module Bolt
     # @return [Bolt::ResultSet]
     #
     def run_script(script, targets, arguments: [], env_vars: {})
-      future = executor.future&.fetch('file_paths', false)
-      script = find_file(script, future)
+      script = find_file(script)
 
       Bolt::Util.validate_file('script', script)
 
@@ -555,18 +569,18 @@ module Bolt
     # directory.
     #
     # @param path [String] The path to the file.
-    # @param future_file_paths [Boolean] Whether to use future file path behavior.
     #
-    private def find_file(path, future_file_paths)
+    private def find_file(path)
       return path if File.exist?(path) || Pathname.new(path).absolute?
       modulepath = Bolt::Config::Modulepath.new(config.modulepath)
       modules    = Bolt::Module.discover(modulepath.full_modulepath, config.project)
-      mod, file = path.split(File::SEPARATOR, 2)
+      mod, file  = path.split(File::SEPARATOR, 2)
+      future     = executor.future&.fetch('file_paths', false)
 
       if modules[mod]
         logger.debug("Did not find file at #{File.expand_path(path)}, checking in module '#{mod}'")
-        found = Bolt::Util.find_file_in_module(modules[mod].path, file || "", future_file_paths)
-        path = found.nil? ? File.join(modules[mod].path, 'files', file) : found
+        found = Bolt::Util.find_file_in_module(modules[mod].path, file || "", future)
+        path  = found.nil? ? File.join(modules[mod].path, 'files', file) : found
       end
 
       path
