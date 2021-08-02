@@ -1,0 +1,6 @@
+{
+  "implementations": [
+    {"name": "ruby_env.sh", "requirements": ["shell"]},
+    {"name": "ruby_env.ps1", "requirements": ["powershell"]}
+  ]
+}
