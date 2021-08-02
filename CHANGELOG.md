@@ -23,7 +23,7 @@
 
   Bolt now respects the `@api` tag in Puppet language plans. If the
   `@api private` tag is present, the plan will be hidden from `bolt plan
-  show` and `Get-BoltPlan` output.
+   show` and `Get-BoltPlan` output.
 
 ### Bug fixes
 
