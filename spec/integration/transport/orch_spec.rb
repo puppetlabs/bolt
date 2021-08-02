@@ -305,24 +305,65 @@ describe Bolt::Transport::Orch, orchestrator: true do
       expect(node_results[1]).to be_success
     end
 
-    it 'uses plan_task when a plan is running' do
-      plan_context = { plan_name: "foo", params: {} }
-      orch.plan_context = plan_context
+    context 'when running in a plan' do
+      let(:plan_context)      { { plan_name: "foo", params: {} } }
+      let(:mock_command_api)  { instance_double("OrchestratorClient::Client") }
 
-      mock_command_api = instance_double("OrchestratorClient::Client")
-      expect(mock_client).to receive(:command).twice.and_return(mock_command_api)
-      expect(mock_command_api).to receive(:plan_start).with(plan_context).and_return("name" => "22")
+      before :each do
+        orch.plan_context = plan_context
+      end
 
-      expect(mock_client).to receive(:run_task).with(hash_including(plan_job: "22")).and_return(results)
+      it 'uses plan_task when a plan is running' do
+        expect(mock_client).to receive(:command)
+          .twice.and_return(mock_command_api)
+        expect(mock_command_api).to receive(:plan_start)
+          .with(plan_context)
+          .and_return("name" => "22")
 
-      node_results = orch.batch_task(targets, mtask, params)
-      expect(node_results[0].value).to eq('_output' => 'hello')
-      expect(node_results[1].value).to eq('_output' => 'goodbye')
-      expect(node_results[0]).to be_success
-      expect(node_results[1]).to be_success
+        expect(mock_client).to receive(:run_task)
+          .with(hash_including(plan_job: "22"))
+          .and_return(results)
 
-      expect(mock_command_api).to receive(:plan_finish).with(plan_job: "22", result: results, status: 'success')
-      orch.finish_plan(Bolt::PlanResult.new(results, 'success'))
+        node_results = orch.batch_task(targets, mtask, params)
+        expect(node_results[0].value).to eq('_output' => 'hello')
+        expect(node_results[1].value).to eq('_output' => 'goodbye')
+        expect(node_results[0]).to be_success
+        expect(node_results[1]).to be_success
+
+        expect(mock_command_api).to receive(:plan_finish)
+          .with(plan_job: '22', result: results, status: 'success')
+        orch.finish_plan(Bolt::PlanResult.new(results, 'success'))
+      end
+
+      it 'restarts the task if it errors with plan-already-finished' do
+        expect(mock_client).to receive(:command)
+          .exactly(3).times
+          .and_return(mock_command_api)
+
+        expect(mock_command_api).to receive(:plan_start)
+          .with(plan_context)
+          .and_return({ 'name' => '22' }, { 'name' => '23' })
+
+        data = { 'kind' => 'puppetlabs.orchestrator/plan-already-finished',
+                 'msg'  => 'The plan has already finished' }
+        expect(mock_client).to receive(:run_task)
+          .with(hash_including(plan_job: '22'))
+          .and_raise(OrchestratorClient::ApiError.new(data, '500'))
+
+        expect(mock_client).to receive(:run_task)
+          .with(hash_including(plan_job: '23'))
+          .and_return(results)
+
+        node_results = orch.batch_task(targets, mtask, params)
+        expect(node_results[0].value).to eq('_output' => 'hello')
+        expect(node_results[1].value).to eq('_output' => 'goodbye')
+        expect(node_results[0]).to be_success
+        expect(node_results[1]).to be_success
+
+        expect(mock_command_api).to receive(:plan_finish)
+          .with(plan_job: '23', result: results, status: 'success')
+        orch.finish_plan(Bolt::PlanResult.new(results, 'success'))
+      end
     end
 
     it 'uses task when the plan cannot be started' do

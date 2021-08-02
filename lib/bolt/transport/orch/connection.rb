@@ -36,7 +36,8 @@ module Bolt
           end
           logger.debug("Creating orchestrator client for #{client_opts}")
           @client = OrchestratorClient.new(client_opts, true)
-          @plan_job = start_plan(plan_context)
+          @plan_context = plan_context
+          @plan_job = start_plan(@plan_context)
           logger.debug("Started plan #{@plan_job}")
           @environment = opts["task-environment"]
         end
@@ -87,6 +88,17 @@ module Bolt
         def run_task(targets, task, arguments, options)
           body = build_request(targets, task, arguments, options[:description])
           @client.run_task(body)
+        rescue OrchestratorClient::ApiError => e
+          if e.data['kind'] == 'puppetlabs.orchestrator/plan-already-finished'
+            @logger.debug("Retrying the task")
+            # Instead of recursing, just retry once
+            @plan_job = start_plan(@plan_context)
+            # Rebuild the request with the new plan job ID
+            body = build_request(targets, task, arguments, options[:description])
+            @client.run_task(body)
+          else
+            raise e
+          end
         end
 
         def query_inventory(targets)
