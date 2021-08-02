@@ -5,7 +5,7 @@
 ### New features
 
 * **Add ability for `--clear-cache` to clear plan/task metadata cache.**
- ([#2915](https://github.com/puppetlabs/bolt/issues/2915))
+  ([#2915](https://github.com/puppetlabs/bolt/issues/2915))
 
   `--clear-cache` flag now clears plan/task metadata cache.
 
