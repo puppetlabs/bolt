@@ -1,5 +1,46 @@
 # Changelog
 
+## Bolt 3.15.0 (2021-08-02)
+
+### New features
+
+* **Add ability for `--clear-cache` to clear plan/task metadata cache.**
+  ([#2915](https://github.com/puppetlabs/bolt/issues/2915))
+
+  `--clear-cache` flag now clears plan/task metadata cache.
+
+* **Support `_catch_errors` in `apply_prep`**
+  ([#2925](https://github.com/puppetlabs/bolt/issues/2925))
+
+  The `apply_prep` function now accepts the `_catch_errors` parameter.
+  Additionally, the `bolt apply` and `Invoke-BoltApply` commands set
+  `_catch_errors` to `true`, allowing an apply action to complete on as
+  many targets as possible instead of erroring if even one target fails
+  the `apply_prep` portion of the command.
+
+* **Respect `@api` tag in Puppet language plans**
+  ([#2945](https://github.com/puppetlabs/bolt/issues/2945))
+
+  Bolt now respects the `@api` tag in Puppet language plans. If the
+  `@api private` tag is present, the plan will be hidden from `bolt plan
+   show` and `Get-BoltPlan` output.
+
+### Bug fixes
+
+* **Ship with Bolt guides**
+  ([#2959](https://github.com/puppetlabs/bolt/pull/2959))
+
+  Bolt 3.14.1 neglected to updated the `bolt.gemspec` to include new
+  guide files. This updates the gemspec to include the new guide files.
+
+### Deprecations
+
+* **Deprecate `@private` tag in Puppet language plans**
+  ([#2945](https://github.com/puppetlabs/bolt/issues/2945))
+
+  The `@private` tag for Puppet language plans is deprecated. Use the
+  `@api` tag instead.
+
 ## Bolt 3.14.1 (2021-07-26)
 
 ### New features
