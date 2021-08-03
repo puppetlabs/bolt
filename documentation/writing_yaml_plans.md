@@ -69,7 +69,7 @@ Each plan name segment must begin with a lowercase letter and:
 -   Can include digits.
 -   Can include underscores.
 -   Must not be a [reserved
-    word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
+    word](https://docs.puppet.com/puppet/latest/lang_reserved.html).
 -   Must not have the same name as any Puppet data types.
 -   Namespace segments must match the following regular expression
     `\A[a-z][a-z0-9_]*\Z`
