@@ -30,7 +30,7 @@ This command outputs an array of objects. Each object uses the following keys:
   - `report` (object):
     A report from the reply. This is a serialized representation of the
     [`Puppet::Transaction::Report`
-    object](https://puppet.com/docs/puppet/7.6/format_report.html#format_report-puppet-transaction-report).
+    object](https://puppet.com/docs/puppet/latest/format_report.html#format_report-puppet-transaction-report).
 
 For example:
 
