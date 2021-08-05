@@ -369,10 +369,8 @@ the desired state for part of a target. Bolt ensures each resource is in its
 desired state. Like the steps in a `plan`, if any resource in the list fails,
 the rest are skipped.
 
-For each `resources` step, Bolt executes the `apply_prep` plan function against
-the targets specified with the `targets` field. For more information about
-`apply_prep` see the [Applying manifest blocks](applying_manifest_blocks.md#)
-section.
+> **Note:** For each `resources` step, Bolt executes the `apply_prep` plan function against the targets specified with the `targets` field.
+> For more information about `apply_prep` see the [Applying manifest blocks](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan) section.
 
 Resources steps support the following keys:
 
