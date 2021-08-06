@@ -6,7 +6,7 @@ require 'bolt/inventory'
 require 'bolt/transport/ssh/connection'
 require 'bolt_spec/errors'
 
-describe Bolt::Transport::SSH::Connection do
+describe Bolt::Transport::SSH::Connection, unless: Bolt::Util.windows? do
   include BoltSpec::Errors
 
   let(:uri) { 'ssh://foo.example.com' }
@@ -55,7 +55,7 @@ describe Bolt::Transport::SSH::Connection do
     end
   end
 
-  context "when connecting", ssh: true do
+  context "when connecting" do
     before :each do
       # We can't allow(subject) here because we rely on subject being lazily
       # instantiated so we can tweak the config per-test first.

@@ -10,9 +10,7 @@ begin
 
     desc "Run RSpec tests that do not require VM fixtures or a particular shell"
     RSpec::Core::RakeTask.new(:unit) do |t|
-      t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~winrm ' \
-                     '--tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
-                     '--tag ~omi --tag ~kerberos --tag ~lxd_remote --tag ~podman'
+      t.pattern = "spec/unit/**/*_spec.rb"
     end
 
     desc 'Run tests that require a host System Under Test configured with WinRM'
@@ -65,34 +63,25 @@ begin
   # to run. Jobs that run these tests can be viewed in .github/workflows/
   namespace :ci do
     namespace :linux do
-      # Run RSpec tests that do not require WinRM
       desc ''
-      RSpec::Core::RakeTask.new(:fast) do |t|
-        t.rspec_opts = '--tag ~winrm --tag ~lxd_transport --tag ~windows_agents --tag ~puppetserver ' \
-                       '--tag ~puppetdb --tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive ' \
-                       '--tag ~lxd_remote --tag ~podman'
-      end
-
-      # Run RSpec tests that are slow or require slow to start containers for setup
-      desc ''
-      RSpec::Core::RakeTask.new(:slow) do |t|
-        t.rspec_opts = '--tag puppetserver --tag puppetdb --tag expensive'
+      RSpec::Core::RakeTask.new(:integration) do |t|
+        t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_server/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
+        t.rspec_opts = '--tag ~winrm --tag ~lxd_transport --tag ~lxd_remote --tag ~winrm_agentless ' \
+                        '--tag ~podman --tag ~kerberos --tag ~omi --tag ~windows_agents'
       end
     end
 
     namespace :windows do
-      # Run RSpec tests that do not require Puppet Agents on Windows
       desc ''
       RSpec::Core::RakeTask.new(:agentless) do |t|
-        t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~windows_agents ' \
-                       '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb --tag ~omi ' \
-                       '--tag ~kerberos --tag ~lxd_remote --tag ~podman'
+        t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
+        t.rspec_opts = '--tag winrm_agentless'
       end
-
-      # Run RSpec tests that require Puppet Agents configured with Windows
       desc ''
-      RSpec::Core::RakeTask.new(:agentful) do |t|
-        t.rspec_opts = '--tag windows_agents'
+      RSpec::Core::RakeTask.new(:integration) do |t|
+        t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
+        t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~podman --tag ~lxd_transport --tag ~lxd_remote ' \
+                       '--tag ~docker --tag ~puppetdb --tag ~omi --tag ~winrm_agentless'
       end
     end
 

@@ -19,8 +19,8 @@ env:
   
 jobs:
 
-  agentful:
-    name: Agentful
+  integration:
+    name: Integration
     runs-on: windows-latest
     env:
       WINDOWS_AGENTS: true
@@ -50,7 +50,38 @@ jobs:
           Set-ActiveRubyFromPuppet
       - name: Run tests
         shell: powershell
-        run: bundle exec rake ci:windows:agentful
+        run: bundle exec rake ci:windows:integration
+
+  unit:
+    name: Unit
+    runs-on: windows-latest
+    env:
+      BOLT_WINDOWS: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+      - name: Update gems
+        run: bundle update
+      - name: Cache modules
+        id: modules
+        uses: actions/cache@v1
+        with:
+          path: modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
+      - name: Install modules
+        if: steps.modules.outputs.cache-hit != 'true'
+        run: bundle exec r10k puppetfile install
+      - name: Pre-test setup
+        shell: powershell
+        run: '& scripts\ci.ps1'
+      - name: Run tests
+        shell: powershell
+        run: bundle exec rake tests:unit
 
   agentless:
     name: Agentless

@@ -66,7 +66,7 @@ describe Bolt::Config do
       expect(config.modulepath).to include(*module_dirs.map { |dir| (project.path + dir).to_s })
     end
 
-    it 'modifies concurrency if ulimit is low', :ssh do
+    it 'modifies concurrency if ulimit is low', unless: Bolt::Util.windows? do
       allow(Etc).to receive(:sysconf).with(Etc::SC_OPEN_MAX).and_return(256)
       config = Bolt::Config.new(project, {})
       expect(config.modified_concurrency).to eq(true)

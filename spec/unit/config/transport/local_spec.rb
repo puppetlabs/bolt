@@ -30,7 +30,7 @@ describe Bolt::Config::Transport::Local do
     end
   end
 
-  context 'on *nix', :ssh do
+  context 'on *nix', unless: Bolt::Util.windows? do
     before(:each) do
       allow(Bolt::Util).to receive(:windows?).and_return(false)
     end
