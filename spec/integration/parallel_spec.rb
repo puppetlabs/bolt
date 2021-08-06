@@ -66,6 +66,11 @@ describe 'plans' do
 
     it "runs when provided an array with duplicate objects" do
     end
+
+    it "does not lose scope when calling an executor function from a custom Puppet language function" do
+      result = run_cli_json(%W[plan run parallel::custom_function -m #{modulepath}])
+      expect(result).to eq('localhost')
+    end
   end
 
   shared_examples "#background()" do

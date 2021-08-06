@@ -4,14 +4,19 @@ require 'fiber'
 
 module Bolt
   class PlanFuture
-    attr_reader :fiber, :id
+    attr_reader :fiber, :id, :scope
     attr_accessor :value, :plan_stack
 
-    def initialize(fiber, id, plan_id:, name: nil)
-      @fiber   = fiber
-      @id      = id
-      @name    = name
-      @value   = nil
+    def initialize(fiber, id, plan_id:, name: nil, scope: nil)
+      @fiber = fiber
+      @id    = id
+      @name  = name
+      @value = nil
+
+      # Default to Puppet's current global_scope, otherwise things will
+      # blow up when the Fiber Executor tries to override the global_scope.
+      @scope = scope || Puppet.lookup(:global_scope) { nil }
+
       # The plan invocation ID when the Future is created may be
       # different from the plan ID of the Future when we switch to it if a new
       # plan was run inside the Future, so keep track of the plans that a
