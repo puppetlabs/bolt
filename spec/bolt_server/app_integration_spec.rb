@@ -23,6 +23,10 @@ describe "BoltServer::TransportApp", puppetserver: true do
     wait_until_available(timeout: 30, interval: 1)
   end
 
+  after(:all) do
+    FileUtils.rm_rf(config_data['cache-dir'])
+  end
+
   context 'with ssh target', ssh: true do
     describe "run_task" do
       let(:path) { '/ssh/run_task' }
@@ -189,7 +193,8 @@ describe "BoltServer::TransportApp", puppetserver: true do
         }
         body = {
           versioned_project: 'bolt_server_test_project',
-          target: target
+          target: target,
+          job_id: 1
         }
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
         expect(last_response).to be_ok
@@ -213,7 +218,8 @@ describe "BoltServer::TransportApp", puppetserver: true do
         }
         body = {
           versioned_project: 'bolt_server_test_project',
-          target: target
+          target: target,
+          job_id: 1
         }
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
         expect(last_response).to be_ok
@@ -235,7 +241,8 @@ describe "BoltServer::TransportApp", puppetserver: true do
         }
         body = {
           versioned_project: 'bolt_server_test_project',
-          target: target
+          target: target,
+          job_id: 1
         }
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
         expect(last_response.status).to eq(400)
@@ -342,7 +349,8 @@ describe "BoltServer::TransportApp", puppetserver: true do
           parameters: {
             catalog: cross_platform_catalog(target[:hostname])['catalog'],
             apply_settings: {}
-          }
+          },
+          job_id: 1
         }
         post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
         expect(last_response).to be_ok

@@ -8,8 +8,12 @@
       "type": "String",
       "description": "Project from which to load code"
     },
-    "target": { "$ref": "partial:target-any" }
+    "target": { "$ref": "partial:target-any" },
+    "job_id": {
+      "type": "integer",
+      "description": "job-id associated with request"
+    }
   },
-  "required": ["target", "versioned_project"],
+  "required": ["target", "versioned_project", "job_id"],
   "additionalProperties": false
 }

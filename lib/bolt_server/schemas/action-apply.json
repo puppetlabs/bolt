@@ -5,7 +5,7 @@
   "type": "object",
   "properties": {
     "versioned_project": {
-      "type": "String",
+      "type": "string",
       "description": "Project from which to load code"
     },
     "parameters": {
@@ -21,8 +21,12 @@
         }
       }
     },
+    "job_id": {
+      "type": "integer",
+      "description": "job-id associated with request"
+    },
     "target": { "$ref": "partial:target-any" }
   },
-  "required": ["target", "versioned_project", "parameters"],
+  "required": ["target", "versioned_project", "parameters", "job_id"],
   "additionalProperties": false
 }

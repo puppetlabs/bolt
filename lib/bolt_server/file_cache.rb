@@ -183,16 +183,16 @@ module BoltServer
       end
     end
 
-    def get_cached_plugin_tarball(versioned_project, tarball_type)
+    def get_cached_project_file(versioned_project, file_name)
       file_dir = create_cache_dir(versioned_project)
-      file_path = File.join(file_dir, tarball_type)
-      File.read(file_path) if File.exist?(file_path)
+      file_path = File.join(file_dir, file_name)
+      serial_execute { File.read(file_path) if File.exist?(file_path) }
     end
 
-    def cache_plugin_tarball(versioned_project, tarball_type, tarball)
+    def cache_project_file(versioned_project, file_name, data)
       file_dir = create_cache_dir(versioned_project)
-      file_path = File.join(file_dir, tarball_type)
-      File.open(file_path, 'w') { |f| f.write(tarball) }
+      file_path = File.join(file_dir, file_name)
+      serial_execute { File.open(file_path, 'w') { |f| f.write(data) } }
     end
   end
 end

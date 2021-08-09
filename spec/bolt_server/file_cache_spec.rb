@@ -149,4 +149,23 @@ describe BoltServer::FileCache, puppetserver: true do
       file_cache
     end
   end
+
+  context "with project file caching" do
+    it 'properly manages reading and writing data from multiple threads' do
+      num_threads = 10
+      file_chars = 10000
+      file_content = 'a' * file_chars
+      threads = num_threads.times.map do |i|
+        if i.even?
+          Thread.new { file_cache.cache_project_file('foo_bar', 'baz', file_content) }
+        else
+          Thread.new { file_cache.get_cached_project_file('foo_bar', 'baz') }
+        end
+      end
+      threads.each_with_index do |t, i|
+        expected = i.even? ? file_chars : file_content
+        expect(t.join.value).to eq(expected)
+      end
+    end
+  end
 end
