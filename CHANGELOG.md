@@ -1,5 +1,35 @@
 # Changelog
 
+## Bolt 3.16.0 (2021-08-09)
+
+### New features
+
+* **Continue executing when a plan over PCP restarts the Orchestrator**
+  ([#2964](https://github.com/puppetlabs/bolt/issues/2964))
+
+  Bolt will now retry a task once when running over PCP as part of a
+  plan, if the task errors with `plan-already-finished`.
+
+### Bug fixes
+
+* **Do not remove variables from scope when using `parallelize()`**
+  ([#2889](https://github.com/puppetlabs/bolt/issues/2889))
+
+  Bolt no longer removes variables from a plan's scope when invoking
+  a custom Puppet language function that invokes a `run_*` function from
+  a `parallelize()` block. Previously, a race condition would result in
+  the current plan's variables to be removed from the plan's scope.
+
+* **Attempt to restore Ruby environment on local with bundled-ruby false**
+  ([#2922](https://github.com/puppetlabs/bolt/issues/2922))
+
+  When executing, Bolt will unset several Ruby environment variables in
+  it's own environment to avoid unexpected behavior. This can interfere
+  with running Ruby on the local transport with Bolt though. Bolt will now
+  attempt to restore Ruby environment variables like `GEM_HOME` and
+  `GEM_PATH` when running over the local transport with `bundled-ruby` set
+  to false.
+
 ## Bolt 3.15.0 (2021-08-02)
 
 ### New features
@@ -23,7 +53,7 @@
 
   Bolt now respects the `@api` tag in Puppet language plans. If the
   `@api private` tag is present, the plan will be hidden from `bolt plan
-   show` and `Get-BoltPlan` output.
+  show` and `Get-BoltPlan` output.
 
 ### Bug fixes
 
