@@ -55,3 +55,4 @@ services:
       - "8140:8140"
     volumes:
       - ./fixtures/modules:/etc/puppetlabs/code/modules
+      - ./fixtures/bolt_server/projects:/etc/puppetlabs/code/projects

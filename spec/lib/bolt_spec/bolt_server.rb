@@ -29,13 +29,14 @@ module BoltSpec
     def default_config
       spec_dir = File.join(__dir__, '..', '..')
       ssl_dir = File.join(spec_dir, 'fixtures', 'ssl')
+      basedir = File.join(__dir__, '..', '..', 'fixtures', 'bolt_server')
       {
         'ssl-cert' => File.join(ssl_dir, "cert.pem"),
         'ssl-key' => File.join(ssl_dir, "key.pem"),
         'ssl-ca-cert' => File.join(ssl_dir, "ca.pem"),
         'cache-dir' => File.join(spec_dir, "tmp", "cache"),
         'file-server-uri' => 'https://localhost:8140',
-        'projects-dir' => '/tmp/foo'
+        'projects-dir' => File.join(basedir, 'projects')
       }
     end
 

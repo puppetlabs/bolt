@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "apply request",
+  "description": "POST <transport>/apply request schema",
+  "type": "object",
+  "properties": {
+    "versioned_project": {
+      "type": "string",
+      "description": "Project from which to load code"
+    },
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "catalog": {
+          "type": "object",
+          "description": "Compiled catalog to apply"
+        },
+        "apply_options": {
+          "type": "object",
+          "description": "Options for application of a catalog"
+        }
+      }
+    },
+    "job_id": {
+      "type": "integer",
+      "description": "job-id associated with request"
+    },
+    "target": { "$ref": "partial:target-any" }
+  },
+  "required": ["target", "versioned_project", "parameters", "job_id"],
+  "additionalProperties": false
+}

@@ -43,6 +43,8 @@ module BoltServer
       transport-ssh
       transport-winrm
       connect-data
+      action-apply_prep
+      action-apply
     ].freeze
 
     # PE_BOLTLIB_PATH is intended to function exactly like the BOLTLIB_PATH used
@@ -74,6 +76,12 @@ module BoltServer
 
       # This is needed until the PAL is threadsafe.
       @pal_mutex = Mutex.new
+
+      # Avoid redundant plugin tarbal construction
+      @plugin_mutex = Mutex.new
+
+      # Avoid redundant project_task metadata construction
+      @task_metadata_mutex = Mutex.new
 
       @logger = Bolt::Logger.logger(self)
 
@@ -118,12 +126,7 @@ module BoltServer
       end
     end
 
-    def run_task(target, body)
-      validate_schema(@schemas["action-run_task"], body)
-
-      task_data = body['task']
-      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
-      parameters = body['parameters'] || {}
+    def task_helper(target, task, parameters)
       # Wrap parameters marked with '"sensitive": true' in the task metadata with a
       # Sensitive wrapper type. This way it's not shown in logs.
       if (param_spec = task.parameters)
@@ -140,6 +143,101 @@ module BoltServer
         next unless value.key?('_sensitive')
         value['_sensitive'] = value['_sensitive'].unwrap
       end
+    end
+
+    def run_task(target, body)
+      validate_schema(@schemas["action-run_task"], body)
+
+      task_data = body['task']
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      task_helper(target, task, body['parameters'] || {})
+    end
+
+    def extract_install_task(target)
+      unless target.plugin_hooks['puppet_library']['task']
+        raise BoltServer::RequestError,
+              "Target must have 'task' plugin hook"
+      end
+      install_task = target.plugin_hooks['puppet_library']['task'].split('::', 2)
+      install_task << 'init' if install_task.count == 1
+      install_task
+    end
+
+    # This helper is responsible for computing or retrieving from the cache a plugin tarball. There are
+    # two supported plugin types 'fact_plugins', and 'all_plugins'. Note that this is cached based on
+    # versioned_project as there are no plugins in the "builtin content" directory
+    def plugin_tarball(versioned_project, tarball_type)
+      tarball_types = %w[fact_plugins all_plugins]
+      unless tarball_types.include?(tarball_type)
+        raise ArgumentError,
+              "tarball_type must be one of: #{tarball_types.join(', ')}"
+      end
+      # lock this so that in the case an apply/apply_prep with multiple targets hits this endpoint
+      # the tarball computation only happens once (all the other targets will just need to read the cached data)
+      @plugin_mutex.synchronize do
+        if (tarball = @file_cache.get_cached_project_file(versioned_project, tarball_type))
+          tarball
+        else
+          new_tarball = build_project_plugins_tarball(versioned_project) do |mod|
+            search_dirs = []
+            search_dirs << mod.plugins if mod.plugins?
+            search_dirs << mod.pluginfacts if mod.pluginfacts?
+            if tarball_type == 'all_plugins'
+              search_dirs << mod.files if mod.files?
+              type_files = "#{mod.path}/types"
+              search_dirs << type_files if File.exist?(type_files)
+            end
+            search_dirs
+          end
+          @file_cache.cache_project_file(versioned_project, tarball_type, new_tarball)
+          new_tarball
+        end
+      end
+    end
+
+    # This helper is responsible for computing or retrieving task metadata for a project.
+    # It expects task name in segments and uses the combination of task name and versioned_project
+    # as a unique identifier for caching in addition to the job_id. The job id is added to protect against
+    # a case where the buildtin content is update (where the apply_helpers would be managed)
+    def project_task_metadata(versioned_project, task_name_segments, job_id)
+      cached_file_name = "#{task_name_segments.join('_')}_#{job_id}"
+      # lock this so that in the case an apply/apply_prep with multiple targets hits this endpoint the
+      # metadata computation will only be computed once, then the cache will be read.
+      @task_metadata_mutex.synchronize do
+        if (metadata = @file_cache.get_cached_project_file(versioned_project, cached_file_name))
+          JSON.parse(metadata)
+        else
+          new_metadata = in_bolt_project(versioned_project) do |context|
+            ps_parameters = {
+              'versioned_project' => versioned_project
+            }
+            pe_task_info(context[:pal], *task_name_segments, ps_parameters)
+          end
+          @file_cache.cache_project_file(versioned_project, cached_file_name, new_metadata.to_json)
+          new_metadata
+        end
+      end
+    end
+
+    def apply_prep(target, body)
+      validate_schema(@schemas["action-apply_prep"], body)
+      plugins_tarball = plugin_tarball(body['versioned_project'], 'fact_plugins')
+      install_task_segments = extract_install_task(target.first)
+      task_data = project_task_metadata(body['versioned_project'], install_task_segments, body["job_id"])
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      install_task_result = task_helper(target, task, target.first.plugin_hooks['puppet_library']['parameters'] || {})
+      return install_task_result unless install_task_result.ok
+      task_data = project_task_metadata(body['versioned_project'], %w[apply_helpers custom_facts], body["job_id"])
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      task_helper(target, task, { 'plugins' => plugins_tarball })
+    end
+
+    def apply(target, body)
+      validate_schema(@schemas["action-apply"], body)
+      plugins_tarball = plugin_tarball(body['versioned_project'], 'all_plugins')
+      task_data = project_task_metadata(body['versioned_project'], %w[apply_helpers apply_catalog], body["job_id"])
+      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
+      task_helper(target, task, body['parameters'].merge({ 'plugins' => plugins_tarball }))
     end
 
     def run_command(target, body)
@@ -476,6 +574,8 @@ module BoltServer
       run_task
       run_script
       upload_file
+      apply
+      apply_prep
     ].freeze
 
     def make_ssh_target(target_hash)
@@ -499,7 +599,8 @@ module BoltServer
         'config' => {
           'transport' => 'ssh',
           'ssh' => opts.slice(*Bolt::Config::Transport::SSH.options)
-        }
+        },
+        'plugin_hooks' => target_hash['plugin_hooks']
       }
 
       inventory = Bolt::Inventory.empty
@@ -537,7 +638,8 @@ module BoltServer
         'config' => {
           'transport' => 'winrm',
           'winrm' => opts.slice(*Bolt::Config::Transport::WinRM.options)
-        }
+        },
+        'plugin_hooks' => target_hash['plugin_hooks']
       }
 
       inventory = Bolt::Inventory.empty
@@ -756,12 +858,7 @@ module BoltServer
       raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       content_type :json
 
-      plugins_tarball = build_project_plugins_tarball(params['versioned_project']) do |mod|
-        search_dirs = []
-        search_dirs << mod.plugins if mod.plugins?
-        search_dirs << mod.pluginfacts if mod.pluginfacts?
-        search_dirs
-      end
+      plugins_tarball = plugin_tarball(params['versioned_project'], 'fact_plugins')
 
       [200, plugins_tarball.to_json]
     end
@@ -773,15 +870,7 @@ module BoltServer
       raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
       content_type :json
 
-      plugins_tarball = build_project_plugins_tarball(params['versioned_project']) do |mod|
-        search_dirs = []
-        search_dirs << mod.plugins if mod.plugins?
-        search_dirs << mod.pluginfacts if mod.pluginfacts?
-        search_dirs << mod.files if mod.files?
-        type_files = "#{mod.path}/types"
-        search_dirs << type_files if File.exist?(type_files)
-        search_dirs
-      end
+      plugins_tarball = plugin_tarball(params['versioned_project'], 'all_plugins')
 
       [200, plugins_tarball.to_json]
     end

@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "title": "apply_prep request",
+  "description": "POST <transport>/apply_prep request schema",
+  "type": "object",
+  "properties": {
+    "versioned_project": {
+      "type": "String",
+      "description": "Project from which to load code"
+    },
+    "target": { "$ref": "partial:target-any" },
+    "job_id": {
+      "type": "integer",
+      "description": "job-id associated with request"
+    }
+  },
+  "required": ["target", "versioned_project", "job_id"],
+  "additionalProperties": false
+}
