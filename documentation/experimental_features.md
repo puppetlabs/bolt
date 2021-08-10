@@ -344,7 +344,7 @@ out::message($result)
 Similarly, using `wait()`:
 ```
 $ts = get_targets($targets)
-$futures = $ts.each |$target| {
+$futures = $ts.map |$target| {
   background() || {
     if $target.name == 'target1' {
       return "Don't run the task on this target"
