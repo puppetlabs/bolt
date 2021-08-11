@@ -147,14 +147,21 @@ module Bolt
           type: Hash,
           properties: {
             "file_paths" => {
-              description: "Load scripts from the `scripts/` directory of a module",
+              description: "Load scripts from the `scripts/` directory of a module.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false
+            },
+            "script_interpreter" => {
+              description: "Use a target's [`interpreters` configuration](bolt_transports_reference.md#interpreters) "\
+                           "when running a script.",
               type: [TrueClass, FalseClass],
               _example: true,
               _default: false
             }
           },
           _plugin: false,
-          _example: { 'file_paths' => true }
+          _example: { 'file_paths' => true, 'script_interpreter' => true }
         },
         "hiera-config" => {
           description: "The path to the Hiera configuration file.",

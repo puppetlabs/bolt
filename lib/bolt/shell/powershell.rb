@@ -212,7 +212,14 @@ module Bolt
                     elsif powershell_file?(script_path)
                       Snippets.run_script(arguments, script_path)
                     else
-                      path, args = *process_from_extension(script_path)
+                      interpreter = select_interpreter(script_path, target.options['interpreters'])
+                      if options[:script_interpreter] && interpreter
+                        path = interpreter
+                        args = escape_arguments([script_path])
+                        logger.trace("Running '#{script_path}' using '#{interpreter}' interpreter")
+                      else
+                        path, args = *process_from_extension(script_path)
+                      end
                       args += escape_arguments(arguments)
                       execute_process(path, args)
                     end

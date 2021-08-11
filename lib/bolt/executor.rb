@@ -300,6 +300,9 @@ module Bolt
       description = options.fetch(:description, "script #{script}")
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)
+        options[:script_interpreter] = (future || {}).fetch('script_interpreter', false)
+
+        @analytics&.event('Future', 'script_interpreter', label: options[:script_interpreter].to_s)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running script #{script} with '#{arguments.to_json}'", batch) do
