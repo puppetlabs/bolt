@@ -97,20 +97,34 @@ module Bolt
           end
         end
 
-        return if unsatisfied_specs.empty?
-
+        versionless_mods = @modules.select { |mod| mod.is_a?(ForgeModule) && mod.version.nil? }
         command = Bolt::Util.windows? ? 'Install-BoltModule -Force' : 'bolt module install --force'
 
-        message = <<~MESSAGE.chomp
-          Puppetfile does not include modules that satisfy the following specifications:
+        if unsatisfied_specs.any?
+          message = <<~MESSAGE.chomp
+            Puppetfile does not include modules that satisfy the following specifications:
 
-          #{unsatisfied_specs.map(&:to_hash).to_yaml.lines.drop(1).join.chomp}
-          
-          This Puppetfile might not be managed by Bolt. To forcibly overwrite the
-          Puppetfile, run '#{command}'.
-        MESSAGE
+            #{unsatisfied_specs.map(&:to_hash).to_yaml.lines.drop(1).join.chomp}
+            
+            This Puppetfile might not be managed by Bolt. To forcibly overwrite the
+            Puppetfile, run '#{command}'.
+          MESSAGE
 
-        raise Bolt::Error.new(message, 'bolt/missing-module-specs')
+          raise Bolt::Error.new(message, 'bolt/missing-module-specs')
+        end
+
+        if versionless_mods.any?
+          message = <<~MESSAGE.chomp
+            Puppetfile includes Forge modules without a version requirement:
+            
+            #{versionless_mods.map(&:to_spec).join.chomp}
+            
+            This Puppetfile might not be managed by Bolt. To forcibly overwrite the
+            Puppetfile, run '#{command}'.
+          MESSAGE
+
+          raise Bolt::Error.new(message, 'bolt/missing-module-version-specs')
+        end
       end
     end
   end
