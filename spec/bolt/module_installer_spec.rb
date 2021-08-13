@@ -54,6 +54,16 @@ describe Bolt::ModuleInstaller do
       )
     end
 
+    it 'errors if module is already in puppetfile without version' do
+      File.write(puppetfile, "mod '#{new_module}'")
+      expect {
+        installer.add(new_module, [], puppetfile, moduledir, project_file, install_config)
+      }.to raise_error(
+        Bolt::Error,
+        /Puppetfile includes Forge modules without a version/
+      )
+    end
+
     it 'updates files and installs modules' do
       expect(installer).to receive(:install_puppetfile)
       installer.add(new_module, specs, puppetfile, moduledir, project_file, install_config)

@@ -112,5 +112,21 @@ describe Bolt::ModuleInstaller::Puppetfile do
         )
       end
     end
+
+    context 'with missing module version' do
+      let(:spec)    { double('spec', satisfied_by?: true) }
+      let(:version) { nil }
+
+      let(:mod) do
+        [double('mod', name: name, version: version, is_a?: true, to_spec: "mod '#{name}'")]
+      end
+
+      it "errors" do
+        expect { puppetfile.assert_satisfies(specs) }.to raise_error(
+          Bolt::Error,
+          /Puppetfile includes Forge modules without a version/
+        )
+      end
+    end
   end
 end
