@@ -1,5 +1,22 @@
 # Changelog
 
+## Bolt 3.16.1 (2021-08-16)
+
+### Bug fixes
+
+* **Handle empty response bodies in `http_request` task**
+  [(#2984)](https://github.com/puppetlabs/bolt/pull/2984)
+
+  The `http_request` task no longer errors when a response does not
+  include a body.
+
+* **Fix stacktrace for conflicting `module add` and Puppetfile**
+  [(#2966)](https://github.com/puppetlabs/bolt/issues/2966)
+
+  When a project's `Puppetfile` has a forge module without a version specified,
+  Bolt now offers a more helpful error when attempting to do a `module install/add` of
+  the same module.
+
 ## Bolt 3.16.0 (2021-08-09)
 
 ### New features
