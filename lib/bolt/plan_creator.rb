@@ -7,7 +7,7 @@ require 'bolt/util'
 
 module Bolt
   module PlanCreator
-    def self.validate_input(project, plan_name)
+    def self.validate_plan_name(project, plan_name)
       if project.name.nil?
         raise Bolt::Error.new(
           "Project directory '#{project.path}' is not a named project. Unable to create "\
@@ -51,7 +51,15 @@ module Bolt
       end
     end
 
-    def self.create_plan(plans_path, plan_name, is_puppet)
+    # Create a new plan from the plan templates based on which language the
+    # user configured, and whether the plan wraps a script.
+    #
+    # @param plans_path [string] The path to the new plan
+    # @param plan_name [string] The name of the new plan
+    # @param is_puppet [boolean] Whether to create a Puppet language plan
+    # @param script [string] A reference to a script for the new plan to run
+    #
+    def self.create_plan(plans_path, plan_name, is_puppet: false, script: nil)
       _, name_segments, basename = segment_plan_name(plan_name)
       dir_path = plans_path.join(*name_segments)
 
@@ -66,8 +74,15 @@ module Bolt
 
       type = is_puppet ? 'pp' : 'yaml'
       plan_path = dir_path + "#{basename}.#{type}"
-      plan_template = is_puppet ? puppet_plan(plan_name) : yaml_plan(plan_name)
-
+      plan_template = if is_puppet && script
+                        puppet_script_plan(plan_name, script)
+                      elsif is_puppet
+                        puppet_plan(plan_name)
+                      elsif script
+                        yaml_script_plan(script)
+                      else
+                        yaml_plan(plan_name)
+                      end
       begin
         File.write(plan_path, plan_template)
       rescue Errno::EACCES => e
@@ -90,7 +105,11 @@ module Bolt
       [prefix, name_segments, basename]
     end
 
-    def self.yaml_plan(plan_name)
+    # Template for a new simple YAML plan.
+    #
+    # @param plan_name [string] The name of the new plan
+    #
+    private_class_method def self.yaml_plan(plan_name)
       <<~YAML
         # This is the structure of a simple plan. To learn more about writing
         # YAML plans, see the documentation: http://pup.pt/bolt-yaml-plans
@@ -119,7 +138,42 @@ module Bolt
       YAML
     end
 
-    def self.puppet_plan(plan_name)
+    # Template for a new YAML plan that runs a script.
+    #
+    # @param script [string] A reference to the script to run.
+    #
+    private_class_method def self.yaml_script_plan(script)
+      <<~YAML
+        # This is the structure of a simple plan. To learn more about writing
+        # YAML plans, see the documentation: http://pup.pt/bolt-yaml-plans
+        
+        # The description sets the description of the plan that will appear
+        # in 'bolt plan show' output.
+        description: A plan created with bolt plan new
+
+        # The parameters key defines the parameters that can be passed to
+        # the plan.
+        parameters:
+          targets:
+            type: TargetSpec
+            description: A list of targets to run actions on
+
+        # The steps key defines the actions the plan will take in order.
+        steps:
+          - name: run_script
+            script: #{script}
+            targets: $targets
+
+        # The return key sets the return value of the plan.
+        return: $run_script
+      YAML
+    end
+
+    # Template for a new simple Puppet plan.
+    #
+    # @param plan_name [string] The name of the new plan
+    #
+    private_class_method def self.puppet_plan(plan_name)
       <<~PUPPET
         # This is the structure of a simple plan. To learn more about writing
         # Puppet plans, see the documentation: http://pup.pt/bolt-puppet-plans
@@ -135,6 +189,29 @@ module Bolt
           out::message("Hello from #{plan_name}")
           $command_result = run_command('whoami', $targets)
           return $command_result
+        }
+      PUPPET
+    end
+
+    # Template for a new Puppet plan that only runs a script.
+    #
+    # @param plan_name [string] The name of the new plan
+    # @param script [string] A reference to the script to run
+    #
+    private_class_method def self.puppet_script_plan(plan_name, script)
+      <<~PUPPET
+        # This is the structure of a simple plan. To learn more about writing
+        # Puppet plans, see the documentation: http://pup.pt/bolt-puppet-plans
+
+        # The summary sets the description of the plan that will appear
+        # in 'bolt plan show' output. Bolt uses puppet-strings to parse the
+        # summary and parameters from the plan.
+        # @summary A plan created with bolt plan new.
+        # @param targets The targets to run on.
+        plan #{plan_name} (
+          TargetSpec $targets
+        ) {
+          return run_script('#{script}', $targets)
         }
       PUPPET
     end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt/application'
+require 'bolt/plan_creator'
 
 require 'bolt_spec/files'
 
@@ -153,6 +154,16 @@ describe Bolt::Application do
     it 'defaults to showing all targets' do
       expect(inventory).to receive(:get_targets).with(['all']).and_return([target])
       application.show_inventory(nil)
+    end
+  end
+
+  describe "#new_plan" do
+    let(:config) { double(future: {}, project: nil) }
+
+    it 'errors if provided a script and future.file_paths is not set' do
+      allow(Bolt::PlanCreator).to receive(:validate_plan_name)
+      expect { application.new_plan('planplanplan', plan_script: 'scriptscriptscript') }
+        .to raise_error(Bolt::CLIError, /The --script flag can only be used if future.file_paths/)
     end
   end
 

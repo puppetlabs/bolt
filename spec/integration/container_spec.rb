@@ -6,7 +6,7 @@ require 'bolt_spec/files'
 require 'bolt_spec/integration'
 require 'bolt_spec/project'
 
-describe 'plans' do
+describe 'plans', bash: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration

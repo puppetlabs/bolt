@@ -155,6 +155,31 @@ describe 'parser' do
       end
     end
 
+    describe '--script' do
+      it 'errors with a relative path' do
+        # This path is specifically structured so that it *won't* be caught by
+        # verifying `scripts` is the second segment of the path.
+        expect { parser.permute(%w[--script ./scripts/ci.ps1]) }
+          .to raise_error(Bolt::CLIError, /The script must be a detailed Puppet file ref/)
+      end
+
+      it 'errors with an absolute path' do
+        path = File.expand_path('./scripts/ci.ps1')
+        expect { parser.permute(%W[--script #{path}]) }
+          .to raise_error(Bolt::CLIError, /The script must be a detailed Puppet file ref/)
+      end
+
+      it 'errors with a nonspecific Puppet file reference' do
+        expect { parser.permute(%w[--script mymodule/myfile]) }
+          .to raise_error(Bolt::CLIError, /The script must be a detailed Puppet file ref/)
+      end
+
+      it 'accepts a Puppet file reference to the scripts directory' do
+        parser.permute(%w[--script mymodule/scripts/myscript.sh])
+        expect(options[:plan_script]).to eq('mymodule/scripts/myscript.sh')
+      end
+    end
+
     describe '--sudo-password-prompt' do
       it 'prompts for a password' do
         allow($stdin).to receive(:noecho).and_return('opensesame')

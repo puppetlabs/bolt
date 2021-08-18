@@ -20,7 +20,6 @@ require 'bolt/logger'
 require 'bolt/module_installer'
 require 'bolt/outputter'
 require 'bolt/pal'
-require 'bolt/plan_creator'
 require 'bolt/plugin'
 require 'bolt/project_manager'
 require 'bolt/puppetdb'
@@ -611,7 +610,7 @@ module Bolt
           app.convert_plan(options[:object])
           SUCCESS
         when 'new'
-          result = app.new_plan(options[:object], **options.slice(:puppet))
+          result = app.new_plan(options[:object], **options.slice(:puppet, :plan_script))
           outputter.print_new_plan(**result)
           SUCCESS
         when 'run'
