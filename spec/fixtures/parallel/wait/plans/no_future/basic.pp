@@ -8,16 +8,16 @@ plan wait::no_future::basic(
   $msgs.each |$msg| {
     background($msg) || {
       if $msg =~ /Run immediately/ {
-          return $msg
+        return $msg
       } else {
         # Include a sleep to ensure that this does some "work" before returning
-        run_command("sleep 0.1", $targets)
+        ctrl::sleep(0.1)
         return $msg
       }
     }
   }
   # Give the first Future a chance to run
-  run_command('hostname', $targets)
+  ctrl::sleep(1)
   # Wait for messages
   return wait()
 }
