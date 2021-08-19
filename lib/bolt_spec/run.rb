@@ -171,7 +171,7 @@ module BoltSpec
       end
 
       def plugins
-        @plugins ||= Bolt::Plugin.setup(config, pal)
+        @plugins ||= Bolt::Plugin.new(config, pal)
       end
 
       def puppetdb_client

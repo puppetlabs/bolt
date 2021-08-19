@@ -20,7 +20,7 @@ describe Bolt::Transport::Orch, orchestrator: true do
   let(:transport)   { 'pcp' }
   let(:hostname)    { 'localhost' }
   let(:config)      { Bolt::Config.default }
-  let(:plugins)     { Bolt::Plugin.setup(config, nil) }
+  let(:plugins)     { Bolt::Plugin.new(config, nil) }
   let(:inv_data)    {
     { 'config' => {
       'pcp' => {

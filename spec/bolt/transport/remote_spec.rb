@@ -8,7 +8,7 @@ require 'bolt/plugin'
 
 describe Bolt::Transport::Remote do
   let(:config) { Bolt::Config.default }
-  let(:plugins) { Bolt::Plugin.setup(config, nil) }
+  let(:plugins) { Bolt::Plugin.new(config, nil) }
   let(:data) {
     {
       'targets' => [

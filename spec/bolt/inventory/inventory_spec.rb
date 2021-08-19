@@ -17,7 +17,7 @@ describe Bolt::Inventory::Inventory do
 
   let(:pal)          { nil }
   let(:config)       { make_config }
-  let(:plugins)      { Bolt::Plugin.setup(config, pal) }
+  let(:plugins)      { Bolt::Plugin.new(config, pal) }
   let(:target_name)  { "example.com" }
   let(:target_entry) { target_name }
   let(:targets)      { [target_entry] }
@@ -1219,7 +1219,7 @@ describe Bolt::Inventory::Inventory do
     }
 
     let(:plugins) do
-      plugins = Bolt::Plugin.setup(config, pal)
+      plugins = Bolt::Plugin.new(config, pal)
       plugin = double('plugin')
       allow(plugin).to receive(:name).and_return('test_plugin')
       allow(plugin).to receive(:hooks).and_return([:resolve_reference])

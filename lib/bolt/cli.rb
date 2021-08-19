@@ -434,7 +434,7 @@ module Bolt
             config.project
           )
 
-          plugins = Bolt::Plugin.setup(config, pal, analytics)
+          plugins = Bolt::Plugin.new(config, pal, analytics)
 
           inventory = Bolt::Inventory.from_config(config, plugins)
 

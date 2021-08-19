@@ -119,7 +119,7 @@ module Bolt
 
     def self.empty
       config  = Bolt::Config.default
-      plugins = Bolt::Plugin.setup(config, nil)
+      plugins = Bolt::Plugin.new(config, nil)
 
       create_version({}, config.transport, config.transports, plugins, nil)
     end

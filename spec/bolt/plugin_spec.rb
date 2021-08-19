@@ -19,7 +19,7 @@ describe Bolt::Plugin do
   let(:config_data)   { { 'modulepath' => modulepath, 'plugins' => plugin_config } }
   let(:config)        { make_config(config_data) }
   let(:pal)           { make_pal(modulepath) }
-  let(:plugins)       { Bolt::Plugin.setup(config, pal) }
+  let(:plugins)       { Bolt::Plugin.new(config, pal) }
 
   def identity(value, cache = nil)
     plugin = {
@@ -76,13 +76,15 @@ describe Bolt::Plugin do
 
     it 'fails if a plugin depends on itself' do
       plugin_config.replace('identity' => { 'foo' => identity('bar') })
-      expect { plugins }.to raise_error(/Configuration for plugin 'identity' depends on the plugin itself/)
+      expect { plugins.by_name('identity') }
+        .to raise_error(/Configuration for plugin 'identity' depends on the plugin itself/)
     end
 
     it 'fails if an indirect plugin dependency cycle is found' do
       plugin_config.replace('pkcs7' => { 'keysize' => identity(1024) },
                             'identity' => { 'foo' => { '_plugin' => 'pkcs7' } })
-      expect { plugins }.to raise_error(/Configuration for plugin 'pkcs7' depends on the plugin itself/)
+      expect { plugins.by_name('pkcs7') }
+        .to raise_error(/Configuration for plugin 'pkcs7' depends on the plugin itself/)
     end
   end
 
@@ -121,7 +123,7 @@ describe Bolt::Plugin do
   end
 
   context 'plugin loading is disabled' do
-    let(:plugins) { Bolt::Plugin.setup(config, pal, load_plugins: false) }
+    let(:plugins) { Bolt::Plugin.new(config, pal, load_plugins: false) }
 
     it 'raises a plugin-loading-disabled error if it attempts to load a Ruby plugin' do
       expect { plugins.by_name('env_var') }.to raise_error(

@@ -12,7 +12,7 @@ describe 'resolve_references' do
                   config.hiera_config,
                   config.project.resource_types)
   }
-  let(:plugins)       { Bolt::Plugin.setup(config, pal) }
+  let(:plugins)       { Bolt::Plugin.new(config, pal) }
   let(:executor)      { Bolt::Executor.new }
   let(:inventory)     { Bolt::Inventory.create_version({}, config.transport, config.transports, plugins) }
   let(:tasks_enabled) { true }

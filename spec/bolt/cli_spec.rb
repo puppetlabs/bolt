@@ -33,7 +33,7 @@ describe Bolt::CLI do
     allow(Bolt::Inventory).to receive(:from_config).and_return(inventory)
     allow(Bolt::Outputter).to receive(:for_format).and_return(outputter)
     allow(Bolt::PAL).to receive(:new).and_return(pal)
-    allow(Bolt::Plugin).to receive(:setup).and_return(plugin)
+    allow(Bolt::Plugin).to receive(:new).and_return(plugin)
     allow(Bolt::Project).to receive(:create_project).and_return(project)
     allow(Bolt::Rerun).to receive(:new).and_return(rerun)
 
