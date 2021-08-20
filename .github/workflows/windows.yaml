@@ -19,6 +19,14 @@ env:
   
 jobs:
 
+  ngen:
+    name: ngen
+    runs-on: windows-latest
+    steps:
+      - name: ngen
+        shell: powershell
+        run: '& scripts\ngen.ps1'
+
   agentful:
     name: Agentful
     runs-on: windows-latest
@@ -79,6 +87,9 @@ jobs:
       - name: Pre-test setup
         shell: powershell
         run: '& scripts\ci.ps1'
+      - name: ngen
+        shell: powershell
+        run: '& scripts\ngen.ps1'
       - name: Run tests
         shell: powershell
         run: bundle exec rake ci:windows:agentless
