@@ -41,15 +41,6 @@ test_name "bolt task run should execute tasks on localhost via local transport" 
       FILE
     end
 
-    step "create ruby_env task on bolt controller" do
-      # Still -p; can never be too careful
-      on(bolt, "mkdir -p #{dir}/modules/test/tasks")
-      create_remote_file(bolt, "#{dir}/modules/test/tasks/ruby_env.sh", <<-FILE)
-      #!/bin/sh
-      echo $GEM_PATH
-      FILE
-    end
-
     step "execute `bolt task run test::whoami_nix` on localhost via local transport" do
       bolt_command = "bolt task run test::whoami_nix greetings=hello"
       flags = {
@@ -61,18 +52,6 @@ test_name "bolt task run should execute tasks on localhost via local transport" 
       message = "Unexpected output from the command:\n#{result.cmd}"
       regex = /hello from root/
       assert_match(regex, result.stdout, message)
-    end
-
-    step "execute `bolt task run test::ruby_env` on localhost via local transport" do
-      bolt_command = "GEM_PATH=$(gem env GEM_PATHS) bolt task run test::ruby_env"
-      flags = {
-        '--targets' => 'localhost',
-        '--modulepath' => "#{dir}/modules"
-      }
-
-      result = bolt_command_on(bolt, bolt_command, flags)
-      message = "Unexpected output from the command:\n#{result.cmd}"
-      assert_match(on(bolt, 'gem env GEM_PATHS').stdout, result.stdout, message)
     end
 
     step "execute `bolt task run` on localhost via local transport with run-as" do
