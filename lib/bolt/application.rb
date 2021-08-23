@@ -89,7 +89,7 @@ module Bolt
     # @param env_vars [Hash] Environment variables to set on the target.
     # @return [Bolt::ResultSet]
     #
-    def run_command(command, targets, env_vars: {})
+    def run_command(command, targets, env_vars: nil)
       targets = inventory.get_targets(targets)
 
       with_benchmark do
@@ -448,7 +448,7 @@ module Bolt
     # @param env_vars [Hash] Environment variables to set on the target.
     # @return [Bolt::ResultSet]
     #
-    def run_script(script, targets, arguments: [], env_vars: {})
+    def run_script(script, targets, arguments: [], env_vars: nil)
       script = find_file(script)
 
       Bolt::Util.validate_file('script', script)
