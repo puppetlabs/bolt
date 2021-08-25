@@ -540,7 +540,7 @@ describe 'apply', expensive: true do
     end
   end
 
-  describe 'over winrm on Windows with Puppet Agents', windows_agents: true do
+  describe 'over winrm on Windows with Puppet Agents', winrm: true do
     around(:each) do |example|
       with_project(config: project_config, inventory: conn_inventory) do |project|
         @project = project

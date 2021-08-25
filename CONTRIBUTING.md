@@ -157,36 +157,6 @@ the root of the Bolt repo:
 docker-compose -f spec/docker-compose.yml up -d --build
 ```
 
-### Provisioning for LXD tests
-
-If you're running on a Debian-flavor of Linux, you can most likely install LXD directly and use the
-configuration at `spec/lxd_config.yaml` to create LXD containers to test against, like so:
-
-```
-sudo snap install -y lxd
-# This makes the LXD group the owner of the current process, which ensures you can connect to
-# containers without sudo
-sg lxd
-cat spec/lxd_config.yaml | lxd init --preseed
-lxc launch ubuntu:focal testlxd
-```
-
-If you're not running Debian-flavored Linux (or if you'd just prefer to run LXD in a VM) you can use
-the LXD VM specified in the Vagrantfile like so:
-```
-vagrant up lxd
-vagrant ssh lxd
-cd bolt/
-bundle config set --local path 'vendor/bundle'
-bundle exec rspec path/to/tests
-```
-The VM mounts the current Bolt directory to the VM at `/home/bolt/bolt`. Any changes you make
-locally will be synced to the VM automatically. This is an excellent way to test the LXD transport
-without installing LXD locally.
-
-**NOTE:** Ensure that you have Ruby 2.7 installed locally, and rubygems installed to
-`vendor/bundle/ruby/2.7.0`.
-
 ### Provisioning for Windows tests
 For Windows tests, execute `vagrant up` from the root of the Bolt repo to bring these up with the
 provided Vagrantfile. Any tests that require this are tagged with `:winrm` or `:ssh` in rspec.

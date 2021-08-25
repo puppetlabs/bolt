@@ -90,9 +90,9 @@ This environment is intended to support multiple environments:
 
 #### Container Setup
 
-The current `spec/docker-compose.yml` supports a number of containers, many of which are intended to be built when started. For Kerberos, build / start just the relevant containers:
+The current `dev-resources/windows-kerberos/docker-compose.yml` supports a number of containers, many of which are intended to be built when started. For Kerberos, build / start just the relevant containers:
 
-`docker-compose -f spec/docker-compose.yml up -d --build samba-ad omiserver`
+`docker-compose -f dev-resources/windows-kerberos/docker-compose.yml up -d --build samba-ad omiserver`
 
 ##### Samba AD (KDC)
 
@@ -123,7 +123,7 @@ This container provides DNS and LDAP support, but does not contain NTP as that i
 
 To access the shell, use `/bin/sh` like:
 
-> docker-compose -f spec/docker-compose.yml exec samba-ad /bin/sh
+> docker-compose -f dev-resources/windows-kerberos/docker-compose.yml exec samba-ad /bin/sh
 
 Useful tooling on the instance for managing Active Directory includes:
 
@@ -151,7 +151,7 @@ The container performs a basic validation using `getent passwd administrator@BOL
 
 To access the shell, use `/bin/bash` like:
 
-> docker-compose -f spec/docker-compose.yml exec omiserver /bin/bash
+> docker-compose -f dev-resources/windows-kerberos/docker-compose.yml exec omiserver /bin/bash
 
 Useful tooling on the instance includes:
 
@@ -161,18 +161,6 @@ Useful tooling on the instance includes:
 * [`net`](https://www.samba.org/samba/docs/current/man-html/net.8.html) - designed to work like the `net` tool on Windows
 * [`pwsh`](https://docs.microsoft.com/en-us/powershell/scripting/install/installing-powershell-core-on-linux?view=powershell-6) - PowerShell 6
 * [`omicli`](https://github.com/microsoft/omi/blob/master/Unix/cli/examples.txt) - client tool used to verify basic OMI server functionality
-
-#### GitHub Actions automated testing
-
-At present, GitHub Actions setup will:
-
-* Ensure that it can refer to itself as `samba-ad.bolt.test` and `omiserver.bolt.test` (the same name that the containers refer to themselves inside the Docker UDN)
-* Install the Kerberos client package
-* Configure the Kerberos client with the approriate server (`samba-ad.bolt.test`) for the realm `BOLT.TEST`
-
-Automated tests (in `spec/bolt/transport/winrm_spec.rb`) verify that the correct TGT (ticket granting ticket) can be acquired from the Samba AD using `kinit` using the domain administrator account `Administrator@BOLT.TEST`.
-
-Despite having a correctly setup environment where OMI server can authenticate against Active Directory with Kerberos, the relevant tests are still marked pending due to a bug in interoperability between the winrm gem and OMI server. [BOLT-1476](https://tickets.puppetlabs.com/browse/BOLT-1476) captures the work remaining to get the tests passing.
 
 #### Local development
 
@@ -194,7 +182,7 @@ If the Powershell cmdlets [Invoke-Command](https://docs.microsoft.com/en-us/powe
 
 ###### Linux
 
-Use the script `spec/fixtures/samba-ad/kerberos-client.config.sh` to generate a `krb5.conf`, which expects the environment variables:
+Use the script `dev-resources/windows-kerberos/fixtures/samba-ad/kerberos-client.config.sh` to generate a `krb5.conf`, which expects the environment variables:
 
 * `KRB5_CONFIG` - optionally used by Kerberos itself to find the config file. Set to a different path like `/tmp/krb5.conf` to not modify the default existing `/etc/krb5.conf` should it already exist
 * `KRB5_REALM` - should be set to `BOLT.TEST`
@@ -203,7 +191,7 @@ Use the script `spec/fixtures/samba-ad/kerberos-client.config.sh` to generate a 
 
 ###### OSX
 
-OSX is slightly different since Docker network ports are not available over UDP. Rather than using the helper script, a sample configuration file is provided at `spec/fixtures/samba-ad/krb5.osx.conf` that forces Kerberos to use only TCP.
+OSX is slightly different since Docker network ports are not available over UDP. Rather than using the helper script, a sample configuration file is provided at `dev-resources/windows-kerberos/fixtures/samba-ad/krb5.osx.conf` that forces Kerberos to use only TCP.
 
 ##### Validation
 
@@ -221,8 +209,8 @@ To remove the ticket, use:
 
 When debugging interoperability problems between the winrm gem and OMI server, it might be necessary to build OMI server from source, rather than consuming packages. This makes it easy to modify OMI server code, rebuild and start using it immediately. When starting the containers, add the build arg `BUILD_OMI=true` like:
 
-> docker-compose -f spec/docker-compose.yml build --build-arg BUILD_OMI=true samba-ad omiserver
-> docker-compose -f spec/docker-compose.yml up -d --build samba-ad omiserver
+> docker-compose -f dev-resources/windows-kerberos/docker-compose.yml build --build-arg BUILD_OMI=true samba-ad omiserver
+> docker-compose -f dev-resources/windows-kerberos/docker-compose.yml up -d --build samba-ad omiserver
 
 This will:
 
@@ -248,10 +236,10 @@ In some cases, OMI server source has to be modified to increase log output, in a
 
 #### Bolt Development Environment
 
-In addition to building OMI from source, it can be useful to run the Bolt source from a Linux agent to iterate on Bolt itself. To really vet Kerberos, this should be performed on a separate container image from the Samba Active Directory controller or the OMI server. This new dev container is defined in `spec/docker-compose-dev.yml` and can be built in addition to the other relevant containers by running `docker-compose`:
+In addition to building OMI from source, it can be useful to run the Bolt source from a Linux agent to iterate on Bolt itself. To really vet Kerberos, this should be performed on a separate container image from the Samba Active Directory controller or the OMI server. This new dev container is defined in `dev-resources/windows-kerberos/docker-compose-dev.yml` and can be built in addition to the other relevant containers by running `docker-compose`:
 
-> docker-compose -f spec/docker-compose.yml -f spec/docker-compose-dev.yml build --build-arg BUILD_OMI=true samba-ad omiserver linuxdev
-> docker-compose -f spec/docker-compose.yml -f spec/docker-compose-dev.yml up samba-ad omiserver linuxdev
+> docker-compose -f dev-resources/windows-kerberos/docker-compose.yml build --build-arg BUILD_OMI=true samba-ad omiserver linuxdev
+> docker-compose -f dev-resources/windows-kerberos/docker-compose.yml up samba-ad omiserver linuxdev
 
 This will:
 
