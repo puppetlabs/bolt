@@ -75,12 +75,6 @@ module Bolt
         end
       end
 
-      # Validates the inventory.
-      #
-      def validate
-        groups.validate
-      end
-
       def group_names_for(target_name)
         group_data_for(target_name).fetch('groups', [])
       end

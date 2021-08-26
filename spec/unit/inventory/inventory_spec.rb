@@ -162,38 +162,6 @@ describe Bolt::Inventory::Inventory do
       }
     }
 
-    describe :validate do
-      it 'accepts empty inventory' do
-        expect(Bolt::Inventory::Inventory.new({}, transport, transports, plugins).validate).to be_nil
-      end
-
-      it 'accepts non-empty inventory' do
-        expect(Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate).to be_nil
-      end
-
-      it 'fails with unnamed groups' do
-        data = { 'groups' => [{}] }
-        expect {
-          Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate
-        }.to raise_error(Bolt::Inventory::ValidationError, /Group does not have a name/)
-      end
-
-      it 'fails with unamed targets' do
-        data = { 'targets' => [{ 'name' => '' }] }
-
-        expect {
-          Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate
-        }.to raise_error(Bolt::Inventory::ValidationError, /No name or uri for target/)
-      end
-
-      it 'fails with duplicate groups' do
-        data = { 'groups' => [{ 'name' => 'group1' }, { 'name' => 'group1' }] }
-        expect {
-          Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate
-        }.to raise_error(Bolt::Inventory::ValidationError, /Tried to redefine group group1/)
-      end
-    end
-
     describe :collect_groups do
       it 'finds the all group with an empty inventory' do
         inventory = Bolt::Inventory::Inventory.new({}, transport, transports, plugins)
