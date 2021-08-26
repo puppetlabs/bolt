@@ -212,7 +212,7 @@ describe Bolt::Project do
       allow(File).to receive(:directory?).with(path).and_return(true)
     end
 
-    it 'errors when loading from a world-writable directory', :bash do
+    it 'errors when loading from a world-writable directory', unless: Bolt::Util.windows? do
       expect { Bolt::Project.create_project(path) }.to raise_error(/Project directory '#{pathname}' is world-writable/)
     end
 

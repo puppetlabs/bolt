@@ -957,7 +957,7 @@ describe Bolt::Transport::WinRM do
     end
 
     describe "when determining result" do
-      it "fails to run a .pp task without Puppet agent installed", winrm: true do
+      it "fails to run a .pp task without Puppet agent installed", winrm_agentless: true do
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           result = winrm.run_task(target, task, {})
           expect(result).to_not be_success
@@ -1126,7 +1126,7 @@ describe Bolt::Transport::WinRM do
         end
       end
 
-      it "returns a friendly stderr msg with puppet.bat missing", winrm: true do
+      it "returns a friendly stderr msg with puppet.bat missing", winrm_agentless: true do
         with_task_containing('task-pp-winrm', "notice('hi')", 'stdin', '.pp') do |task|
           result = winrm.run_task(target, task, {})
           stderr = result.error_hash['msg']

@@ -14,8 +14,27 @@ env:
 
 jobs:
 
-  fast:
-    name: Fast
+  unit:
+    name: Unit
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+      - name: Update gems
+        run: bundle update
+      - name: Pre-test setup
+        run: |
+          bundle exec r10k puppetfile install
+      - name: Unit tests
+        run: bundle exec rake tests:unit
+
+  integration:
+    name: Integration
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -32,30 +51,9 @@ jobs:
           echo 'runner:runner' | sudo chpasswd
           sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
           sudo sh -c "echo 'runner  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
-          docker-compose -f spec/docker-compose.yml build --parallel ubuntu_node puppet_6_node puppet_7_node
-          docker-compose -f spec/docker-compose.yml up -d ubuntu_node puppet_6_node puppet_7_node
           chmod 0600 spec/fixtures/keys/id_rsa
-          bundle exec r10k puppetfile install
-      - name: Run tests with minimal container infrastructure
-        run: bundle exec rake ci:linux:fast
-
-  slow:
-    name: Slow
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7
-          bundler-cache: true
-      - name: Update gems
-        run: bundle update
-      - name: Pre-test setup
-        run: |
           docker-compose -f spec/docker-compose.yml build --parallel
           docker-compose -f spec/docker-compose.yml up -d
           bundle exec r10k puppetfile install
-      - name: Run tests with expensive containers
-        run: bundle exec rake ci:linux:slow
+      - name: Integration tests
+        run: bundle exec rake ci:linux:integration

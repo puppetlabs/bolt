@@ -52,7 +52,8 @@ describe "errors gracefully attempting to apply a manifest block" do
     let(:password) { conn_info('winrm')[:password] }
     let(:tflags) { %w[--no-ssl --no-ssl-verify] }
 
-    it 'prints a helpful error if Puppet is not present' do
+    it 'prints a helpful error if Puppet is not present', :winrm_agentless do
+      skip "Skipping this test as it fails with a connection error until #3001 is fixed"
       result = run_cli_json(%w[plan run basic::class] + config_flags)
       error = result['details']['result_set'][0]['value']['_error']
       expect(error['kind']).to eq('bolt/apply-error')

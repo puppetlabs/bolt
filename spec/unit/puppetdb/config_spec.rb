@@ -227,7 +227,7 @@ describe Bolt::PuppetDB::Config do
       Bolt::PuppetDB::Config.load_config({})
     end
 
-    it "on windows OS loads from default location", :winrm do
+    it "on windows OS loads from default location", if: Bolt::Util.windows? do
       allow(Bolt::Util).to receive(:windows?).and_return(true)
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user])
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config.default_windows_config)
