@@ -5,7 +5,7 @@ describe 'remove_from_group' do
   let(:executor)      { Bolt::Executor.new }
   let(:config)        { Bolt::Config.default }
   let(:pal)           { nil }
-  let(:plugins)       { Bolt::Plugin.setup(config, pal) }
+  let(:plugins)       { Bolt::Plugin.new(config, pal) }
   let(:inventory)     { Bolt::Inventory.create_version(data, config.transport, config.transports, plugins) }
   let(:tasks_enabled) { true }
   let(:target1)       { 'target1' }

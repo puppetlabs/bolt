@@ -154,16 +154,16 @@ describe 'using the task plugin' do
       }
 
       it 'errors when the result is unexpected' do
-        expect { run_cli(command) }
-          .to raise_error(Bolt::Plugin::PluginError, /Task result did not return 'value'/)
+        result = run_cli_json(command)
+        expect(result['msg']).to match(/Task result did not return 'value'/)
       end
 
       context 'execution fails' do
         let(:params) { { 'bad-key' => %w[foo bar] } }
 
         it 'errors' do
-          expect { run_cli(command) }
-            .to raise_error(Bolt::ValidationError, /bad-key/)
+          result = run_cli_json(command)
+          expect(result['msg']).to match(/bad-key/)
         end
       end
 
@@ -176,8 +176,8 @@ describe 'using the task plugin' do
           }
         }
         it 'errors when the task fails' do
-          expect { run_cli(command) }
-            .to raise_error(Bolt::Plugin::PluginError, /The task failed/)
+          result = run_cli_json(command)
+          expect(result['msg']).to match(/The task failed/)
         end
       end
     end

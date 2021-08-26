@@ -14,7 +14,7 @@ describe Bolt::Inventory::Group do
   let(:data)    { { 'name' => 'all' } }
   let(:pal)     { nil } # Not used
   let(:config)  { make_config }
-  let(:plugins) { Bolt::Plugin.setup(config, nil) }
+  let(:plugins) { Bolt::Plugin.new(config, nil) }
   let(:group)   {
     # Inventory always resolves unknown labels to names or aliases from the top-down when constructed,
     # passing the collection of all aliases in it. Do that manually here to ensure plain target strings
@@ -798,7 +798,7 @@ describe Bolt::Inventory::Group do
     let(:pal) { Bolt::PAL.new(Bolt::Config::Modulepath.new(modulepath), nil, nil) }
 
     let(:plugins) do
-      plugins = Bolt::Plugin.setup(config, pal)
+      plugins = Bolt::Plugin.new(config, pal)
       plugins.add_plugin(BoltSpec::Plugins::Constant.new)
       plugins.add_plugin(BoltSpec::Plugins::Error.new)
       plugins.add_plugin(BoltSpec::Plugins::TestLookup.new(lookup_data))

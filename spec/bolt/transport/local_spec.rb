@@ -14,12 +14,12 @@ describe Bolt::Transport::Local do
     targets[0]
   end
 
-  let(:pal)          { nil }
-  let(:config)       { make_config }
-  let(:plugins)      { Bolt::Plugin.setup(config, pal) }
-  let(:transports)   { config.transports }
-  let(:transport)    { config.transport }
-  let(:inventory)    { Bolt::Inventory.create_version(data, transport, transports, plugins) }
+  let(:pal)        { nil }
+  let(:config)     { make_config }
+  let(:plugins)    { Bolt::Plugin.new(config, pal) }
+  let(:transports) { config.transports }
+  let(:transport)  { config.transport }
+  let(:inventory)  { Bolt::Inventory.create_version(data, transport, transports, plugins) }
 
   around :each do |example|
     target = get_target(inventory, uri)

@@ -31,7 +31,7 @@ describe Bolt::Transport::WinRM do
   let(:ssl_config)  { mk_config(cacert: cacert_path, user: user, password: password) }
   let(:winrm)       { Bolt::Transport::WinRM.new }
   let(:winrm_ssl)   { Bolt::Transport::WinRM.new }
-  let(:plugins)     { Bolt::Plugin.setup(config, nil) }
+  let(:plugins)     { Bolt::Plugin.new(config, nil) }
   let(:transport)   { 'winrm' }
   let(:inventory)   { Bolt::Inventory.empty }
   let(:target)      { make_target }

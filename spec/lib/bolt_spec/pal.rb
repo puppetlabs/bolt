@@ -19,7 +19,7 @@ module BoltSpec
 
     def make_plugins(config = nil)
       config ||= make_config
-      Bolt::Plugin.setup(config, nil)
+      Bolt::Plugin.new(config, nil)
     end
 
     def make_inventory(data = {})

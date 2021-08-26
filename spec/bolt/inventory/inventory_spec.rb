@@ -17,7 +17,7 @@ describe Bolt::Inventory::Inventory do
 
   let(:pal)          { nil }
   let(:config)       { make_config }
-  let(:plugins)      { Bolt::Plugin.setup(config, pal) }
+  let(:plugins)      { Bolt::Plugin.new(config, pal) }
   let(:target_name)  { "example.com" }
   let(:target_entry) { target_name }
   let(:targets)      { [target_entry] }
@@ -182,7 +182,7 @@ describe Bolt::Inventory::Inventory do
         data = { 'targets' => [{ 'name' => '' }] }
 
         expect {
-          Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
+          Bolt::Inventory::Inventory.new(data, transport, transports, plugins).validate
         }.to raise_error(Bolt::Inventory::ValidationError, /No name or uri for target/)
       end
 
@@ -1219,7 +1219,7 @@ describe Bolt::Inventory::Inventory do
     }
 
     let(:plugins) do
-      plugins = Bolt::Plugin.setup(config, pal)
+      plugins = Bolt::Plugin.new(config, pal)
       plugin = double('plugin')
       allow(plugin).to receive(:name).and_return('test_plugin')
       allow(plugin).to receive(:hooks).and_return([:resolve_reference])
@@ -1431,7 +1431,7 @@ describe Bolt::Inventory::Inventory do
         end
 
         it 'returns an empty hash instead of deleting the transport config' do
-          test_group = inventory.collect_groups['test_group']
+          test_group = inventory.group_lookup['test_group']
           expect(test_group.group_data['config']['ssh']).to eql({})
         end
       end

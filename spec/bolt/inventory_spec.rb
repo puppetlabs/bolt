@@ -13,7 +13,7 @@ describe Bolt::Inventory do
 
   let(:pal)     { nil } # Not used
   let(:config)  { make_config }
-  let(:plugins) { Bolt::Plugin.setup(config, pal) }
+  let(:plugins) { Bolt::Plugin.new(config, pal) }
 
   context 'with BOLT_INVENTORY set' do
     let(:inventory) { Bolt::Inventory.from_config(config, plugins) }

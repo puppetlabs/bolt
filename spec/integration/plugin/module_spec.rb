@@ -197,8 +197,9 @@ describe 'using module based plugins' do
         let(:plugin_config) { { 'task_conf_plug' => { 'random_key' => 'bar' } } }
 
         it 'forbids config entries that do not match task metadata schema' do
-          expect { run_cli(command) }
-            .to raise_error(Bolt::ValidationError, /task_conf_plug plugin contains unexpected key random_key/)
+          result = run_cli_json(command)
+          expect(result['kind']).to eq('bolt/validation-error')
+          expect(result['msg']).to match(/Config for task_conf_plug plugin contains unexpected key random_key/)
         end
       end
     end
