@@ -47,7 +47,7 @@ begin
       desc ''
       RSpec::Core::RakeTask.new(:integration) do |t|
         t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_server/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
-        t.rspec_opts = '--tag ~winrm --tag ~winrm_agentless --profile 100'
+        t.rspec_opts = '--tag ~winrm --tag ~winrm_agentless'
       end
     end
 
@@ -60,7 +60,7 @@ begin
       desc ''
       RSpec::Core::RakeTask.new(:integration) do |t|
         t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
-        t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~docker --tag ~puppetdb --tag ~winrm_agentless --profile 100'
+        t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~docker --tag ~puppetdb --tag ~winrm_agentless'
       end
     end
 
