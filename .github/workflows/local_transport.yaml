@@ -1,4 +1,4 @@
-name: Linux
+name: Local Transport
 
 on:
   push:
@@ -8,10 +8,20 @@ on:
     types: [opened, reopened, edited, synchronize]
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
+env:
+  BOLT_WINRM_USER: roddypiper
+  BOLT_WINRM_HOST: localhost
+  BOLT_WINRM_PORT: 5985
+  BOLT_WINRM_SSL_PORT: 5986
+  BOLT_WINRM_SMB_PORT: 445
+
 jobs:
-  integration:
-    name: Integration
-    runs-on: ubuntu-latest
+  tests:
+    name: Tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -31,6 +41,13 @@ jobs:
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
-      - uses: ./.github/actions/sudo_setup
-      - name: Run tests
-        run: bundle exec rake ci:linux:integration
+      - if: matrix.os == 'ubuntu-latest'
+        uses: ./.github/actions/sudo_setup
+      - if: matrix.os == 'windows-latest'
+        uses: ./.github/actions/windows_agent_setup
+      - if: matrix.os == 'ubuntu-latest'
+        name: Run tests
+        run: bundle exec rake ci:local_transport:linux
+      - if: matrix.os == 'windows-latest'
+        name: Run tests
+        run: bundle exec rake ci:local_transport:windows

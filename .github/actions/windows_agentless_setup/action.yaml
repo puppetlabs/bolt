@@ -1,0 +1,8 @@
+name: Configure WinRM
+description: Setup and test WinRM connection to itself
+runs:
+  using: composite
+  steps:
+    - name: Configure WinRM
+      shell: powershell
+      run: '& scripts\ci.ps1'

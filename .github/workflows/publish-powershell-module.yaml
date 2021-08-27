@@ -11,16 +11,9 @@ on:
 jobs:
   publish_module:
     name: Publish
-
     runs-on: windows-latest
-
-    defaults:
-      run:
-        shell: powershell
-
     env:
       BOLT_DISABLE_PWSH_WARNING: 'true'
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2

@@ -1,4 +1,4 @@
-name: Linux
+name: Docker transport
 
 on:
   push:
@@ -9,8 +9,8 @@ on:
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
 jobs:
-  integration:
-    name: Integration
+  docker_transport:
+    name: Docker Transport
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -33,4 +33,4 @@ jobs:
         run: bundle exec r10k puppetfile install
       - uses: ./.github/actions/sudo_setup
       - name: Run tests
-        run: bundle exec rake ci:linux:integration
+        run: bundle exec rake ci:docker_transport

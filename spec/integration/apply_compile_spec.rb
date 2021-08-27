@@ -9,7 +9,7 @@ require 'bolt_spec/puppetdb'
 require 'bolt/catalog'
 require 'bolt/task'
 
-describe "passes parsed AST to the apply_catalog task" do
+describe "passes parsed AST to the apply_catalog task", apply: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration

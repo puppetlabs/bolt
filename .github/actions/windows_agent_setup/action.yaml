@@ -1,0 +1,10 @@
+name: Configure WinRM and use Puppet's Ruby
+description: Setup and test WinRM connection to itself, and use Puppet's Ruby
+runs:
+  using: composite
+  steps:
+    - name: Configure WinRM and use Puppet's Ruby
+      shell: powershell
+      run: |
+        . scripts\ci.ps1
+        Set-ActiveRubyFromPuppet

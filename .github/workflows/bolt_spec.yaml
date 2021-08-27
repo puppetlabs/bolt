@@ -1,4 +1,4 @@
-name: Windows
+name: BoltSpec
 
 on:
   push:
@@ -14,37 +14,14 @@ env:
   BOLT_WINRM_PORT: 5985
   BOLT_WINRM_SSL_PORT: 5986
   BOLT_WINRM_SMB_PORT: 445
-  
-jobs:
-  integration:
-    name: Integration
-    runs-on: windows-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 2.7
-          bundler-cache: true
-      - name: Update gems
-        run: bundle update
-      - name: Cache modules
-        id: modules
-        uses: actions/cache@v1
-        with:
-          path: modules
-          key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
-      - name: Install modules
-        if: steps.modules.outputs.cache-hit != 'true'
-        run: bundle exec r10k puppetfile install
-      - uses: ./.github/actions/windows_agent_setup
-      - name: Run tests
-        run: bundle exec rake ci:windows:integration
 
-  agentless:
-    name: Agentless
-    runs-on: windows-latest
+jobs:
+  tests:
+    name: Tests
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -64,6 +41,13 @@ jobs:
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
-      - uses: ./.github/actions/windows_agentless_setup
+      - if: matrix.os == 'ubuntu-latest'
+        uses: ./.github/actions/docker_setup
+      - if: matrix.os == 'windows-latest'
+        uses: ./.github/actions/windows_agentless_setup
       - name: Run tests
-        run: bundle exec rake ci:windows:agentless
+        if: matrix.os == 'windows-latest'
+        run: bundle exec rake ci:boltspec:windows
+      - name: Run tests
+        if: matrix.os == 'ubuntu-latest'
+        run: bundle exec rake ci:boltspec:linux
