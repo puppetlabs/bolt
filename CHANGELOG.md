@@ -1,5 +1,34 @@
 # Changelog
 
+## Bolt 3.17.0 (2021-08-30)
+
+### New features
+
+* **Pass `--script` to `bolt plan new` to wrap a script in a plan** (hack)
+  The `bolt plan new` command now accepts a `--script SCRIPT` parameter
+  that will generate a plan that simply runs the script and returns the
+  result. The flag only supports detailed (new-style) Puppet file
+  references. Learn more about file references at http://pup.pt/bolt-scripts
+
+### Bug fixes
+
+* **Do not wrap commands in `sh -c` when not using environment variables
+  or privilege escalation**
+
+  Bolt no longer wraps commands in `sh -c` when environment variables
+  are not specified and not using privilege escalation. Previously, Bolt
+  would wrap all commands in `sh -c` when using the SSH transport, which
+  caused commands to fail on targets that do not recognize `sh`, such as
+  some Windows targets.
+
+* **Resolve plugins as needed**
+  ([#2992](https://github.com/puppetlabs/bolt/issues/2992))
+
+  Bolt now only resolves plugin configuration, plugin hooks, and
+  inventory plugins as needed. Previously, Bolt resolved all plugins
+  each time a command was run, causing some commands to fail when
+  they should not.
+
 ## Bolt 3.16.1 (2021-08-16)
 
 ### Bug fixes
