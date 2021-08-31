@@ -184,6 +184,7 @@ module BoltServer
             search_dirs << mod.pluginfacts if mod.pluginfacts?
             if tarball_type == 'all_plugins'
               search_dirs << mod.files if mod.files?
+              search_dirs << mod.scripts if mod.scripts?
               type_files = "#{mod.path}/types"
               search_dirs << type_files if File.exist?(type_files)
             end
@@ -468,13 +469,26 @@ module BoltServer
         pal.in_bolt_compiler do
           mod = Puppet.lookup(:current_environment).module(module_name)
           raise BoltServer::RequestError, "module_name: '#{module_name}' does not exist" unless mod
-          mod.file(file)
+          # First, look in the 'old' location <module>/files/<path>.
+          # If not found, and the path starts with `files` or `scripts`, munge
+          # the path and look inside that directory.
+          if (abs_path = mod.file(file))
+            abs_path
+          else
+            subdir, relative_path = file.split(File::SEPARATOR, 2)
+            case subdir
+            when 'files'
+              mod.file(relative_path)
+            when 'scripts'
+              mod.script(relative_path)
+            end
+          end
         end
       end
 
       unless abs_file_path
         raise BoltServer::RequestError,
-              "file: '#{file}' does not exist inside the module's 'files' directory"
+              "file: '#{file}' does not exist inside #{module_name} 'files' or 'scripts' directories"
       end
 
       fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
