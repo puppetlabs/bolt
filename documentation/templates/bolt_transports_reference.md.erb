@@ -19,7 +19,7 @@ to targets. These options can be set in multiple locations:
 <% end -%>
 
 <% if data.key?(:_default) -%>
-- **Default:** <%= data[:_default] %>
+- **Default:** `<%= data[:_default] %>`
 <% end -%>
 
 <% if data.key?(:properties) -%>
@@ -35,7 +35,7 @@ to targets. These options can be set in multiple locations:
 - **Available values:** `<%= data[:enum].join('`, `') %>`
 <% end -%>
 <% if data.key?(:_default) -%>
-- **Default:** <%= data[:_default] %>
+- **Default:** `<%= data[:_default] %>`
 <% end -%>
 <% if data[:_plugin] == true -%>
 - **Pluggable:** true
@@ -138,7 +138,7 @@ ssh:
 - **Available values:** `<%= data[:enum].join('`, `') %>`
 <% end -%>
 <% if data.key?(:_default) -%>
-- **Default:** <%= data[:_default] %>
+- **Default:** `<%= data[:_default] %>`
 <% end -%>
 <% if data[:_plugin] == true -%>
 - **Pluggable:** true

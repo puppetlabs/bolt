@@ -19,7 +19,7 @@ _This option is deprecated. <%= data[:_deprecation] %>_
 - **Available values:** `<%= data[:enum].join('`, `') %>`
 <% end -%>
 <% if data.key?(:_default) -%>
-- **Default:** <%= data[:_default] %>
+- **Default:** `<%= data[:_default] %>`
 <% end -%>
 <% if data[:_plugin] == true -%>
 - **Pluggable:** true
@@ -36,7 +36,7 @@ _This option is deprecated. <%= data[:_deprecation] %>_
 - **Available values:** `<%= data[:enum].join('`, `') %>`
 <% end -%>
 <% if data.key?(:_default) -%>
-- **Default:** <%= data[:_default] %>
+- **Default:** `<%= data[:_default] %>`
 <% end -%>
 <% if data[:_plugin] == true -%>
 - **Pluggable:** true
