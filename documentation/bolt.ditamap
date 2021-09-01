@@ -126,4 +126,5 @@
         <topicref href="boltspec_reference.md" format="markdown"/>
     </topichead>
     <topicref href="troubleshooting.md" format="markdown"/>
+    <topicref href="glossary.md" format="markdown"/>
 </map>
