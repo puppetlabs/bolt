@@ -183,9 +183,7 @@ describe Bolt::Transport::WinRM do
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
     end
 
-    # winrm gem doesn't fully support OMI server, so disable this test
-    # refactor into other file upload tests when SMB gem adds SMB v3 support
-    it "can upload a file to a host", omi: false do
+    it "can upload a file to a host" do
       contents = "kadejtw89894"
       remote_path = 'C:\Windows\Temp\upload-test-winrm-ssl'
       with_tempfile_containing('upload-test-winrm-ssl', contents, '.ps1') do |file|
@@ -203,7 +201,7 @@ describe Bolt::Transport::WinRM do
       end
     end
 
-    it "can download a file from a host", omi: false do
+    it "can download a file from a host" do
       contents = SecureRandom.uuid
       remote_path = File.join(%w[C: Windows Temp test-winrm-ssl])
       basename = 'test.ps1'
@@ -234,65 +232,6 @@ describe Bolt::Transport::WinRM do
       set_config(target, 'ssl-verify' => false)
 
       expect(winrm.run_command(target, command)['stdout']).to eq("#{user}\r\n")
-    end
-  end
-
-  context "connecting over SSL to OMI container ", omi: true do
-    # In order to run vagrant and docker targets simultaniously for local dev, use 4598{5,6} to avoid port conflict
-    let(:omi_target) { make_target(port_: 45986, conf: ssl_config) }
-
-    it "can test whether the target is available" do
-      expect(winrm.connected?(omi_target)).to eq(true)
-    end
-
-    it "executes a command on a host" do
-      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
-    end
-
-    it "skips verification with ssl-verify: false" do
-      target.options.delete('cacert')
-      target.options['ssl-verify'] = false
-
-      expect(winrm.run_command(omi_target, command)['stdout']).to eq("#{user}\r\n")
-    end
-  end
-
-  context "authenticating with Kerberos", kerberos: true, omi: true do
-    before(:all) do
-      # disable all tests on Windows for now
-      skip('Windows Active Directory tickets are different') if Bolt::Util.windows?
-      skip("WinRM gem and OMI server have a protocol negotiation bug")
-
-      @kerb_user = 'Administrator'
-      @kerb_realm = ENV['KRB5_REALM'] || 'BOLT.TEST'
-      @smb_admin_pass = ENV['SMB_ADMIN_PASSWORD'] || 'B0ltrules!'
-
-      # this will renew any stale tickets when testing locally
-      `echo #{@smb_admin_pass} | kinit Administrator@#{@kerb_realm}`
-    end
-
-    let(:omi_http_kerb_target) do
-      conf = mk_config(ssl: false, realm: @kerb_realm)
-      make_target(host_: 'omiserver.bolt.test', port_: 45985, conf: conf)
-    end
-
-    let(:omi_https_kerb_target) do
-      conf = mk_config(ssl: true, realm: @kerb_realm, 'ssl-verify': false)
-      make_target(host_: 'omiserver.bolt.test', port_: 45986, conf: conf)
-    end
-
-    # verifies the local setup has already acquired the right Kerberos ticket
-    it "has acquired a ticket granting ticket from the Samba AD / KDC" do
-      esc_realm = Regexp.escape(@kerb_realm)
-      expect(`klist`).to match(%r{krbtgt/#{esc_realm}@#{esc_realm}})
-    end
-
-    it "executes a command on a host over HTTP" do
-      expect(winrm.run_command(omi_http_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
-    end
-
-    it "executes a command on a host over HTTPS" do
-      expect(winrm.run_command(omi_https_kerb_target, command)['stdout']).to eq("#{@kerb_user}\r\n")
     end
   end
 

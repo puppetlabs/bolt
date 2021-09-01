@@ -370,29 +370,6 @@ describe 'apply', expensive: true do
         expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
       end
 
-      it 'succeeds when run twice' do
-        result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
-        expect(result).not_to include('kind')
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
-        report = result[0]['value']['report']
-        expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
-
-        # Includes agent facts from apply_prep
-        agent_facts = report['resource_statuses']['Notify[agent facts]']['events'][0]['desired_value'].split("\n")
-        expect(agent_facts[0]).to match(/^\w+/)
-        expect(agent_facts[1]).to eq(agent_facts[0])
-        expect(agent_facts[2]).to match(/^\d+\.\d+\.\d+$/)
-        expect(agent_facts[3]).to eq(agent_facts[2])
-        expect(agent_facts[4]).to eq('false')
-
-        result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
-        report = result[0]['value']['report']
-        expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
-      end
-
       it 'returns both failing and successful results' do
         result = run_cli_json(%W[apply -e notice('hello') -t #{uri},foobar], project: project)
 
@@ -405,34 +382,6 @@ describe 'apply', expensive: true do
           'target' => uri,
           'status' => 'success'
         )
-      end
-
-      context 'with plugin configured' do
-        let(:inventory) do
-          {
-            'targets' => [
-              {
-                'uri' => uri,
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'puppet_agent'
-                  }
-                }
-              }
-            ],
-            'config' => config
-          }
-        end
-
-        it 'installs puppet' do
-          result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
-
-          expect(result).not_to include('kind')
-          expect(result.count).to eq(1)
-          expect(result[0]['status']).to eq('success')
-          report = result[0]['value']['report']
-          expect(report['resource_statuses']).to include("Notify[Hello #{uri}]")
-        end
       end
 
       context 'with task plugin configured' do
@@ -473,74 +422,10 @@ describe 'apply', expensive: true do
           expect(result[0]['value']['version']).to match(/^7\.0/)
         end
       end
-
-      context 'with bad plugin configuration' do
-        let(:inventory) do
-          {
-            'targets' => [
-              {
-                'uri' => uri,
-                'name' => 'error',
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'task',
-                    'task' => 'prep::error'
-                  }
-                }
-              },
-              {
-                'uri' => uri,
-                'name' => 'badparams',
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'task',
-                    'task' => 'puppet_agent::install',
-                    'parameters' => {
-                      'collection' => 'The act or process of collecting.'
-                    }
-                  }
-                }
-              },
-              {
-                'uri' => uri,
-                'name' => 'badplugin',
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'what plugin?'
-                  }
-                }
-              }
-            ],
-            'config' => config
-          }
-        end
-
-        it 'errors appropriately for each target' do
-          result = run_cli_json(%w[plan run prep -t all], project: project)
-
-          expect(result['kind']).to eq('bolt/run-failure')
-          expect(result['msg']).to eq("apply_prep failed on 3 targets")
-
-          result_set = result['details']['result_set']
-          task_error = result_set.select { |h| h['target'] == 'error' }[0]['value']['_error']
-          expect(task_error['kind']).to eq('puppetlabs.tasks/task-error')
-          expect(task_error['msg']).to include("The task failed with exit code 1")
-
-          param_error = result_set.select { |h| h['target'] == 'badparams' }[0]['value']['_error']
-          expect(param_error['kind']).to eq('bolt/plugin-error')
-          expect(param_error['msg']).to match(
-            /Task puppet_agent::install.*parameter 'collection' expects an undef value/m
-          )
-
-          plugin_error = result_set.select { |h| h['target'] == 'badplugin' }[0]['value']['_error']
-          expect(plugin_error['kind']).to eq('bolt/unknown-plugin')
-          expect(plugin_error['msg']).to include("Unknown plugin: 'what plugin?'")
-        end
-      end
     end
   end
 
-  describe 'over winrm on Windows with Puppet Agents', windows_agents: true do
+  describe 'over winrm on Windows with Puppet Agents', winrm: true do
     around(:each) do |example|
       with_project(config: project_config, inventory: conn_inventory) do |project|
         @project = project

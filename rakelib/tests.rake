@@ -29,21 +29,6 @@ begin
       t.rspec_opts = '--tag docker'
     end
 
-    desc 'Run tests that require a host System Under Test configured with LXD'
-    RSpec::Core::RakeTask.new(:lxd) do |t|
-      t.rspec_opts = '--tag lxd_transport'
-    end
-
-    desc 'Run tests that require a host System Under Test configured with LXD remote'
-    RSpec::Core::RakeTask.new(:lxd_remote) do |t|
-      t.rspec_opts = '--tag lxd_remote'
-    end
-
-    desc 'Run tests that require a host System Under Test configured with Podman'
-    RSpec::Core::RakeTask.new(:podman) do |t|
-      t.rspec_opts = '--tag podman'
-    end
-
     desc 'Run tests that require Bash on the local host'
     RSpec::Core::RakeTask.new(:bash) do |t|
       t.rspec_opts = '--tag bash'
@@ -52,11 +37,6 @@ begin
     desc 'Run tests that require Windows on the local host'
     RSpec::Core::RakeTask.new(:windows) do |t|
       t.rspec_opts = '--tag windows'
-    end
-
-    desc 'Run tests that require OMI docker container'
-    RSpec::Core::RakeTask.new(:omi) do |t|
-      t.rspec_opts = '--tag omi'
     end
   end
 
@@ -67,8 +47,7 @@ begin
       desc ''
       RSpec::Core::RakeTask.new(:integration) do |t|
         t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_server/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
-        t.rspec_opts = '--tag ~winrm --tag ~lxd_transport --tag ~lxd_remote --tag ~winrm_agentless ' \
-                        '--tag ~podman --tag ~kerberos --tag ~omi --tag ~windows_agents'
+        t.rspec_opts = '--tag ~winrm --tag ~winrm_agentless'
       end
     end
 
@@ -81,8 +60,7 @@ begin
       desc ''
       RSpec::Core::RakeTask.new(:integration) do |t|
         t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
-        t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~podman --tag ~lxd_transport --tag ~lxd_remote ' \
-                       '--tag ~docker --tag ~puppetdb --tag ~omi --tag ~winrm_agentless'
+        t.rspec_opts = '--tag ~ssh --tag ~bash --tag ~docker --tag ~puppetdb --tag ~winrm_agentless'
       end
     end
 
