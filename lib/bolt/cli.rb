@@ -53,8 +53,7 @@ module Bolt
     TARGETING_OPTIONS = %i[query rerun targets].freeze
 
     SUCCESS = 0
-    ERROR   = 1
-    FAILURE = 2
+    FAILURE = 1
 
     def initialize(argv)
       Bolt::Logger.initialize_logging
