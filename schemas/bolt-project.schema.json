@@ -149,7 +149,11 @@
       "type": "object",
       "properties": {
         "file_paths": {
-          "description": "Load scripts from the `scripts/` directory of a module",
+          "description": "Load scripts from the `scripts/` directory of a module.",
+          "type": "boolean"
+        },
+        "script_interpreter": {
+          "description": "Use a target's [`interpreters` configuration](bolt_transports_reference.md#interpreters) when running a script.",
           "type": "boolean"
         }
       }

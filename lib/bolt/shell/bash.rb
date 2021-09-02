@@ -94,7 +94,17 @@ module Bolt
           with_tmpdir do |dir|
             path = write_executable(dir.to_s, script)
             dir.chown(run_as)
-            output = execute([path, *arguments], environment: options[:env_vars], sudoable: true)
+
+            exec_args   = [path, *arguments]
+            interpreter = select_interpreter(script, target.options['interpreters'])
+
+            # Only use interpreter if script_interpreter config is enabled
+            if options[:script_interpreter] && interpreter
+              exec_args.unshift(interpreter)
+              logger.trace("Running '#{script}' using '#{interpreter}' interpreter")
+            end
+
+            output = execute(exec_args, environment: options[:env_vars], sudoable: true)
             Bolt::Result.for_command(target,
                                      output.to_h,
                                      'script',

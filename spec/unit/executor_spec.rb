@@ -105,7 +105,7 @@ describe "Bolt::Executor" do
   context 'executes running a script' do
     it "on all nodes" do
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_script).with(target, script, [], {}, []).and_return(result)
+        expect(ssh).to receive(:run_script).with(target, script, [], anything, []).and_return(result)
       end
 
       results = executor.run_script(targets, script, [], {})
@@ -117,7 +117,7 @@ describe "Bolt::Executor" do
     it 'passes run_as' do
       executor.run_as = 'foo'
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_script).with(target, script, [], { run_as: 'foo' }, [])
+        expect(ssh).to receive(:run_script).with(target, script, [], include(run_as: 'foo'), [])
                                            .and_return(result)
       end
 
@@ -129,7 +129,7 @@ describe "Bolt::Executor" do
 
     it "yields each result" do
       node_results.each do |target, result|
-        expect(ssh).to receive(:run_script).with(target, script, [], {}, []).and_return(result)
+        expect(ssh).to receive(:run_script).with(target, script, [], anything, []).and_return(result)
       end
 
       executor.run_script(targets, script, [])
@@ -145,7 +145,7 @@ describe "Bolt::Executor" do
       node_results.each_key do |target|
         expect(ssh)
           .to receive(:run_script)
-          .with(target, script, [], {}, position)
+          .with(target, script, [], anything, position)
           .and_raise(Bolt::Error.new('failed', 'my-exception', file_lineno))
       end
 
@@ -823,7 +823,7 @@ describe "Bolt::Executor" do
       node_results.each do |target, result|
         expect(ssh)
           .to receive(:run_script)
-          .with(target, script, [], {}, [])
+          .with(target, script, [], anything, [])
           .and_return(result)
       end
 
