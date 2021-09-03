@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/util'
-require 'bolt/validator'
-require 'bolt/config/transport/options'
+require_relative '../../../bolt/error'
+require_relative '../../../bolt/util'
+require_relative '../../../bolt/validator'
+require_relative '../../../bolt/config/transport/options'
 
 module Bolt
   class Config

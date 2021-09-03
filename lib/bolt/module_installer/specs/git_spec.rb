@@ -3,7 +3,7 @@
 require 'json'
 require 'set'
 
-require 'bolt/error'
+require_relative '../../../bolt/error'
 
 # This class represents a Git module specification.
 #

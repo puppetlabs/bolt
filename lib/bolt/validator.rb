@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
+require_relative '../bolt/error'
 
 # This class validates config against a schema, raising an error that includes
 # details about any invalid configuration.

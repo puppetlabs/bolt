@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'base64'
-require 'bolt/apply_result'
-require 'bolt/apply_target'
-require 'bolt/config'
-require 'bolt/error'
-require 'bolt/task'
-require 'bolt/util/puppet_log_level'
+require_relative '../bolt/apply_result'
+require_relative '../bolt/apply_target'
+require_relative '../bolt/config'
+require_relative '../bolt/error'
+require_relative '../bolt/task'
+require_relative '../bolt/util/puppet_log_level'
 require 'find'
 require 'json'
 require 'logging'

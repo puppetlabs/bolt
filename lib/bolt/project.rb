@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require 'bolt/config'
-require 'bolt/validator'
-require 'bolt/pal'
-require 'bolt/module'
+require_relative '../bolt/config'
+require_relative '../bolt/validator'
+require_relative '../bolt/pal'
+require_relative '../bolt/module'
 
 module Bolt
   class Project

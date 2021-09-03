@@ -4,8 +4,8 @@ require 'base64'
 require 'find'
 require 'json'
 require 'pathname'
-require 'bolt/transport/base'
-require 'bolt/transport/orch/connection'
+require_relative '../../bolt/transport/base'
+require_relative 'orch/connection'
 
 module Bolt
   module Transport

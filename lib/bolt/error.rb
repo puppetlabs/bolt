@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/util'
+require_relative '../bolt/util'
 
 module Bolt
   class Error < RuntimeError

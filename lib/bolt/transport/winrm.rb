@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/node/errors'
-require 'bolt/transport/base'
+require_relative '../../bolt/node/errors'
+require_relative '../../bolt/transport/base'
 
 module Bolt
   module Transport
@@ -30,4 +30,4 @@ module Bolt
   end
 end
 
-require 'bolt/transport/winrm/connection'
+require_relative 'winrm/connection'

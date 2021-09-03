@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/task'
-require 'bolt/transport/base'
+require_relative '../../bolt/task'
+require_relative '../../bolt/transport/base'
 
 module Bolt
   module Transport

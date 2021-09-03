@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'bolt/error'
-require 'bolt/util'
+require_relative '../bolt/error'
+require_relative '../bolt/util'
 
 module Bolt
   class PlanResult

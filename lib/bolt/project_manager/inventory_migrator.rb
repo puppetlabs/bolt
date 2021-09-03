@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/project_manager/migrator'
+require_relative '../../bolt/project_manager/migrator'
 
 module Bolt
   class ProjectManager

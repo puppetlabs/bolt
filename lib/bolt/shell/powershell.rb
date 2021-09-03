@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/shell/powershell/snippets'
+require_relative 'powershell/snippets'
 
 module Bolt
   class Shell
