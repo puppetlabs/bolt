@@ -320,7 +320,8 @@ plan myplan(TargetSpec $targets) {
 }
 ```
 
-#### Getting Results from parallel blocks
+#### Getting results from parallel blocks
+
 The `parallelize()` and `wait()` functions return an array that contains the results of executing
 the block in the same order as the input array. You can think of them as `map` functions
 that run in parallel. The `result` of the block for a particular input is either a value passed to
@@ -365,6 +366,82 @@ in the result array, the plan throws a `PlanFailure` and includes the entire res
 `details` key of the failure. If the block is wrapped in a `catch_errors()` block, Bolt catches the
 `PlanFailure` and continues to execute the plan. If you've provided `_catch_errors => true`
 to `wait()`, Bolt returns any errors raised and the plan continues to execute.
+
+#### Viewing failing results in parallel blocks
+
+When an action fails in a parallel block, such as a task returning an error, Bolt
+does not print the error result to the console. For example, the following plan
+runs a non-existent command on targets in parallel:
+
+```puppet
+plan example (
+  TargetSpec $targets
+) {
+  $_targets = get_targets($targets)
+
+  $results = parallelize($_targets) |$target| {
+    run_command('badcommand', $target)
+  }
+
+  return $results
+}
+```
+
+Bolt does not print the error result from the targets the command is run on,
+making it difficult to know why the command failed:
+
+```shell
+$ bolt plan run example -t target1,target2
+
+Starting: plan example
+Starting: command 'badcommand' on target1
+Starting: command 'badcommand' on target2
+Finished: command 'badcommand' with 1 failure in 0.01 sec
+Finished: command 'badcommand' with 1 failure in 0.02 sec
+Error in future '2': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Error in future '3': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Finished: plan example in 1.53 sec
+parallel block failed on 2 targets
+  (file: /Users/bolt/.puppetlabs/bolt/plans/init.pp, line: 4, column: 14)
+```
+
+To view error results from parallel blocks, you can run the plan in verbose mode.
+To run in verbose mode, use the `verbose` flag:
+
+_\*nix shell command_
+
+```shell
+bolt plan run <PLAN NAME> --verbose
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltPlan -Name <PLAN NAME> -Verbose
+```
+
+Running the same plan in verbose mode shows the error results for each target:
+
+```shell
+$ bolt plan run example -t target1,target2
+
+Starting: plan example
+Starting: command 'badcommand' on target1
+Starting: command 'badcommand' on target2
+Started on target1...
+Failed on target1:
+  No such file or directory - badcommand
+Started on target2...
+Failed on target2:
+  No such file or directory - badcommand
+Finished: command 'badcommand' with 1 failure in 0.01 sec
+Finished: command 'badcommand' with 1 failure in 0.02 sec
+Error in future '2': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Error in future '3': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Finished: plan example in 1.53 sec
+parallel block failed on 2 targets
+  (file: /Users/bolt/.puppetlabs/bolt/plans/init.pp, line: 4, column: 14)
+```
 
 ## `ResourceInstance` data type
 

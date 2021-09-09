@@ -736,7 +736,7 @@ module Bolt
         #
         # Every future except for the main plan needs to have a plan id in
         # order to be tracked for the `wait()` function with no arguments.
-        future = executor.create_future(name: plan_name, plan_id: 1) do |_scope|
+        future = executor.create_future(name: plan_name, plan_id: 0) do |_scope|
           r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
           Bolt::PlanResult.from_pcore(r, 'success')
         rescue Bolt::Error => e
