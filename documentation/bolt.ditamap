@@ -38,7 +38,19 @@
       </topicref>
       <topicref href="running_bolt_network.md" format="markdown">
         <topicmeta>
-          <shortdesc>Tips for running Bolt when targeting network devices</shortdesc>
+          <shortdesc>Tips for running Bolt when targeting network devices.</shortdesc>
+        </topicmeta>
+      </topicref>
+    </topichead>
+    <topichead navtitle="Scripts">
+      <topicref href="bolt_running_scripts.md" format="markdown">
+        <topicmeta>
+          <shortdesc>How to run scripts using Bolt.</shortdesc>
+        </topicmeta>
+      </topicref>
+      <topicref href="creating_a_script_plan.md" format="markdown">
+        <topicmeta>
+          <shortdesc>How to create a plan that runs a script.</shortdesc>
         </topicmeta>
       </topicref>
     </topichead>
