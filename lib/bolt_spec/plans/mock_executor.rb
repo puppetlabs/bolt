@@ -44,7 +44,7 @@ module BoltSpec
 
       def module_file_id(file)
         modpath = @modulepath.select { |path| file =~ /^#{path}/ }
-        raise "Could not identify modulepath containing #{file}: #{modpath}" unless modpath.size == 1
+        return nil unless modpath.size == 1
 
         path = Pathname.new(file)
         relative = path.relative_path_from(Pathname.new(modpath.first))
@@ -66,7 +66,7 @@ module BoltSpec
       end
 
       def run_script(targets, script_path, arguments, options = {}, _position = [])
-        script = module_file_id(script_path)
+        script = module_file_id(script_path) || script_path
         result = nil
         if (doub = @script_doubles[script] || @script_doubles[:default])
           result = doub.process(targets, script, arguments, options)
@@ -116,7 +116,7 @@ module BoltSpec
       end
 
       def upload_file(targets, source_path, destination, options = {}, _position = [])
-        source = module_file_id(source_path)
+        source = module_file_id(source_path) || source_path
         result = nil
         if (doub = @upload_doubles[source] || @upload_doubles[:default])
           result = doub.process(targets, source, destination, options)
