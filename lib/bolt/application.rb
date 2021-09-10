@@ -258,7 +258,7 @@ module Bolt
                     config.project.puppetfile,
                     config.project.managed_moduledir,
                     config.project.project_file,
-                    config.module_install)
+                    @plugins.resolve_references(config.module_install))
     end
 
     # Generate Puppet data types from project modules.
@@ -292,7 +292,7 @@ module Bolt
       installer.install(config.project.modules,
                         config.project.puppetfile,
                         config.project.managed_moduledir,
-                        config.module_install,
+                        @plugins.resolve_references(config.module_install),
                         force: force,
                         resolve: resolve)
     end

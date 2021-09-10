@@ -184,9 +184,20 @@
       "type": "object",
       "properties": {
         "forge": {
-          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
+          "description": "A subsection for configuring connections to a Forge host.",
           "type": "object",
           "properties": {
+            "authorization_token": {
+              "description": "The token used to authorize requests to the Forge host. Must also specify `baseurl` when using this option.",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "baseurl": {
               "description": "The URL to the Forge host.",
               "type": "string",
