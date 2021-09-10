@@ -59,7 +59,7 @@ when "compile"
     puts({ message: message, backtrace: e.backtrace }.to_json)
     exit 1
   rescue StandardError => e
-    puts({ message: e.message }.to_json)
+    puts({ message: e.message, backtrace: e.backtrace }.to_json)
     exit 1
   end
 else
