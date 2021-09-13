@@ -36,6 +36,16 @@ module Bolt
       #     ssl: false
     INVENTORY
 
+    GITIGNORE_CONTENT = <<~GITIGNORE
+      .modules/
+      .resource_types/
+      bolt-debug.log
+      .plan_cache.json
+      .plugin_cache.json
+      .task_cache.json
+      .rerun.json
+    GITIGNORE
+
     def initialize(config, outputter, pal)
       @config    = config
       @outputter = outputter
@@ -53,6 +63,7 @@ module Bolt
       puppetfile    = project + 'Puppetfile'
       moduledir     = project + '.modules'
       inventoryfile = project + 'inventory.yaml'
+      gitignore     = project + '.gitignore'
       project_name  = name || File.basename(project)
 
       if config.exist?
@@ -122,6 +133,14 @@ module Bolt
           File.write(inventoryfile.to_path, INVENTORY_TEMPLATE)
         rescue StandardError => e
           raise Bolt::FileError.new("Could not create inventory.yaml at #{project}: #{e.message}", nil)
+        end
+      end
+
+      unless gitignore.exist?
+        begin
+          File.write(gitignore.to_path, GITIGNORE_CONTENT)
+        rescue StandardError => e
+          raise Bolt::FileError.new("Could not create .gitignore at #{project}: #{e.message}", nil)
         end
       end
 

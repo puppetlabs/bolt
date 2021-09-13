@@ -27,6 +27,7 @@ describe Bolt::ProjectManager do
   let(:config_migrator)    { double('config_migrator',    migrate: true) }
   let(:inventory_migrator) { double('inventory_migrator', migrate: true) }
   let(:module_migrator)    { double('module_migrator',    migrate: true) }
+  let(:gitignore_path)     { Pathname.new(File.join(@project.path, ".gitignore")) }
 
   around :each do |example|
     with_project do |project|
@@ -65,6 +66,17 @@ describe Bolt::ProjectManager do
     it 'does not create an inventory.yaml if one already exists' do
       FileUtils.touch(project.inventory_file)
       expect(File).not_to receive(:write).with(project.inventory_file.to_path, anything)
+      manager.create(project.path, 'myproject', nil)
+    end
+
+    it 'creates a .gitignore' do
+      manager.create(project.path, 'myproject', nil)
+      expect(gitignore_path.exist?).to be
+    end
+
+    it 'does not create a .gitignore if one already exists' do
+      FileUtils.touch(gitignore_path)
+      expect(File).not_to receive(:write).with(gitignore_path.to_path, anything)
       manager.create(project.path, 'myproject', nil)
     end
 
