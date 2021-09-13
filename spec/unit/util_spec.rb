@@ -117,6 +117,19 @@ describe Bolt::Util do
         }.to raise_error(Bolt::FileError, /should be a Hash or empty, not String/)
       end
     end
+
+    it "communicates that aliases are not supported" do
+      contents = <<~YAML
+      ---
+      foo: &flag value
+      bar: *flag
+      YAML
+      with_tempfile_containing('config_file_test', contents) do |file|
+        expect {
+          Bolt::Util.read_yaml_hash(file, 'inventory')
+        }.to raise_error(Bolt::FileError, /does not support.*aliases/)
+      end
+    end
   end
 
   context "when parsing a yaml file with read_optional_yaml_hash" do
