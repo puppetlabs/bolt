@@ -255,10 +255,16 @@ module Bolt
           type: Hash,
           properties: {
             "forge" => {
-              description: "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge "\
-                           "operations only, and a `baseurl` setting to specify a different Forge host.",
+              description: "A subsection for configuring connections to a Forge host.",
               type: Hash,
               properties: {
+                "authorization_token" => {
+                  description: "The token used to authorize requests to the Forge host. Must also specify "\
+                               "`baseurl` when using this option.",
+                  type: String,
+                  _example: "Bearer eyJhbGciOiJIUzI1NiIsInR5c...",
+                  _plugin: true
+                },
                 "baseurl" => {
                   description: "The URL to the Forge host.",
                   type: String,
@@ -272,7 +278,11 @@ module Bolt
                   _example: "https://my-forge-proxy.com:8080"
                 }
               },
-              _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://my-forge-proxy.com:8080" }
+              _example: {
+                "authorization_token" => "Bearer eyJhbGciOiJIUzI1NiIsInR5c...",
+                "baseurl" => "https://forge.example.com",
+                "proxy" => "https://my-forge-proxy.com:8080"
+              }
             },
             "proxy" => {
               description: "The HTTP proxy to use for Git and Forge operations.",

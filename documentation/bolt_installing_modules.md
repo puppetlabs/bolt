@@ -329,6 +329,27 @@ module-install:
     proxy: https://forge-proxy.com:8080
 ```
 
+## Install modules using an authorization token
+
+If you need to install modules that require an authorization token to download,
+you can configure Bolt to pass a token as part of the request it makes to the
+Forge host. To configure Bolt to use an authorization token, set the
+`module-install` configuration option in either your project configuration file,
+`bolt-project.yaml`, or the default configuration file, `bolt-defaults.yaml`.
+
+To set an authorization token that is used when installing Forge modules,
+set the `authorization_token` key under the `forge` section of the
+`module-install` option. When you set the `authorization_token` key, you
+must also set the `baseurl` key.
+
+```yaml
+# bolt-project.yaml
+module-install:
+  forge:
+    authorization_token: Bearer eyJhbGciOiJIUzI1NiIsInR5c...
+    baseurl: https://forge.example.com
+```
+
 📖 **Related information**
 
 - [bolt-project.yaml options](bolt_project_reference.md#module-install)
