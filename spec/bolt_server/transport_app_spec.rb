@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'bolt_spec/bolt_server'
 require 'bolt_spec/conn'
 require 'bolt_spec/file_cache'
+require 'bolt_spec/files'
 require 'bolt_server/config'
 require 'bolt_server/transport_app'
 require 'json'
@@ -17,16 +18,17 @@ describe "BoltServer::TransportApp" do
   include BoltSpec::BoltServer
   include BoltSpec::Conn
   include BoltSpec::FileCache
+  include BoltSpec::Files
   include Rack::Test::Methods
 
-  let(:basedir) { File.join(__dir__, '..', 'fixtures', 'bolt_server') }
+  let(:basedir) { fixtures_path('bolt_server') }
   let(:environment_dir) { File.join(basedir, 'environments', 'production') }
   let(:project_dir) { File.join(basedir, 'projects') }
 
   def app
     # The moduledir and mock file cache are used in the tests for task
     # execution tests. Everything else uses the fixtures above.
-    moduledir = File.join(__dir__, '..', 'fixtures', 'modules')
+    moduledir = fixtures_path('modules')
     mock_file_cache(moduledir)
     config = BoltServer::Config.new({ 'projects-dir' => project_dir, 'environments-codedir' => basedir })
     BoltServer::TransportApp.new(config)
@@ -1192,6 +1194,9 @@ describe "BoltServer::TransportApp" do
 
     describe '/project_file_metadatas/:module_name/:file' do
       let(:versioned_project) { 'bolt_server_test_project' }
+      let(:modpath) {
+        File.join(project_dir, versioned_project, 'modules', 'project_module')
+      }
 
       it 'returns 400 if versioned_project is not specified' do
         get('/project_file_metadatas/foo_module/foo_file')
@@ -1221,152 +1226,180 @@ describe "BoltServer::TransportApp" do
         expect(error['msg']).to match(/not_a_real_file' does not exist/)
       end
 
-      context "with a valid filepath to one file", ssh: true do
-        let(:test_file) {
-          Pathname.new(
-            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_file')
-          ).cleanpath.to_s
-        }
-        let(:file_checksum) {
-          Digest::SHA256.hexdigest(
-            File.read(test_file)
-          )
-        }
-        let(:expected_response) {
-          [
-            {
-              "path" => test_file,
-              "relative_path" => ".",
-              "links" => "follow",
-              "owner" => File.stat(test_file).uid,
-              "group" => File.stat(test_file).gid,
-              "checksum" => {
-                "type" => "sha256",
-                "value" => "{sha256}#{file_checksum}"
-              },
-              "type" => "file",
-              "destination" => nil
-            }
-          ]
-        }
-        it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_file?versioned_project=#{versioned_project}")
-          file_metadatas = JSON.parse(last_response.body)
-          # I don't know why the mode returned by puppet is not the same as the mode returned
-          # from ruby's File.stat(test_file) function. But these tests probably don't need to
-          # cover the specifics of what puppet returns, plus we don't use this metadata in
-          # orch anyway, so ignore the mode part of the respose.
-          #                                     - Sean P. McDonald 10/15/2020
-          file_metadatas.each do |entry|
-            entry.delete("mode")
+      it 'returns 400 if the file includes scripts/ and does not exist' do
+        get("/project_file_metadatas/project_module/scripts/not_a_real_file?versioned_project=#{versioned_project}")
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_file' does not exist/)
+      end
+
+      shared_examples 'valid data' do
+        context "with a valid filepath to one file", ssh: true do
+          let(:file_checksum) { Digest::SHA256.hexdigest(File.read(test_file)) }
+          let(:expected_response) {
+            [
+              {
+                "path" => test_file,
+                "relative_path" => ".",
+                "links" => "follow",
+                "owner" => File.stat(test_file).uid,
+                "group" => File.stat(test_file).gid,
+                "checksum" => {
+                  "type" => "sha256",
+                  "value" => "{sha256}#{file_checksum}"
+                },
+                "type" => "file",
+                "destination" => nil
+              }
+            ]
+          }
+
+          it 'returns the file metadata of the file, prefering the files directory' do
+            get("/project_file_metadatas/project_module/#{file_request}?versioned_project=#{versioned_project}")
+            file_metadatas = JSON.parse(last_response.body)
+            # I don't know why the mode returned by puppet is not the same as the mode returned
+            # from ruby's File.stat(test_file) function. But these tests probably don't need to
+            # cover the specifics of what puppet returns, plus we don't use this metadata in
+            # orch anyway, so ignore the mode part of the respose.
+            #                                     - Sean P. McDonald 10/15/2020
+            file_metadatas.each do |entry|
+              entry.delete("mode")
+            end
+            expect(file_metadatas).to eq(expected_response)
+            expect(last_response.status).to eq(200)
           end
-          expect(file_metadatas).to eq(expected_response)
-          expect(last_response.status).to eq(200)
+        end
+
+        context "with a directory", ssh: true do
+          let(:file_checksum) { Digest::SHA256.hexdigest(File.read(file_in_dir)) }
+          let(:expected_response) {
+            [
+              {
+                "path" => test_dir,
+                "relative_path" => ".",
+                "links" => "follow",
+                "owner" => File.stat(test_dir).uid,
+                "group" => File.stat(test_dir).gid,
+                "checksum" => {
+                  "type" => "ctime",
+                  "value" => "{ctime}#{File.ctime(test_dir)}"
+                },
+                "type" => "directory",
+                "destination" => nil
+              },
+              {
+                "path" => test_dir,
+                "relative_path" => File.basename(file_in_dir),
+                "links" => "follow",
+                "owner" => File.stat(file_in_dir).uid,
+                "group" => File.stat(file_in_dir).gid,
+                "checksum" => {
+                  "type" => "sha256",
+                  "value" => "{sha256}#{file_checksum}"
+                },
+                "type" => "file",
+                "destination" => nil
+              }
+            ]
+          }
+
+          it 'returns the file metadata of the directory and all its children' do
+            get("/project_file_metadatas/project_module/#{dir_request}?versioned_project=#{versioned_project}")
+            file_metadatas = JSON.parse(last_response.body)
+            # I don't know why the mode returned by puppet is not the same as the mode returned
+            # from ruby's File.stat(test_file) function. But these tests probably don't need to
+            # cover the specifics of what puppet returns, plus we don't use this metadata in
+            # orch anyway, so ignore the mode part of the respose.
+            #                                     - Sean P. McDonald 10/15/2020
+            file_metadatas.each do |entry|
+              entry.delete("mode")
+            end
+            expect(file_metadatas).to eq(expected_response)
+            expect(last_response.status).to eq(200)
+          end
         end
       end
 
-      context "when the file path contains '/'", ssh: true do
-        let(:test_file) {
-          Pathname.new(
-            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_dir', 'test_dir_file')
-          ).cleanpath.to_s
-        }
-        let(:file_checksum) {
-          Digest::SHA256.hexdigest(
-            File.read(test_file)
-          )
-        }
-        let(:expected_response) {
-          [
-            {
-              "path" => test_file,
-              "relative_path" => ".",
-              "links" => "follow",
-              "owner" => File.stat(test_file).uid,
-              "group" => File.stat(test_file).gid,
-              "checksum" => {
-                "type" => "sha256",
-                "value" => "{sha256}#{file_checksum}"
-              },
-              "type" => "file",
-              "destination" => nil
-            }
-          ]
-        }
-        it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_dir/test_dir_file?versioned_project=#{versioned_project}")
-          file_metadatas = JSON.parse(last_response.body)
-          # I don't know why the mode returned by puppet is not the same as the mode returned
-          # from ruby's File.stat(test_file) function. But these tests probably don't need to
-          # cover the specifics of what puppet returns, plus we don't use this metadata in
-          # orch anyway, so ignore the mode part of the respose.
-          #                                     - Sean P. McDonald 10/15/2020
-          file_metadatas.each do |entry|
-            entry.delete("mode")
+      context "using nonspecific Puppet file ref (<module>/<path>)" do
+        let(:test_file)    { File.join(modpath, 'files', 'test_file') }
+        let(:file_request) { 'test_file' }
+        let(:test_dir)     { File.join(modpath, 'files', 'test_dir') }
+        let(:dir_request)  { 'test_dir' }
+        let(:file_in_dir)  { File.join(test_dir, 'test_dir_file') }
+
+        include_examples 'valid data'
+
+        context "when the file path contains '/'", ssh: true do
+          let(:file_in_dir) { File.join(modpath, 'files', 'test_dir', 'test_dir_file') }
+          let(:file_checksum) { Digest::SHA256.hexdigest(File.read(file_in_dir)) }
+          let(:expected_response) {
+            [
+              {
+                "path" => file_in_dir,
+                "relative_path" => ".",
+                "links" => "follow",
+                "owner" => File.stat(file_in_dir).uid,
+                "group" => File.stat(file_in_dir).gid,
+                "checksum" => {
+                  "type" => "sha256",
+                  "value" => "{sha256}#{file_checksum}"
+                },
+                "type" => "file",
+                "destination" => nil
+              }
+            ]
+          }
+
+          it 'returns the file metadata of the file' do
+            get("/project_file_metadatas/project_module/test_dir/test_dir_file?versioned_project=#{versioned_project}")
+            file_metadatas = JSON.parse(last_response.body)
+            # I don't know why the mode returned by puppet is not the same as the mode returned
+            # from ruby's File.stat(file_in_dir) function. But these tests probably don't need to
+            # cover the specifics of what puppet returns, plus we don't use this metadata in
+            # orch anyway, so ignore the mode part of the respose.
+            #                                     - Sean P. McDonald 10/15/2020
+            file_metadatas.each do |entry|
+              entry.delete("mode")
+            end
+            expect(file_metadatas).to eq(expected_response)
+            expect(last_response.status).to eq(200)
           end
-          expect(file_metadatas).to eq(expected_response)
-          expect(last_response.status).to eq(200)
         end
       end
 
-      context "with a directory", ssh: true do
-        let(:test_dir) {
-          Pathname.new(
-            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_dir')
-          ).cleanpath.to_s
-        }
-        let(:file_in_dir) {
-          File.join(test_dir, 'test_dir_file')
-        }
-        let(:file_checksum) {
-          Digest::SHA256.hexdigest(
-            File.read(file_in_dir)
-          )
-        }
-        let(:expected_response) {
-          [
-            {
-              "path" => test_dir,
-              "relative_path" => ".",
-              "links" => "follow",
-              "owner" => File.stat(test_dir).uid,
-              "group" => File.stat(test_dir).gid,
-              "checksum" => {
-                "type" => "ctime",
-                "value" => "{ctime}#{File.ctime(test_dir)}"
-              },
-              "type" => "directory",
-              "destination" => nil
-            },
-            {
-              "path" => test_dir,
-              "relative_path" => "test_dir_file",
-              "links" => "follow",
-              "owner" => File.stat(file_in_dir).uid,
-              "group" => File.stat(file_in_dir).gid,
-              "checksum" => {
-                "type" => "sha256",
-                "value" => "{sha256}#{file_checksum}"
-              },
-              "type" => "file",
-              "destination" => nil
-            }
-          ]
-        }
-        it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_dir?versioned_project=#{versioned_project}")
-          file_metadatas = JSON.parse(last_response.body)
-          # I don't know why the mode returned by puppet is not the same as the mode returned
-          # from ruby's File.stat(test_file) function. But these tests probably don't need to
-          # cover the specifics of what puppet returns, plus we don't use this metadata in
-          # orch anyway, so ignore the mode part of the respose.
-          #                                     - Sean P. McDonald 10/15/2020
-          file_metadatas.each do |entry|
-            entry.delete("mode")
-          end
-          expect(file_metadatas).to eq(expected_response)
-          expect(last_response.status).to eq(200)
-        end
+      context "getting files from the 'scripts/' directory" do
+        let(:test_file)     { File.join(modpath, 'scripts', 'script.sh') }
+        let(:file_request)  { 'scripts/script.sh' }
+        let(:test_dir)      { File.join(modpath, 'scripts', 'test_dir') }
+        let(:dir_request)   { 'scripts/test_dir/' }
+        let(:file_in_dir)   { File.join(test_dir, 'dir_script.sh') }
+
+        include_examples 'valid data'
+      end
+
+      context "getting files from the 'files/' directory with specific ref" do
+        let(:test_file)    { File.join(modpath, 'files', 'test_file') }
+        let(:file_request) { 'files/test_file' }
+        let(:test_dir)     { File.join(modpath, 'files', 'test_dir') }
+        let(:dir_request)  { 'files/test_dir' }
+        let(:file_in_dir)  { File.join(test_dir, 'test_dir_file') }
+
+        include_examples 'valid data'
+      end
+
+      it 'without specific Puppet file reference does not find script' do
+        get("/project_file_metadatas/project_module/script.sh?versioned_project=#{versioned_project}")
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/'script.sh' does not exist/)
+      end
+
+      it 'prefers loading from files/files/ when file also exists in files/' do
+        abs_path = File.join(modpath, 'files', 'files', 'duplicate')
+        get("/project_file_metadatas/project_module/files/duplicate?versioned_project=#{versioned_project}")
+        file_metadatas = JSON.parse(last_response.body)
+        expect(file_metadatas.first['path']).to eq(abs_path)
+        expect(last_response.status).to eq(200)
       end
     end
 
@@ -1451,7 +1484,11 @@ describe "BoltServer::TransportApp" do
             'plugin_module/types/some_alias.pp',
             'pluginfacts_module/facts.d/external_fact.sh',
             'project_module/files/test_dir/test_dir_file',
-            'project_module/files/test_file'
+            'project_module/files/test_file',
+            'project_module/files/duplicate',
+            'project_module/files/files/duplicate',
+            'project_module/scripts/script.sh',
+            'project_module/scripts/test_dir/dir_script.sh'
           ]
           expect(unpacked_plugin_files.sort).to eql(expected_plugin_files.sort)
 

@@ -239,6 +239,7 @@ module Bolt
           search_dirs << mod.plugins if mod.plugins?
           search_dirs << mod.pluginfacts if mod.pluginfacts?
           search_dirs << mod.files if mod.files?
+          search_dirs << mod.scripts if mod.scripts?
           type_files = "#{mod.path}/types"
           search_dirs << type_files if File.exist?(type_files)
           search_dirs
