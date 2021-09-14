@@ -1,13 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-if RbConfig::CONFIG['host_os'] =~ /mswin|mingw|cygwin/
-  require 'bootsnap'
-  Bootsnap.setup(
-    cache_dir:       File.join(ENV['ProgramData'], 'PuppetLabs', 'bolt'),
-    load_path_cache: false
-  )
-end
 require 'bolt'
 require 'bolt/cli'
 
