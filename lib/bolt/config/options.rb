@@ -150,7 +150,9 @@ module Bolt
               description: "Load scripts from the `scripts/` directory of a module.",
               type: [TrueClass, FalseClass],
               _example: true,
-              _default: false
+              _default: false,
+              _deprecation: "Bolt no longer honors this option and enables loading scripts from the scripts "\
+                            "directory by default."
             },
             "script_interpreter" => {
               description: "Use a target's [`interpreters` configuration](bolt_transports_reference.md#interpreters) "\
@@ -161,7 +163,7 @@ module Bolt
             }
           },
           _plugin: false,
-          _example: { 'file_paths' => true, 'script_interpreter' => true }
+          _example: { 'script_interpreter' => true }
         },
         "hiera-config" => {
           description: "The path to the Hiera configuration file.",

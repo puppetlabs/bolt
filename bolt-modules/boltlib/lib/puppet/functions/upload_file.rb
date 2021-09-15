@@ -70,11 +70,8 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
     # Send Analytics Report
     executor.report_function_call(self.class.name)
 
-    future = executor&.future || {}
-    fallback = future.fetch('file_paths', false)
-
     # Find the file path if it exists, otherwise return nil
-    found = Bolt::Util.find_file_from_scope(source, scope, fallback)
+    found = Bolt::Util.find_file_from_scope(source, scope)
     unless found && Puppet::FileSystem.exist?(found)
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, file: source

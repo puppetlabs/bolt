@@ -65,8 +65,7 @@ module Bolt
       puppet_overrides = {
         bolt_pdb_client: pdb_client,
         bolt_inventory: inv,
-        bolt_project: bolt_project,
-        future: request['future']
+        bolt_project: bolt_project
       }
 
       # Facts will be set by the catalog compiler, so we need to ensure

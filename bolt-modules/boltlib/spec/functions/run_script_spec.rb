@@ -43,11 +43,10 @@ describe 'run_script' do
         .and_return(result_set)
     end
 
-    context 'with future.file_paths enabled' do
+    context 'when locating files' do
       let(:module_root) { File.expand_path(fixtures('modules')) }
 
       before(:each) do
-        executor.expects(:future).returns({ 'file_paths' => true })
         inventory.stubs(:get_targets).with(hostname).returns([target])
       end
 
@@ -126,25 +125,6 @@ describe 'run_script' do
             .with_params('with_files/files/toplevel.sh', hostname)
             .and_return(result_set)
         end
-      end
-    end
-
-    context 'with future.file_paths explicitly disabled' do
-      before(:each) do
-        executor.expects(:future).returns({ 'file_paths' => false })
-      end
-
-      it 'does not load from scripts/' do
-        is_expected.to run
-          .with_params('with_scripts/scripts/hostname.sh', hostname)
-          .and_raise_error(/No such file or directory: .*with_scripts.*hostname\.sh/)
-      end
-
-      it 'does not load from files/ if files/files/script.sh is specified' do
-        # This file exists at the toplevel but not under files/, so should not get loaded
-        is_expected.to run
-          .with_params('with_files/files/toplevel.sh', hostname)
-          .and_raise_error(/No such file or directory: .*with_files.*toplevel\.sh/)
       end
     end
 

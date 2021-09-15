@@ -201,10 +201,6 @@ begin
       # 'console' and filepath
       @opts['log'][:properties] = @opts['log'][:additionalProperties][:properties]
 
-      # Remove 'notice' log level. This is soft-deprecated and shouldn't appear
-      # in documentation.
-      @opts['log'][:properties]['level'][:enum].delete('notice')
-
       # Stringify data types
       @opts.transform_values! { |data| stringify_types(data) }
 
@@ -460,10 +456,6 @@ begin
       # Move sub-options for 'log' option up one level, as they're nested under
       # 'console' and filepath
       @opts['log'][:properties] = @opts['log'][:additionalProperties][:properties]
-
-      # Remove 'notice' log level. This is soft-deprecated and shouldn't appear
-      # in documentation.
-      @opts['log'][:properties]['level'][:enum].delete('notice')
 
       # Stringify data types
       @opts.transform_values! { |data| stringify_types(data) }

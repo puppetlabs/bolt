@@ -92,11 +92,7 @@ describe "when runnning over the ssh transport", ssh: true do
       }
     end
 
-    let(:future_config) do
-      {
-        'file_paths' => true
-      }
-    end
+    let(:future_config) { {} }
 
     let(:default_inv) do
       {
@@ -170,7 +166,6 @@ describe "when runnning over the ssh transport", ssh: true do
       context 'with future.script_interpreter configured' do
         let(:future_config) do
           {
-            'file_paths'         => true,
             'script_interpreter' => true
           }
         end
