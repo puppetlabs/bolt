@@ -401,6 +401,23 @@ _PowerShell cmdlet_
 Invoke-BoltScript -Script ./scripts/configure.ps1 -Targets servers
 ```
 
+You can also run scripts that are part of a project or module. Scripts that are
+part of a project or module are saved in the `scripts/` directory. To run the
+script, specify a Puppet file path with the form `<MODULE OR PROJECT
+NAME>/scripts/<FILE NAME>`:
+
+_\*nix shell command_
+
+```shell
+bolt script run my_module/scripts/configure.sh --targets servers
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltScript -Script my_module/scripts/configure.ps1 -Targets servers
+```
+
 ### Pass arguments to a script
 
 Argument values are passed literally and are not interpolated by the shell on

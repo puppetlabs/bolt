@@ -333,12 +333,6 @@ module Bolt
     def new_plan(name, puppet: false, plan_script: nil)
       Bolt::PlanCreator.validate_plan_name(config.project, name)
 
-      if plan_script && !config.future&.fetch('file_paths', false)
-        raise Bolt::CLIError,
-              "The --script flag can only be used if future.file_paths is " \
-              "configured in bolt-project.yaml."
-      end
-
       if plan_script
         Bolt::Util.validate_file('script', find_file(plan_script))
       end
@@ -575,11 +569,10 @@ module Bolt
       modulepath = Bolt::Config::Modulepath.new(config.modulepath)
       modules    = Bolt::Module.discover(modulepath.full_modulepath, config.project)
       mod, file  = path.split(File::SEPARATOR, 2)
-      future     = executor.future&.fetch('file_paths', false)
 
       if modules[mod]
         logger.debug("Did not find file at #{File.expand_path(path)}, checking in module '#{mod}'")
-        found = Bolt::Util.find_file_in_module(modules[mod].path, file || "", future)
+        found = Bolt::Util.find_file_in_module(modules[mod].path, file || "")
         path  = found.nil? ? File.join(modules[mod].path, 'files', file) : found
       end
 

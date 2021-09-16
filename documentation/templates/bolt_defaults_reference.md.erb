@@ -9,7 +9,7 @@ which is supported in both the [system-wide and user-level configuration directo
 ### <% if data.key?(:_deprecation) %>⛔ <% end %>`<%= option %>`
 
 <% if data.key?(:_deprecation) -%>
-_This option is deprecated. <%= data[:_deprecation] %>_
+_This option is deprecated._
 <% end -%>
 
 <%= data[:description] %>
@@ -30,7 +30,11 @@ For a detailed description of each option, their default values, and any availab
 sub-options, see [Transport configuration reference](bolt_transports_reference.md).
 <% elsif data.key?(:properties) -%>
 <% data[:properties].each do |option, data| -%>
-#### `<%= option %>`
+#### <% if data.key?(:_deprecation) %>⛔ <% end %>`<%= option %>`
+
+<% if data.key?(:_deprecation) -%>
+_This option is deprecated._
+<% end -%>
 
 <%= data[:description] %>
 

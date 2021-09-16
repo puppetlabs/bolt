@@ -95,11 +95,7 @@ describe "when runnning over the winrm transport", winrm: true do
       }
     end
 
-    let(:future_config) do
-      {
-        'file_paths' => true
-      }
-    end
+    let(:future_config) { {} }
 
     let(:default_inv) do
       {
@@ -225,7 +221,6 @@ describe "when runnning over the winrm transport", winrm: true do
       context 'with future.script_interpreter configured' do
         let(:future_config) do
           {
-            'file_paths'         => true,
             'script_interpreter' => true
           }
         end

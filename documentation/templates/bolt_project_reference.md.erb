@@ -9,7 +9,7 @@ For more information, see [Configuring Bolt](configuring_bolt.md).
 ### <% if data.key?(:_deprecation) %>⛔ <% end %>`<%= option %>`
 
 <% if data.key?(:_deprecation) -%>
-_This option is deprecated. <%= data[:_deprecation] %>_
+_This option is deprecated._
 <% end -%>
 
 <%= data[:description] %>
@@ -27,7 +27,11 @@ _This option is deprecated. <%= data[:_deprecation] %>_
 
 <% if data.key?(:properties) -%>
 <% data[:properties].each do |option, data| -%>
-#### `<%= option %>`
+#### <% if data.key?(:_deprecation) %>⛔ <% end %>`<%= option %>`
+
+<% if data.key?(:_deprecation) -%>
+_This option is deprecated._
+<% end -%>
 
 <%= data[:description] %>
 
