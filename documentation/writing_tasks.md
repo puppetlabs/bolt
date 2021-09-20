@@ -8,6 +8,11 @@ PowerShell, or Python. A task can even be a compiled binary that runs on the
 target. Place your task in the `./tasks` directory of a module and add a
 metadata file to describe parameters and configure task behavior.
 
+> 🔩 **Tip:** In most cases, you can wrap an existing script in a YAML
+> plan, giving you much of the same benefit of converting a script to a task
+> without much effort. To learn more about wrapping scripts in YAML plans, see
+> [Wrapping a script in a plan](creating_a_script_plan.md).
+
 For a task to run on remote *nix systems, it must include a shebang (`#!`) line
 at the top of the file to specify the interpreter.
 
