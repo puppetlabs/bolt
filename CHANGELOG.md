@@ -1,5 +1,96 @@
 # Changelog
 
+## Bolt 3.18.0 (2021-09-20)
+
+### New features
+
+* **Support `interpreters` configuration when running scripts**
+  ([#2698](https://github.com/puppetlabs/bolt/issues/2698))
+
+  Bolt now supports the `interpreters` transport configuration when running
+  scripts. To enable this feature, set the `future.script_interpreter`
+  configuration to `true`.
+
+* **Create `.gitignore` in new projects with local Bolt files**
+  ([#2985](https://github.com/puppetlabs/bolt))
+
+  The `bolt project init` command now lays down a `.gitignore` file to ignore
+  local files that Bolt creates while executing.
+
+* **Update bundled modules to latest versions**
+  ([#3019](https://github.com/puppetlabs/bolt/pull/3019))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [package 2.1.0](https://forge.puppet.com/puppetlabs/package/2.1.0/changelog)
+
+  - [puppet_agent 4.9.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.9.0/changelog)
+
+  - [puppet_conf 1.2.0](https://forge.puppet.com/puppetlabs/puppet_conf/1.2.0/changelog)
+
+  - [reboot 4.1.0](https://forge.puppet.com/puppetlabs/reboot/4.1.0/changelog)
+
+  - [service 2.1.0](https://forge.puppet.com/puppetlabs/service/2.1.0/changelog)
+
+  - [stdlib 8.0.0](https://forge.puppet.com/puppetlabs/stdlib/8.0.0/changelog)
+
+    The `stdlib 8.0.0` module includes breaking changes to the
+    `ensure_packages` function. If you need to use an older version of
+    the module, you can [install the module](http://pup.pt/bolt-modules)
+    in your project configuration.
+
+* **Support Forge authorization token when installing modules**
+  ([#3022](https://github.com/puppetlabs/bolt/pull/3022))
+
+  Bolt now supports using a token to authorizing requests to the Forge when
+  installing modules using the `module-install.forge.authorization_token`
+  setting.
+
+* **Look for scripts in a `scripts` directory**
+  ([#3025](https://github.com/puppetlabs/bolt/pull/3025))
+
+  Bolt now looks for scripts in a project's or module's `scripts` directory when
+  provided a Puppet file path with the form `<module>/scripts/<file>`.
+  Previously, this behavior was opt-in only by setting the `future.file_paths`
+  configuration option.
+
+### Bug fixes
+
+* **Return exit code 1 instead of 2 when Bolt errors**
+  ([#2998](https://github.com/puppetlabs/bolt/issues/2998))
+
+  Bolt will now exit with code 1 instead of 2 whenever a Bolt operation fails.
+
+* **Update BoltSpec functions to allow absolute paths**
+  ([#2905](https://github.com/puppetlabs/bolt/issues/2905))
+
+  BoltSpec's `allow_upload`, `expect_upload`, `allow_script`, and
+  `expect_script` functions now support passing absolute paths that rather than
+  a module reference. The referenced path must refer to a real file or upload
+  and script functions will still error.
+
+* **Correctly set main plan ID**
+  ([#2977](https://github.com/puppetlabs/bolt/issues/2977))
+
+  Bolt now sets the main plan's ID to the correct value. Previously, the main
+  plan ID was set incorrectly, causing Bolt to issue warnings during plan runs
+  when it should not have.
+
+* **Allow using the scripts file mount in Puppet manifests**
+  ([#2921](https://github.com/puppetlabs/bolt/issues/2921))
+
+  This fixes a bug where `scripts/` directory files needed for the new Puppet
+  scripts mount were not included in the tarball of dependencies for applying
+  manifests. Users can now use the scripts mount from Puppet manifests.
+
+### Deprecations
+
+* **Deprecate `future.file_paths` configuration option**
+  ([#3025](https://github.com/puppetlabs/bolt/pull/3025))
+
+  The `future.file_paths` configuration option has been deprecated.
+
 ## Bolt 3.17.0 (2021-08-30)
 
 ### New features
