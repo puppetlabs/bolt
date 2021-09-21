@@ -414,6 +414,8 @@ module BoltServer
           'path' => case mount_segment
                     when 'files'
                       "/puppet/v3/file_content/modules/#{module_segment}/#{name_segment}"
+                    when 'scripts'
+                      "/puppet/v3/file_content/scripts/#{module_segment}/#{name_segment}"
                     when 'tasks'
                       "/puppet/v3/file_content/tasks/#{module_segment}/#{name_segment}"
                     when 'lib'
