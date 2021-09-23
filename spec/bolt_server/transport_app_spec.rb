@@ -1194,6 +1194,7 @@ describe "BoltServer::TransportApp" do
 
     describe '/project_file_metadatas/:module_name/:file' do
       let(:versioned_project) { 'bolt_server_test_project' }
+      let(:mod) { 'project_module' }
       let(:modpath) {
         File.join(project_dir, versioned_project, 'modules', 'project_module')
       }
@@ -1249,7 +1250,8 @@ describe "BoltServer::TransportApp" do
                   "value" => "{sha256}#{file_checksum}"
                 },
                 "type" => "file",
-                "destination" => nil
+                "destination" => nil,
+                "puppetserver_root" => test_file_puppetserver_root
               }
             ]
           }
@@ -1285,7 +1287,8 @@ describe "BoltServer::TransportApp" do
                   "value" => "{ctime}#{File.ctime(test_dir)}"
                 },
                 "type" => "directory",
-                "destination" => nil
+                "destination" => nil,
+                "puppetserver_root" => test_dir_puppetserver_root
               },
               {
                 "path" => test_dir,
@@ -1298,7 +1301,8 @@ describe "BoltServer::TransportApp" do
                   "value" => "{sha256}#{file_checksum}"
                 },
                 "type" => "file",
-                "destination" => nil
+                "destination" => nil,
+                "puppetserver_root" => test_dir_puppetserver_root
               }
             ]
           }
@@ -1321,11 +1325,13 @@ describe "BoltServer::TransportApp" do
       end
 
       context "using nonspecific Puppet file ref (<module>/<path>)" do
-        let(:test_file)    { File.join(modpath, 'files', 'test_file') }
-        let(:file_request) { 'test_file' }
-        let(:test_dir)     { File.join(modpath, 'files', 'test_dir') }
-        let(:dir_request)  { 'test_dir' }
-        let(:file_in_dir)  { File.join(test_dir, 'test_dir_file') }
+        let(:test_file)                   { File.join(modpath, 'files', 'test_file') }
+        let(:file_request)                { 'test_file' }
+        let(:test_file_puppetserver_root) { "modules/#{mod}/test_file" }
+        let(:test_dir)                    { File.join(modpath, 'files', 'test_dir') }
+        let(:dir_request)                 { 'test_dir' }
+        let(:test_dir_puppetserver_root)  { "modules/#{mod}/test_dir" }
+        let(:file_in_dir)                 { File.join(test_dir, 'test_dir_file') }
 
         include_examples 'valid data'
 
@@ -1345,7 +1351,8 @@ describe "BoltServer::TransportApp" do
                   "value" => "{sha256}#{file_checksum}"
                 },
                 "type" => "file",
-                "destination" => nil
+                "destination" => nil,
+                "puppetserver_root" => "modules/#{mod}/test_dir/test_dir_file"
               }
             ]
           }
@@ -1368,21 +1375,25 @@ describe "BoltServer::TransportApp" do
       end
 
       context "getting files from the 'scripts/' directory" do
-        let(:test_file)     { File.join(modpath, 'scripts', 'script.sh') }
-        let(:file_request)  { 'scripts/script.sh' }
-        let(:test_dir)      { File.join(modpath, 'scripts', 'test_dir') }
-        let(:dir_request)   { 'scripts/test_dir/' }
-        let(:file_in_dir)   { File.join(test_dir, 'dir_script.sh') }
+        let(:test_file)                   { File.join(modpath, 'scripts', 'script.sh') }
+        let(:file_request)                { 'scripts/script.sh' }
+        let(:test_file_puppetserver_root) { "scripts/#{mod}/script.sh" }
+        let(:test_dir)                    { File.join(modpath, 'scripts', 'test_dir') }
+        let(:dir_request)                 { 'scripts/test_dir/' }
+        let(:test_dir_puppetserver_root)  { "scripts/#{mod}/test_dir/" }
+        let(:file_in_dir)                 { File.join(test_dir, 'dir_script.sh') }
 
         include_examples 'valid data'
       end
 
       context "getting files from the 'files/' directory with specific ref" do
-        let(:test_file)    { File.join(modpath, 'files', 'test_file') }
-        let(:file_request) { 'files/test_file' }
-        let(:test_dir)     { File.join(modpath, 'files', 'test_dir') }
-        let(:dir_request)  { 'files/test_dir' }
-        let(:file_in_dir)  { File.join(test_dir, 'test_dir_file') }
+        let(:test_file)                   { File.join(modpath, 'files', 'test_file') }
+        let(:file_request)                { 'files/test_file' }
+        let(:test_file_puppetserver_root) { "modules/#{mod}/test_file" }
+        let(:test_dir)                    { File.join(modpath, 'files', 'test_dir') }
+        let(:dir_request)                 { 'files/test_dir' }
+        let(:test_dir_puppetserver_root)  { "modules/#{mod}/test_dir" }
+        let(:file_in_dir)                 { File.join(test_dir, 'test_dir_file') }
 
         include_examples 'valid data'
       end
@@ -1399,6 +1410,7 @@ describe "BoltServer::TransportApp" do
         get("/project_file_metadatas/project_module/files/duplicate?versioned_project=#{versioned_project}")
         file_metadatas = JSON.parse(last_response.body)
         expect(file_metadatas.first['path']).to eq(abs_path)
+        expect(file_metadatas.first['puppetserver_root']).to eq('modules/project_module/files/duplicate')
         expect(last_response.status).to eq(200)
       end
     end

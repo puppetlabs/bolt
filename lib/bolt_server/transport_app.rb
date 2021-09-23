@@ -414,6 +414,8 @@ module BoltServer
           'path' => case mount_segment
                     when 'files'
                       "/puppet/v3/file_content/modules/#{module_segment}/#{name_segment}"
+                    when 'scripts'
+                      "/puppet/v3/file_content/scripts/#{module_segment}/#{name_segment}"
                     when 'tasks'
                       "/puppet/v3/file_content/tasks/#{module_segment}/#{name_segment}"
                     when 'lib'
@@ -463,7 +465,7 @@ module BoltServer
     end
 
     def file_metadatas(versioned_project, module_name, file)
-      abs_file_path = @pal_mutex.synchronize do
+      result = @pal_mutex.synchronize do
         bolt_config = config_from_project(versioned_project)
         pal = pal_from_project_bolt_config(bolt_config)
         pal.in_bolt_compiler do
@@ -473,23 +475,28 @@ module BoltServer
           # If not found, and the path starts with `files` or `scripts`, munge
           # the path and look inside that directory.
           if (abs_path = mod.file(file))
-            abs_path
+            { abs_file_path: abs_path, puppetserver_root: "modules/#{module_name}/#{file}" }
           else
             subdir, relative_path = file.split(File::SEPARATOR, 2)
-            case subdir
-            when 'files'
-              mod.file(relative_path)
-            when 'scripts'
-              mod.script(relative_path)
-            end
+            abs_path, mount = case subdir
+                              when 'files'
+                                [mod.file(relative_path), 'modules']
+                              when 'scripts'
+                                [mod.script(relative_path), 'scripts']
+                              end
+            next nil unless abs_path
+            { abs_file_path: abs_path, puppetserver_root: "#{mount}/#{module_name}/#{relative_path}" }
           end
         end
       end
 
-      unless abs_file_path
+      unless result
         raise BoltServer::RequestError,
               "file: '#{file}' does not exist inside #{module_name} 'files' or 'scripts' directories"
       end
+
+      abs_file_path = result[:abs_file_path]
+      puppetserver_root = result[:puppetserver_root]
 
       fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
       Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
@@ -497,7 +504,7 @@ module BoltServer
         metadata.checksum_type = 'sha256'
         metadata.links = 'follow'
         metadata.collect
-        metadata.to_data_hash
+        metadata.to_data_hash.merge(puppetserver_root: puppetserver_root)
       end
     end
 
