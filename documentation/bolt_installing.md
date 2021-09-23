@@ -9,7 +9,7 @@ and Microsoft Windows.
 
 | Operating system          | Versions            |
 | ------------------------- | ------------------- |
-| Debian                    | 9, 10               |
+| Debian                    | 9, 10, 11           |
 | Fedora                    | 32, 34              |
 | macOS                     | 10.15, 11           |
 | Microsoft Windows*        | 10 Enterprise       |
@@ -33,7 +33,7 @@ have installed:
   ```shell
   wget https://apt.puppet.com/puppet-tools-release-stretch.deb
   sudo dpkg -i puppet-tools-release-stretch.deb
-  sudo apt-get update 
+  sudo apt-get update
   sudo apt-get install puppet-bolt
   ```
 
@@ -42,7 +42,16 @@ have installed:
   ```shell
   wget https://apt.puppet.com/puppet-tools-release-buster.deb
   sudo dpkg -i puppet-tools-release-buster.deb
-  sudo apt-get update 
+  sudo apt-get update
+  sudo apt-get install puppet-bolt
+  ```
+
+- _Debian 11_
+
+  ```shell
+  wget https://apt.puppet.com/puppet-tools-release-bullseye.deb
+  sudo dpkg -i puppet-tools-release-bullseye.deb
+  sudo apt-get update
   sudo apt-get install puppet-bolt
   ```
 
