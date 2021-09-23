@@ -819,6 +819,7 @@ the `files` property in your metadata as an array of paths. A path consists of
     -   `tasks` — Helper files that can be called as tasks on their own.
     -   `lib` — Ruby code that might be reused by types, providers, or Puppet
         functions.
+    -   `scripts` — Scripts that can be called from a task.
 -   The remaining path to a file or directory; directories must include a
     trailing slash `/`.
 
