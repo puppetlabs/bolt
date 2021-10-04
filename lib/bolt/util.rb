@@ -65,6 +65,9 @@ module Bolt
         raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}, line #{e.line}, "\
                                   "column #{e.column}\n#{e.problem}",
                                   path)
+      rescue Psych::BadAlias => e
+        raise Bolt::FileError.new('Bolt does not support the use of aliases in YAML files. Alias '\
+                                  "detected in #{file_name} file at #{path}\n#{e.message}", path)
       rescue Psych::Exception => e
         raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}\n#{e.message}",
                                   path)
