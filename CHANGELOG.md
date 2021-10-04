@@ -5,10 +5,12 @@
 ### New features
 
 * **Debian 11 packages**
+  ([#3027](https://github.com/puppetlabs/bolt/pull/3027))
 
   Bolt now ships packages for Debian 11.
 
 * **Update bundled modules to latest versions**
+  ([#3030](https://github.com/puppetlabs/bolt/pull/3030))
 
   The following bundled modules have been updated to their latest
   versions:
@@ -26,6 +28,7 @@
 ### Bug fixes
 
 * **Correctly set inventory config when resolving plugins**
+  ([#3029](https://github.com/puppetlabs/bolt/pull/3029))
 
   Previously, Bolt would resolve plugins then set the config in the
   Inventory to `nil`, causing errors like `undefined method 'merge' for
