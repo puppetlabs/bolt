@@ -71,7 +71,7 @@ module Bolt
           @config
         else
           @config_resolved = true
-          @config.transform_values! { |t| t.resolved? ? t : t.resolve(@plugins) }
+          @config.each_value { |t| t.resolve(@plugins) unless t.resolved? }
         end
       end
 
