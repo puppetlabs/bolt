@@ -1320,6 +1320,38 @@ describe Bolt::Inventory::Inventory do
     end
   end
 
+  context 'resolving transport config' do
+    let(:config_data) do
+      {
+        'ssh' => {
+          'user' => {
+            '_plugin' => 'mock_plugin'
+          }
+        }
+      }
+    end
+    let(:config)    { make_config(config_data) }
+    let(:inventory) do
+      Bolt::Inventory::Inventory.new({ 'config' => config_data },
+                                     config.transport,
+                                     config.transports,
+                                     plugins)
+    end
+
+    before(:each) do
+      mock_plugin = double('mock_plugin')
+      allow(mock_plugin).to receive(:name).and_return('mock_plugin')
+      allow(mock_plugin).to receive(:hooks).and_return([:resolve_reference])
+      allow(mock_plugin).to receive(:resolve_reference).and_return("test_user")
+      plugins.add_plugin(mock_plugin)
+    end
+
+    it 'sets the resolved config on the inventory config object' do
+      config = inventory.config
+      expect(config['ssh'].to_h['user']).to eq("test_user")
+    end
+  end
+
   context 'when the transport config contains keys that resolved to nil' do
     let(:transport_config) do
       {
