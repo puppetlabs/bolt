@@ -1,5 +1,37 @@
 # Changelog
 
+## Bolt 3.19.0 (2021-10-04)
+
+### New features
+
+* **Debian 11 packages**
+
+  Bolt now ships packages for Debian 11.
+
+* **Update bundled modules to latest versions**
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [augeas_core 1.2.0](https://forge.puppet.com/puppetlabs/augeas_core/1.2.0/changelog)
+  - [cron_core 1.1.0](https://forge.puppet.com/puppetlabs/cron_core/1.1.0/changelog)
+  - [host_core 1.1.0](https://forge.puppet.com/puppetlabs/host_core/1.1.0/changelog)
+  - [mount_core 1.1.0](https://forge.puppet.com/puppetlabs/mount_core/1.1.0/changelog)
+  - [selinux_core 1.2.0](https://forge.puppet.com/puppetlabs/selinux_core/1.2.0/changelog)
+  - [sshkeys_core 2.3.0](https://forge.puppet.com/puppetlabs/sshkeys_core/2.3.0/changelog)
+  - [stdlib 8.1.0](https://forge.puppet.com/puppetlabs/stdlib/8.1.0/changelog)
+  - [yumrepo_core 1.1.0](https://forge.puppet.com/puppetlabs/yumrepo_core/1.1.0/changelog)
+  - [zfs_core 1.3.0](https://forge.puppet.com/puppetlabs/zfs_core/1.3.0/changelog)
+
+### Bug fixes
+
+* **Correctly set inventory config when resolving plugins**
+
+  Previously, Bolt would resolve plugins then set the config in the
+  Inventory to `nil`, causing errors like `undefined method 'merge' for
+  nil:NilClass`. Bolt now correctly returns the resolved config to the
+  inventory.
+
 ## Bolt 3.18.0 (2021-09-20)
 
 ### New features
