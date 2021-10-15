@@ -400,6 +400,7 @@ included in the message.
     "msg": "Task exited 1:\nSomething on stderr",
     "kind": "puppetlabs.tasks/task-error",
     "details": { "exitcode": 1 }
+  }
 }
 ```
 
