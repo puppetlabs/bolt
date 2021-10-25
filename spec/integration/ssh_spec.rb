@@ -148,6 +148,31 @@ describe "when runnning over the ssh transport", ssh: true do
       }
     end
 
+    let(:interpreter_array) do
+      {
+        'config' => {
+          'ssh' => {
+            'interpreters' => {
+              'py' => ['/usr/bin/python3', '-d']
+            }
+          }
+        }
+      }
+    end
+
+    let(:interpreter_array_wrapper) do
+      {
+        'config' => {
+          'ssh' => {
+            'tty' => true,
+            'interpreters' => {
+              'py' => ['/usr/bin/python3', '-d']
+            }
+          }
+        }
+      }
+    end
+
     around :each do |example|
       with_project(config: config, inventory: inv) do |project|
         @project = project
@@ -223,6 +248,28 @@ describe "when runnning over the ssh transport", ssh: true do
       include_examples 'script interpreter'
 
       it 'runs task with interpreter key .py' do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
+      end
+    end
+
+    context 'with interpreters as an array' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_array) }
+
+      include_examples 'script interpreter'
+
+      it 'runs task with interpreter value as array' do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
+      end
+    end
+
+    context 'with interpreters as an array that gets wrapped' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_array_wrapper) }
+
+      it 'runs task with interpreter value as array' do
         result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
         expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
         expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])

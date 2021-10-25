@@ -155,6 +155,18 @@ describe "when runnning over the winrm transport", winrm: true do
       }
     end
 
+    let(:array_interpreter) do
+      {
+        'config' => {
+          'winrm' => {
+            'interpreters' => {
+              '.rb' => [RbConfig.ruby]
+            }
+          }
+        }
+      }
+    end
+
     around :each do |example|
       with_project(config: config, inventory: inv) do |project|
         @project = project
@@ -200,6 +212,16 @@ describe "when runnning over the winrm transport", winrm: true do
       it 'task fails with bad interpreter', windows: true do
         result = run_failed_node(%W[task run #{interpreter_task} message=short] + single_target)
         expect(result['_error']['msg']).to match(/'C:\\dev\\null' is not recognized/)
+      end
+    end
+
+    context 'with an array interpreter' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, array_interpreter) }
+
+      it 'runs task with interpreter array', windows: true do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
       end
     end
 

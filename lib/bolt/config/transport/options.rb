@@ -155,14 +155,15 @@ module Bolt
                          "`task.py`) and the extension is case sensitive. When a target's name is `localhost`, "\
                          "Ruby tasks run with the Bolt Ruby interpreter by default.",
             additionalProperties: {
-              type: String,
+              type: [String, Array],
               _plugin: false
             },
             propertyNames: {
               pattern: "^.?[a-zA-Z0-9]+$"
             },
             _plugin: true,
-            _example: { "rb" => "/usr/bin/ruby" }
+            _example: { "rb" => ["/usr/bin/ruby", "-r", "puppet"],
+                        ".py" => "/usr/bin/python3" }
           },
           "job-poll-interval" => {
             type: Integer,
