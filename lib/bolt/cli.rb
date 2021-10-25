@@ -446,7 +446,7 @@ module Bolt
           check_gem_install
           warn_inventory_overrides_cli(config, options)
           submit_screen_view(analytics, config, inventory, options)
-          options[:targets] = process_target_list(plugins.puppetdb_client, @rerun, options)
+          options[:targets] = process_target_list(plugins, @rerun, options)
 
           # TODO: Fix casing issue in Windows.
           config.check_path_case('modulepath', config.modulepath)
@@ -689,14 +689,14 @@ module Bolt
     # Process the target list by turning a PuppetDB query or rerun mode into a
     # list of target names.
     #
-    # @param pdb_client [Bolt::PuppetDB::Client] The PuppetDB client.
+    # @param plugins [Bolt::Plugin] The Plugin instance.
     # @param rerun [Bolt::Rerun] The Rerun instance.
     # @param options [Hash] The CLI options.
     # @return [Hash] The target list.
     #
-    private def process_target_list(pdb_client, rerun, options)
+    private def process_target_list(plugins, rerun, options)
       if options[:query]
-        pdb_client.query_certnames(options[:query])
+        plugins.puppetdb_client.query_certnames(options[:query])
       elsif options[:rerun]
         rerun.get_targets(options[:rerun])
       elsif options[:targets]
