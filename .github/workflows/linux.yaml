@@ -57,3 +57,5 @@ jobs:
           bundle exec r10k puppetfile install
       - name: Integration tests
         run: bundle exec rake ci:linux:integration
+      - name: Tests requiring puppetserver
+        run: bundle exec rake ci:linux:boltserver
