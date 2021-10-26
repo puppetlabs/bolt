@@ -1,5 +1,27 @@
 # Changelog
 
+## Bolt 3.20.0 (2021-10-26)
+
+### New features
+
+* **Support arrays and strings for `interpreters` transport configuration**
+  ([#3035](https://github.com/puppetlabs/bolt/pull/3035))
+
+  Bolt now supports arrays in addition to strings as the value for the
+  `interpreters` transport configuration option, which enables passing
+  flags in addition to a binary.
+
+### Bug fixes
+
+* **Resolve puppetdb client configuration plugins as needed**
+  ([#3034](https://github.com/puppetlabs/bolt/issues/3034))
+
+  Bolt now only resolves plugins for the puppetdb client when needed.
+  Previously, Bolt would attempt to resolve plugins for the puppetdb
+  client for every command, which would cause Bolt to error if the
+  plugin module was not available, such as when installing a project's
+  modules for the first time.
+
 ## Bolt 3.19.0 (2021-10-04)
 
 ### New features
