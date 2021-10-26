@@ -46,7 +46,13 @@ begin
     namespace :linux do
       desc ''
       RSpec::Core::RakeTask.new(:integration) do |t|
-        t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_server/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
+        t.pattern = "spec/integration/**/*_spec.rb,spec/bolt_spec/**/*_spec.rb"
+        t.rspec_opts = '--tag ~winrm --tag ~winrm_agentless'
+      end
+
+      desc ''
+      RSpec::Core::RakeTask.new(:boltserver) do |t|
+        t.pattern = "spec/bolt_server/**/*_spec.rb"
         t.rspec_opts = '--tag ~winrm --tag ~winrm_agentless'
       end
     end

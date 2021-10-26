@@ -100,7 +100,7 @@ module Bolt
 
             # Only use interpreter if script_interpreter config is enabled
             if options[:script_interpreter] && interpreter
-              exec_args.unshift(interpreter)
+              exec_args.unshift(interpreter).flatten!
               logger.trace("Running '#{script}' using '#{interpreter}' interpreter")
             end
 
@@ -254,7 +254,7 @@ module Bolt
         if interpreter
           StringIO.new(<<~SCRIPT)
             #!/bin/sh
-            '#{interpreter}' '#{task_path}' <<'EOF'
+            #{Array(interpreter).map { |word| "'#{word}'" }.join(' ')} '#{task_path}' <<'EOF'
             #{stdin}
             EOF
           SCRIPT
@@ -335,11 +335,7 @@ module Bolt
       # Returns string with the interpreter conditionally prepended
       def inject_interpreter(interpreter, command)
         if interpreter
-          if command.is_a?(Array)
-            command.unshift(interpreter)
-          else
-            command = [interpreter, command]
-          end
+          command = Array(command).unshift(interpreter).flatten
         end
 
         command.is_a?(String) ? command : Shellwords.shelljoin(command)

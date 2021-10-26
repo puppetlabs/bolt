@@ -438,7 +438,7 @@ end
 describe "when loading bolt for CLI invocation" do
   context 'and calling help' do
     def cli_loaded_features
-      cli_loader = File.join(__dir__, '..', 'fixtures', 'scripts', 'bolt_cli_loader.rb')
+      cli_loader = File.join(__dir__, '..', '..', 'fixtures', 'scripts', 'bolt_cli_loader.rb')
       `bundle exec ruby #{cli_loader}`.split("\n")
     end
 

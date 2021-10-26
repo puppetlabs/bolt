@@ -82,6 +82,11 @@ shared_examples 'interpreters' do
     expect(transport.new(data)['interpreters']).to include('.rb')
   end
 
+  it 'accepts an array value' do
+    data['interpreters'] = { 'rb' => ['/path/to/ruby', '-r', 'gem_gem_gem'] }
+    expect(transport.new(data)['interpreters']).to include('.rb')
+  end
+
   it 'interpreters errors with wrong type' do
     data['interpreters'] = ['rb']
     expect { transport.new(data) }.to raise_error(Bolt::ValidationError)

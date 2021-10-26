@@ -149,7 +149,7 @@ describe "BoltServer::TransportApp" do
           expect(resp).to eq(expected_response)
         end
       end
-      context 'with non-existant plan' do
+      context 'with non-existent plan' do
         let(:path) { '/plans/foo/bar?environment=production' }
         it 'returns 404 if an unknown plan error is thrown' do
           get(path)
@@ -172,7 +172,7 @@ describe "BoltServer::TransportApp" do
           end
         end
 
-        context 'with a non-existant environment' do
+        context 'with a non-existent environment' do
           let(:path) { "/plans?environment=not_an_env" }
           it 'returns 400 if an environment not found error is thrown' do
             get(path)
@@ -180,7 +180,7 @@ describe "BoltServer::TransportApp" do
           end
         end
 
-        context 'with a non existant environment' do
+        context 'with a non existent environment' do
           let(:path) { "/plans" }
           it 'returns 400 if an environment query parameter not supplied' do
             get(path)
@@ -269,7 +269,7 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with non-existant plan' do
+      context 'with non-existent plan' do
         let(:path) { "/project_plans/foo/bar?versioned_project=bolt_server_test_project" }
         it 'returns 404 if an unknown plan error is thrown' do
           get(path)
@@ -296,7 +296,7 @@ describe "BoltServer::TransportApp" do
           end
         end
 
-        context 'with a non existant project' do
+        context 'with a non existent project' do
           let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
           it 'returns 400 if an versioned_project not found error is thrown' do
             get(path)
@@ -309,7 +309,7 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/tasks' do
-      context 'with a non existant environment' do
+      context 'with a non existent environment' do
         let(:path) { "/tasks?environment=production" }
         it 'returns just the list of task names' do
           get(path)
@@ -318,7 +318,7 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with a non existant environment' do
+      context 'with a non existent environment' do
         let(:path) { "/tasks?environment=not_a_real_env" }
         it 'returns 400 if an environment not found error is thrown' do
           get(path)
@@ -326,7 +326,7 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with a non existant environment' do
+      context 'with a non existent environment' do
         let(:path) { "/tasks" }
         it 'returns 400 if an environment query parameter not supplied' do
           get(path)
@@ -419,7 +419,7 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with non-existant task' do
+      context 'with non-existent task' do
         let(:path) { "/tasks/foo/bar?environment=production" }
         it 'returns 404 if an unknown task error is thrown' do
           get(path)
@@ -499,7 +499,7 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with non-existant task' do
+      context 'with non-existent task' do
         let(:path) { "/project_tasks/foo/bar?versioned_project=bolt_server_test_project" }
         it 'returns 404 if an unknown task error is thrown' do
           get(path)
@@ -809,32 +809,6 @@ describe "BoltServer::TransportApp" do
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
           expect(result['value']['_output']).to match(/got passed the message: Hello!/)
-        end
-
-        it 'overrides host-key-check default', :ssh do
-          target = conn_info('ssh')
-          body = {
-            target: {
-              hostname: target[:host],
-              user: target[:user],
-              password: target[:password],
-              port: target[:port],
-              'host-key-check': true
-            },
-            task: { name: 'sample::echo',
-                    metadata: {
-                      description: 'Echo a message',
-                      parameters: { message: 'Default message' }
-                    },
-                    files: [{ filename: "echo.sh", sha256: "foo",
-                              uri: { path: 'foo', params: { environment: 'foo' } } }] },
-            parameters: { message: "Hello!" }
-          }
-
-          post('ssh/run_task', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
-
-          result = last_response.body
-          expect(result).to match(/Host key verification failed for localhost/)
         end
 
         it 'errors if multiple targets are supplied', :ssh do
