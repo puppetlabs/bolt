@@ -44,6 +44,7 @@ module Bolt
       'module'    => %w[add generate-types install show],
       'plan'      => %w[show run convert new],
       'plugin'    => %w[show],
+      'policy'    => %w[apply new show],
       'project'   => %w[init migrate],
       'script'    => %w[run],
       'secret'    => %w[encrypt decrypt createkeys],
@@ -285,6 +286,26 @@ module Bolt
 
       if options[:action] == 'convert' && !options[:object]
         raise Bolt::CLIError, "Must specify a plan."
+      end
+
+      if options[:subcommand] == 'policy'
+        if options[:action] == 'apply' && !options[:object]
+          raise Bolt::CLIError, "Must specify one or more policies to apply."
+        end
+
+        if options[:action] == 'apply' && options[:leftovers].any?
+          raise Bolt::CLIError, "Unknown argument(s) #{options[:leftovers].join(', ')}. "\
+                                "To apply multiple policies, provide a comma-separated list of "\
+                                "policy names."
+        end
+
+        if options[:action] == 'new' && !options[:object]
+          raise Bolt::CLIError, "Must specify a name for the new policy."
+        end
+
+        if options[:action] == 'show' && options[:object]
+          raise Bolt::CLIError, "Unknown argument #{options[:object]}."
+        end
       end
 
       if options[:subcommand] == 'module' && options[:action] == 'install' && options[:object]
@@ -630,6 +651,17 @@ module Bolt
       when 'plugin'
         outputter.print_plugin_list(**app.list_plugins)
         SUCCESS
+
+      when 'policy'
+        Bolt::Logger.warn('policy_command', 'This command is experimental and is subject to change.')
+        case action
+        when 'apply'
+          SUCCESS
+        when 'new'
+          SUCCESS
+        when 'show'
+          SUCCESS
+        end
 
       when 'project'
         case action

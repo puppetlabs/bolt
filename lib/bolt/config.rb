@@ -439,6 +439,10 @@ module Bolt
       @data['plugin-hooks']
     end
 
+    def policies
+      @data['policies']
+    end
+
     def trusted_external
       @data['trusted-external-command']
     end

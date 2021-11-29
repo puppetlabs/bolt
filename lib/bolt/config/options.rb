@@ -396,6 +396,15 @@ module Bolt
           _plugin: false,
           _example: { "pkcs7" => { "keysize" => 1024 } }
         },
+        "policies" => {
+          description: "A list of policy names and glob patterns to filter the project's policies by. This option "\
+                       "is used to specify which policies are available to a project and can be applied to targets. "\
+                       "When this option is not configured, policies are not available to the project and cannot "\
+                       "be applied to targets.",
+          type: Array,
+          _plugin: false,
+          _example: ["myproject::apache", "myproject::postgres"]
+        },
         "puppetdb" => {
           description: "A map containing options for [configuring the Bolt PuppetDB "\
                        "client](bolt_connect_puppetdb.md).",
@@ -619,6 +628,7 @@ module Bolt
         plugin-cache
         plugin-hooks
         plugins
+        policies
         puppetdb
         save-rerun
         spinner

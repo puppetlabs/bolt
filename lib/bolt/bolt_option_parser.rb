@@ -114,6 +114,21 @@ module Bolt
           { flags: OPTIONS[:global],
             banner: PLUGIN_HELP }
         end
+      when 'policy'
+        case action
+        when 'apply'
+          { flags: ACTION_OPTS + %w[compile-concurrency hiera-config noop],
+            banner: POLICY_APPLY_HELP }
+        when 'new'
+          { flags: OPTIONS[:global] + PROJECT_PATHS,
+            banner: POLICY_NEW_HELP }
+        when 'show'
+          { flags: OPTIONS[:global] + PROJECT_PATHS,
+            banner: POLICY_SHOW_HELP }
+        else
+          { flags: OPTIONS[:global],
+            banner: POLICY_HELP }
+        end
       when 'project'
         case action
         when 'init'
@@ -202,6 +217,7 @@ module Bolt
           lookup            Look up a value with Hiera
           plan              Convert, create, show, and run Bolt plans
           plugin            Show available plugins
+          policy            Apply, create, and show policies
           project           Create and migrate Bolt projects
           script            Upload a local script and run it remotely
           secret            Create encryption keys and encrypt and decrypt values
@@ -250,7 +266,7 @@ module Bolt
 
     COMMAND_RUN_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          run
+          command run
 
       #{colorize(:cyan, 'Usage')}
           bolt command run <command> {--targets TARGETS | --query QUERY | --rerun FILTER}
@@ -286,7 +302,7 @@ module Bolt
 
     FILE_DOWNLOAD_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          download
+          file download
 
       #{colorize(:cyan, 'Usage')}
           bolt file download <source> <destination> {--targets TARGETS | --query QUERY | --rerun FILTER}
@@ -309,7 +325,7 @@ module Bolt
 
     FILE_UPLOAD_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          upload
+          file upload
 
       #{colorize(:cyan, 'Usage')}
           bolt file upload <source> <destination> {--targets TARGETS | --query QUERY | --rerun FILTER}
@@ -344,7 +360,7 @@ module Bolt
 
     GROUP_SHOW_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          show
+          group show
 
       #{colorize(:cyan, 'Usage')}
           bolt group show [options]
@@ -395,7 +411,7 @@ module Bolt
 
     INVENTORY_SHOW_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          show
+          inventory show
 
       #{colorize(:cyan, 'Usage')}
           bolt inventory show [options]
@@ -453,7 +469,7 @@ module Bolt
 
     MODULE_ADD_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          add
+          module add
       
       #{colorize(:cyan, 'Usage')}
           bolt module add <module> [options]
@@ -471,7 +487,7 @@ module Bolt
 
     MODULE_GENERATETYPES_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          generate-types
+          module generate-types
 
       #{colorize(:cyan, 'Usage')}
           bolt module generate-types [options]
@@ -486,7 +502,7 @@ module Bolt
 
     MODULE_INSTALL_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          install
+          module install
       
       #{colorize(:cyan, 'Usage')}
           bolt module install [options]
@@ -504,7 +520,7 @@ module Bolt
 
     MODULE_SHOW_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          show
+          module show
 
       #{colorize(:cyan, 'Usage')}
           bolt module show [module name] [options]
@@ -541,7 +557,7 @@ module Bolt
 
     PLAN_CONVERT_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          convert
+          plan convert
 
       #{colorize(:cyan, 'Usage')}
           bolt plan convert <plan name> [options]
@@ -564,7 +580,7 @@ module Bolt
 
     PLAN_NEW_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          new
+          plan new
       
       #{colorize(:cyan, 'Usage')}
           bolt plan new <plan name> [options]
@@ -581,7 +597,7 @@ module Bolt
 
     PLAN_RUN_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          run
+          plan run
 
       #{colorize(:cyan, 'Usage')}
           bolt plan run <plan name> [parameters] [options]
@@ -598,7 +614,7 @@ module Bolt
 
     PLAN_SHOW_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          show
+          plan show
 
       #{colorize(:cyan, 'Usage')}
           bolt plan show [plan name] [options]
@@ -641,7 +657,7 @@ module Bolt
 
     PLUGIN_SHOW_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          show
+          plugin show
 
       #{colorize(:cyan, 'Usage')}
           bolt plugin show [options]
@@ -651,6 +667,55 @@ module Bolt
 
       #{colorize(:cyan, 'Documentation')}
           Learn more about Bolt plugins at https://pup.pt/bolt-plugins.
+    HELP
+
+    POLICY_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          policy
+
+      #{colorize(:cyan, 'Usage')}
+          bolt policy <action> [options]
+
+      #{colorize(:cyan, 'Description')}
+          Apply, create, and show policies.
+
+      #{colorize(:cyan, 'Actions')}
+          apply         Apply a policy to the specified targets
+          new           Create a new policy in the current project
+          show          Show available policy
+    HELP
+
+    POLICY_APPLY_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          policy apply
+
+      #{colorize(:cyan, 'Usage')}
+          bolt policy apply <policy> [options]
+
+      #{colorize(:cyan, 'Description')}
+          Apply a policy to the specified targets.
+    HELP
+
+    POLICY_NEW_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          policy new
+
+      #{colorize(:cyan, 'Usage')}
+          bolt policy new <policy> [options]
+
+      #{colorize(:cyan, 'Description')}
+          Create a new policy in the current project.
+    HELP
+
+    POLICY_SHOW_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          policy show
+
+      #{colorize(:cyan, 'Usage')}
+          bolt policy show [options]
+
+      #{colorize(:cyan, 'Description')}
+          Show available policies.
     HELP
 
     PROJECT_HELP = <<~HELP
@@ -673,7 +738,7 @@ module Bolt
 
     PROJECT_INIT_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          init
+          project init
 
       #{colorize(:cyan, 'Usage')}
           bolt project init [name] [options]
@@ -697,7 +762,7 @@ module Bolt
 
     PROJECT_MIGRATE_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          migrate
+          project migrate
 
       #{colorize(:cyan, 'Usage')}
           bolt project migrate [options]
@@ -729,7 +794,7 @@ module Bolt
 
     SCRIPT_RUN_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          run
+          script run
 
       #{colorize(:cyan, 'Usage')}
           bolt script run <script> [arguments] {--targets TARGETS | --query QUERY | --rerun FILTER}
@@ -770,7 +835,7 @@ module Bolt
 
     SECRET_CREATEKEYS_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          createkeys
+          secret createkeys
 
       #{colorize(:cyan, 'Usage')}
           bolt secret createkeys [options]
@@ -784,7 +849,7 @@ module Bolt
 
     SECRET_DECRYPT_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          decrypt
+          secret decrypt
 
       #{colorize(:cyan, 'Usage')}
           bolt secret decrypt <ciphertext> [options]
@@ -798,7 +863,7 @@ module Bolt
 
     SECRET_ENCRYPT_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          encrypt
+          secret encrypt
 
       #{colorize(:cyan, 'Usage')}
         bolt secret encrypt <plaintext> [options]
@@ -830,7 +895,7 @@ module Bolt
 
     TASK_RUN_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          run
+          task run
 
       #{colorize(:cyan, 'Usage')}
           bolt task run <task name> [parameters] {--targets TARGETS | --query QUERY | --rerun FILTER}
@@ -850,7 +915,7 @@ module Bolt
 
     TASK_SHOW_HELP = <<~HELP
       #{colorize(:cyan, 'Name')}
-          show
+          task show
 
       #{colorize(:cyan, 'Usage')}
           bolt task show [task name] [options]
