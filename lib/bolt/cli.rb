@@ -658,6 +658,8 @@ module Bolt
         when 'apply'
           SUCCESS
         when 'new'
+          result = app.new_policy(options[:object])
+          outputter.print_new_policy(**result)
           SUCCESS
         when 'show'
           SUCCESS

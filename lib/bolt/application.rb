@@ -413,6 +413,94 @@ module Bolt
       { plugins: plugins.list_plugins, modulepath: pal.user_modulepath }
     end
 
+    # Add a new policy to the project.
+    #
+    # @param name [String] The name of the new policy.
+    # @return [Hash]
+    #
+    def new_policy(name)
+      # Validate the policy name
+      unless name =~ Bolt::Module::CONTENT_NAME_REGEX
+        message = <<~MESSAGE.chomp
+          Invalid policy name '#{name}'. Policy names are composed of one or more name segments
+          separated by double colons '::'.
+
+          Each name segment must begin with a lowercase letter, and can only include lowercase
+          letters, digits, and underscores.
+
+          Examples of valid policy names:
+              - #{@config.project.name}
+              - #{@config.project.name}::my_policy
+        MESSAGE
+
+        raise Bolt::ValidationError, message
+      end
+
+      prefix, *name_segments, basename = name.split('::')
+
+      # Error if name is not namespaced to project
+      unless prefix == @config.project.name
+        raise Bolt::ValidationError,
+              "Policy name '#{name}' must begin with project name '#{@config.project.name}'. Did "\
+              "you mean '#{@config.project.name}::#{name}'?"
+      end
+
+      # If the policy name is just the project name, use the special init.pp class
+      basename ||= 'init'
+
+      # Policies can be saved in subdirectories in the 'manifests/' directory
+      policy_dir = File.expand_path(File.join(name_segments), @config.project.manifests)
+      policy     = File.expand_path("#{basename}.pp", policy_dir)
+
+      # Ensure the policy does not already exist
+      if File.exist?(policy)
+        raise Bolt::Error.new(
+          "A policy with the name '#{name}' already exists at '#{policy}', nothing to do.",
+          'bolt/existing-policy-error'
+        )
+      end
+
+      # Create the policy directory structure in the current project
+      begin
+        FileUtils.mkdir_p(policy_dir)
+      rescue Errno::EEXIST => e
+        raise Bolt::Error.new(
+          "#{e.message}; unable to create manifests directory '#{policy_dir}'",
+          'bolt/existing-file-error'
+        )
+      end
+
+      # Create the new policy
+      begin
+        File.write(policy, <<~POLICY)
+          class #{name} {
+
+          }
+        POLICY
+      rescue Errno::EACCES => e
+        raise Bolt::FileError.new("#{e.message}; unable to create policy", policy)
+      end
+
+      # Update the project configuration to include the new policy
+      project_config = Bolt::Util.read_yaml_hash(@config.project.project_file, 'project config')
+
+      # Add the 'policies' key if it does not exist and de-dupiclate entries
+      project_config['policies'] ||= []
+      project_config['policies'] <<  name
+      project_config['policies'].uniq!
+
+      begin
+        File.write(@config.project.project_file, project_config.to_yaml)
+      rescue Errno::EACCES => e
+        raise Bolt::FileError.new(
+          "#{e.message}; unable to update project configuration",
+          @config.project.project_file
+        )
+      end
+
+      { name: name, path: policy }
+    end
+
     # Initialize the current directory as a Bolt project.
     #
     # @param name [String] The name of the project.
