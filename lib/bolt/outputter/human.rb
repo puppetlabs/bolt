@@ -677,6 +677,30 @@ module Bolt
         OUTPUT
       end
 
+      # Print policies and the modulepath they are loaded from.
+      #
+      # @param policies [Array] The list of available policies.
+      # @param modulepath [Array] The project's modulepath.
+      #
+      def print_policy_list(policies:, modulepath:)
+        info = +''
+
+        info << colorize(:cyan, "Policies\n")
+
+        if policies.any?
+          policies.sort.each { |policy| info << indent(2, "#{policy}\n") }
+        else
+          info << indent(2, "No available policies\n")
+        end
+
+        info << "\n"
+
+        info << colorize(:cyan, "Modulepath\n")
+        info << indent(2, modulepath.join(File::PATH_SEPARATOR).to_s)
+
+        @stream.puts info.chomp
+      end
+
       # Print target names and where they came from.
       #
       # @param adhoc [Hash] Adhoc targets provided on the command line.

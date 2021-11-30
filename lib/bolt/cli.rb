@@ -662,6 +662,7 @@ module Bolt
           outputter.print_new_policy(**result)
           SUCCESS
         when 'show'
+          outputter.print_policy_list(**app.list_policies)
           SUCCESS
         end
 

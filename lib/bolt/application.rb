@@ -501,6 +501,26 @@ module Bolt
       { name: name, path: policy }
     end
 
+    # List policies available to the project.
+    #
+    # @return [Hash]
+    #
+    def list_policies
+      unless @config.policies
+        command = Bolt::Util.powershell? ? 'New-BoltPolicy -Name <NAME>' : 'bolt policy new <NAME>'
+
+        raise Bolt::Error.new(
+          "Project configuration file #{@config.project.project_file} does not "\
+          "specify any policies. You can add policies to the project by including "\
+          "a 'policies' key or creating a new policy using the '#{command}' "\
+          "command.",
+          'bolt/no-policies-error'
+        )
+      end
+
+      { policies: @config.policies.uniq, modulepath: pal.user_modulepath }
+    end
+
     # Initialize the current directory as a Bolt project.
     #
     # @param name [String] The name of the project.
