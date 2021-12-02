@@ -5,7 +5,7 @@ require 'bolt_spec/conn'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
 
-describe "errors gracefully attempting to apply a manifest block" do
+describe "errors gracefully attempting to apply a manifest block", apply: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
@@ -52,7 +52,7 @@ describe "errors gracefully attempting to apply a manifest block" do
     let(:password) { conn_info('winrm')[:password] }
     let(:tflags) { %w[--no-ssl --no-ssl-verify] }
 
-    it 'prints a helpful error if Puppet is not present', :winrm_agentless do
+    it 'prints a helpful error if Puppet is not present', :winrm_agentless, :winrm do
       skip "Skipping this test as it fails with a connection error until #3001 is fixed"
       result = run_cli_json(%w[plan run basic::class] + config_flags)
       error = result['details']['result_set'][0]['value']['_error']

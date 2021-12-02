@@ -13,7 +13,7 @@ TEST_VERSIONS = [
   [7, 'puppet']
 ].freeze
 
-describe 'apply', expensive: true do
+describe 'apply', apply: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration

@@ -1,4 +1,4 @@
-name: Linux
+name: Unit tests
 
 on:
   push:
@@ -8,10 +8,17 @@ on:
     types: [opened, reopened, edited, synchronize]
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
-  integration:
-    name: Integration
-    runs-on: ubuntu-latest
+
+  unit:
+    name: Unit
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -31,6 +38,5 @@ jobs:
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
-      - uses: ./.github/actions/sudo_setup
-      - name: Run tests
-        run: bundle exec rake ci:linux:integration
+      - name: Unit tests
+        run: bundle exec rake tests:unit

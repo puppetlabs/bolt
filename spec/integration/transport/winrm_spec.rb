@@ -11,7 +11,7 @@ require 'bolt/config'
 require 'bolt/inventory'
 require 'winrm'
 
-describe Bolt::Transport::WinRM do
+describe Bolt::Transport::WinRM, winrm_transport: true do
   include BoltSpec::Conn
   include BoltSpec::Errors
   include BoltSpec::Files

@@ -1,0 +1,17 @@
+name: Sudo test setup
+description: Setup Docker containers and non-Sudo user for Bolt tests that validate sudo usage
+runs:
+  using: composite
+  steps:
+    - name: Bring up containers
+      shell: bash
+      run: |
+        docker-compose -f spec/docker-compose.yml build --parallel
+        docker-compose -f spec/docker-compose.yml up -d
+    - name: Create non-sudo user
+      shell: bash
+      run: |
+        echo 'runner:runner' | sudo chpasswd
+        sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
+        sudo sh -c "echo 'runner  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
+        chmod 0600 spec/fixtures/keys/id_rsa

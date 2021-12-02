@@ -1,0 +1,10 @@
+name: Docker containers
+description: Start Docker containers required for Bolt tests
+runs:
+  using: composite
+  steps:
+    - name: Bring up containers
+      shell: bash
+      run: |
+        docker-compose -f spec/docker-compose.yml build --parallel
+        docker-compose -f spec/docker-compose.yml up -d
