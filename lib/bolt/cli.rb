@@ -345,7 +345,9 @@ module Bolt
       end
 
       if options[:noop] &&
-         !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
+         !(options[:subcommand] == 'task' && options[:action] == 'run') &&
+         options[:subcommand] != 'apply' &&
+         options[:action] != 'apply'
         raise Bolt::CLIError,
               "Option '--noop' can only be specified when running a task or applying manifest code"
       end
@@ -656,7 +658,13 @@ module Bolt
         Bolt::Logger.warn('policy_command', 'This command is experimental and is subject to change.')
         case action
         when 'apply'
-          SUCCESS
+          results = outputter.spin do
+            app.apply_policies(options[:object], options[:targets], **options.slice(:noop))
+          end
+          rerun.update(results)
+          app.shutdown
+          outputter.print_apply_result(results)
+          results.ok? ? SUCCESS : FAILURE
         when 'new'
           result = app.new_policy(options[:object])
           outputter.print_new_policy(**result)

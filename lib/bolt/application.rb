@@ -413,6 +413,60 @@ module Bolt
       { plugins: plugins.list_plugins, modulepath: pal.user_modulepath }
     end
 
+    # Applies one or more policies to the specified targets.
+    #
+    # @param policies [String] A comma-separated list of policies to apply.
+    # @param targets [Array[String]] The list of targets to apply the policies to.
+    # @param noop [Boolean] Whether to apply the policies in no-operation mode.
+    # @return [Bolt::ResultSet]
+    #
+    def apply_policies(policies, targets, noop: false)
+      policies = policies.split(',')
+
+      # Validate that the policies are available to the project.
+      unavailable_policies = policies.reject do |policy|
+        @config.policies&.any? do |known_policy|
+          File.fnmatch?(known_policy, policy, File::FNM_EXTGLOB)
+        end
+      end
+
+      if unavailable_policies.any?
+        command = Bolt::Util.powershell? ? 'Get-BoltPolicy' : 'bolt policy show'
+
+        # CODEREVIEW: Phrasing
+        raise Bolt::Error.new(
+          "The following policies are not available to the project: '#{unavailable_policies.join("', '")}'. "\
+          "You must list policies in a project's 'policies' setting before Bolt can apply them to targets. "\
+          "For a list of policies available to the project, run '#{command}'.",
+          'bolt/unavailable-policy-error'
+        )
+      end
+
+      # Validate that the policies are loadable Puppet classes.
+      unloadable_policies = []
+
+      @pal.in_catalog_compiler do |_|
+        environment = Puppet.lookup(:current_environment)
+
+        unloadable_policies = policies.reject do |policy|
+          environment.known_resource_types.find_hostclass(policy)
+        end
+      end
+
+      # CODEREVIEW: Phrasing
+      if unloadable_policies.any?
+        raise Bolt::Error.new(
+          "The following policies cannot be loaded: '#{unloadable_policies.join("', '")}'. "\
+          "Policies must be a Puppet class saved to a project's or module's manifests directory.",
+          'bolt/unloadable-policy-error'
+        )
+      end
+
+      # Execute a single include statement with all the policies to apply them
+      # to the targets. Yay, reusable code!
+      apply(nil, targets, code: "include #{policies.join(', ')}", noop: noop)
+    end
+
     # Add a new policy to the project.
     #
     # @param name [String] The name of the new policy.
