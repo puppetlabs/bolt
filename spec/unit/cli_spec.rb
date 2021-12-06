@@ -357,6 +357,37 @@ describe Bolt::CLI do
       end
     end
 
+    describe 'policy apply' do
+      it 'errors without a policy' do
+        expect {
+          Bolt::CLI.new(%w[policy apply]).parse
+        }.to raise_error(
+          Bolt::CLIError,
+          /Must specify one or more policies to apply/
+        )
+      end
+
+      it 'errors with multiple arguments' do
+        expect {
+          Bolt::CLI.new(%w[policy apply foo bar]).parse
+        }.to raise_error(
+          Bolt::CLIError,
+          /Unknown argument\(s\) bar/
+        )
+      end
+    end
+
+    describe 'policy new' do
+      it 'errors without a name' do
+        expect {
+          Bolt::CLI.new(%w[policy new]).parse
+        }.to raise_error(
+          Bolt::CLIError,
+          /Must specify a name for the new policy/
+        )
+      end
+    end
+
     describe 'script run' do
       it 'accepts multiple extra arguments' do
         options = Bolt::CLI.new(%w[script run script.sh foo bar baz --targets localhost]).parse
