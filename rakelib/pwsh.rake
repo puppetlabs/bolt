@@ -321,6 +321,35 @@ namespace :pwsh do
             ruby_arg:                   'bare',
             validate_not_null_or_empty: true
           }
+        when 'policy'
+          case @pwsh_command[:verb]
+          # bolt policy apply <policy>
+          when 'Invoke'
+            @pwsh_command[:options] << {
+              name:                       'Name',
+              ruby_short:                 'n',
+              help_msg:                   "The policy or policies to apply",
+              type:                       'string',
+              switch:                     false,
+              mandatory:                  true,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          # bolt policy new <policy>
+          when 'New'
+            @pwsh_command[:options] << {
+              name:                       'Name',
+              ruby_short:                 'n',
+              help_msg:                   "The policy to create",
+              type:                       'string',
+              switch:                     false,
+              mandatory:                  true,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          end
         end
 
         # verbose is a commonparameter and is already present in the

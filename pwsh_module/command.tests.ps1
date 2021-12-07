@@ -34,7 +34,7 @@ Describe "test bolt module" {
 
     it "has the correct number of exported functions" {
       # should count of pwsh functions
-      @($commands).Count | Should -Be 25
+      @($commands).Count | Should -Be 28
     }
   }
 }
@@ -336,6 +336,23 @@ Describe "test all bolt command examples" {
     It "bolt lookup key --plan-hierarchy" {
       $results = Invoke-BoltLookup -key 'key' -PlanHierarchy
       $results | Should -Be "bolt lookup key --plan-hierarchy"
+    }
+  }
+
+  Context "bolt policy" {
+    It "bolt policy apply policy::foo,policy::bar --targets target1,target2" {
+      $results = Invoke-BoltPolicy -Name 'policy::foo,policy::bar' -Targets 'target1,target2'
+      $results | Should -Be "bolt policy apply policy::foo,policy::bar --targets target1,target2"
+    }
+
+    It "bolt policy new policy::foo" {
+      $results = New-BoltPolicy -Name 'policy::foo'
+      $results | Should -Be "bolt policy new policy::foo"
+    }
+
+    It "bolt policy show" {
+      $results = Get-BoltPolicy
+      $results | Should -Be "bolt policy show"
     }
   }
 }
