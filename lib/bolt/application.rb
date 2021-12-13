@@ -413,6 +413,168 @@ module Bolt
       { plugins: plugins.list_plugins, modulepath: pal.user_modulepath }
     end
 
+    # Applies one or more policies to the specified targets.
+    #
+    # @param policies [String] A comma-separated list of policies to apply.
+    # @param targets [Array[String]] The list of targets to apply the policies to.
+    # @param noop [Boolean] Whether to apply the policies in no-operation mode.
+    # @return [Bolt::ResultSet]
+    #
+    def apply_policies(policies, targets, noop: false)
+      policies = policies.split(',')
+
+      # Validate that the policies are available to the project.
+      unavailable_policies = policies.reject do |policy|
+        @config.policies&.any? do |known_policy|
+          File.fnmatch?(known_policy, policy, File::FNM_EXTGLOB)
+        end
+      end
+
+      if unavailable_policies.any?
+        command = Bolt::Util.powershell? ? 'Get-BoltPolicy' : 'bolt policy show'
+
+        # CODEREVIEW: Phrasing
+        raise Bolt::Error.new(
+          "The following policies are not available to the project: '#{unavailable_policies.join("', '")}'. "\
+          "You must list policies in a project's 'policies' setting before Bolt can apply them to targets. "\
+          "For a list of policies available to the project, run '#{command}'.",
+          'bolt/unavailable-policy-error'
+        )
+      end
+
+      # Validate that the policies are loadable Puppet classes.
+      unloadable_policies = []
+
+      @pal.in_catalog_compiler do |_|
+        environment = Puppet.lookup(:current_environment)
+
+        unloadable_policies = policies.reject do |policy|
+          environment.known_resource_types.find_hostclass(policy)
+        end
+      end
+
+      # CODEREVIEW: Phrasing
+      if unloadable_policies.any?
+        raise Bolt::Error.new(
+          "The following policies cannot be loaded: '#{unloadable_policies.join("', '")}'. "\
+          "Policies must be a Puppet class saved to a project's or module's manifests directory.",
+          'bolt/unloadable-policy-error'
+        )
+      end
+
+      # Execute a single include statement with all the policies to apply them
+      # to the targets. Yay, reusable code!
+      apply(nil, targets, code: "include #{policies.join(', ')}", noop: noop)
+    end
+
+    # Add a new policy to the project.
+    #
+    # @param name [String] The name of the new policy.
+    # @return [Hash]
+    #
+    def new_policy(name)
+      # Validate the policy name
+      unless name =~ Bolt::Module::CONTENT_NAME_REGEX
+        message = <<~MESSAGE.chomp
+          Invalid policy name '#{name}'. Policy names are composed of one or more name segments
+          separated by double colons '::'.
+
+          Each name segment must begin with a lowercase letter, and can only include lowercase
+          letters, digits, and underscores.
+
+          Examples of valid policy names:
+              - #{@config.project.name}
+              - #{@config.project.name}::my_policy
+        MESSAGE
+
+        raise Bolt::ValidationError, message
+      end
+
+      prefix, *name_segments, basename = name.split('::')
+
+      # Error if name is not namespaced to project
+      unless prefix == @config.project.name
+        raise Bolt::ValidationError,
+              "Policy name '#{name}' must begin with project name '#{@config.project.name}'. Did "\
+              "you mean '#{@config.project.name}::#{name}'?"
+      end
+
+      # If the policy name is just the project name, use the special init.pp class
+      basename ||= 'init'
+
+      # Policies can be saved in subdirectories in the 'manifests/' directory
+      policy_dir = File.expand_path(File.join(name_segments), @config.project.manifests)
+      policy     = File.expand_path("#{basename}.pp", policy_dir)
+
+      # Ensure the policy does not already exist
+      if File.exist?(policy)
+        raise Bolt::Error.new(
+          "A policy with the name '#{name}' already exists at '#{policy}', nothing to do.",
+          'bolt/existing-policy-error'
+        )
+      end
+
+      # Create the policy directory structure in the current project
+      begin
+        FileUtils.mkdir_p(policy_dir)
+      rescue Errno::EEXIST => e
+        raise Bolt::Error.new(
+          "#{e.message}; unable to create manifests directory '#{policy_dir}'",
+          'bolt/existing-file-error'
+        )
+      end
+
+      # Create the new policy
+      begin
+        File.write(policy, <<~POLICY)
+          class #{name} {
+
+          }
+        POLICY
+      rescue Errno::EACCES => e
+        raise Bolt::FileError.new("#{e.message}; unable to create policy", policy)
+      end
+
+      # Update the project configuration to include the new policy
+      project_config = Bolt::Util.read_yaml_hash(@config.project.project_file, 'project config')
+
+      # Add the 'policies' key if it does not exist and de-dupiclate entries
+      project_config['policies'] ||= []
+      project_config['policies'] <<  name
+      project_config['policies'].uniq!
+
+      begin
+        File.write(@config.project.project_file, project_config.to_yaml)
+      rescue Errno::EACCES => e
+        raise Bolt::FileError.new(
+          "#{e.message}; unable to update project configuration",
+          @config.project.project_file
+        )
+      end
+
+      { name: name, path: policy }
+    end
+
+    # List policies available to the project.
+    #
+    # @return [Hash]
+    #
+    def list_policies
+      unless @config.policies
+        command = Bolt::Util.powershell? ? 'New-BoltPolicy -Name <NAME>' : 'bolt policy new <NAME>'
+
+        raise Bolt::Error.new(
+          "Project configuration file #{@config.project.project_file} does not "\
+          "specify any policies. You can add policies to the project by including "\
+          "a 'policies' key or creating a new policy using the '#{command}' "\
+          "command.",
+          'bolt/no-policies-error'
+        )
+      end
+
+      { policies: @config.policies.uniq, modulepath: pal.user_modulepath }
+    end
+
     # Initialize the current directory as a Bolt project.
     #
     # @param name [String] The name of the project.

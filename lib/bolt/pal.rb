@@ -238,6 +238,20 @@ module Bolt
       Puppet.override(opts, &block)
     end
 
+    def in_catalog_compiler
+      with_puppet_settings do
+        Puppet.override(bolt_project: @project) do
+          Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath) do |pal|
+            pal.with_catalog_compiler do |compiler|
+              yield compiler
+            end
+          end
+        end
+      rescue Puppet::Error => e
+        raise PALError.from_error(e)
+      end
+    end
+
     def in_plan_compiler(executor, inventory, pdb_client, applicator = nil)
       with_bolt_executor(executor, inventory, pdb_client, applicator) do
         # TODO: remove this call and see if anything breaks when

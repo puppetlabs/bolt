@@ -58,6 +58,9 @@
     "plugins": {
       "$ref": "#/definitions/plugins"
     },
+    "policies": {
+      "$ref": "#/definitions/policies"
+    },
     "puppetdb": {
       "$ref": "#/definitions/puppetdb"
     },
@@ -375,6 +378,10 @@
           }
         ]
       }
+    },
+    "policies": {
+      "description": "A list of policy names and glob patterns to filter the project's policies by. This option is used to specify which policies are available to a project and can be applied to targets. When this option is not configured, policies are not available to the project and cannot be applied to targets.",
+      "type": "array"
     },
     "puppetdb": {
       "description": "A map containing options for [configuring the Bolt PuppetDB client](bolt_connect_puppetdb.md).",

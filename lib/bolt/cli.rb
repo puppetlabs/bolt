@@ -44,6 +44,7 @@ module Bolt
       'module'    => %w[add generate-types install show],
       'plan'      => %w[show run convert new],
       'plugin'    => %w[show],
+      'policy'    => %w[apply new show],
       'project'   => %w[init migrate],
       'script'    => %w[run],
       'secret'    => %w[encrypt decrypt createkeys],
@@ -287,6 +288,26 @@ module Bolt
         raise Bolt::CLIError, "Must specify a plan."
       end
 
+      if options[:subcommand] == 'policy'
+        if options[:action] == 'apply' && !options[:object]
+          raise Bolt::CLIError, "Must specify one or more policies to apply."
+        end
+
+        if options[:action] == 'apply' && options[:leftovers].any?
+          raise Bolt::CLIError, "Unknown argument(s) #{options[:leftovers].join(', ')}. "\
+                                "To apply multiple policies, provide a comma-separated list of "\
+                                "policy names."
+        end
+
+        if options[:action] == 'new' && !options[:object]
+          raise Bolt::CLIError, "Must specify a name for the new policy."
+        end
+
+        if options[:action] == 'show' && options[:object]
+          raise Bolt::CLIError, "Unknown argument #{options[:object]}."
+        end
+      end
+
       if options[:subcommand] == 'module' && options[:action] == 'install' && options[:object]
         command = Bolt::Util.powershell? ? 'Add-BoltModule -Module' : 'bolt module add'
         raise Bolt::CLIError, "Invalid argument '#{options[:object]}'. To add a new module to "\
@@ -324,7 +345,9 @@ module Bolt
       end
 
       if options[:noop] &&
-         !(options[:subcommand] == 'task' && options[:action] == 'run') && options[:subcommand] != 'apply'
+         !(options[:subcommand] == 'task' && options[:action] == 'run') &&
+         options[:subcommand] != 'apply' &&
+         options[:action] != 'apply'
         raise Bolt::CLIError,
               "Option '--noop' can only be specified when running a task or applying manifest code"
       end
@@ -630,6 +653,26 @@ module Bolt
       when 'plugin'
         outputter.print_plugin_list(**app.list_plugins)
         SUCCESS
+
+      when 'policy'
+        Bolt::Logger.warn('policy_command', 'This command is experimental and is subject to change.')
+        case action
+        when 'apply'
+          results = outputter.spin do
+            app.apply_policies(options[:object], options[:targets], **options.slice(:noop))
+          end
+          rerun.update(results)
+          app.shutdown
+          outputter.print_apply_result(results)
+          results.ok? ? SUCCESS : FAILURE
+        when 'new'
+          result = app.new_policy(options[:object])
+          outputter.print_new_policy(**result)
+          SUCCESS
+        when 'show'
+          outputter.print_policy_list(**app.list_policies)
+          SUCCESS
+        end
 
       when 'project'
         case action

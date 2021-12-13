@@ -87,11 +87,19 @@ module Bolt
         @stream.puts plan.to_json
       end
 
+      def print_policy_list(**kwargs)
+        print_table(**kwargs)
+      end
+
       def print_plans(**kwargs)
         print_table(**kwargs)
       end
 
       def print_new_plan(**kwargs)
+        print_table(**kwargs)
+      end
+
+      def print_new_policy(**kwargs)
         print_table(**kwargs)
       end
 
