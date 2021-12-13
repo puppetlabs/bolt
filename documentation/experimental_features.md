@@ -12,11 +12,13 @@ around breaking behavior where possible.
 
 This feature was introduced in [Bolt 3.21.0](). 
 
-Configuration policies are public classes that can be assigned directly to one or more nodes via the Bolt command line. Policies are Puppet code (.pp files).
+Configuration policies are public classes that can be assigned directly to one or more nodes via the Bolt command line. Policies are Puppet code stored in .pp files.
 
 Policies can be accessed through the `policy` subcommand, with `apply`, `new` and `show` options. The default location for a policy created through Bolt is `<Bolt project directory>/manifests/<policyname>.pp`. Bolt creates an empty class to fill in with the desired configuration.
 
-Once a policy is created it can be applied to targets via `bolt policy apply` and available policies can be listed via `bolt policy show`.`bolt policy apply` accepts a comma-separated list of policy names to apply, or a single policy name to apply to a list of one or more targets.
+Once a policy is created it can be applied to target nodes via `bolt policy apply` and available policies can be listed via `bolt policy show`.`bolt policy apply` accepts a comma-separated list of policy names to apply, or a single policy name to apply to a list of one or more targets. Use '-h' with any of the policy subcommand options for more detail.
+
+A Bolt project's configuration file `bolt-project.yaml` also has a new `policies` setting which lists the configuration policies available to a project. When not configured, the policies feature for a given project is disabled.
 
 ## `run_container` plan step
 
