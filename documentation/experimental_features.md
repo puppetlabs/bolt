@@ -10,7 +10,7 @@ around breaking behavior where possible.
 
 ## Configuration policies and `bolt policy` subcommand
 
-This feature was introduced in [Bolt 3.21.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-321-2021-some-date). 
+This feature was introduced in [Bolt 3.21.0](). 
 
 Configuration policies are public classes that can be assigned directly to one or more nodes via the Bolt command line. Policies are Puppet code (.pp files).
 
