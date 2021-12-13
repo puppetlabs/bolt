@@ -8,6 +8,16 @@ API might change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
+## Configuration policies and `bolt policy` subcommand
+
+This feature was introduced in [Bolt 3.21.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-321-2021-some-date). 
+
+Configuration policies are public classes that can be assigned directly to one or more nodes via the Bolt command line. Policies are Puppet code (.pp files).
+
+Policies can be accessed through the `policy` subcommand, with `apply`, `new` and `show` options. The default location for a policy created through Bolt is `<Bolt project directory>/manifests/<policyname>.pp`. Bolt creates an empty class to fill in with the desired configuration.
+
+Once a policy is created it can be applied to targets via `bolt policy apply` and available policies can be listed via `bolt policy show`.`bolt policy apply` accepts a comma-separated list of policy names to apply, or a single policy name to apply to a list of one or more targets.
+
 ## `run_container` plan step
 
 This feature was introduced in [Bolt 3.5.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-350-2021-3-29).
