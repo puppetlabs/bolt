@@ -14,7 +14,6 @@ This feature was introduced in [Bolt 3.21.0]().
 
 Configuration policies are public classes that can be assigned directly to one
 or more nodes. Policies are Puppet code stored in the `manifests/` directory of modules on the modulepath.
-files.
 
 Policies can be accessed through the `policy` subcommand, with `apply`, `new`
 and `show` options. The default location for a policy created through Bolt is
