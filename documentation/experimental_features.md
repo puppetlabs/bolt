@@ -12,24 +12,30 @@ around breaking behavior where possible.
 
 This feature was introduced in [Bolt 3.21.0](). 
 
-Configuration policies, or policies for short, are public classes that can be applied directly to one
-or more nodes. Policies are Puppet code stored in the `manifests/` directory of modules on the modulepath.
+Configuration policies, or policies for short, are public classes that can be
+applied directly to one or more nodes. Policies are Puppet code stored in the
+`manifests/` directory of modules on the modulepath. A class becomes a policy
+when it's listed under the `policies` key in `bolt-project.yaml`, and if the
+`policies` key is empty then no policies will be available for Bolt to apply.
 
-Policies can be managed through the `policy` command, with `apply`, `new`
-and `show` subcommands. A common workflow is to create a new policy in your current Bolt project using `bolt policy new <POLICY NAME>`, which will add `POLICY NAME` to the `policies` key in `bolt-project.yaml` and create an empty class at `<PROJECT DIRECTORY>/manifests/<POLICY NAME>.pp` that you can then populate.
+Policies can be managed through the `policy` command, with `apply`, `new` and
+`show` subcommands. A common workflow is to create a new policy in your current
+Bolt project using `bolt policy new <POLICY NAME>`, which will add `POLICY NAME`
+to the `policies` key in `bolt-project.yaml` and create an empty class at
+`<PROJECT DIRECTORY>/manifests/<POLICY NAME>.pp` that you can then populate.
 `<Bolt project directory>/manifests/<policyname>.pp`. Bolt creates an empty
 class to fill in with the desired configuration.
 
-You can list available policies using `bolt policy show`, and apply them to targets using `bolt policy apply`.
-apply` and available policies can be listed via `bolt policy show`.`bolt policy
-apply` accepts a comma-separated list of policy names to apply, or a single
-policy name to apply to a list of one or more targets. Use '-h' with any of the
-policy subcommand options for more detail.
+You can list available policies using `bolt policy show`, and apply them to
+targets using `bolt policy apply`. apply` and available policies can be listed
+via `bolt policy show`.`bolt policy apply` accepts a comma-separated list of
+policy names to apply, or a single policy name to apply to a list of one or more
+targets. Use '-h' with any of the policy subcommand options for more detail.
 
 A Bolt project's configuration file `bolt-project.yaml` also has a new
 `policies` setting which lists the configuration policies available to a
-project. When not configured, no policies will be available to Bolt to be applied.
-disabled.
+project. When not configured, no policies will be available to Bolt to be
+applied. disabled.
 
 ## `run_container` plan step
 
