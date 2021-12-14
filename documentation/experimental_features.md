@@ -20,7 +20,7 @@ and `show` subcommands. A common workflow is to create a new policy in your curr
 `<Bolt project directory>/manifests/<policyname>.pp`. Bolt creates an empty
 class to fill in with the desired configuration.
 
-Once a policy is created it can be applied to target nodes via `bolt policy
+You can list available policies using `bolt policy show`, and apply them to targets using `bolt policy apply`.
 apply` and available policies can be listed via `bolt policy show`.`bolt policy
 apply` accepts a comma-separated list of policy names to apply, or a single
 policy name to apply to a list of one or more targets. Use '-h' with any of the
