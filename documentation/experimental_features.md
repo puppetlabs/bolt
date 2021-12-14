@@ -23,8 +23,9 @@ Policies can be managed through the `policy` command, with `apply`, `new` and
 Bolt project using `bolt policy new <POLICY NAME>`, which will add `POLICY NAME`
 to the `policies` key in `bolt-project.yaml` and create an empty class at
 `<PROJECT DIRECTORY>/manifests/<POLICY NAME>.pp` that you can then populate.
-`<Bolt project directory>/manifests/<policyname>.pp`. Bolt creates an empty
-class to fill in with the desired configuration.
+This is only the default creation directory, policies can be loaded from
+anywhere on the modulepath. Policies can also manually added to the `policies`
+key in `bolt-project.yaml`.
 
 You can list available policies using `bolt policy show`, and apply them to
 targets using `bolt policy apply`. apply` and available policies can be listed
