@@ -14,29 +14,31 @@ This feature was introduced in [Bolt 3.21.0]().
 
 Configuration policies, or policies for short, are public classes that can be
 applied directly to one or more nodes. Policies are Puppet code stored in the
-`manifests/` directory of modules on the modulepath. A class becomes a policy
-when it's listed under the `policies` key in `bolt-project.yaml`, and if the
-`policies` key is empty then no policies will be available for Bolt to apply.
+`manifests/` directory of modules on the modulepath. A Bolt project's
+configuration file `bolt-project.yaml` also has a new `policies` setting which
+lists the policies available to a project. When not configured, no policies will
+be available to Bolt to be applied. A class becomes a policy when it's listed
+under the `policies` key, and if the `policies` key is empty then no policies
+will be available for Bolt to apply.
 
 Policies can be managed through the `policy` command, with `apply`, `new` and
-`show` subcommands. A common workflow is to create a new policy in your current
-Bolt project using `bolt policy new <POLICY NAME>`, which will add `POLICY NAME`
-to the `policies` key in `bolt-project.yaml` and create an empty class at
-`<PROJECT DIRECTORY>/manifests/<POLICY NAME>.pp` that you can then populate.
-This is only the default creation directory, policies can be loaded from
-anywhere on the modulepath. Policies can also manually added to the `policies`
-key in `bolt-project.yaml`.
+`show` subcommands or the corresponding Powershell cmdlets `Invoke-BoltPolicy`,
+`Get-BoltPolicy`, and `New-BoltPolicy`. A common workflow is to create a new
+policy in your current Bolt project using `bolt policy new <POLICY NAME>`, which
+will add `POLICY NAME` to the `policies` key in `bolt-project.yaml` and create
+an empty class at `<PROJECT DIRECTORY>/manifests/<POLICY NAME>.pp` that you can
+then populate. Under the hood, Bolt creates a single line of Puppet code
+"include #{policies.join(,)}" that will be compiled and applied to the provided
+targets, and will log that code at the debug level. Policies are also not
+limited to the project directory; they can be loaded from anywhere on the
+modulepath. Policies can also be manually added to the `policies` key in
+`bolt-project.yaml`.
 
 You can list available policies using `bolt policy show`, and apply them to
-targets using `bolt policy apply`. apply` and available policies can be listed
-via `bolt policy show`.`bolt policy apply` accepts a comma-separated list of
-policy names to apply, or a single policy name to apply to a list of one or more
-targets. Use '-h' with any of the policy subcommand options for more detail.
-
-A Bolt project's configuration file `bolt-project.yaml` also has a new
-`policies` setting which lists the configuration policies available to a
-project. When not configured, no policies will be available to Bolt to be
-applied. disabled.
+targets using `bolt policy apply`. `bolt policy apply` accepts a comma-separated
+list of policy names to apply, or a single policy name to apply to a list of one
+or more targets. Use '-h' with any of the policy subcommands for more detail or
+`Get-Help` with any Powershell cmdlet.
 
 ## `run_container` plan step
 
