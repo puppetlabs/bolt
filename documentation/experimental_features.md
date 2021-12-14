@@ -8,7 +8,7 @@ API might change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible. 
 
-## Configuration policies and `bolt policy` subcommand
+## Configuration policies and the policy command
 
 This feature was introduced in [Bolt 3.21.0](). 
 
