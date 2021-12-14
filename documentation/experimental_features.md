@@ -28,7 +28,7 @@ policy subcommand options for more detail.
 
 A Bolt project's configuration file `bolt-project.yaml` also has a new
 `policies` setting which lists the configuration policies available to a
-project. When not configured, the policies feature for a given project is
+project. When not configured, no policies will be available to Bolt to be applied.
 disabled.
 
 ## `run_container` plan step
