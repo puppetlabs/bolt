@@ -13,7 +13,7 @@ around breaking behavior where possible.
 This feature was introduced in [Bolt 3.21.0](). 
 
 Configuration policies are public classes that can be assigned directly to one
-or more nodes via the Bolt command line. Policies are Puppet code stored in .pp
+or more nodes. Policies are Puppet code stored in the `manifests/` directory of modules on the modulepath.
 files.
 
 Policies can be accessed through the `policy` subcommand, with `apply`, `new`
