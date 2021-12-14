@@ -490,6 +490,16 @@ module Bolt
         raise Bolt::ValidationError, message
       end
 
+      # Validate that we're not running with the default project
+      if @config.project.name.nil?
+        command = Bolt::Util.powershell? ? 'New-BoltProject -Name <NAME>' : 'bolt project init <NAME>'
+        message = <<~MESSAGE.chomp
+          Can't create a policy for the default Bolt project because it doesn't
+          have a name. Run '#{command}' to create a new project.
+        MESSAGE
+        raise Bolt::ValidationError, message
+      end
+
       prefix, *name_segments, basename = name.split('::')
 
       # Error if name is not namespaced to project
