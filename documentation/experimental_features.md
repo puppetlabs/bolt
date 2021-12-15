@@ -52,13 +52,12 @@ name.
 
 You can create a new policy with `bolt policy new <POLICY NAME>`, which performs
 two actions for you:
-1. `POLICY NAME` is added to the `policies` key in `bolt-project.yaml`.
+
+1. `<PROJECT NAME>::<POLICY NAME>` is added to the `policies` key in `bolt-project.yaml`.
 2.  An empty class is created at `<PROJECT DIRECTORY>/manifests/<POLICY
-    NAME>.pp`[^1] that you can then populate. Under the hood, Bolt creates a single
+    NAME>.pp` that you can then populate. Under the hood, Bolt creates a single
     line of Puppet code "include #{policies.join(,)}" that will be compiled and
     applied to the provided targets, and will log that code at the debug level.
-
-    [^1]:Policy files are not limited to the project directory; they can be loaded from anywhere on the modulepath.
 
 ```
 % bolt policy new boltproject::user
@@ -67,6 +66,7 @@ Created policy 'boltproject::user' at '/Users/puppet.user/bolt/manifests/user.pp
 ```
 
 Policies can also be created manually by:
+
 1. Adding the file to a module's or project's `manifests/` directory.
 2. Modifying the project's `bolt-project.yaml` to include the policy in the
    `policies` key. Policies are listed in the form `<PROJECT NAME>::<POLICY
