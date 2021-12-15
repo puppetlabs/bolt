@@ -48,10 +48,10 @@ subcommands for more detail or `Get-Help` followed by any Powershell cmdlet
 name.
 
 #### Creating new policies 
-> Policy names must follow [class naming
+> Policy names must be in the form `<PROJECT NAME>::<POLICY NAME>`. This is
+> referred to as `<POLICY NAME>` below. Policy names must also follow [class
+> naming
 > conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
-> Policy names must also be in the form `<PROJECT NAME>::<POLICY NAME>`. This is
-> referred to as `<POLICY NAME>` below.
 
 You can create a new policy with `bolt policy new <POLICY NAME>`, which performs
 two actions for you:
