@@ -28,8 +28,8 @@ configured then no policies will be available for Bolt to apply.
 
 Policies may be manually added to the `policies` key in `bolt-project.yaml` or
 managed via Bolt commands. This key supports glob pattern for easily listing
-multiple policies, i.e. boltproject::* includes boltproject::admin and
-boltproject::sshkeys policies.
+multiple policies. For example, `bolt::project::*` includes `bolt::project::admin` and
+`bolt::project::sshkeys` policies.
 
 The following configuration file makes the `bolt::project::admin` and
 `bolt::project::sshkeys` policies available to the project:
@@ -54,7 +54,7 @@ project-level policy named `bolt::project::user`, run:
 
 * _PowerShell cmdlet_
   ```
-  New-BoltPolicy bolt::project::user
+  New-BoltPolicy -Name bolt::project::user
   ```
 
 An empty class is created in the project's `manifests/` directory that you can
@@ -64,7 +64,7 @@ Example output:
 ```
 Created policy 'bolt::project::user' at '/Users/puppet.user/bolt/manifests/project/user.pp'
 ```
-> Policy names must follow [class naming
+Policy names must follow [class naming
 conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
 
 Policies can also be created manually by:
@@ -75,7 +75,7 @@ Policies can also be created manually by:
 
 ### Listing available policies
 
-You can list available policies using `bolt policy show`.
+You can list available policies for the project:
 
 * _*nix shell command_ 
   ```
@@ -116,7 +116,7 @@ policies to a target:
 
 * _PowerShell cmdlet_
   ```
-  Invoke-BoltPolicy bolt::project::admin,bolt::project::sshkeys -t mytarget
+  Invoke-BoltPolicy -Name bolt::project::admin,bolt::project::sshkeys -Targets mytarget
   ```
 
 Example output:
