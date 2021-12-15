@@ -19,13 +19,12 @@ applied directly to one or more nodes. Policies are Puppet code stored in the
 `manifests/` directory of modules on the modulepath. They can be applied
 directly to targets just like other Puppet code.
 
-### Policies in a Bolt project's yaml
+### Policies in Bolt project yaml
 
 A Bolt project's configuration file `bolt-project.yaml` has a `policies` key
-which lists the policies available to a project. When not configured, no
-policies will be available to Bolt to be applied. A Puppet class becomes a
-policy when it's listed under the `policies` key, and if the `policies` key is
-empty then no policies will be available for Bolt to apply.
+which lists the policies available to a project. A Puppet class becomes a policy
+when it's listed under the `policies` key, and if the `policies` key is empty
+then no policies will be available for Bolt to apply.
 
 Policies may be manually added to the `policies` key in `bolt-project.yaml` or
 managed via Bolt commands.
@@ -49,19 +48,23 @@ subcommands for more detail or `Get-Help` followed by any Powershell cmdlet
 name.
 
 #### Creating new policies 
-> Policy names must follow [class naming conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
+> Policy names must follow [class naming
+> conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
+
+> Policy names must also be in the form `<PROJECT NAME>::<POLICY NAME>`. This is
+> referred to as `<POLICY NAME>` below.
 
 You can create a new policy with `bolt policy new <POLICY NAME>`, which performs
 two actions for you:
 
-1. `<PROJECT NAME>::<POLICY NAME>` is added to the `policies` key in `bolt-project.yaml`.
+1. `<POLICY NAME>` is added to the `policies` key in `bolt-project.yaml`.
 2.  An empty class is created at `<PROJECT DIRECTORY>/manifests/<POLICY
     NAME>.pp` that you can then populate. Under the hood, Bolt creates a single
     line of Puppet code "include #{policies.join(,)}" that will be compiled and
     applied to the provided targets, and will log that code at the debug level.
 
 ```
-% bolt policy new boltproject::user
+$ bolt policy new boltproject::user
 Created policy 'boltproject::user' at '/Users/puppet.user/bolt/manifests/user.pp'
 ```
 
@@ -69,8 +72,7 @@ Policies can also be created manually by:
 
 1. Adding the file to a module's or project's `manifests/` directory.
 2. Modifying the project's `bolt-project.yaml` to include the policy in the
-   `policies` key. Policies are listed in the form `<PROJECT NAME>::<POLICY
-   NAME>`.
+   `policies` key.
 
 #### Listing available policies
 
@@ -79,7 +81,7 @@ You can list available policies using `bolt policy show`.
   boltproject::* includes boltproject::admin and boltproject::sshkeys policies.
 
 ```
-% bolt policy show
+$ bolt policy show
 Policies
   boltproject::admin
   boltproject::sshkeys
@@ -90,8 +92,28 @@ Modulepath
 
 #### Applying policies to targets
 
+Applying policies is very similar to [applying Puppet
+code](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html) with
+`bolt apply`, with the addition that `bolt policy apply` allows you to apply one
+or more policies at a time. Before applying policies, Bolt will install the
+puppet-agent package and collect facts from each target.
+
 `bolt policy apply` accepts a comma-separated list of policy names to apply, or
-a single policy name to apply to a list of one or more targets. 
+a single policy name to apply to a list of one or more targets.
+
+```
+$ bolt policy apply boltproject::admin -t mytarget                                                                                                  
+
+Starting: install puppet and gather facts on mytarget
+Finished: install puppet and gather facts with 0 failures in 6.51 sec
+Starting: apply catalog on mytarget
+Started on mytarget...
+Finished on mytarget:
+  changed: 1, failed: 0, unchanged: 0 skipped: 0, noop: 0
+Finished: apply catalog with 0 failures in 8.59 sec
+Successful on 1 target: mytarget
+Ran on 1 target in 15.2 sec
+```
 
 ## `run_container` plan step
 
