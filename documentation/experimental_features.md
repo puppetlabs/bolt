@@ -15,13 +15,13 @@ This feature was introduced in [Bolt 3.21.0]().
 ### What are policies?
 
 Configuration policies, or policies for short, are public classes that can be
-applied directly to one or more nodes. Policies are Puppet code stored in the
+applied directly to one or more targets. Policies are Puppet code stored in the
 `manifests/` directory of modules on the modulepath. They can be applied
 directly to targets just like other Puppet code.
 
 ### Policies in Bolt project yaml
 
-A Bolt project's configuration file `bolt-project.yaml` has a `policies` key
+The project configuration file, `bolt-project.yaml`, supports a `policies` key
 which lists the policies available to a project. A Puppet class becomes a policy
 when it's listed under the `policies` key, and if the `policies` key is empty
 then no policies will be available for Bolt to apply.
@@ -29,11 +29,12 @@ then no policies will be available for Bolt to apply.
 Policies may be manually added to the `policies` key in `bolt-project.yaml` or
 managed via Bolt commands.
 
-Example bolt-project.yaml
+The following configuration file makes the `boltproject::admin` and `boltproject::sshkeys`
+policies available to the project:
+
 ```
 ---
 name: boltproject
-modules: []
 policies:
 - boltproject::admin
 - boltproject::sshkeys
