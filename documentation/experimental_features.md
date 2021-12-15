@@ -57,9 +57,6 @@ project-level policy named `bolt::project::user`, run:
   New-BoltPolicy bolt::project::user
   ```
 
-> Policy names must follow [class naming
-conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
-
 An empty class is created in the project's `manifests/` directory that you can
 then populate.
 
@@ -67,6 +64,8 @@ Example output:
 ```
 Created policy 'bolt::project::user' at '/Users/puppet.user/bolt/manifests/project/user.pp'
 ```
+> Policy names must follow [class naming
+conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
 
 Policies can also be created manually by:
 
@@ -103,7 +102,12 @@ Modulepath
 Applying policies is very similar to [applying Puppet
 code](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html) with
 `bolt apply`, with the addition that `bolt policy apply` allows you to apply one
-or more policies at a time.
+or more policies at a time. `bolt policy apply` accepts a comma-separated list
+of policy names to apply, or a single policy name to apply to a list of one or
+more targets. 
+
+For example, to apply both `bolt::project::admin` and `bolt::project::sshkeys`
+policies to a target:
 
 * _*nix shell command_
   ```
@@ -114,13 +118,6 @@ or more policies at a time.
   ```
   Invoke-BoltPolicy bolt::project::admin,bolt::project::sshkeys -t mytarget
   ```
-
-Before applying policies, Bolt will install the puppet-agent package and collect
-facts from each target. `bolt policy apply` accepts a comma-separated list of
-policy names to apply, or a single policy name to apply to a list of one or more
-targets. Under the hood, Bolt creates a single line of Puppet code `include
-<POLICIES>` that will be compiled and applied to the provided targets, and will
-log that code at the debug level.
 
 Example output:
 ```
@@ -134,6 +131,11 @@ Finished: apply catalog with 0 failures in 8.59 sec
 Successful on 1 target: mytarget
 Ran on 1 target in 15.2 sec
 ```
+
+Before applying policies, Bolt will install the puppet-agent package and collect
+facts from each target. Under the hood, Bolt creates a single line of Puppet
+code `include <POLICIES>` that will be compiled and applied to the provided
+targets, and will log that code at the debug level.
 
 ## `run_container` plan step
 
