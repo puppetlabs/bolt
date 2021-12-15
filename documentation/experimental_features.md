@@ -49,6 +49,7 @@ subcommands for more detail or `Get-Help` followed by any Powershell cmdlet
 name.
 
 #### Creating new policies 
+> Policy names must follow [class naming conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
 
 You can create a new policy with `bolt policy new <POLICY NAME>`, which performs
 two actions for you:
@@ -62,7 +63,6 @@ two actions for you:
 ```
 % bolt policy new boltproject::user
 Created policy 'boltproject::user' at '/Users/puppet.user/bolt/manifests/user.pp'
-
 ```
 
 Policies can also be created manually by:
