@@ -6,7 +6,7 @@ while iterating on new functionality. Almost all experimental features are
 eventually stabilized in future releases. While a feature is experimental, its
 API might change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
-around breaking behavior where possible. 
+around breaking behavior where possible.
 
 ## Configuration policies and the policy command
 
@@ -50,7 +50,6 @@ name.
 #### Creating new policies 
 > Policy names must follow [class naming
 > conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
-
 > Policy names must also be in the form `<PROJECT NAME>::<POLICY NAME>`. This is
 > referred to as `<POLICY NAME>` below.
 
