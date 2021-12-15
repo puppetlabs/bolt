@@ -8,28 +8,27 @@ API might change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
 around breaking behavior where possible.
 
-## Configuration policies and the policy command
+## Configuration policies and the `policy` command
 
 This feature was introduced in [Bolt 3.21.0](). 
 
 ### What are policies?
 
-Configuration policies, or policies for short, are public classes that can be
-applied directly to one or more targets. Policies are Puppet code stored in the
-`manifests/` directory of modules on the modulepath. They can be applied
-directly to targets just like other Puppet code.
+Configuration policies are public Puppet classes stored in the `manifests/` 
+directory of modules on the modulepath. Just like other Puppet code, you 
+can apply policies directly to one or more targets.
 
 ### Policies in a Bolt project's configuration file
 
 The project configuration file, `bolt-project.yaml`, supports a `policies` key
 which lists the policies available to a project. A Puppet class becomes a policy
-when it's listed under the `policies` key, and if the `policies` key is not
-configured then no policies will be available for Bolt to apply.
+when you list it under the `policies` key. If you do not configure 
+the `policies` key, no policies will be available for Bolt to apply.
 
-Policies may be manually added to the `policies` key in `bolt-project.yaml` or
-managed via Bolt commands. This key supports glob pattern for easily listing
-multiple policies. For example, `bolt::project::*` includes
-`bolt::project::admin` and `bolt::project::sshkeys` policies.
+You can manually add policies to the `policies` key in `bolt-project.yaml`, or
+manage policies using the Bolt command line. The `policies` key supports
+glob patterns for easily listing multiple policies. For example, `bolt::project::*` 
+includes both the `bolt::project::admin` and `bolt::project::sshkeys` policies.
 
 The following configuration file makes the `bolt::project::admin` and
 `bolt::project::sshkeys` policies available to the project:
@@ -57,17 +56,17 @@ project-level policy named `bolt::project::user`, run:
   New-BoltPolicy -Name bolt::project::user
   ```
 
-Policy names must follow [class naming
+Bolt creates an empty class in the project's `manifests/` directory that you can
+populate with code. Policy names must follow [class naming
 conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
-An empty class is created in the project's `manifests/` directory that you can
-then populate.
+
 
 Example output:
 ```
 Created policy 'bolt::project::user' at '/Users/puppet.user/bolt/manifests/project/user.pp'
 ```
 
-Policies can also be created manually by:
+Create policies manually by:
 
 1. Adding the file to a module's or project's `manifests/` directory.
 2. Modifying the project's `bolt-project.yaml` to include the policy in the
@@ -99,12 +98,11 @@ Modulepath
 
 ### Applying policies to targets
 
-Applying policies is very similar to [applying Puppet
-code](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html) with
-`bolt apply`, with the addition that `bolt policy apply` allows you to apply one
-or more policies at a time. `bolt policy apply` accepts a comma-separated list
-of policy names to apply, or a single policy name to apply to a list of one or
-more targets. 
+Applying policies is similar to [applying Puppet
+code](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html), 
+with the addition that you can apply one or more policies at a time. The Bolt 
+commands for applying policies accept a single policy name or a 
+comma-separated list of policy names to apply to a list of one or more targets. 
 
 For example, to apply both `bolt::project::admin` and `bolt::project::sshkeys`
 policies to a target:
@@ -132,10 +130,10 @@ Successful on 1 target: mytarget
 Ran on 1 target in 15.2 sec
 ```
 
-Before applying policies, Bolt will install the puppet-agent package and collect
-facts from each target. Under the hood, Bolt creates a single line of Puppet
-code `include <POLICIES>` that will be compiled and applied to the provided
-targets, and will log that code at the debug level.
+Before applying policies, Bolt installs the `puppet-agent` package and collects
+facts from each target. Bolt creates a single line of Puppet code to compile 
+and apply to the provided targets. This line of code includes the syntax
+`include <POLICIES>` and Bolt logs the line at the debug level.
 
 
 ## `run_container` plan step
