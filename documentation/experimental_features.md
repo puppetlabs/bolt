@@ -28,8 +28,8 @@ configured then no policies will be available for Bolt to apply.
 
 Policies may be manually added to the `policies` key in `bolt-project.yaml` or
 managed via Bolt commands. This key supports glob pattern for easily listing
-multiple policies. For example, `bolt::project::*` includes `bolt::project::admin` and
-`bolt::project::sshkeys` policies.
+multiple policies. For example, `bolt::project::*` includes
+`bolt::project::admin` and `bolt::project::sshkeys` policies.
 
 The following configuration file makes the `bolt::project::admin` and
 `bolt::project::sshkeys` policies available to the project:
@@ -57,6 +57,8 @@ project-level policy named `bolt::project::user`, run:
   New-BoltPolicy -Name bolt::project::user
   ```
 
+Policy names must follow [class naming
+conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
 An empty class is created in the project's `manifests/` directory that you can
 then populate.
 
@@ -64,8 +66,6 @@ Example output:
 ```
 Created policy 'bolt::project::user' at '/Users/puppet.user/bolt/manifests/project/user.pp'
 ```
-Policy names must follow [class naming
-conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
 
 Policies can also be created manually by:
 
@@ -136,6 +136,7 @@ Before applying policies, Bolt will install the puppet-agent package and collect
 facts from each target. Under the hood, Bolt creates a single line of Puppet
 code `include <POLICIES>` that will be compiled and applied to the provided
 targets, and will log that code at the debug level.
+
 
 ## `run_container` plan step
 
