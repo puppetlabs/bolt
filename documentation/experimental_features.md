@@ -12,33 +12,86 @@ around breaking behavior where possible.
 
 This feature was introduced in [Bolt 3.21.0](). 
 
+### What are policies?
+
 Configuration policies, or policies for short, are public classes that can be
 applied directly to one or more nodes. Policies are Puppet code stored in the
-`manifests/` directory of modules on the modulepath. A Bolt project's
-configuration file `bolt-project.yaml` also has a new `policies` setting which
-lists the policies available to a project. When not configured, no policies will
-be available to Bolt to be applied. A class becomes a policy when it's listed
-under the `policies` key, and if the `policies` key is empty then no policies
-will be available for Bolt to apply.
+`manifests/` directory of modules on the modulepath. They can be applied
+directly to targets just like other Puppet code.
+
+### Policies in a Bolt project's yaml
+
+A Bolt project's configuration file `bolt-project.yaml` has a `policies` key
+which lists the policies available to a project. When not configured, no
+policies will be available to Bolt to be applied. A Puppet class becomes a
+policy when it's listed under the `policies` key, and if the `policies` key is
+empty then no policies will be available for Bolt to apply.
+
+Policies may be manually added to the `policies` key in `bolt-project.yaml` or
+managed via Bolt commands.
+
+Example bolt-project.yaml
+```
+---
+name: boltproject
+modules: []
+policies:
+- boltproject::admin
+- boltproject::sshkeys
+```
+
+### Policy management overview
 
 Policies can be managed through the `policy` command, with `apply`, `new` and
 `show` subcommands or the corresponding Powershell cmdlets `Invoke-BoltPolicy`,
-`Get-BoltPolicy`, and `New-BoltPolicy`. A common workflow is to create a new
-policy in your current Bolt project using `bolt policy new <POLICY NAME>`, which
-will add `POLICY NAME` to the `policies` key in `bolt-project.yaml` and create
-an empty class at `<PROJECT DIRECTORY>/manifests/<POLICY NAME>.pp` that you can
-then populate. Under the hood, Bolt creates a single line of Puppet code
-"include #{policies.join(,)}" that will be compiled and applied to the provided
-targets, and will log that code at the debug level. Policies are also not
-limited to the project directory; they can be loaded from anywhere on the
-modulepath. Policies can also be manually added to the `policies` key in
-`bolt-project.yaml`.
+`Get-BoltPolicy`, and `New-BoltPolicy`. Use '-h' with any of the policy
+subcommands for more detail or `Get-Help` followed by any Powershell cmdlet
+name.
 
-You can list available policies using `bolt policy show`, and apply them to
-targets using `bolt policy apply`. `bolt policy apply` accepts a comma-separated
-list of policy names to apply, or a single policy name to apply to a list of one
-or more targets. Use '-h' with any of the policy subcommands for more detail or
-`Get-Help` with any Powershell cmdlet.
+#### Creating new policies 
+
+You can create a new policy with `bolt policy new <POLICY NAME>`, which performs
+two actions for you:
+1. `POLICY NAME` is added to the `policies` key in `bolt-project.yaml`.
+2.  An empty class is created at `<PROJECT DIRECTORY>/manifests/<POLICY
+    NAME>.pp`[^1] that you can then populate. Under the hood, Bolt creates a single
+    line of Puppet code "include #{policies.join(,)}" that will be compiled and
+    applied to the provided targets, and will log that code at the debug level.
+
+    [^1]:Policy files are not limited to the project directory; they can be loaded from anywhere on the modulepath.
+
+```
+% bolt policy new boltproject::user
+Created policy 'boltproject::user' at '/Users/puppet.user/bolt/manifests/user.pp'
+
+```
+
+Policies can also be created manually by:
+1. Adding the file to a module's or project's `manifests/` directory.
+2. Modifying the project's `bolt-project.yaml` to include the policy in the
+   `policies` key. Policies are listed in the form `<PROJECT NAME>::<POLICY
+   NAME>`.
+
+#### Listing available policies
+
+You can list available policies using `bolt policy show`.
+* This command supports glob pattern for easily listing multiple policies, i.e.
+  boltproject::* includes boltproject::admin and boltproject::sshkeys policies.
+
+```
+% bolt policy show
+Policies
+  boltproject::admin
+  boltproject::sshkeys
+
+Modulepath
+  /Users/puppet.user/bolt/modules:/Users/puppet.user/bolt/.modules
+```
+
+#### Applying policies to targets
+
+`bolt policy apply` accepts a comma-separated list of policy names to apply, or
+a single policy name to apply to a list of one or more targets. 
 
 ## `run_container` plan step
 
