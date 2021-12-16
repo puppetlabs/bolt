@@ -34,7 +34,8 @@ The following configuration file makes the `bolt::project::admin` and
 `bolt::project::sshkeys` policies available to the project:
 ```
 ---
-name: bolt
+# bolt-project.yaml
+name: myproject
 policies:
 - bolt::project::admin
 - bolt::project::sshkeys
