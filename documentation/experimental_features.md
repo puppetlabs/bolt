@@ -64,7 +64,7 @@ conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-def
 
 Example output:
 ```
-Created policy 'myproject::user' at '/Users/puppet.user/myproject/manifests/project/user.pp'
+Created policy 'myproject::user' at '/Users/puppet.user/myproject/manifests/user.pp'
 ```
 
 Create policies manually by:
