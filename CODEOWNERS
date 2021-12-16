@@ -1,7 +1,5 @@
-# Default to Bolt team
-* @puppetlabs/bolt
+# Default to Skeletor team
+* @puppetlabs/skeletor
 
-/documentation @hestonhoffman @puppetlabs/bolt
-/guides @hestonhoffman @puppetlabs/bolt
-/lib/bolt_server @puppetlabs/skeletor
-/spec/bolt_server @puppetlabs/skeletor
+/documentation @hestonhoffman @puppetlabs/skeletor
+/guides @hestonhoffman @puppetlabs/skeletor
