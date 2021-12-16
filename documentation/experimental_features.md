@@ -14,47 +14,47 @@ This feature was introduced in [Bolt 3.21.0]().
 
 ### What are policies?
 
-Configuration policies are public Puppet classes stored in the `manifests/` 
-directory of modules on the modulepath. Just like other Puppet code, you 
-can apply policies directly to one or more targets.
+Configuration policies are public Puppet classes stored in the `manifests/`
+directory of modules on the modulepath. Just like other Puppet code, you can
+apply policies directly to one or more targets.
 
 ### Policies in a Bolt project's configuration file
 
 The project configuration file, `bolt-project.yaml`, supports a `policies` key
 which lists the policies available to a project. A Puppet class becomes a policy
-when you list it under the `policies` key. If you do not configure 
-the `policies` key, no policies will be available for Bolt to apply.
+when you list it under the `policies` key. If you do not configure the
+`policies` key, no policies will be available for Bolt to apply.
 
 You can manually add policies to the `policies` key in `bolt-project.yaml`, or
-manage policies using the Bolt command line. The `policies` key supports
-glob patterns for easily listing multiple policies. For example, `bolt::project::*` 
-includes both the `bolt::project::admin` and `bolt::project::sshkeys` policies.
+manage policies using the Bolt command line. The `policies` key supports glob
+patterns for easily listing multiple policies. For example, `myproject::*`
+includes both the `myproject::admin` and `myproject::sshkeys` policies.
 
-The following configuration file makes the `bolt::project::admin` and
-`bolt::project::sshkeys` policies available to the project:
+The following configuration file makes the `myproject::admin` and
+`myproject::sshkeys` policies available to the project:
 ```
 ---
 # bolt-project.yaml
 name: myproject
 policies:
-- bolt::project::admin
-- bolt::project::sshkeys
+- myproject::admin
+- myproject::sshkeys
 ```
 
 ### Creating new policies 
 
 You can use Bolt to create a new policy in your project and add it to the
 `policies` key in your project configuration. For example, to create a new
-project-level policy named `bolt::project::user`, run:
+project-level policy named `myproject::user`, run:
 
 * _*nix shell command_
   ```
-  bolt policy new bolt::project::user
+  bolt policy new myproject::user
   ```
 
 * _PowerShell cmdlet_
   ```
-  New-BoltPolicy -Name bolt::project::user
+  New-BoltPolicy -Name myproject::user
   ```
 
 Bolt creates an empty class in the project's `manifests/` directory that you can
@@ -64,7 +64,7 @@ conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-def
 
 Example output:
 ```
-Created policy 'bolt::project::user' at '/Users/puppet.user/bolt/manifests/project/user.pp'
+Created policy 'myproject::user' at '/Users/puppet.user/myproject/manifests/project/user.pp'
 ```
 
 Create policies manually by:
@@ -90,32 +90,32 @@ You can list available policies for the project:
 Example output:
 ```
 Policies
-  bolt::project::admin
-  bolt::project::sshkeys
+  myproject::admin
+  myproject::sshkeys
 
 Modulepath
-  /Users/puppet.user/bolt/modules:/Users/puppet.user/bolt/.modules
+  /Users/puppet.user/myproject/modules:/Users/puppet.user/myproject/.modules
 ```
 
 ### Applying policies to targets
 
 Applying policies is similar to [applying Puppet
-code](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html), 
-with the addition that you can apply one or more policies at a time. The Bolt 
-commands for applying policies accept a single policy name or a 
-comma-separated list of policy names to apply to a list of one or more targets. 
+code](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html), with
+the addition that you can apply one or more policies at a time. The Bolt
+commands for applying policies accept a single policy name or a comma-separated
+list of policy names to apply to a list of one or more targets. 
 
-For example, to apply both `bolt::project::admin` and `bolt::project::sshkeys`
-policies to a target:
+For example, to apply both `myproject::admin` and `myproject::sshkeys` policies
+to a target:
 
 * _*nix shell command_
   ```
-  bolt policy apply bolt::project::admin,bolt::project::sshkeys -t mytarget                                
+  bolt policy apply myproject::admin,myproject::sshkeys -t mytarget                                
   ```
 
 * _PowerShell cmdlet_
   ```
-  Invoke-BoltPolicy -Name bolt::project::admin,bolt::project::sshkeys -Targets mytarget
+  Invoke-BoltPolicy -Name myproject::admin,myproject::sshkeys -Targets mytarget
   ```
 
 Example output:
@@ -132,10 +132,9 @@ Ran on 1 target in 15.2 sec
 ```
 
 Before applying policies, Bolt installs the `puppet-agent` package and collects
-facts from each target. Bolt creates a single line of Puppet code to compile 
-and apply to the provided targets. This line of code includes the syntax
-`include <POLICIES>` and Bolt logs the line at the debug level.
-
+facts from each target. Bolt creates a single line of Puppet code to compile and
+apply to the provided targets. This line of code includes the syntax `include
+<POLICIES>` and Bolt logs the line at the debug level.
 
 ## `run_container` plan step
 
