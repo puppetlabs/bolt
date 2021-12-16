@@ -1,5 +1,33 @@
 # Changelog
 
+## Bolt 3.21.0 (2021-12-16)
+
+### New features
+
+* **`policies` configuration setting**
+  ([#3041](https://github.com/puppetlabs/bolt/pull/3041))
+
+  The project configuration file, `bolt-project.yaml`, has a new
+  `policies` setting which lists the configuration policies available to
+  a project.
+  
+  _This feature is experimental and subject to change._
+
+* **`policy` subcommands**
+  ([#3041](https://github.com/puppetlabs/bolt/pull/3041))
+
+  Bolt now includes three new subcommands for interacting with a
+  project's configuration policies:
+
+  - The `policy new` command can be used to create a new configuration
+    policy in the project and add it to the project's configuration.
+  - The `policy show` command can be used to view which configuration
+    policies are available to a project.
+  - The `policy apply` command can be used to apply one or more
+    configuration policies to a list of targets.
+
+  _This feature is experimental and subject to change._
+
 ## Bolt 3.20.0 (2021-10-26)
 
 ### New features
