@@ -131,10 +131,13 @@ Successful on 1 target: mytarget
 Ran on 1 target in 15.2 sec
 ```
 
-Before applying policies, Bolt installs the `puppet-agent` package and collects
-facts from each target. Bolt creates a single line of Puppet code to compile and
-apply to the provided targets. This line of code includes the syntax `include
-<POLICIES>` and Bolt logs the line at the debug level.
+Before applying policies, Bolt uses the apply_prep function to collect facts and
+ensure that the puppet-agent package is available on each target. For more
+information on how Bolt uses apply_prep, see [Applying manifest
+blocks](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan).
+Bolt creates a single line of Puppet code to compile and apply to the provided
+targets. This line of code includes the syntax `include <POLICIES>` and Bolt
+logs the line at the debug level.
 
 ## `run_container` plan step
 
