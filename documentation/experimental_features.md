@@ -10,7 +10,7 @@ around breaking behavior where possible.
 
 ## Configuration policies and the `policy` command
 
-This feature was introduced in [Bolt 3.21.0](). 
+This feature was introduced in [Bolt 3.21.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-3210-2021-12-16). 
 
 ### What are policies?
 
