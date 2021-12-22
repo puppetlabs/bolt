@@ -42,6 +42,12 @@ module Bolt
     end
 
     def plugin?
+      if File.exist?(File.join(path, 'bolt-plugin.json'))
+        msg = "Found bolt-plugin.json in module #{name} at #{path}. Bolt looks for " \
+          "bolt_plugin.json to determine if the module contains plugins. " \
+          "Rename the file for Bolt to recognize it."
+        Bolt::Logger.warn_once('plugin_file_name', msg)
+      end
       File.exist?(plugin_data_file)
     end
   end
