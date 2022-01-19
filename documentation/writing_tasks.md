@@ -70,10 +70,9 @@ the extension for the language they are written in (such as `.rb` for Ruby), and
 place them in the top level of your module's `./tasks` directory.
 
 Each task or plan name segment must begin with a lowercase letter and:
--   Must start with a lowercase letter.
 -   Can include digits.
 -   Can include underscores.
--   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`
+-   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`.
 -   The file extension must not use the reserved extensions `.md` or `.json`.
 
 > **Note:** The task filename `init` is special: the task it defines is
