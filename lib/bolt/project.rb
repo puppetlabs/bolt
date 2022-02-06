@@ -107,7 +107,7 @@ module Bolt
       @inventory_file    = @path + 'inventory.yaml'
       @hiera_config      = @path + 'hiera.yaml'
       @puppetfile        = @path + 'Puppetfile'
-      @rerunfile         = @path + '.rerun.json'
+      @rerunfile         = ENV.keys.include?('BOLT_RERUNFILE') && ENV['BOLT_RERUNFILE'] || @path + '.rerun.json'
       @resource_types    = @path + '.resource_types'
       @downloads         = @path + 'downloads'
       @plans_path        = @path + 'plans'
