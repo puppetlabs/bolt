@@ -344,7 +344,7 @@ module Bolt
 
         if !stat.readable?
           raise Bolt::FileError.new("The #{type} '#{path}' is unreadable", path)
-        elsif !stat.file? && (!allow_dir || !stat.directory?)
+        elsif !allow_dir && stat.directory?
           expected = allow_dir ? 'file or directory' : 'file'
           raise Bolt::FileError.new("The #{type} '#{path}' is not a #{expected}", path)
         elsif stat.directory?
