@@ -851,34 +851,9 @@ natural or readable as it could be.
 ### Resource step variable interpolation
 
 When applying Puppet resources in a `resource` step, variable interpolation
-behaves differently in YAML plans and Puppet language plans. To illustrate this
-difference, consider this YAML plan:
+behaves differently in YAML plans and Puppet language plans. For example:
 
-```yaml
-steps:
-  - targets: localhost
-    description: Apply a file resource
-    resources:
-    - type: file
-      title: '/tmp/foo'
-      parameters:
-        content: $facts['os']['family']
-        ensure: present
-  - name: file_contents
-    description: Read contents of file managed with file resource
-    eval: >
-      file::read('/tmp/foo')
-      
-return: $file_contents
-
-```
-
-This plan performs `apply_prep` on a localhost target. Then it uses a Puppet
-`file` resource to write the OS family discovered from the Puppet `$facts` hash
-to a temporary file. Finally, it reads the value written to the file and returns
-it. Running `bolt plan convert` on this plan produces this Puppet code:
-
-```
+```pp
 plan yaml_plans::interpolation_pp() {
   apply_prep('localhost')
   $interpolation = apply('localhost') {
@@ -893,10 +868,13 @@ plan yaml_plans::interpolation_pp() {
 }
 ```
 
-This Puppet language plan works as expected, whereas the YAML plan it was
-converted from fails. The failure stems from the `$facts`variable being resolved
-as a plan variable, instead of being evaluated as part of compiling the manifest
-code in an `apply`block.
+This Puppet language plan 
+- Performs `apply_prep` on the target `localhost`.
+- Uses a Puppet `file` resource to write the OS family discovered from the Puppet `$facts` hash
+to a temporary file.
+- Reads the value written to the file and returns it.
+
+Trying to access `$facts['os']['family']` in a YAML plan would fail because Bolt would try to resolve `$facts` as a plan variable instead of evaluating it as manifest code in an `apply` block.
 
 ### Dependency order
 
