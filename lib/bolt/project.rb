@@ -128,6 +128,10 @@ module Bolt
 
       @data = data.slice(*Bolt::Config::PROJECT_OPTIONS)
 
+      if @data['rerunfile']
+        @rerunfile = File.expand_path(@data['rerunfile'], @path)
+      end
+
       validate if project_file?
     end
 
