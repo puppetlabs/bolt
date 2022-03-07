@@ -326,6 +326,7 @@ module BoltServer
         cli << "--basemodulepath" << basemodulepath
         Puppet.settings.send(:clear_everything_for_tests)
         Puppet.initialize_settings(cli)
+        Puppet[:versioned_environment_dirs] = true
         yield
       end
     end
