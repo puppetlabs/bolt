@@ -17,6 +17,10 @@ describe Bolt::Plugin::Puppetdb do
       expect(plugin.fact_path("facts.straw.berries")).to eq(%w[straw berries])
     end
 
+    it "converts array indexes to integers" do
+      expect(plugin.fact_path("facts.0.berries")).to eq([0, 'berries'])
+    end
+
     it "errors when fact is not prepended with 'facts'" do
       expect { plugin.fact_path("strawberries") }
         .to raise_error(Bolt::Plugin::Puppetdb::FactLookupError,
