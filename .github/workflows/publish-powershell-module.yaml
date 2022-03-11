@@ -11,7 +11,7 @@ on:
 jobs:
   publish_module:
     name: Publish
-    runs-on: windows-latest
+    runs-on: windows-2019
     env:
       BOLT_DISABLE_PWSH_WARNING: 'true'
     steps:

@@ -20,7 +20,7 @@ jobs:
     name: Tests
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-2019]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -43,10 +43,10 @@ jobs:
         run: bundle exec r10k puppetfile install
       - if: matrix.os == 'ubuntu-latest'
         uses: ./.github/actions/docker_setup
-      - if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-2019'
         uses: ./.github/actions/windows_agentless_setup
       - name: Run tests
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-2019'
         run: bundle exec rake ci:boltspec:windows
       - name: Run tests
         if: matrix.os == 'ubuntu-latest'

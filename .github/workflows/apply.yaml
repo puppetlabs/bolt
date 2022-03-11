@@ -20,7 +20,7 @@ jobs:
     name: Tests
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-2019]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
@@ -43,11 +43,11 @@ jobs:
         run: bundle exec r10k puppetfile install
       - if: matrix.os == 'ubuntu-latest'
         uses: ./.github/actions/sudo_setup
-      - if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-2019'
         uses: ./.github/actions/windows_agent_setup
       - if: matrix.os == 'ubuntu-latest'
         name: Run tests
         run: bundle exec rake ci:apply:linux
-      - if: matrix.os == 'windows-latest'
+      - if: matrix.os == 'windows-2019'
         name: Run tests
         run: bundle exec rake ci:apply:windows

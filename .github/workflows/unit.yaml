@@ -17,7 +17,7 @@ jobs:
     name: Unit
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-latest, windows-2019]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout repository
