@@ -843,7 +843,7 @@ For example:
 ```
 ssh:
   ssh-command: 'ssh'
-  copy-command: 'scp -r -F ~/ssh-config/myconf'
+  copy-command: ['scp', '-r', '-F', '~/ssh-config/myconf']
 ```
 
 ### Connecting with SSH configuration not supported by net-ssh
