@@ -50,14 +50,11 @@ jobs:
   agentless:
     name: Agentless
     runs-on: windows-latest
-<<<<<<< HEAD
     strategy:
       matrix:
         ruby: [2.7, 3.0]
     env:
       BOLT_WINDOWS: true
-=======
->>>>>>> main
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
