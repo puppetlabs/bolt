@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/config/transport/base'
+require_relative '../../../bolt/error'
+require_relative '../../../bolt/config/transport/base'
 
 module Bolt
   class Config
@@ -34,6 +34,7 @@ module Bolt
 
         # Options available when using the native ssh transport
         NATIVE_OPTIONS = %w[
+          batch-mode
           cleanup
           copy-command
           host
@@ -49,6 +50,7 @@ module Bolt
         ].concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {
+          "batch-mode"         => true,
           "cleanup"            => true,
           "connect-timeout"    => 10,
           "disconnect-timeout" => 5,
@@ -123,6 +125,11 @@ module Bolt
           if @config['native-ssh'] && !@config['load-config']
             msg = 'Cannot use native SSH transport with load-config set to false'
             raise Bolt::ValidationError, msg
+          end
+
+          if !@config['batch-mode'] && !@config['ssh-command']
+            raise Bolt::ValidationError,
+                  'Must set ssh-command when batch-mode is set to false'
           end
         end
       end

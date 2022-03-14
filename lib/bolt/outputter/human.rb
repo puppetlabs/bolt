@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/pal'
+require_relative '../../bolt/container_result'
+require_relative '../../bolt/pal'
 
 module Bolt
   class Outputter
@@ -77,6 +78,8 @@ module Bolt
           @disable_depth += 1
         when :message
           print_message(event[:message])
+        when :verbose
+          print_message(event[:message]) if @verbose
         end
 
         if enabled?
@@ -173,13 +176,28 @@ module Bolt
           if result.message?
             @stream.puts(remove_trail(indent(2, result.message)))
           end
-
-          # Use special handling if the result looks like a command or script result
-          if result.generic_value.keys == %w[stdout stderr merged_output exit_code]
+          case result.action
+          when 'command', 'script'
             safe_value = result.safe_value
-            @stream.puts(indent(2, safe_value['merged_output'])) unless safe_value['merged_output'].strip.empty?
-          elsif result.generic_value.any?
-            @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
+            if safe_value["merged_output"]
+              @stream.puts(indent(2, safe_value['merged_output'])) unless safe_value['merged_output'].strip.empty?
+
+            else # output stdout or stderr
+              unless safe_value['stdout'].nil? || safe_value['stdout'].strip.empty?
+                @stream.puts(indent(2, "STDOUT:"))
+                @stream.puts(indent(4, safe_value['stdout']))
+              end
+              unless safe_value['stderr'].nil? || safe_value['stderr'].strip.empty?
+                @stream.puts(indent(2, "STDERR:"))
+                @stream.puts(indent(4, safe_value['stderr']))
+              end
+            end
+          when 'lookup'
+            @stream.puts(indent(2, result['value']))
+          else
+            if result.generic_value.any?
+              @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
+            end
           end
         end
       end
@@ -292,8 +310,13 @@ module Bolt
         )
       end
 
-      def print_tasks(tasks, modulepath)
-        command = Bolt::Util.powershell? ? 'Get-BoltTask -Task <TASK NAME>' : 'bolt task show <TASK NAME>'
+      # List available tasks.
+      #
+      # @param tasks [Array] A list of task names and descriptions.
+      # @param modulepath [Array] The modulepath.
+      #
+      def print_tasks(tasks:, modulepath:)
+        command = Bolt::Util.powershell? ? 'Get-BoltTask -Name <TASK NAME>' : 'bolt task show <TASK NAME>'
 
         tasks = tasks.map do |name, description|
           description = truncate(description, 72)
@@ -312,8 +335,11 @@ module Bolt
         @stream.puts indent(2, "Use '#{command}' to view details and parameters for a specific task.")
       end
 
-      # @param [Hash] task A hash representing the task
-      def print_task_info(task)
+      # Print information about a task.
+      #
+      # @param task [Bolt::Task] The task information.
+      #
+      def print_task_info(task:)
         params = (task.parameters || []).sort
 
         info = +''
@@ -323,7 +349,7 @@ module Bolt
         info << if task.description
                   indent(2, task.description.chomp)
                 else
-                  indent(2, 'No description')
+                  indent(2, 'No description available.')
                 end
         info << "\n\n"
 
@@ -382,7 +408,7 @@ module Bolt
         info << if plan['description']
                   indent(2, plan['description'].chomp)
                 else
-                  indent(2, 'No description')
+                  indent(2, 'No description available.')
                 end
         info << "\n\n"
 
@@ -425,7 +451,7 @@ module Bolt
         @stream.puts info
       end
 
-      def print_plans(plans, modulepath)
+      def print_plans(plans:, modulepath:)
         command = Bolt::Util.powershell? ? 'Get-BoltPlan -Name <PLAN NAME>' : 'bolt plan show <PLAN NAME>'
 
         plans = plans.map do |name, description|
@@ -445,26 +471,52 @@ module Bolt
         @stream.puts indent(2, "Use '#{command}' to view details and parameters for a specific plan.")
       end
 
-      def print_topics(topics)
-        print_message("Available topics are:")
-        print_message(topics.join("\n"))
-        print_message("\nUse 'bolt guide <TOPIC>' to view a specific guide.")
+      # Print available guide topics.
+      #
+      # @param topics [Array] The available topics.
+      #
+      def print_topics(topics:, **_kwargs)
+        info = +"#{colorize(:cyan, 'Topics')}\n"
+        info << indent(2, topics.join("\n"))
+        info << "\n\n#{colorize(:cyan, 'Additional information')}\n"
+        info << indent(2, "Use 'bolt guide <TOPIC>' to view a specific guide.")
+        @stream.puts info
       end
 
-      def print_guide(guide, _topic)
-        @stream.puts(guide)
+      # Print the guide for the specified topic.
+      #
+      # @param guide [String] The guide.
+      #
+      def print_guide(topic:, guide:, documentation: nil, **_kwargs)
+        info = +"#{colorize(:cyan, topic)}\n"
+        info << indent(2, guide)
+
+        if documentation
+          info << "\n#{colorize(:cyan, 'Documentation')}\n"
+          info << indent(2, documentation.join("\n"))
+        end
+
+        @stream.puts info
+      end
+
+      def print_plan_lookup(value)
+        @stream.puts(value)
       end
 
       def print_module_list(module_list)
+        info = +''
+
         module_list.each do |path, modules|
-          if (mod = modules.find { |m| m[:internal_module_group] })
-            @stream.puts(colorize(:cyan, mod[:internal_module_group]))
-          else
-            @stream.puts(colorize(:cyan, path))
-          end
+          info << if (mod = modules.find { |m| m[:internal_module_group] })
+                    colorize(:cyan, mod[:internal_module_group])
+                  else
+                    colorize(:cyan, path)
+                  end
+
+          info << "\n"
 
           if modules.empty?
-            @stream.puts('(no modules installed)')
+            info << '(no modules installed)'
           else
             module_info = modules.map do |m|
               version = if m[:version].nil?
@@ -476,19 +528,191 @@ module Bolt
               [m[:name], version]
             end
 
-            @stream.puts format_table(module_info, 2, 1)
+            info << format_table(module_info, 2, 1).to_s
           end
 
-          @stream.write("\n")
+          info << "\n\n"
         end
+
+        command = Bolt::Util.powershell? ? 'Get-BoltModule -Name <MODULE>' : 'bolt module show <MODULE>'
+        info << colorize(:cyan, "Additional information\n")
+        info << indent(2, "Use '#{command}' to view details for a specific module.")
+
+        @stream.puts info
       end
 
-      def print_targets(target_list, inventoryfile, target_flag)
-        adhoc = colorize(:yellow, "(Not found in inventory file)")
+      # Prints detailed module information.
+      #
+      # @param name [String] The module's short name.
+      # @param metadata [Hash] The module's metadata.
+      # @param path [String] The path to the module.
+      # @param plans [Array] The module's plans.
+      # @param tasks [Array] The module's tasks.
+      #
+      def print_module_info(name:, metadata:, path:, plans:, tasks:, **_kwargs)
+        info = +''
+
+        info << colorize(:cyan, name)
+
+        info << colorize(:dim, " [#{metadata['version']}]") if metadata['version']
+        info << "\n"
+
+        info << if metadata['summary']
+                  indent(2, wrap(metadata['summary'].strip, 76))
+                else
+                  indent(2, "No description available.\n")
+                end
+        info << "\n"
+
+        if tasks.any?
+          length = tasks.map(&:first).map(&:length).max
+          data   = tasks.map { |task, desc| [task, truncate(desc, 76 - length)] }
+          info << colorize(:cyan, "Tasks\n")
+          info << format_table(data, 2).to_s
+          info << "\n\n"
+        end
+
+        if plans.any?
+          length = plans.map(&:first).map(&:length).max
+          data   = plans.map { |plan, desc| [plan, truncate(desc, 76 - length)] }
+          info << colorize(:cyan, "Plans\n")
+          info << format_table(data, 2).to_s
+          info << "\n\n"
+        end
+
+        if metadata['operatingsystem_support']&.any?
+          supported = metadata['operatingsystem_support'].map do |os|
+            [os['operatingsystem'], os['operatingsystemrelease']&.join(', ')]
+          end
+
+          info << colorize(:cyan, "Operating system support\n")
+          info << format_table(supported, 2).to_s
+          info << "\n\n"
+        end
+
+        if metadata['dependencies']&.any?
+          dependencies = metadata['dependencies'].map do |dep|
+            [dep['name'], dep['version_requirement']]
+          end
+
+          info << colorize(:cyan, "Dependencies\n")
+          info << format_table(dependencies, 2).to_s
+          info << "\n\n"
+        end
+
+        info << colorize(:cyan, "Path\n")
+        info << if path.start_with?(Bolt::Config::Modulepath::MODULES_PATH) ||
+                   path.start_with?(Bolt::Config::Modulepath::BOLTLIB_PATH)
+                  indent(2, 'built-in module')
+                else
+                  indent(2, path)
+                end
+
+        @stream.puts info
+      end
+
+      def print_plugin_list(plugins:, modulepath:)
+        info   = +''
+        length = plugins.values.map(&:keys).flatten.map(&:length).max + 4
+
+        plugins.each do |hook, plugin|
+          next if plugin.empty?
+          next if hook == :validate_resolve_reference
+
+          info << colorize(:cyan, "#{hook}\n")
+
+          plugin.each do |name, description|
+            info << indent(2, name.ljust(length))
+            info << truncate(description, 80 - length) if description
+            info << "\n"
+          end
+
+          info << "\n"
+        end
+
+        info << colorize(:cyan, "Modulepath\n")
+        info << indent(2, "#{modulepath.join(File::PATH_SEPARATOR)}\n\n")
+
+        info << colorize(:cyan, "Additional information\n")
+        info << indent(2, "For more information about using plugins see https://pup.pt/bolt-plugins")
+
+        @stream.puts info.chomp
+      end
+
+      def print_new_plan(name:, path:)
+        if Bolt::Util.powershell?
+          show_command = 'Get-BoltPlan -Name '
+          run_command  = 'Invoke-BoltPlan -Name '
+        else
+          show_command = 'bolt plan show'
+          run_command  = 'bolt plan run'
+        end
+
+        print_message(<<~OUTPUT)
+          Created plan '#{name}' at '#{path}'
+  
+          Show this plan with:
+              #{show_command} #{name}
+          Run this plan with:
+              #{run_command} #{name}
+        OUTPUT
+      end
+
+      def print_new_policy(name:, path:)
+        if Bolt::Util.powershell?
+          apply_command = "Invoke-BoltPolicy -Name #{name} -Targets <TARGETS>"
+          show_command  = 'Get-BoltPolicy'
+        else
+          apply_command = "bolt policy apply #{name} --targets <TARGETS>"
+          show_command  = 'bolt policy show'
+        end
+
+        print_message(<<~OUTPUT)
+          Created policy '#{name}' at '#{path}'
+          
+          Apply this policy with:
+              #{apply_command}
+          Show available policies with:
+              #{show_command}
+        OUTPUT
+      end
+
+      # Print policies and the modulepath they are loaded from.
+      #
+      # @param policies [Array] The list of available policies.
+      # @param modulepath [Array] The project's modulepath.
+      #
+      def print_policy_list(policies:, modulepath:)
+        info = +''
+
+        info << colorize(:cyan, "Policies\n")
+
+        if policies.any?
+          policies.sort.each { |policy| info << indent(2, "#{policy}\n") }
+        else
+          info << indent(2, "No available policies\n")
+        end
+
+        info << "\n"
+
+        info << colorize(:cyan, "Modulepath\n")
+        info << indent(2, modulepath.join(File::PATH_SEPARATOR).to_s)
+
+        @stream.puts info.chomp
+      end
+
+      # Print target names and where they came from.
+      #
+      # @param adhoc [Hash] Adhoc targets provided on the command line.
+      # @param inventory [Hash] Targets provided from the inventory.
+      # @param flag [Boolean] Whether a targeting command-line option was used.
+      #
+      def print_targets(adhoc:, inventory:, flag:, **_kwargs)
+        adhoc_text = colorize(:yellow, "(Not found in inventory file)")
 
         targets  = []
-        targets += target_list[:inventory].map { |target| [target.name, nil] }
-        targets += target_list[:adhoc].map { |target| [target.name, adhoc] }
+        targets += inventory[:targets].map { |target| [target['name'], nil] }
+        targets += adhoc[:targets].map { |target| [target['name'], adhoc_text] }
 
         info = +''
 
@@ -501,32 +725,31 @@ module Bolt
                 end
         info << "\n\n"
 
-        @stream.puts info
+        info << format_inventory_source(inventory[:file], inventory[:default])
+        info << format_target_summary(inventory[:count], adhoc[:count], flag, false)
 
-        print_inventory_summary(
-          target_list[:inventory].count,
-          target_list[:adhoc].count,
-          inventoryfile,
-          target_flag,
-          false
-        )
+        @stream.puts info
       end
 
-      def print_target_info(target_list, inventoryfile, target_flag)
-        adhoc_targets     = target_list[:adhoc].map(&:name).to_set
-        inventory_targets = target_list[:inventory].map(&:name).to_set
-        targets           = target_list.values.flatten.sort_by(&:name)
+      # Print detailed target information.
+      #
+      # @param adhoc [Hash] Adhoc targets provided on the command line.
+      # @param inventory [Hash] Targets provided from the inventory.
+      # @param flag [Boolean] Whether a targeting command-line option was used.
+      #
+      def print_target_info(adhoc:, inventory:, flag:, **_kwargs)
+        targets = (adhoc[:targets] + inventory[:targets]).sort_by { |t| t['name'] }
 
         info = +''
 
         if targets.any?
-          adhoc = colorize(:yellow, " (Not found in inventory file)")
+          adhoc_text = colorize(:yellow, " (Not found in inventory file)")
 
           targets.each do |target|
-            info << colorize(:cyan, target.name)
-            info << adhoc if adhoc_targets.include?(target.name)
+            info << colorize(:cyan, target['name'])
+            info << adhoc_text if adhoc[:targets].include?(target)
             info << "\n"
-            info << indent(2, target.detail.to_yaml.lines.drop(1).join)
+            info << indent(2, target.to_yaml.lines.drop(1).join)
             info << "\n"
           end
         else
@@ -534,28 +757,27 @@ module Bolt
           info << indent(2, "No targets\n\n")
         end
 
-        @stream.puts info
+        info << format_inventory_source(inventory[:file], inventory[:default])
+        info << format_target_summary(inventory[:count], adhoc[:count], flag, true)
 
-        print_inventory_summary(
-          inventory_targets.count,
-          adhoc_targets.count,
-          inventoryfile,
-          target_flag,
-          true
-        )
+        @stream.puts info
       end
 
-      private def print_inventory_summary(inventory_count, adhoc_count, inventoryfile, target_flag, detail_flag)
+      private def format_inventory_source(inventory_source, default_inventory)
         info = +''
 
         # Add inventory file source
-        info << colorize(:cyan, "Inventory file\n")
-        info << if File.exist?(inventoryfile)
-                  indent(2, "#{inventoryfile}\n")
+        info << colorize(:cyan, "Inventory source\n")
+        info << if inventory_source
+                  indent(2, "#{inventory_source}\n")
                 else
-                  indent(2, wrap("Tried to load inventory from #{inventoryfile}, but the file does not exist\n"))
+                  indent(2, wrap("Tried to load inventory from #{default_inventory}, but the file does not exist\n"))
                 end
         info << "\n"
+      end
+
+      private def format_target_summary(inventory_count, adhoc_count, target_flag, detail_flag)
+        info = +''
 
         # Add target count summary
         count = "#{inventory_count + adhoc_count} total, "\
@@ -579,18 +801,36 @@ module Bolt
           end
         end
 
+        info
+      end
+
+      # Print inventory group information.
+      #
+      # @param count [Integer] Number of groups in the inventory.
+      # @param groups [Array] Names of groups in the inventory.
+      # @param inventory [Hash] Where the inventory was loaded from.
+      #
+      def print_groups(count:, groups:, inventory:)
+        info = +''
+
+        # Add group list
+        info << colorize(:cyan, "Groups\n")
+        info << indent(2, groups.join("\n"))
+        info << "\n\n"
+
+        # Add inventory file source
+        info << format_inventory_source(inventory[:source], inventory[:default])
+
+        # Add group count summary
+        info << colorize(:cyan, "Group count\n")
+        info << indent(2, "#{count} total")
+
         @stream.puts info
       end
 
-      def print_groups(groups)
-        count = "#{groups.count} group#{'s' unless groups.count == 1}"
-        @stream.puts groups.join("\n")
-        @stream.puts colorize(:green, count)
-      end
-
       # @param [Bolt::ResultSet] apply_result A ResultSet object representing the result of a `bolt apply`
-      def print_apply_result(apply_result, elapsed_time)
-        print_summary(apply_result, elapsed_time)
+      def print_apply_result(apply_result)
+        print_summary(apply_result, apply_result.elapsed_time)
       end
 
       # @param [Bolt::PlanResult] plan_result A PlanResult object
@@ -607,6 +847,12 @@ module Bolt
           print_container_result(value.result)
         when Bolt::ResultSet
           print_result_set(value)
+        when Bolt::Result
+          print_result(value)
+        when Bolt::ApplyResult
+          print_apply_result(value)
+        when Bolt::Error
+          print_bolt_error(**value.to_h.transform_keys(&:to_sym))
         else
           @stream.puts(::JSON.pretty_generate(plan_result, quirks_mode: true))
         end
@@ -644,6 +890,17 @@ module Bolt
 
       def print_error(message)
         @stream.puts(colorize(:red, message))
+      end
+
+      def print_bolt_error(msg:, details:, **_kwargs)
+        err = msg
+        if (f = details[:file])
+          err += "\n  (file: #{f}"
+          err += ", line: #{details[:line]}" if details[:line]
+          err += ", column: #{details[:column]}" if details[:column]
+          err += ")"
+        end
+        @stream.puts(colorize(:red, err))
       end
 
       def print_prompt(prompt)

@@ -7,19 +7,19 @@ module BoltSpec
   module Plans
     class PublishStub < ActionStub
       def return
-        raise "return is not implemented for out_message"
+        raise "return is not implemented for out module functions"
       end
 
       def return_for_targets(_data)
-        raise "return_for_targets is not implemented for out_message"
+        raise "return_for_targets is not implemented for out module functions"
       end
 
       def always_return(_data)
-        raise "always_return is not implemented for out_message"
+        raise "always_return is not implemented for out module functions"
       end
 
       def error_with(_data)
-        raise "error_with is not implemented for out_message"
+        raise "error_with is not implemented for out module functions"
       end
 
       def matches(message)

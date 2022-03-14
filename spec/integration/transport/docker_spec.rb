@@ -46,6 +46,20 @@ describe Bolt::Transport::Docker, docker: true do
         docker.with_connection(inventory.get_target('not_a_target')) {}
       }.to raise_error(Bolt::Node::ConnectError, /Could not find a container with name or ID matching 'not_a_target'/)
     end
+
+    context "when connecting to containers by ID" do
+      let(:container_id) { docker.with_connection(target, &:container_id) }
+
+      it "succeeds when using full container IDs" do
+        expect(docker.connected?(inventory.get_target("docker://#{container_id}"))).to eq(true)
+      end
+
+      it "succeeds when using short container IDs" do
+        short_id = container_id[0..11]
+
+        expect(docker.connected?(inventory.get_target("docker://#{short_id}"))).to eq(true)
+      end
+    end
   end
 
   context 'when url is specified' do
@@ -79,6 +93,21 @@ describe Bolt::Transport::Docker, docker: true do
     it 'uses the specified shell' do
       result = docker.run_command(target, 'echo $SHELL')
       expect(result.value['stdout'].strip).to eq('/bin/bash')
+    end
+  end
+
+  context 'with run_as specified' do
+    let(:target_data) {
+      { 'uri' => uri,
+        'config' => {
+          'docker' => { 'run-as' => 'root' }
+        } }
+    }
+    let(:target) { Bolt::Target.from_hash(target_data, inventory) }
+
+    it 'runs as the specified user' do
+      result = docker.run_command(target, 'whoami')
+      expect(result.value['stdout'].strip).to eq('root')
     end
   end
 end

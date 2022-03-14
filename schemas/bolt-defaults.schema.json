@@ -144,8 +144,7 @@
                 "error",
                 "info",
                 "warn",
-                "fatal",
-                "any"
+                "fatal"
               ]
             }
           }
@@ -174,8 +173,7 @@
               "error",
               "info",
               "warn",
-              "fatal",
-              "any"
+              "fatal"
             ]
           }
         }
@@ -186,9 +184,20 @@
       "type": "object",
       "properties": {
         "forge": {
-          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
+          "description": "A subsection for configuring connections to a Forge host.",
           "type": "object",
           "properties": {
+            "authorization_token": {
+              "description": "The token used to authorize requests to the Forge host. Must also specify `baseurl` when using this option.",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "baseurl": {
               "description": "The URL to the Forge host.",
               "type": "string",
@@ -408,6 +417,26 @@
                 }
               ]
             },
+            "run-as": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "run-as-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "service-url": {
               "oneOf": [
                 {
@@ -422,6 +451,26 @@
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/shell-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-executable": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-password": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
                 },
                 {
                   "$ref": "#/definitions/_plugin"
@@ -574,6 +623,46 @@
                 }
               ]
             },
+            "run-as": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "run-as-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-executable": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-password": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "tmpdir": {
               "oneOf": [
                 {
@@ -720,10 +809,50 @@
                 }
               ]
             },
+            "run-as": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "run-as-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/run-as-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "shell-command": {
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/shell-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-executable": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-executable"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "sudo-password": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/sudo-password"
                 },
                 {
                   "$ref": "#/definitions/_plugin"
@@ -1277,6 +1406,17 @@
         }
       ]
     },
+    "batch-mode": {
+      "description": "Whether to disable password querying. When set to `false`, SSH will fall back to prompting for a password if key authentication fails. This might cause Bolt to hang. To prevent Bolt from hanging, you can configure `ssh-command` to use an SSH utility such as sshpass that supports providing a password non-interactively. For more information, see [Providing a password non-interactively using `native-ssh`](troubleshooting.md#providing-a-password-non-interactively-using-native-ssh).",
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
     "bundled-ruby": {
       "description": "Whether to use the Ruby bundled with Bolt packages for local targets.",
       "type": "boolean"
@@ -1460,7 +1600,10 @@
         {
           "type": "object",
           "additionalProperties": {
-            "type": "string"
+            "type": [
+              "string",
+              "array"
+            ]
           },
           "propertyNames": {
             "pattern": "^.?[a-zA-Z0-9]+$"
@@ -1597,7 +1740,7 @@
       ]
     },
     "private-key": {
-      "description": "Either the path to the private key file to use for authentication, or a hash with the key `key-data` and the contents of the private key.",
+      "description": "Either the path to the private key file to use for authentication, or a hash with the key `key-data` and the contents of the private key. Note that the key cannot be encrypted if using the `key-data` hash.",
       "oneOf": [
         {
           "type": [

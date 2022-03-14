@@ -7,7 +7,7 @@ on:
       - 'rakelib/schemas.rake'
       - 'schemas/*.json'
       - 'lib/bolt/config/options.rb'
-      - 'lib/bolt/config/transport/options.rb'
+      - 'lib/bolt/config/transport/*'
   pull_request:
     types: [opened, reopened, edited, synchronize]
     paths:

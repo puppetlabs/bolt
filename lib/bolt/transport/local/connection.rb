@@ -3,13 +3,15 @@
 require 'open3'
 require 'fileutils'
 require 'tempfile'
-require 'bolt/node/output'
-require 'bolt/util'
+require_relative '../../../bolt/node/output'
+require_relative '../../../bolt/util'
 
 module Bolt
   module Transport
     class Local < Simple
       class Connection
+        RUBY_ENV_VARS = %w[GEM_PATH GEM_HOME RUBYLIB RUBYLIB_PREFIX RUBYOPT RUBYPATH RUBYSHELL].freeze
+
         attr_accessor :user, :logger, :target
 
         def initialize(target)
@@ -68,7 +70,21 @@ module Bolt
             end
           end
 
-          Open3.popen3(*command)
+          # Only do this if bundled-ruby is set to false, not nil
+          ruby_env_vars = if target.transport_config['bundled-ruby'] == false
+                            RUBY_ENV_VARS.each_with_object({}) do |e, acc|
+                              acc[e] = ENV["BOLT_ORIG_#{e}"] if ENV["BOLT_ORIG_#{e}"]
+                            end
+                          end
+
+          if target.transport_config['bundled-ruby'] == false &&
+             Gem.loaded_specs.keys.include?('bundler')
+            Bundler.with_unbundled_env do
+              Open3.popen3(ruby_env_vars || {}, *command)
+            end
+          else
+            Open3.popen3(ruby_env_vars || {}, *command)
+          end
         end
 
         # This is used by the Bash shell to decide whether to `cd` before

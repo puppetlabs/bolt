@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/node/errors'
-require 'bolt/node/output'
+require_relative '../../../bolt/node/errors'
+require_relative '../../../bolt/node/output'
 
 module Bolt
   module Transport

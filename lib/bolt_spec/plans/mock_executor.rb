@@ -17,19 +17,19 @@ module BoltSpec
 
     # Nothing on the executor is 'public'
     class MockExecutor
-      attr_reader :noop, :error_message, :in_parallel, :transports, :future
+      attr_reader :noop, :error_message, :transports, :future
       attr_accessor :run_as, :transport_features, :execute_any_plan
 
       def initialize(modulepath)
         @noop = false
         @run_as = nil
-        @in_parallel = false
         @future = {}
         @error_message = nil
         @allow_apply = false
         @modulepath = [modulepath].flatten.map { |path| File.absolute_path(path) }
         MOCKED_ACTIONS.each { |action| instance_variable_set(:"@#{action}_doubles", {}) }
         @stub_out_message = nil
+        @stub_out_verbose = nil
         @transport_features = ['puppet-agent']
         @executor_real = Bolt::Executor.new
         # by default, we want to execute any plan that we come across without error
@@ -38,11 +38,13 @@ module BoltSpec
         @execute_any_plan = true
         # plans that are allowed to be executed by the @executor_real
         @allowed_exec_plans = {}
+        @id = 0
+        @plan_futures = []
       end
 
       def module_file_id(file)
         modpath = @modulepath.select { |path| file =~ /^#{path}/ }
-        raise "Could not identify modulepath containing #{file}: #{modpath}" unless modpath.size == 1
+        return nil unless modpath.size == 1
 
         path = Pathname.new(file)
         relative = path.relative_path_from(Pathname.new(modpath.first))
@@ -64,7 +66,7 @@ module BoltSpec
       end
 
       def run_script(targets, script_path, arguments, options = {}, _position = [])
-        script = module_file_id(script_path)
+        script = module_file_id(script_path) || script_path
         result = nil
         if (doub = @script_doubles[script] || @script_doubles[:default])
           result = doub.process(targets, script, arguments, options)
@@ -114,7 +116,7 @@ module BoltSpec
       end
 
       def upload_file(targets, source_path, destination, options = {}, _position = [])
-        source = module_file_id(source_path)
+        source = module_file_id(source_path) || source_path
         result = nil
         if (doub = @upload_doubles[source] || @upload_doubles[:default])
           result = doub.process(targets, source, destination, options)
@@ -187,6 +189,7 @@ module BoltSpec
           end
         end
         @stub_out_message.assert_called('out::message') if @stub_out_message
+        @stub_out_verbose.assert_called('out::verbose') if @stub_out_verbose
       end
 
       MOCKED_ACTIONS.each do |action|
@@ -197,6 +200,10 @@ module BoltSpec
 
       def stub_out_message
         @stub_out_message ||= ActionDouble.new(:PublishStub)
+      end
+
+      def stub_out_verbose
+        @stub_out_verbose ||= ActionDouble.new(:PublishStub)
       end
 
       def stub_apply
@@ -220,12 +227,20 @@ module BoltSpec
       end
 
       def publish_event(event)
-        if event[:type] == :message
+        case event[:type]
+        when :message
           unless @stub_out_message
             @error_message = "Unexpected call to 'out::message(#{event[:message]})'"
             raise UnexpectedInvocation, @error_message
           end
           @stub_out_message.process(event[:message])
+
+        when :verbose
+          unless @stub_out_verbose
+            @error_message = "Unexpected call to 'out::verbose(#{event[:message]})'"
+            raise UnexpectedInvocation, @error_message
+          end
+          @stub_out_verbose.process(event[:message])
         end
       end
 
@@ -257,56 +272,56 @@ module BoltSpec
       end
       # End apply_prep mocking
 
-      # Evaluates a `parallelize()` block and returns the result. Normally,
-      # Bolt's executor wraps this in a Yarn for each object passed to the
-      # `parallelize()` function, and then executes them in parallel before
-      # returning the result from the block. However, in BoltSpec the block is
-      # executed for each object sequentially, and this function returns the
-      # result itself.
-      #
-      def create_yarn(scope, block, object, _index)
-        # Create the new scope
-        newscope = Puppet::Parser::Scope.new(scope.compiler)
-        local = Puppet::Parser::Scope::LocalScope.new
-
-        # Compress the current scopes into a single vars hash to add to the new scope
-        current_scope = scope.effective_symtable(true)
-        until current_scope.nil?
-          current_scope.instance_variable_get(:@symbols)&.each_pair { |k, v| local[k] = v }
-          current_scope = current_scope.parent
-        end
-        newscope.push_ephemerals([local])
-
-        begin
-          result = catch(:return) do
-            args = { block.parameters[0][1].to_s => object }
-            block.closure.call_by_name_with_scope(newscope, args, true)
-          end
-
-          # If we got a return from the block, get it's value
-          # Otherwise the result is the last line from the block
-          result = result.value if result.is_a?(Puppet::Pops::Evaluator::Return)
-
-          # Validate the result is a PlanResult
-          unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
-            raise Bolt::InvalidParallelResult.new(result.to_s, *Puppet::Pops::PuppetStack.top_of_stack)
-          end
-
-          result
-        rescue Puppet::PreformattedError => e
-          if e.cause.is_a?(Bolt::Error)
-            e.cause
-          else
-            raise e
-          end
-        end
+      # Parallel function mocking
+      def run_in_thread
+        yield
       end
 
-      # BoltSpec already evaluated the `parallelize()` block for each object
-      # passed to the function, so these results can be returned as-is.
-      #
-      def round_robin(results)
-        results
+      def in_parallel?
+        false
+      end
+
+      def create_future(plan_id:, scope: nil, name: nil)
+        newscope = nil
+        if scope
+          # Create the new scope
+          newscope = Puppet::Parser::Scope.new(scope.compiler)
+          local = Puppet::Parser::Scope::LocalScope.new
+
+          # Compress the current scopes into a single vars hash to add to the new scope
+          scope.to_hash(true, true).each_pair { |k, v| local[k] = v }
+          newscope.push_ephemerals([local])
+        end
+
+        # Execute "futures" serially when running in BoltSpec
+        result = yield newscope
+        @id += 1
+        future = Bolt::PlanFuture.new(nil, @id, name: name, plan_id: plan_id)
+        future.value = result
+        @plan_futures << future
+        future
+      end
+
+      def get_futures_for_plan(plan_id:)
+        @plan_futures.select { |future| future.plan_id == plan_id }
+      end
+
+      def wait(futures, **_kwargs)
+        futures.map(&:value)
+      end
+
+      # Since Futures are executed immediately once created, this will always
+      # be true by the time it's called.
+      def plan_complete?
+        true
+      end
+
+      def get_current_future(fiber)
+        @plan_futures.select { |f| f.fiber == fiber }&.first
+      end
+
+      def get_current_plan_id(fiber)
+        get_current_future(fiber)&.current_plan
       end
 
       # Public methods on Bolt::Executor that need to be mocked so there aren't
@@ -330,6 +345,8 @@ module BoltSpec
 
       def report_yaml_plan(_plan); end
 
+      def report_noop_mode(_mode); end
+
       def shutdown; end
 
       def start_plan(_plan_context); end
@@ -337,6 +354,8 @@ module BoltSpec
       def subscribe(_subscriber, _types = nil); end
 
       def unsubscribe(_subscriber, _types = nil); end
+
+      def round_robin; end
     end
   end
 end

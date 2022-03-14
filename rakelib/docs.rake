@@ -4,6 +4,7 @@ require 'fileutils'
 require 'json'
 require 'erb'
 require 'net/http'
+require 'bolt/util'
 
 class PuppetfileParser
   attr_reader :local_modules, :modules
@@ -55,6 +56,7 @@ begin
     desc 'Generate all markdown docs'
     task all: %i[
       function_reference
+      type_reference
       cmdlet_reference
       command_reference
       defaults_reference
@@ -63,6 +65,29 @@ begin
       transports_reference
       packaged_modules
     ]
+
+    # Generate Puppet strings for built-in functions and data types.
+    # This task has no description so it does not appear in the task
+    # list.
+    desc ''
+    task :generate_strings do
+      modules = Dir.children("#{__dir__}/../bolt-modules").map { |dir| dir.prepend('bolt-modules/') }
+
+      @puppet_strings ||= begin
+        FileUtils.mkdir_p('tmp')
+        tmpfile = 'tmp/boltlib.json'
+
+        PuppetStrings.generate(
+          ['bolt-modules/*'],
+          markup: 'markdown',
+          json: true,
+          path: tmpfile,
+          yard_args: modules
+        )
+
+        JSON.parse(File.read(tmpfile))
+      end
+    end
 
     desc "Generate markdown docs for Bolt PowerShell cmdlets"
     task cmdlet_reference: 'pwsh:generate_powershell_cmdlets' do
@@ -128,7 +153,7 @@ begin
         actions.each do |action|
           command = [subcommand, action].compact.join(' ')
           help_text = parser.get_help_text(subcommand, action)
-          matches = help_text[:banner].match(/USAGE(?<usage>.+?)DESCRIPTION(?<desc>.+?)(EXAMPLES|\z)/m)
+          matches = help_text[:banner].match(/Usage(?<usage>.+?)Description(?<desc>.+?)(Examples|\z)/m)
 
           options = help_text[:flags].map do |option|
             switch = parser.top.long[option]
@@ -176,10 +201,6 @@ begin
       # 'console' and filepath
       @opts['log'][:properties] = @opts['log'][:additionalProperties][:properties]
 
-      # Remove 'notice' log level. This is soft-deprecated and shouldn't appear
-      # in documentation.
-      @opts['log'][:properties]['level'][:enum].delete('notice')
-
       # Stringify data types
       @opts.transform_values! { |data| stringify_types(data) }
 
@@ -196,25 +217,70 @@ begin
       $stdout.puts "Generated bolt-defaults.yaml reference at:\n\t#{filepath}"
     end
 
+    desc "Generate markdown docs for Bolt's data types"
+    task type_reference: :generate_strings do
+      filepath = File.expand_path('../documentation/bolt_types_reference.md', __dir__)
+      template = File.expand_path('../documentation/templates/bolt_types_reference.md.erb', __dir__)
+
+      @types = @puppet_strings['data_types'].map do |data|
+        functions = []
+
+        # Simplify select types.
+        data = Bolt::Util.walk_vals(data) do |val|
+          if val.is_a?(String)
+            val.gsub(/TypeReference\['(\w*)'\]/, '\1')
+               .gsub(/String\[1\]/, 'String')
+          else
+            val
+          end
+        end
+        # Add attributes, which are listed under the type's params
+        data.dig('docstring', 'tags')&.each do |param|
+          functions << {
+            'name' => param['name'],
+            'desc' => param['text'].tr("\n", ' '),
+            'type' => param['types'].first
+          }
+        end
+
+        # Add functions
+        data['functions'].each do |func|
+          if data['name'] == 'ResultSet' && func['name'] == '[]'
+            type = 'Variant[Result, ApplyResult, Array[Variant[Result, ApplyResult]]]'
+          else
+            type = func.dig('docstring', 'tags')
+                       .find { |tag| tag['tag_name'] == 'return' }
+                       .fetch('types')
+            type = type.first if type.is_a?(Array)
+          end
+
+          functions << {
+            'name' => func['name'],
+            'desc' => func.dig('docstring', 'text').tr("\n", ' '),
+            'type' => type
+          }
+        end
+
+        {
+          'name'  => data['name'],
+          'desc'  => data.dig('docstring', 'text'),
+          'funcs' => functions.sort_by { |func| func['name'] }
+        }
+      end
+
+      # Generate markdown file from template
+      renderer = ERB.new(File.read(template), trim_mode: '-')
+      File.write(filepath, renderer.result)
+
+      $stdout.puts "Generated data type reference at:\n\t#{filepath}"
+    end
+
     desc "Generate markdown docs for Bolt's core Puppet functions"
-    task :function_reference do
+    task function_reference: :generate_strings do
       filepath = File.expand_path('../documentation/plan_functions.md', __dir__)
       template = File.expand_path('../documentation/templates/plan_functions.md.erb', __dir__)
 
-      FileUtils.mkdir_p 'tmp'
-      tmpfile = 'tmp/boltlib.json'
-      PuppetStrings.generate(['bolt-modules/*'],
-                             markup: 'markdown', json: true, path: tmpfile,
-                             yard_args: ['bolt-modules/boltlib',
-                                         'bolt-modules/ctrl',
-                                         'bolt-modules/file',
-                                         'bolt-modules/out',
-                                         'bolt-modules/prompt',
-                                         'bolt-modules/system'])
-      json = JSON.parse(File.read(tmpfile))
-      funcs = json.delete('puppet_functions')
-      json.delete('data_types')
-      json.each { |k, v| raise "Expected #{k} to be empty, found #{v}" unless v.empty? }
+      funcs = @puppet_strings.delete('puppet_functions')
 
       apply = {
         "name"       => "apply",
@@ -390,10 +456,6 @@ begin
       # Move sub-options for 'log' option up one level, as they're nested under
       # 'console' and filepath
       @opts['log'][:properties] = @opts['log'][:additionalProperties][:properties]
-
-      # Remove 'notice' log level. This is soft-deprecated and shouldn't appear
-      # in documentation.
-      @opts['log'][:properties]['level'][:enum].delete('notice')
 
       # Stringify data types
       @opts.transform_values! { |data| stringify_types(data) }

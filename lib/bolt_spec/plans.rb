@@ -98,7 +98,7 @@ module BoltSpec
       Puppet[:tasks] = true
 
       # Ensure logger is initialized with Puppet levels so 'notice' works when running plan specs.
-      Logging.init :trace, :debug, :info, :notice, :warn, :error, :fatal, :any
+      Logging.init :trace, :debug, :info, :notice, :warn, :error, :fatal
     end
 
     # Provided as a class so expectations can be placed on it.

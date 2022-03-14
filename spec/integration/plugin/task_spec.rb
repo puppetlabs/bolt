@@ -154,16 +154,16 @@ describe 'using the task plugin' do
       }
 
       it 'errors when the result is unexpected' do
-        expect { run_cli(command) }
-          .to raise_error(Bolt::Plugin::PluginError, /Task result did not return 'value'/)
+        result = run_cli_json(command)
+        expect(result['msg']).to match(/Task result did not return 'value'/)
       end
 
       context 'execution fails' do
         let(:params) { { 'bad-key' => %w[foo bar] } }
 
         it 'errors' do
-          expect { run_cli(command) }
-            .to raise_error(Bolt::ValidationError, /bad-key/)
+          result = run_cli_json(command)
+          expect(result['msg']).to match(/bad-key/)
         end
       end
 
@@ -176,8 +176,8 @@ describe 'using the task plugin' do
           }
         }
         it 'errors when the task fails' do
-          expect { run_cli(command) }
-            .to raise_error(Bolt::Plugin::PluginError, /The task failed/)
+          result = run_cli_json(command)
+          expect(result['msg']).to match(/The task failed/)
         end
       end
     end
@@ -213,7 +213,7 @@ describe 'using the task plugin' do
         result = run_cli_json(command + %w[--targets agentless], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
+        expect(result['msg']).to match(/apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
           /The task failed with exit code 1/
         )
@@ -227,9 +227,9 @@ describe 'using the task plugin' do
         result = run_cli_json(command + %w[--targets agentless], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
+        expect(result['msg']).to match(/apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
-          /Invalid parameters for Task sample::params/
+          /Error executing plugin task from puppet_library.*expects a value for parameter/m
         )
       end
     end
@@ -241,9 +241,9 @@ describe 'using the task plugin' do
         result = run_cli_json(command + %w[--targets agentless], rescue_exec: true)
 
         expect(result).to include('kind' => "bolt/run-failure")
-        expect(result['msg']).to match(/Plan aborted: apply_prep failed on 1 target/)
+        expect(result['msg']).to match(/apply_prep failed on 1 target/)
         expect(result['details']['result_set'][0]['value']['_error']['msg']).to match(
-          /Task 'non_existent_task' could not be found/
+          /Could not find a task named 'non_existent_task'/
         )
       end
     end

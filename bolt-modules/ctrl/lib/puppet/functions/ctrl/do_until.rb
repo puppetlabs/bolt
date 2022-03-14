@@ -3,8 +3,10 @@
 # Repeat the block until it returns a truthy value. Returns the value.
 Puppet::Functions.create_function(:'ctrl::do_until') do
   # @param options A hash of additional options.
+  # @param block The code block to repeat.
   # @option options [Numeric] limit The number of times to repeat the block.
   # @option options [Numeric] interval The number of seconds to wait before repeating the block.
+  # @return [nil]
   # @example Run a task until it succeeds
   #   ctrl::do_until() || {
   #     run_task('test', $target, '_catch_errors' => true).ok()

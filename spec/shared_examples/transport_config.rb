@@ -44,7 +44,7 @@ shared_examples 'filters options' do
 end
 
 shared_examples 'plugins' do
-  let(:plugins) { Bolt::Plugin.setup(Bolt::Config.default, nil) }
+  let(:plugins) { Bolt::Plugin.new(Bolt::Config.default, nil) }
 
   it 'accepts plugin references' do
     expect { transport.new(plugin_data) }.not_to raise_error
@@ -79,6 +79,11 @@ end
 shared_examples 'interpreters' do
   it 'normalizes interpreters' do
     data['interpreters'] = { 'rb' => '/path/to/ruby' }
+    expect(transport.new(data)['interpreters']).to include('.rb')
+  end
+
+  it 'accepts an array value' do
+    data['interpreters'] = { 'rb' => ['/path/to/ruby', '-r', 'gem_gem_gem'] }
     expect(transport.new(data)['interpreters']).to include('.rb')
   end
 

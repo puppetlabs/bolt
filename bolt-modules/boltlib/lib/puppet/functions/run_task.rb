@@ -130,28 +130,19 @@ Puppet::Functions.create_function(:run_task) do
       end
     end
 
+    # Report whether the task was run in noop mode.
+    executor.report_noop_mode(executor.noop || options[:noop])
+
     if targets.empty?
       Bolt::ResultSet.new([])
     else
-      result = if executor.in_parallel
-                 require 'concurrent'
-                 require 'fiber'
-                 future = Concurrent::Future.execute do
-                   executor.run_task(targets,
-                                     task,
-                                     params,
-                                     options,
-                                     Puppet::Pops::PuppetStack.top_of_stack)
+      file_line = Puppet::Pops::PuppetStack.top_of_stack
+      result = if executor.in_parallel?
+                 executor.run_in_thread do
+                   executor.run_task(targets, task, params, options, file_line)
                  end
-
-                 Fiber.yield('unfinished') while future.incomplete?
-                 future.value || future.reason
                else
-                 executor.run_task(targets,
-                                   task,
-                                   params,
-                                   options,
-                                   Puppet::Pops::PuppetStack.top_of_stack)
+                 executor.run_task(targets, task, params, options, file_line)
                end
 
       if !result.ok && !options[:catch_errors]

@@ -8,14 +8,9 @@ on:
     types: [opened, reopened, edited, synchronize]
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
-env:
-  BOLT_SUDO_USER: true
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
-
-  fast:
-    name: Fast
+  integration:
+    name: Integration
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,38 +25,15 @@ jobs:
           bundler-cache: true
       - name: Update gems
         run: bundle update
-      - name: Pre-test setup
-        run: |
-          echo 'runner:runner' | sudo chpasswd
-          sudo sh -c "echo 'Defaults authenticate' >> /etc/sudoers"
-          sudo sh -c "echo 'runner  ALL=(ALL) PASSWD:ALL' >> /etc/sudoers"
-          docker-compose -f spec/docker-compose.yml build --parallel ubuntu_node puppet_6_node puppet_7_node
-          docker-compose -f spec/docker-compose.yml up -d ubuntu_node puppet_6_node puppet_7_node
-          chmod 0600 spec/fixtures/keys/id_rsa
-          bundle exec r10k puppetfile install
-      - name: Run tests with minimal container infrastructure
-        run: bundle exec rake ci:linux:fast
-
-  slow:
-    name: Slow
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        ruby: [2.7, 3.0]
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
+      - name: Cache modules
+        id: modules
+        uses: actions/cache@v1
         with:
-          ruby-version: ${{ matrix.ruby }}
-          bundler-cache: true
-      - name: Update gems
-        run: bundle update
-      - name: Pre-test setup
-        run: |
-          docker-compose -f spec/docker-compose.yml build --parallel
-          docker-compose -f spec/docker-compose.yml up -d
-          bundle exec r10k puppetfile install
-      - name: Run tests with expensive containers
-        run: bundle exec rake ci:linux:slow
+          path: modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
+      - name: Install modules
+        if: steps.modules.outputs.cache-hit != 'true'
+        run: bundle exec r10k puppetfile install
+      - uses: ./.github/actions/sudo_setup
+      - name: Run tests
+        run: bundle exec rake ci:linux:integration

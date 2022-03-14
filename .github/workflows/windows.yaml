@@ -14,13 +14,10 @@ env:
   BOLT_WINRM_PORT: 5985
   BOLT_WINRM_SSL_PORT: 5986
   BOLT_WINRM_SMB_PORT: 445
-  RUBY_VERSION: 25-x64
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   
 jobs:
-
-  agentful:
-    name: Agentful
+  integration:
+    name: Integration
     runs-on: windows-latest
     strategy:
       matrix:
@@ -46,23 +43,21 @@ jobs:
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
-      - name: Pre-test setup
-        shell: powershell
-        run: |
-          . scripts\ci.ps1
-          Set-ActiveRubyFromPuppet
+      - uses: ./.github/actions/windows_agent_setup
       - name: Run tests
-        shell: powershell
-        run: bundle exec rake ci:windows:agentful
+        run: bundle exec rake ci:windows:integration
 
   agentless:
     name: Agentless
     runs-on: windows-latest
+<<<<<<< HEAD
     strategy:
       matrix:
         ruby: [2.7, 3.0]
     env:
       BOLT_WINDOWS: true
+=======
+>>>>>>> main
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -82,9 +77,6 @@ jobs:
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
-      - name: Pre-test setup
-        shell: powershell
-        run: '& scripts\ci.ps1'
+      - uses: ./.github/actions/windows_agentless_setup
       - name: Run tests
-        shell: powershell
         run: bundle exec rake ci:windows:agentless

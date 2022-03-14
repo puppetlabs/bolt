@@ -6,21 +6,21 @@ require 'json'
 require 'logging'
 require 'pathname'
 require 'set'
-require 'bolt/analytics'
-require 'bolt/result'
-require 'bolt/config'
-require 'bolt/result_set'
-require 'bolt/puppetdb'
+require_relative '../bolt/analytics'
+require_relative '../bolt/config'
+require_relative '../bolt/fiber_executor'
+require_relative '../bolt/puppetdb'
+require_relative '../bolt/result'
+require_relative '../bolt/result_set'
 # Load transports
-require 'bolt/transport/docker'
-require 'bolt/transport/local'
-require 'bolt/transport/lxd'
-require 'bolt/transport/orch'
-require 'bolt/transport/podman'
-require 'bolt/transport/remote'
-require 'bolt/transport/ssh'
-require 'bolt/transport/winrm'
-require 'bolt/yarn'
+require_relative '../bolt/transport/docker'
+require_relative '../bolt/transport/local'
+require_relative '../bolt/transport/lxd'
+require_relative '../bolt/transport/orch'
+require_relative '../bolt/transport/podman'
+require_relative '../bolt/transport/remote'
+require_relative '../bolt/transport/ssh'
+require_relative '../bolt/transport/winrm'
 
 module Bolt
   TRANSPORTS = {
@@ -35,7 +35,7 @@ module Bolt
   }.freeze
 
   class Executor
-    attr_reader :noop, :transports, :in_parallel, :future
+    attr_reader :noop, :transports, :future
     attr_accessor :run_as
 
     def initialize(concurrency = 1,
@@ -66,7 +66,6 @@ module Bolt
 
       @noop = noop
       @run_as = nil
-      @in_parallel = false
       @future = future
       @pool = if concurrency > 0
                 Concurrent::ThreadPoolExecutor.new(name: 'exec', max_threads: concurrency)
@@ -77,6 +76,7 @@ module Bolt
 
       @concurrency = concurrency
       @warn_concurrency = modified_concurrency
+      @fiber_executor = Bolt::FiberExecutor.new
     end
 
     def transport(transport)
@@ -242,6 +242,10 @@ module Bolt
       @analytics&.event('Plan', plan_function, label: label)
     end
 
+    def report_noop_mode(noop)
+      @analytics&.event('Task', 'noop', label: (!!noop).to_s)
+    end
+
     def report_apply(statement_count, resource_counts)
       data = { statement_count: statement_count }
 
@@ -296,6 +300,9 @@ module Bolt
       description = options.fetch(:description, "script #{script}")
       log_action(description, targets) do
         options[:run_as] = run_as if run_as && !options.key?(:run_as)
+        options[:script_interpreter] = (future || {}).fetch('script_interpreter', false)
+
+        @analytics&.event('Future', 'script_interpreter', label: options[:script_interpreter].to_s)
 
         batch_execute(targets) do |transport, batch|
           with_node_logging("Running script #{script} with '#{arguments.to_json}'", batch) do
@@ -373,83 +380,70 @@ module Bolt
       plan.call_by_name_with_scope(scope, params, true)
     end
 
-    def create_yarn(scope, block, object, index)
-      fiber = Fiber.new do
-        # Create the new scope
-        newscope = Puppet::Parser::Scope.new(scope.compiler)
-        local = Puppet::Parser::Scope::LocalScope.new
-
-        # Compress the current scopes into a single vars hash to add to the new scope
-        current_scope = scope.effective_symtable(true)
-        until current_scope.nil?
-          current_scope.instance_variable_get(:@symbols)&.each_pair { |k, v| local[k] = v }
-          current_scope = current_scope.parent
-        end
-        newscope.push_ephemerals([local])
-
-        begin
-          result = catch(:return) do
-            args = { block.parameters[0][1].to_s => object }
-            block.closure.call_by_name_with_scope(newscope, args, true)
-          end
-
-          # If we got a return from the block, get it's value
-          # Otherwise the result is the last line from the block
-          result = result.value if result.is_a?(Puppet::Pops::Evaluator::Return)
-
-          # Validate the result is a PlanResult
-          unless Puppet::Pops::Types::TypeParser.singleton.parse('Boltlib::PlanResult').instance?(result)
-            raise Bolt::InvalidParallelResult.new(result.to_s, *Puppet::Pops::PuppetStack.top_of_stack)
-          end
-
-          result
-        rescue Puppet::PreformattedError => e
-          if e.cause.is_a?(Bolt::Error)
-            e.cause
-          else
-            raise e
-          end
-        end
-      end
-
-      Bolt::Yarn.new(fiber, index)
+    # Call into FiberExecutor to avoid this class getting
+    # overloaded while also minimizing the Puppet lookups needed from plan
+    # functions
+    #
+    def create_future(plan_id:, scope: nil, name: nil, &block)
+      @fiber_executor.create_future(scope: scope, name: name, plan_id: plan_id, &block)
     end
 
-    def handle_event(event)
-      case event[:type]
-      when :node_result
-        @thread_completed = true
-      end
+    def get_current_future(fiber:)
+      @fiber_executor.get_current_future(fiber: fiber)
     end
 
-    def round_robin(skein)
-      subscribe(self, [:node_result])
-      results = Array.new(skein.length)
-      @in_parallel = true
-      publish_event(type: :stop_spin)
+    def get_current_plan_id(fiber:)
+      @fiber_executor.get_current_plan_id(fiber: fiber)
+    end
 
-      until skein.empty?
-        @thread_completed = false
-        r = nil
+    def plan_complete?
+      @fiber_executor.plan_complete?
+    end
 
-        skein.each do |yarn|
-          if yarn.alive?
-            publish_event(type: :stop_spin)
-            r = yarn.resume
-          else
-            results[yarn.index] = yarn.value
-            skein.delete(yarn)
-          end
-        end
+    def round_robin
+      @fiber_executor.round_robin
+    end
 
-        next unless r == 'unfinished'
-        sleep(0.1) until @thread_completed || skein.empty?
+    def in_parallel?
+      @fiber_executor.in_parallel?
+    end
+
+    def wait(futures, **opts)
+      @fiber_executor.wait(futures, **opts)
+    end
+
+    def get_futures_for_plan(plan_id:)
+      @fiber_executor.get_futures_for_plan(plan_id: plan_id)
+    end
+
+    # Execute a plan function concurrently. This function accepts the executor
+    # function to be run and the parameters to pass to it, and returns the
+    # result of running the executor function.
+    #
+    def run_in_thread
+      require 'concurrent'
+      require 'fiber'
+      future = Concurrent::Future.execute do
+        yield
       end
 
-      publish_event(type: :stop_spin)
-      @in_parallel = false
-      unsubscribe(self, [:node_result])
-      results
+      # Used to track how often we resume the same executor function
+      still_running = 0
+      # While the thread is still running
+      while future.incomplete?
+        # If the Fiber gets resumed, increment the resume tracker. This means
+        # the tracker starts at 1 since it needs to increment before yielding,
+        # since it can't yield then increment.
+        still_running += 1
+        # If the Fiber has been resumed before, still_running will be 2 or
+        # more. Yield different values for when the same Fiber is resumed
+        # multiple times and when it's resumed the first time in order to know
+        # if progress was made in the plan.
+        Fiber.yield(still_running < 2 ? :something_happened : :returned_immediately)
+      end
+
+      # Once the thread completes, return the result.
+      future.value || future.reason
     end
 
     class TimeoutError < RuntimeError; end
@@ -519,7 +513,7 @@ module Bolt
     # coupled with the orchestrator transport since the transport behaves
     # differently when a plan is running. In order to limit how much this
     # pollutes the transport API we only handle the orchestrator transport here.
-    # Since we callt this function without resolving targets this will result
+    # Since we call this function without resolving targets this will result
     # in the orchestrator transport always being initialized during plan runs.
     # For now that's ok.
     #

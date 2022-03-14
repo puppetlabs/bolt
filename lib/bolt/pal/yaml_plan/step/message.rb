@@ -24,14 +24,6 @@ module Bolt
           private def function
             'out::message'
           end
-
-          # Transpiles the step into the plan language
-          #
-          def transpile
-            code = String.new("  ")
-            code << function_call(function, format_args(body))
-            code << "\n"
-          end
         end
       end
     end

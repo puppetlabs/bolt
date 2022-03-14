@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/project_manager/config_migrator'
-require 'bolt/project_manager/inventory_migrator'
-require 'bolt/project_manager/module_migrator'
+require_relative 'project_manager/config_migrator'
+require_relative 'project_manager/inventory_migrator'
+require_relative 'project_manager/module_migrator'
 
 module Bolt
   class ProjectManager
@@ -36,6 +36,16 @@ module Bolt
       #     ssl: false
     INVENTORY
 
+    GITIGNORE_CONTENT = <<~GITIGNORE
+      .modules/
+      .resource_types/
+      bolt-debug.log
+      .plan_cache.json
+      .plugin_cache.json
+      .task_cache.json
+      .rerun.json
+    GITIGNORE
+
     def initialize(config, outputter, pal)
       @config    = config
       @outputter = outputter
@@ -45,7 +55,7 @@ module Bolt
     # Creates a new project at the specified directory.
     #
     def create(path, name, modules)
-      require 'bolt/module_installer'
+      require_relative '../bolt/module_installer'
 
       project       = Pathname.new(File.expand_path(path))
       old_config    = project + 'bolt.yaml'
@@ -53,6 +63,7 @@ module Bolt
       puppetfile    = project + 'Puppetfile'
       moduledir     = project + '.modules'
       inventoryfile = project + 'inventory.yaml'
+      gitignore     = project + '.gitignore'
       project_name  = name || File.basename(project)
 
       if config.exist?
@@ -122,6 +133,14 @@ module Bolt
           File.write(inventoryfile.to_path, INVENTORY_TEMPLATE)
         rescue StandardError => e
           raise Bolt::FileError.new("Could not create inventory.yaml at #{project}: #{e.message}", nil)
+        end
+      end
+
+      unless gitignore.exist?
+        begin
+          File.write(gitignore.to_path, GITIGNORE_CONTENT)
+        rescue StandardError => e
+          raise Bolt::FileError.new("Could not create .gitignore at #{project}: #{e.message}", nil)
         end
       end
 

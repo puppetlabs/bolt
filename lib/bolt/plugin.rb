@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'bolt/inventory'
-require 'bolt/executor'
-require 'bolt/module'
-require 'bolt/pal'
-require 'bolt/plugin/cache'
-require 'bolt/plugin/puppetdb'
+require_relative '../bolt/inventory'
+require_relative '../bolt/executor'
+require_relative '../bolt/module'
+require_relative '../bolt/pal'
+require_relative 'plugin/cache'
+require_relative 'plugin/puppetdb'
 
 module Bolt
   class Plugin
@@ -127,29 +127,15 @@ module Bolt
       end
     end
 
-    def self.setup(config, pal, analytics = Bolt::Analytics::NoopClient.new, **opts)
-      plugins = new(config, pal, analytics, **opts)
-
-      config.plugins.each_key do |plugin|
-        plugins.by_name(plugin)
-      end
-
-      plugins.plugin_hooks.merge!(plugins.resolve_references(config.plugin_hooks))
-
-      plugins
-    end
-
     RUBY_PLUGINS = %w[task prompt env_var puppetdb puppet_connect_data].freeze
     BUILTIN_PLUGINS = %w[task terraform pkcs7 prompt vault aws_inventory puppetdb azure_inventory
                          yaml env_var gcloud_inventory].freeze
     DEFAULT_PLUGIN_HOOKS = { 'puppet_library' => { 'plugin' => 'puppet_agent', 'stop_service' => true } }.freeze
 
     attr_reader :pal, :plugin_context
-    attr_accessor :plugin_hooks
+    attr_writer :plugin_hooks
 
-    private_class_method :new
-
-    def initialize(config, pal, analytics, load_plugins: true)
+    def initialize(config, pal, analytics = Bolt::Analytics::NoopClient.new, load_plugins: true)
       @config = config
       @analytics = analytics
       @plugin_context = PluginContext.new(config, pal, self)
@@ -166,7 +152,15 @@ module Bolt
         raise Bolt::Error.new(msg, 'bolt/plugin-error')
       end
       @unresolved_plugin_configs['puppetdb'] = config.puppetdb if config.puppetdb
-      @plugin_hooks = DEFAULT_PLUGIN_HOOKS.dup
+    end
+
+    # Returns a map of configured plugin hooks. Any unresolved plugin references
+    # are resolved.
+    #
+    # @return [Hash[String, Hash]]
+    #
+    def plugin_hooks
+      @plugin_hooks ||= DEFAULT_PLUGIN_HOOKS.merge(resolve_references(@config.plugin_hooks))
     end
 
     def modules
@@ -248,6 +242,44 @@ module Bolt
           add_module_plugin(plugin_name)
         end
       end
+    end
+
+    # Loads all plugins and returns a map of plugin names to hooks.
+    #
+    def list_plugins
+      load_all_plugins
+
+      hooks = KNOWN_HOOKS.map { |hook| [hook, {}] }.to_h
+
+      @plugins.sort.each do |name, plugin|
+        # Don't show the Puppet Connect plugin for now.
+        next if name == 'puppet_connect_data'
+
+        case plugin
+        when Bolt::Plugin::Module
+          plugin.hook_map.each do |hook, spec|
+            next unless hooks.include?(hook)
+            hooks[hook][name] = spec['task'].description
+          end
+        else
+          plugin.hook_descriptions.each do |hook, description|
+            hooks[hook][name] = description
+          end
+        end
+      end
+
+      hooks
+    end
+
+    # Loads all plugins available to the project.
+    #
+    private def load_all_plugins
+      modules.each do |name, mod|
+        next unless mod.plugin?
+        by_name(name)
+      end
+
+      RUBY_PLUGINS.each { |name| by_name(name) }
     end
 
     def puppetdb_client
@@ -344,4 +376,4 @@ module Bolt
 end
 
 # references PluginError
-require 'bolt/plugin/module'
+require_relative 'plugin/module'

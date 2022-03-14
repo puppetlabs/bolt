@@ -8,6 +8,7 @@ require 'bolt/error'
 Puppet::Functions.create_function(:add_to_group) do
   # @param targets A pattern or array of patterns identifying a set of targets.
   # @param group The name of the group to add targets to.
+  # @return [Array[Target]] The targets.
   # @example Add new Target to group.
   #   Target.new('foo@example.com', 'password' => 'secret').add_to_group('group1')
   # @example Add new target to group by name.

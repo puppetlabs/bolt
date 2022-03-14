@@ -47,7 +47,9 @@ module Bolt
           cmd = []
           # BatchMode is SSH's noninteractive option: if key authentication
           # fails it will error out instead of falling back to password prompt
-          cmd += %w[-o BatchMode=yes]
+          batch_mode = @target.transport_config['batch-mode'] ? 'yes' : 'no'
+          cmd += %W[-o BatchMode=#{batch_mode}]
+
           cmd += %W[-o Port=#{@target.port}] if @target.port
 
           if @target.transport_config.key?('host-key-check')

@@ -42,7 +42,7 @@ lxd_provision = <<LXD
 sudo snap install lxd
 sudo usermod -aG lxd vagrant
 sg lxd
-cat /home/vagrant/bolt/spec/lxd_config.yaml | lxd init --preseed
+cat /home/vagrant/bolt/dev-resources/lxd/lxd_config.yaml | lxd init --preseed
 lxc launch ubuntu:focal testlxd -c security.privileged=true
 lxc config set core.https_address [::]:8443
 lxc config set core.trust_password bolt
@@ -51,7 +51,7 @@ LXD
 lxc_add_remote = <<LXD
 lxc config set core.https_address [::]:8443
 lxc config set core.trust_password bolt
-lxc remote add myremote 192.168.50.1
+lxc remote add myremote 192.168.50.4 --password bolt --accept-certificate
 LXD
 
 Vagrant.configure('2') do |config|
@@ -104,7 +104,7 @@ Vagrant.configure('2') do |config|
   config.vm.define :lxc_remote do |lxd|
     lxd.vm.box = 'generic/ubuntu2004'
     lxd.vm.network "private_network", ip: "192.168.50.4"
-    lxd.vm.synced_folder "./spec/", "/home/vagrant/bolt/spec/", create: true, owner: 'vagrant'
+    lxd.vm.synced_folder "./dev-resources/lxd/", "/home/vagrant/bolt/dev-resources/lxd", create: true, owner: 'vagrant'
     lxd.vm.provision 'shell', inline: lxd_provision
   end
 end

@@ -51,7 +51,7 @@ module Bolt
   end
 end
 
-require 'bolt/outputter/human'
-require 'bolt/outputter/json'
-require 'bolt/outputter/logger'
-require 'bolt/outputter/rainbow'
+require_relative 'outputter/human'
+require_relative 'outputter/json'
+require_relative 'outputter/logger'
+require_relative 'outputter/rainbow'

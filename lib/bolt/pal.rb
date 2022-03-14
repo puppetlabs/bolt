@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require 'bolt/applicator'
-require 'bolt/executor'
-require 'bolt/error'
-require 'bolt/plan_result'
-require 'bolt/util'
-require 'bolt/config/modulepath'
+require_relative '../bolt/applicator'
+require_relative '../bolt/executor'
+require_relative '../bolt/error'
+require_relative '../bolt/plan_result'
+require_relative '../bolt/util'
+require_relative '../bolt/config/modulepath'
 require 'etc'
 
 module Bolt
@@ -101,10 +101,10 @@ module Bolt
         raise Bolt::Error.new("Puppet must be installed to execute tasks", "bolt/puppet-missing")
       end
 
-      require 'bolt/pal/logging'
-      require 'bolt/pal/issues'
-      require 'bolt/pal/yaml_plan/loader'
-      require 'bolt/pal/yaml_plan/transpiler'
+      require_relative 'pal/logging'
+      require_relative 'pal/issues'
+      require_relative 'pal/yaml_plan/loader'
+      require_relative 'pal/yaml_plan/transpiler'
 
       # Now that puppet is loaded we can include puppet mixins in data types
       Bolt::ResultSet.include_iterable
@@ -163,9 +163,10 @@ module Bolt
     # Runs a block in a PAL script compiler configured for Bolt.  Catches
     # exceptions thrown by the block and re-raises them ensuring they are
     # Bolt::Errors since the script compiler block will squash all exceptions.
-    def in_bolt_compiler
+    def in_bolt_compiler(compiler_params: {})
       # TODO: If we always call this inside a bolt_executor we can remove this here
       setup
+      compiler_params = compiler_params.merge(set_local_facts: false)
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath, facts: {}) do |pal|
         # Only load the project if it a) exists, b) has a name it can be loaded with
         Puppet.override(bolt_project: @project,
@@ -174,7 +175,7 @@ module Bolt
           # of modules, it must happen *after* we have overridden
           # bolt_project or the project will be ignored
           detect_project_conflict(@project, Puppet.lookup(:environments).get('bolt'))
-          pal.with_script_compiler(set_local_facts: false) do |compiler|
+          pal.with_script_compiler(**compiler_params) do |compiler|
             alias_types(compiler)
             register_resource_types(Puppet.lookup(:loaders)) if @resource_types
             begin
@@ -235,6 +236,20 @@ module Bolt
         )
       }
       Puppet.override(opts, &block)
+    end
+
+    def in_catalog_compiler
+      with_puppet_settings do
+        Puppet.override(bolt_project: @project) do
+          Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath) do |pal|
+            pal.with_catalog_compiler do |compiler|
+              yield compiler
+            end
+          end
+        end
+      rescue Puppet::Error => e
+        raise PALError.from_error(e)
+      end
     end
 
     def in_plan_compiler(executor, inventory, pdb_client, applicator = nil)
@@ -299,6 +314,49 @@ module Bolt
       end
     end
 
+    def list_tasks_with_cache(filter_content: false)
+      # Don't filter content yet, so that if users update their task filters
+      # we don't need to refresh the cache
+      task_names = list_tasks(filter_content: false).map(&:first)
+      task_cache = if @project
+                     Bolt::Util.read_optional_json_file(@project.task_cache_file, 'Task cache file')
+                   else
+                     {}
+                   end
+      updated = false
+
+      task_list = task_names.each_with_object([]) do |task_name, list|
+        data = task_cache[task_name] || get_task_info(task_name, with_mtime: true)
+
+        # Make sure all the keys are strings - if we get data from
+        # get_task_info they will be symbols
+        data = Bolt::Util.walk_keys(data, &:to_s)
+
+        # If any files in the task were updated, refresh the cache
+        if data['files']&.any?
+          # For all the files that are part of the task
+          data['files'].each do |f|
+            # If any file has been updated since we last cached, update the
+            # cache
+            next unless file_modified?(f['path'], f['mtime'])
+            data = get_task_info(task_name, with_mtime: true)
+            data = Bolt::Util.walk_keys(data, &:to_s)
+            # Tell Bolt to write to the cache file once we're done
+            updated = true
+            # Update the cache data
+            task_cache[task_name] = data
+          end
+        end
+        metadata = data['metadata'] || {}
+        # Don't add tasks to the list to return if they are private
+        list << [task_name, metadata['description']] unless metadata['private']
+      end
+
+      # Write the cache if any entries were updated
+      File.write(@project.task_cache_file, task_cache.to_json) if updated && @project
+      filter_content ? filter_content(task_list, @project&.tasks) : task_list
+    end
+
     def list_tasks(filter_content: false)
       in_bolt_compiler do |compiler|
         tasks = compiler.list_tasks.map(&:name).sort.each_with_object([]) do |task_name, data|
@@ -350,14 +408,20 @@ module Bolt
       end
     end
 
-    def get_task(task_name)
+    def get_task(task_name, with_mtime: false)
       task = task_signature(task_name)
 
       if task.nil?
         raise Bolt::Error.unknown_task(task_name)
       end
 
-      Bolt::Task.from_task_signature(task)
+      task = Bolt::Task.from_task_signature(task)
+      task.add_mtimes if with_mtime
+      task
+    end
+
+    def get_task_info(task_name, with_mtime: false)
+      get_task(task_name, with_mtime: with_mtime).to_h
     end
 
     def list_plans_with_cache(filter_content: false)
@@ -372,25 +436,32 @@ module Bolt
       updated = false
 
       plan_list = plan_names.each_with_object([]) do |plan_name, list|
-        info = plan_cache[plan_name] || get_plan_info(plan_name, with_mtime: true)
-
-        # If the plan is a 'local' plan (in the project itself, or the
-        # modules/ directory) then verify it hasn't been updated since we
-        # cached it. If it has been updated, refresh the cache and use the
-        # new data.
-        if info['file'] &&
-           (File.mtime(info.dig('file', 'path')) <=> info.dig('file', 'mtime')) != 0
-          info = get_plan_info(plan_name, with_mtime: true)
+        data = plan_cache[plan_name] || get_plan_info(plan_name, with_mtime: true)
+        # If the plan is a 'local' plan (in the project itself, or the modules/
+        # directory) then verify it hasn't been updated since we cached it. If
+        # it has been updated, refresh the cache and use the new data.
+        if file_modified?(data.dig('file', 'path'), data.dig('file', 'mtime'))
+          data = get_plan_info(plan_name, with_mtime: true)
           updated = true
-          plan_cache[plan_name] = info
+          plan_cache[plan_name] = data
         end
 
-        list << [plan_name, info['description']] unless info['private']
+        list << [plan_name, data['description']] unless data['private']
       end
 
-      File.write(@project.plan_cache_file, plan_cache.to_json) if updated
+      File.write(@project.plan_cache_file, plan_cache.to_json) if updated && @project
 
       filter_content ? filter_content(plan_list, @project&.plans) : plan_list
+    end
+
+    # Returns true if a file has been modified or no longer exists, false
+    # otherwise.
+    #
+    # @param path [String] The path to the file.
+    # @param mtime [String] The last time the file was modified.
+    #
+    private def file_modified?(path, mtime)
+      path && !(File.exist?(path) && File.mtime(path).to_s == mtime.to_s)
     end
 
     def list_plans(filter_content: false)
@@ -455,19 +526,14 @@ module Bolt
           end
         end
 
-        privie = plan.tag(:private)&.text
-        unless privie.nil? || %w[true false].include?(privie.downcase)
-          msg = "Plan #{plan_name} key 'private' must be a boolean, received: #{privie}"
-          raise Bolt::Error.new(msg, 'bolt/invalid-plan')
-        end
-
         pp_info = {
           'name'        => plan_name,
           'description' => description,
           'parameters'  => parameters,
-          'module'      => mod
+          'module'      => mod,
+          'private'     => private_plan?(plan)
         }
-        pp_info.merge!({ 'private' => privie&.downcase == 'true' }) unless privie.nil?
+
         pp_info.merge!(get_plan_mtime(plan.file)) if with_mtime
         pp_info
 
@@ -497,12 +563,37 @@ module Bolt
           'name'        => plan_name,
           'description' => plan.description,
           'parameters'  => parameters,
-          'module'      => mod
+          'module'      => mod,
+          'private'     => !!plan.private
         }
-        yaml_info.merge!({ 'private' => plan.private }) unless plan.private.nil?
+
         yaml_info.merge!(get_plan_mtime(yaml_path)) if with_mtime
         yaml_info
       end
+    end
+
+    # Returns true if the plan is private, false otherwise.
+    #
+    # @param plan [PuppetStrings::Yard::CodeObjects::Plan] The puppet-strings plan documentation.
+    # @return [Boolean]
+    #
+    private def private_plan?(plan)
+      if plan.tag(:private)
+        value     = plan.tag(:private).text
+        api_value = value.downcase == 'true' ? 'private' : 'public'
+
+        Bolt::Logger.deprecate(
+          'plan_private_tag',
+          "Tag '@private #{value}' in plan '#{plan.name}' is deprecated, use '@api #{api_value}' instead"
+        )
+
+        unless %w[true false].include?(plan.tag(:private).text.downcase)
+          msg = "Value for '@private' tag in plan '#{plan.name}' must be a boolean, received: #{value}"
+          raise Bolt::Error.new(msg, 'bolt/invalid-plan')
+        end
+      end
+
+      plan.tag(:api).text == 'private' || plan.tag(:private)&.text&.downcase == 'true'
     end
 
     def get_plan_mtime(path)
@@ -578,6 +669,36 @@ module Bolt
       end
     end
 
+    # Return information about a module.
+    #
+    # @param name [String] The name of the module.
+    # @return [Hash]
+    #
+    def show_module(name)
+      name = name.tr('-', '/')
+
+      data = in_bolt_compiler do |_compiler|
+        mod = Puppet.lookup(:current_environment).module(name.split(%r{[/-]}, 2).last)
+
+        unless mod && (mod.forge_name == name || mod.name == name)
+          raise Bolt::Error.new("Could not find module '#{name}' on the modulepath.", 'bolt/unknown-module')
+        end
+
+        {
+          name:     mod.forge_name || mod.name,
+          metadata: mod.metadata,
+          path:     mod.path,
+          plans:    mod.plans.map(&:name).sort,
+          tasks:    mod.tasks.map(&:name).sort
+        }
+      end
+
+      data[:plans] = list_plans_with_cache.to_h.slice(*data[:plans]).to_a
+      data[:tasks] = list_tasks_with_cache.to_h.slice(*data[:tasks]).to_a
+
+      data
+    end
+
     def generate_types(cache: false)
       require 'puppet/face/generate'
       in_bolt_compiler do
@@ -585,6 +706,7 @@ module Bolt
         inputs = generator.find_inputs(:pcore)
         FileUtils.mkdir_p(@resource_types)
         cache_plan_info if @project && cache
+        cache_task_info if @project && cache
         generator.generate(inputs, @resource_types, true)
       end
     end
@@ -600,6 +722,17 @@ module Bolt
       File.write(@project.plan_cache_file, plans_info.to_json)
     end
 
+    def cache_task_info
+      # task_name is an array here
+      tasks_info = list_tasks(filter_content: false).map do |task_name,|
+        data = get_task_info(task_name, with_mtime: true)
+        { task_name => data }
+      end.reduce({}, :merge)
+
+      FileUtils.touch(@project.task_cache_file)
+      File.write(@project.task_cache_file, tasks_info.to_json)
+    end
+
     def run_task(task_name, targets, params, executor, inventory, description = nil)
       in_task_compiler(executor, inventory) do |compiler|
         params = params.merge('_bolt_api_call' => true, '_catch_errors' => true)
@@ -607,13 +740,99 @@ module Bolt
       end
     end
 
-    def run_plan(plan_name, params, executor = nil, inventory = nil, pdb_client = nil, applicator = nil)
+    def run_plan(plan_name, params, executor, inventory = nil, pdb_client = nil, applicator = nil)
+      # Start the round robin inside the plan compiler, so that
+      # backgrounded tasks can finish once the main plan exits
       in_plan_compiler(executor, inventory, pdb_client, applicator) do |compiler|
-        r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
-        Bolt::PlanResult.from_pcore(r, 'success')
+        # Create a Fiber for the main plan. This will be run along with any
+        # other Fibers created during the plan run in the round_robin, with the
+        # main plan always taking precedence in being resumed.
+        #
+        # Every future except for the main plan needs to have a plan id in
+        # order to be tracked for the `wait()` function with no arguments.
+        future = executor.create_future(name: plan_name, plan_id: 0) do |_scope|
+          r = compiler.call_function('run_plan', plan_name, params.merge('_bolt_api_call' => true))
+          Bolt::PlanResult.from_pcore(r, 'success')
+        rescue Bolt::Error => e
+          Bolt::PlanResult.new(e, 'failure')
+        end
+
+        # Round robin until all Fibers, including the main plan, have finished.
+        # This will stay alive until backgrounded tasks have finished.
+        executor.round_robin until executor.plan_complete?
+
+        # Return the result from the main plan
+        future.value
       end
     rescue Bolt::Error => e
       Bolt::PlanResult.new(e, 'failure')
+    end
+
+    def plan_hierarchy_lookup(key, plan_vars: {})
+      # Do a lookup with a script compiler, which uses the 'plan_hierarchy' key in
+      # Hiera config.
+      with_puppet_settings do
+        # We want all of the setup and teardown that `in_bolt_compiler` does,
+        # but also want to pass keys to the script compiler.
+        in_bolt_compiler(compiler_params: { variables: plan_vars }) do |compiler|
+          compiler.call_function('lookup', key)
+        end
+      rescue Puppet::Error => e
+        raise PALError.from_error(e)
+      end
+    end
+
+    def lookup(key, targets, inventory, executor, plan_vars: {})
+      # Install the puppet-agent package and collect facts. Facts are
+      # automatically added to the targets.
+      in_plan_compiler(executor, inventory, nil) do |compiler|
+        compiler.call_function('apply_prep', targets)
+      end
+
+      overrides = {
+        bolt_inventory: inventory,
+        bolt_project:   @project
+      }
+
+      # Do a lookup with a catalog compiler, which uses the 'hierarchy' key in
+      # Hiera config.
+      results = targets.map do |target|
+        node = Puppet::Node.from_data_hash(
+          'name'       => target.name,
+          'parameters' => { 'clientcert' => target.name }
+        )
+
+        trusted = Puppet::Context::TrustedInformation.local(node).to_h
+
+        # Separate environment configuration from interpolation data the same
+        # way we do when compiling Puppet catalogs.
+        env_conf = {
+          modulepath: @modulepath.full_modulepath,
+          facts:      target.facts
+        }
+
+        interpolations = {
+          variables:        plan_vars,
+          target_variables: target.vars
+        }
+
+        with_puppet_settings do
+          Puppet::Pal.in_tmp_environment(target.name, **env_conf) do |pal|
+            Puppet.override(overrides) do
+              Puppet.lookup(:pal_current_node).trusted_data = trusted
+              pal.with_catalog_compiler(**interpolations) do |compiler|
+                Bolt::Result.for_lookup(target, key, compiler.call_function('lookup', key))
+              rescue StandardError => e
+                Bolt::Result.from_exception(target, e)
+              end
+            rescue Puppet::Error => e
+              raise PALError.from_error(e)
+            end
+          end
+        end
+      end
+
+      Bolt::ResultSet.new(results)
     end
   end
 end

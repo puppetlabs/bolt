@@ -10,7 +10,14 @@ module Bolt
       end
 
       def hooks
-        %i[resolve_reference validate_resolve_reference]
+        hook_descriptions.keys
+      end
+
+      def hook_descriptions
+        {
+          resolve_reference: 'Prompt the user for a sensitive value.',
+          validate_resolve_reference: nil
+        }
       end
 
       def validate_resolve_reference(opts)

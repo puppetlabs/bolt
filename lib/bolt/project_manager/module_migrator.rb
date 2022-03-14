@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/project_manager/migrator'
+require_relative '../../bolt/project_manager/migrator'
 
 module Bolt
   class ProjectManager
@@ -43,10 +43,10 @@ module Bolt
       # to the new moduledir.
       #
       private def migrate_modules_from_puppetfile(config, puppetfile_path, managed_moduledir, modulepath)
-        require 'bolt/module_installer/installer'
-        require 'bolt/module_installer/puppetfile'
-        require 'bolt/module_installer/resolver'
-        require 'bolt/module_installer/specs'
+        require_relative '../../bolt/module_installer/installer'
+        require_relative '../../bolt/module_installer/puppetfile'
+        require_relative '../../bolt/module_installer/resolver'
+        require_relative '../../bolt/module_installer/specs'
 
         begin
           @outputter.print_action_step("Parsing Puppetfile at #{puppetfile_path}")

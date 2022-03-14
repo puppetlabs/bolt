@@ -1,0 +1,18 @@
+---
+topic: module
+guide: |
+    Modules are shareable, reusable packages of Puppet content. They can include
+    tasks, plans, functions, and other types of content that you can use in your
+    project. You can download and install modules to your project from the
+    Puppet Forge or write your own modules. Bolt also ships with several helpful
+    modules pre-installed that are available to all of your projects.
+
+    Bolt makes it easy to manage the modules that your project depends on. You
+    can use Bolt commands to install a project's modules, add new modules to a
+    project, and view the modules that are available to the project.
+    
+    To learn more about managing modules in a project, see the documentation.
+    To learn how modules are loaded by Bolt, see the 'modulepath' guide.
+
+documentation:
+  - https://pup.pt/bolt-modules

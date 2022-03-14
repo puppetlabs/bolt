@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/shell/powershell/snippets'
+require_relative 'powershell/snippets'
 
 module Bolt
   class Shell
@@ -212,7 +212,20 @@ module Bolt
                     elsif powershell_file?(script_path)
                       Snippets.run_script(arguments, script_path)
                     else
-                      path, args = *process_from_extension(script_path)
+                      interpreter = select_interpreter(script_path, target.options['interpreters'])
+                      if options[:script_interpreter] && interpreter
+                        # interpreter can be a String or Array here. Cast it to an array.
+                        interpreter_array = Array(interpreter)
+                        # Make path the first part of the array - this should be the binary
+                        path = interpreter_array.shift
+                        # Anything else in interpreters should get prepended to
+                        # the command. If interpreters was a string this will
+                        # just be [script_path]
+                        args = escape_arguments(interpreter_array + Array(script_path))
+                        logger.trace("Running '#{script_path}' using '#{interpreter}' interpreter")
+                      else
+                        path, args = *process_from_extension(script_path)
+                      end
                       args += escape_arguments(arguments)
                       execute_process(path, args)
                     end
@@ -261,8 +274,14 @@ module Bolt
                       run_ps_task(task_path, arguments, input_method)
                     else
                       if (interpreter = select_interpreter(task_path, target.options['interpreters']))
-                        path = interpreter
-                        args = [task_path]
+                        # interpreter can be a String or Array here. Cast it to an array.
+                        interpreter_array = Array(interpreter)
+                        # Make path the first part of the array - this should be the binary
+                        path = interpreter_array.shift
+                        # Anything else in interpreters should get prepended to
+                        # the command. If interpreters was a string this will
+                        # just be [task_path]
+                        args = interpreter_array + [task_path]
                       else
                         path, args = *process_from_extension(task_path)
                       end

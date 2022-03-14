@@ -3,11 +3,11 @@
 require 'etc'
 require 'logging'
 require 'pathname'
-require 'bolt/project'
-require 'bolt/logger'
-require 'bolt/util'
-require 'bolt/config/options'
-require 'bolt/validator'
+require_relative '../bolt/project'
+require_relative '../bolt/logger'
+require_relative '../bolt/util'
+require_relative 'config/options'
+require_relative '../bolt/validator'
 
 module Bolt
   class UnknownTransportError < Bolt::Error
@@ -437,6 +437,10 @@ module Bolt
 
     def plugin_hooks
       @data['plugin-hooks']
+    end
+
+    def policies
+      @data['policies']
     end
 
     def trusted_external

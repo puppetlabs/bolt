@@ -171,7 +171,7 @@ module BoltSpec
       end
 
       def plugins
-        @plugins ||= Bolt::Plugin.setup(config, pal)
+        @plugins ||= Bolt::Plugin.new(config, pal)
       end
 
       def puppetdb_client
@@ -182,7 +182,10 @@ module BoltSpec
         @pal ||= Bolt::PAL.new(Bolt::Config::Modulepath.new(config.modulepath),
                                config.hiera_config,
                                config.project.resource_types,
-                               config.compile_concurrency)
+                               config.compile_concurrency,
+                               config.trusted_external,
+                               config.apply_settings,
+                               config.project)
       end
 
       def resolve_targets(target_spec)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/module_installer/puppetfile/module'
+require_relative '../../../bolt/module_installer/puppetfile/module'
 
 # This class represents a resolved Git module.
 #

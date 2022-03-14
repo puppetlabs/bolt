@@ -34,7 +34,7 @@ Describe "test bolt module" {
 
     it "has the correct number of exported functions" {
       # should count of pwsh functions
-      @($commands).Count | Should -Be 23
+      @($commands).Count | Should -Be 28
     }
   }
 }
@@ -213,6 +213,13 @@ Describe "test all bolt command examples" {
     }
   }
 
+  Context "bolt plugin" {
+    It "bolt plugin show" {
+      $result = Get-BoltPlugin
+      $result | Should -Be "bolt plugin show"
+    }
+  }
+
   Context "bolt project" {
     It "bolt project migrate" {
       $result = Update-BoltProject
@@ -249,6 +256,10 @@ Describe "test all bolt command examples" {
       $result = Get-BoltModule
       $result | Should -Be 'bolt module show'
     }
+    It "bolt module show puppet_agent" {
+      $result = Get-BoltModule -Name 'puppet_agent'
+      $result | Should -Be 'bolt module show puppet_agent'
+    }
   }
 
 
@@ -258,6 +269,16 @@ Describe "test all bolt command examples" {
       Write-Warning "Verify this"
       # This does work without quotes being explicitly added here
       $result | Should -Be "bolt script run myscript.sh echo hello --targets target1,target2"
+    }
+
+    It "bolt script run myscript.sh foo bar --targets target1,target2" {
+      $result = Invoke-BoltScript -script 'myscript.sh' 'foo' 'bar' -targets 'target1,target2'
+      $result | Should -Be "bolt script run myscript.sh --targets target1,target2 foo bar"
+    }
+
+    It "bolt script run myscript.sh foo bar --targets target1,target2" {
+      $result = Invoke-BoltScript -script 'myscript.sh' -arguments 'foo','bar' -targets 'target1,target2'
+      $result | Should -Be "bolt script run myscript.sh foo bar --targets target1,target2"
     }
   }
 
@@ -303,6 +324,35 @@ Describe "test all bolt command examples" {
     It "bolt task show canary" {
       $results = Get-BoltTask -name 'canary'
       $results | Should -Be "bolt task show canary"
+    }
+  }
+
+  Context "bolt lookup" {
+    It "bolt lookup key --targets target1,target2" {
+      $results = Invoke-BoltLookup -key 'key' -targets 'target1,target2'
+      $results | Should -Be "bolt lookup key --targets target1,target2"
+    }
+
+    It "bolt lookup key --plan-hierarchy" {
+      $results = Invoke-BoltLookup -key 'key' -PlanHierarchy
+      $results | Should -Be "bolt lookup key --plan-hierarchy"
+    }
+  }
+
+  Context "bolt policy" {
+    It "bolt policy apply policy::foo,policy::bar --targets target1,target2" {
+      $results = Invoke-BoltPolicy -Name 'policy::foo,policy::bar' -Targets 'target1,target2'
+      $results | Should -Be "bolt policy apply policy::foo,policy::bar --targets target1,target2"
+    }
+
+    It "bolt policy new policy::foo" {
+      $results = New-BoltPolicy -Name 'policy::foo'
+      $results | Should -Be "bolt policy new policy::foo"
+    }
+
+    It "bolt policy show" {
+      $results = Get-BoltPolicy
+      $results | Should -Be "bolt policy show"
     }
   }
 }

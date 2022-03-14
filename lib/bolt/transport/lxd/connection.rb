@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'logging'
-require 'bolt/node/errors'
+require_relative '../../../bolt/node/errors'
 
 module Bolt
   module Transport
@@ -21,6 +21,10 @@ module Bolt
 
         def shell
           Bolt::Shell::Bash.new(target, self)
+        end
+
+        def reset_cwd?
+          true
         end
 
         def container_id

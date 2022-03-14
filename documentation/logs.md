@@ -154,6 +154,10 @@ Puppet code.
 
 ## Using `verbose` output
 
+Verbose output is useful when you want to see the results for Bolt actions on your targets that are
+usually not printed to standard out (stdout). Verbose isn't a log level, but is a way of telling
+Bolt to output additional information in a human-readable format.
+
 The following Bolt commands include the `--verbose` CLI option: 
 - `bolt command run`
 - `bolt task run`
@@ -172,11 +176,17 @@ The following PowerShell cmdlets include the `-Verbose` argument:
 - `Receive-BoltFile`
 - `Invoke-BoltApply`
 
-Verbose output is useful when you want to see the results for Bolt actions on your targets that are
-usually not printed to standard out (stdout). Verbose isn't a log level, but is a way of telling
-Bolt to output additional information in a human-readable format. Verbose output is particularly
-useful for debugging your tasks and plans - if you're not sure why something is failing, try running
-it with `--verbose` to get more information.
+Verbose output is particularly useful for debugging your tasks and plans. If
+you're not sure why something is failing, try running it with `--verbose` to get
+more information. You can also use `out::verbose` in plans to print messages to
+stdout in verbose mode. For example, to print "Hello world" to stdout in verbose
+mode:
+
+ ```shell
+plan mymodule::myplan {
+  out::verbose('Hello world')
+}
+  ```
 
 ## Suppress warnings
 

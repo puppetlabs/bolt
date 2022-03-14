@@ -203,7 +203,7 @@ module Bolt
     def self.flush_queue
       @mutex.synchronize do
         @message_queue.each do |message|
-          log_message(message)
+          log_message(**message)
         end
 
         @message_queue.clear

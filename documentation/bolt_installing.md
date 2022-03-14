@@ -9,9 +9,9 @@ and Microsoft Windows.
 
 | Operating system          | Versions            |
 | ------------------------- | ------------------- |
-| Debian                    | 9, 10               |
-| Fedora                    | 30, 31, 32          |
-| macOS                     | 10.14, 10.15        |
+| Debian                    | 9, 10, 11           |
+| Fedora                    | 32, 34              |
+| macOS                     | 10.15, 11           |
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
 | RHEL                      | 6, 7, 8             |
@@ -33,7 +33,7 @@ have installed:
   ```shell
   wget https://apt.puppet.com/puppet-tools-release-stretch.deb
   sudo dpkg -i puppet-tools-release-stretch.deb
-  sudo apt-get update 
+  sudo apt-get update
   sudo apt-get install puppet-bolt
   ```
 
@@ -42,7 +42,16 @@ have installed:
   ```shell
   wget https://apt.puppet.com/puppet-tools-release-buster.deb
   sudo dpkg -i puppet-tools-release-buster.deb
-  sudo apt-get update 
+  sudo apt-get update
+  sudo apt-get install puppet-bolt
+  ```
+
+- _Debian 11_
+
+  ```shell
+  wget https://apt.puppet.com/puppet-tools-release-bullseye.deb
+  sudo dpkg -i puppet-tools-release-bullseye.deb
+  sudo apt-get update
   sudo apt-get install puppet-bolt
   ```
 
@@ -70,24 +79,17 @@ sudo apt remove puppet-bolt
 To install Bolt, run the appropriate command for the version of Fedora you
 have installed:
 
-- _Fedora 30_
-
-  ```shell
-  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-30.noarch.rpm
-  sudo dnf install puppet-bolt
-  ```
-
-- _Fedora 31_
-
-  ```shell
-  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-31.noarch.rpm
-  sudo dnf install puppet-bolt
-  ```
-
 - _Fedora 32_
 
   ```shell
   sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-32.noarch.rpm
+  sudo dnf install puppet-bolt
+  ```
+
+- _Fedora 34_
+
+  ```shell
+  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-34.noarch.rpm
   sudo dnf install puppet-bolt
   ```
 
@@ -155,8 +157,8 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS:
 
 1. Download the Bolt installer package for your macOS version.
 
-   - [10.14 (Mojave)](https://downloads.puppet.com/mac/puppet-tools/10.14/x86_64/puppet-bolt-latest.dmg)
    - [10.15 (Catalina)](https://downloads.puppet.com/mac/puppet-tools/10.15/x86_64/puppet-bolt-latest.dmg)
+   - [11 (Big Sur)](https://downloads.puppet.com/mac/puppet-tools/11/x86_64/puppet-bolt-latest.dmg)
 
 1. Double-click the `puppet-bolt-latest.dmg` file to mount the installer and
    then double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
@@ -203,6 +205,8 @@ manager](https://chocolatey.org/docs/installation) installed.
     refreshenv
     ```
 
+1. Install the [PuppetBolt PowerShell module](#puppetbolt-powershell-module).
+
 1. Run a [Bolt cmdlet](bolt_cmdlet_reference.md). If you see an error message
    instead of the expected output, you might need to [add the Bolt module to
    PowerShell](troubleshooting.md#powershell-does-not-recognize-bolt-cmdlets) or
@@ -236,6 +240,8 @@ Use the Windows installer (MSI) package to install Bolt on Windows:
 
 1.  Double-click the MSI file and run the installer.
 
+1. Install the [PuppetBolt PowerShell module](#puppetbolt-powershell-module).
+
 1.  Open a new PowerShell window and run a [Bolt cmdlet](bolt_cmdlet_reference.md).
     If you see an error message instead of the expected output, you might need to
     [add the Bolt module to
@@ -255,6 +261,41 @@ You can uninstall Bolt from Windows **Apps & Features**:
 1. Press **Windows** + **X** + **F** to open **Apps & Features**.
 
 1. Search for **Puppet Bolt**, select it, and click **Uninstall**.
+
+### PuppetBolt PowerShell module
+
+The PuppetBolt PowerShell module is available on the [PowerShell
+Gallery](https://www.powershellgallery.com/packages/PuppetBolt) and includes
+help documents and [PowerShell cmdlets](bolt_cmdlet_reference.md) for running
+each of Bolt's commands. New versions of the PuppetBolt module are shipped at the
+same time as a new Bolt release.
+
+**Install PuppetBolt**
+
+To install the PuppetBolt PowerShell module, run the following command in
+PowerShell:
+
+```powershell
+Install-Module PuppetBolt
+```
+
+**Update PuppetBolt**
+
+To update the PuppetBolt PowerShell module, run the following command in
+PowerShell:
+
+```powershell
+Update-Module PuppetBolt
+```
+
+**Uninstall PuppetBolt**
+
+To uninstall the PuppetBolt PowerShell module, run the following command in
+PowerShell:
+
+```powershell
+Remove-Module PuppetBolt
+```
 
 ## Install Bolt on RHEL
 

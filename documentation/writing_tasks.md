@@ -8,6 +8,11 @@ PowerShell, or Python. A task can even be a compiled binary that runs on the
 target. Place your task in the `./tasks` directory of a module and add a
 metadata file to describe parameters and configure task behavior.
 
+> 🔩 **Tip:** In most cases, you can wrap an existing script in a YAML
+> plan, giving you much of the same benefit of converting a script to a task
+> without much effort. To learn more about wrapping scripts in YAML plans, see
+> [Wrapping a script in a plan](creating_a_script_plan.md).
+
 For a task to run on remote *nix systems, it must include a shebang (`#!`) line
 at the top of the file to specify the interpreter.
 
@@ -65,10 +70,9 @@ the extension for the language they are written in (such as `.rb` for Ruby), and
 place them in the top level of your module's `./tasks` directory.
 
 Each task or plan name segment must begin with a lowercase letter and:
--   Must start with a lowercase letter.
 -   Can include digits.
 -   Can include underscores.
--   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`
+-   Namespace segments must match the regular expression: `\A[a-z][a-z0-9_]*\Z`.
 -   The file extension must not use the reserved extensions `.md` or `.json`.
 
 > **Note:** The task filename `init` is special: the task it defines is
@@ -395,6 +399,7 @@ included in the message.
     "msg": "Task exited 1:\nSomething on stderr",
     "kind": "puppetlabs.tasks/task-error",
     "details": { "exitcode": 1 }
+  }
 }
 ```
 
@@ -421,7 +426,7 @@ rescue ZeroDivisionError
   result[:_error] = { msg: "Cannot divide by zero",
                       # namespace the error to this module
                       kind: "puppetlabs-example_modules/dividebyzero",
-                      details: { divisor: divisor },
+                      details: { divisor: params['divisor'] },
                     }
 rescue Exception => e
   result[:_error] = { msg: e.message,
@@ -439,9 +444,12 @@ error. Bolt merges the 'file' and 'line' keys with results unless 'file' is pres
 
 ### Returning sensitive data
 
-To return secrets from a task, use the `_sensitive` key in the output. Bolt
-will treat the result as sensitive and won't allow it to be printed to the
-console or log.
+To return secrets from a task, use the `_sensitive` key at the top level of the output. Bolt treats
+the result as sensitive and does not allow it to be printed to the console or log. Note that Bolt
+does not obfuscate data under `_sensitive` if `_sensitive` is not at the top level.  For example,
+Bolt does not treat this `user` data as sensitive: `{user: _sensitive: { carmen: sandiego } }`.
+
+This task generates a random password for user `someone`, making the password hash sensitive.
 
 ```ruby
 #!/opt/puppetlabs/puppet/bin/ruby
@@ -455,6 +463,18 @@ user_password = [*'a'..'z'].sample(10).join
 result = { user: user_name, _sensitive: { password: user_password } }
 
 puts result.to_json
+```
+
+Running the task prints:
+
+```
+$ bolt task run mytask -t myhost
+Started on myhost...
+Finished on myhost:
+  {
+    "user": "someone",
+    "_sensitive": "Sensitive [value redacted]"
+  }
 ```
 
 ## Supporting no-op in tasks
@@ -799,6 +819,7 @@ the `files` property in your metadata as an array of paths. A path consists of
     -   `tasks` — Helper files that can be called as tasks on their own.
     -   `lib` — Ruby code that might be reused by types, providers, or Puppet
         functions.
+    -   `scripts` — Scripts that can be called from a task.
 -   The remaining path to a file or directory; directories must include a
     trailing slash `/`.
 

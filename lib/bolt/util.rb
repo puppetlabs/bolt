@@ -65,6 +65,9 @@ module Bolt
         raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}, line #{e.line}, "\
                                   "column #{e.column}\n#{e.problem}",
                                   path)
+      rescue Psych::BadAlias => e
+        raise Bolt::FileError.new('Bolt does not support the use of aliases in YAML files. Alias '\
+                                  "detected in #{file_name} file at #{path}\n#{e.message}", path)
       rescue Psych::Exception => e
         raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}\n#{e.message}",
                                   path)
@@ -78,11 +81,60 @@ module Bolt
       end
 
       def first_runs_free
+        # If this fails, use the system path instead
+        FileUtils.mkdir_p(Bolt::Config.user_path)
         Bolt::Config.user_path + '.first_runs_free'
+      rescue StandardError
+        begin
+          # If using the system path fails, then don't bother with the welcome
+          # message
+          FileUtils.mkdir_p(Bolt::Config.system_path)
+          Bolt::Config.system_path + '.first_runs_free'
+        rescue StandardError
+          nil
+        end
       end
 
       def first_run?
-        Bolt::Config.user_path && !File.exist?(first_runs_free)
+        !first_runs_free.nil? &&
+          !File.exist?(first_runs_free)
+      end
+
+      # If Puppet is loaded, we aleady have the path to the module and should
+      # just get it. This takes the path to a file provided by the user and a
+      # Puppet Parser scope object and tries to find the file, either as an
+      # absolute path or Puppet module syntax lookup. Returns the path to the
+      # file if found, or nil.
+      #
+      def find_file_from_scope(file, scope)
+        # If we got an absolute path, just return that.
+        return file if Pathname.new(file).absolute?
+
+        module_name, file_pattern = Bolt::Util.split_path(file)
+        # Get the absolute path to the module root from the scope
+        mod_path = scope.compiler.environment.module(module_name)&.path
+
+        # Search the module for the file, falling back to new-style paths if enabled.
+        search_module(mod_path, file_pattern) if mod_path
+      end
+
+      # This searches a module for files under 'files/' or 'scripts/', falling
+      # back to the new style of file loading. It takes the absolute path to the
+      # module root and the relative path provided by the user.
+      #
+      def search_module(module_path, module_file)
+        if File.exist?(File.join(module_path, 'files', module_file))
+          File.join(module_path, 'files', module_file)
+        elsif File.exist?(File.join(module_path, module_file))
+          File.join(module_path, module_file)
+        end
+      end
+      alias find_file_in_module search_module
+
+      # Copied directly from puppet/lib/puppet/parser/files.rb
+      #
+      def split_path(path)
+        path.split(File::SEPARATOR, 2)
       end
 
       # Accepts a path with either 'plans' or 'tasks' in it and determines

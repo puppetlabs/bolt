@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'bolt/inventory/group'
-require 'bolt/inventory/target'
+require_relative '../../bolt/inventory/group'
+require_relative '../../bolt/inventory/target'
 
 module Bolt
   class Inventory
     class Inventory
-      attr_reader :targets, :plugins, :config, :transport
+      attr_reader :plugins, :source, :targets, :transport
 
       class WildcardError < Bolt::Error
         def initialize(target)
@@ -14,24 +14,15 @@ module Bolt
         end
       end
 
-      # TODO: Pass transport config instead of config object
-      def initialize(data, transport, transports, plugins)
-        @logger       = Bolt::Logger.logger(self)
-        @data         = data || {}
-        @transport    = transport
-        @config       = transports
-        @plugins      = plugins
-        @groups       = Group.new(@data, plugins, all_group: true)
-        @group_lookup = {}
-        @targets      = {}
-
-        @groups.resolve_string_targets(@groups.target_aliases, @groups.all_targets)
-
-        collect_groups
-      end
-
-      def validate
-        @groups.validate
+      def initialize(data, transport, transports, plugins, source = nil)
+        @logger          = Bolt::Logger.logger(self)
+        @data            = data || {}
+        @transport       = transport
+        @config          = transports
+        @config_resolved = transports.values.all?(&:resolved?)
+        @plugins         = plugins
+        @targets         = {}
+        @source          = source
       end
 
       def version
@@ -42,13 +33,46 @@ module Bolt
         Bolt::Target
       end
 
-      def collect_groups
-        # Provide a lookup map for finding a group by name
-        @group_lookup = @groups.collect_groups
+      # Load and resolve the groups in the inventory. Loading groups resolves
+      # all plugin references except for those for target data and config.
+      #
+      # @return [Bolt::Inventory::Group]
+      #
+      def groups
+        @groups ||= Group.new(@data, @plugins, all_group: true).tap do |groups|
+          groups.resolve_string_targets(groups.target_aliases, groups.all_targets)
+          groups.validate
+        end
       end
 
+      # Return a list of all group names in the inventory.
+      #
+      # @return [Array[String]]
+      #
       def group_names
-        @group_lookup.keys
+        group_lookup.keys
+      end
+
+      # Return a map of all groups in the inventory.
+      #
+      # @return [Hash[String, Bolt::Inventory::Group]]
+      #
+      def group_lookup
+        @group_lookup ||= groups.collect_groups
+      end
+
+      # Return a map of transport configuration for the inventory. Any
+      # unresolved plugin references are resolved.
+      #
+      # @return [Hash[String, Bolt::Config::Transport]]
+      #
+      def config
+        if @config_resolved
+          @config
+        else
+          @config_resolved = true
+          @config.each_value { |t| t.resolve(@plugins) unless t.resolved? }
+        end
       end
 
       def group_names_for(target_name)
@@ -56,7 +80,7 @@ module Bolt
       end
 
       def target_names
-        @groups.all_targets
+        groups.all_targets
       end
       # alias for analytics
       alias node_names target_names
@@ -80,7 +104,7 @@ module Bolt
 
       #### PRIVATE ####
       def group_data_for(target_name)
-        @groups.group_collect(target_name)
+        groups.group_collect(target_name)
       end
 
       # If target is a group name, expand it to the members of that group.
@@ -88,15 +112,15 @@ module Bolt
       # If a wildcard string, error if no matches are found.
       # Else fall back to [target] if no matches are found.
       def resolve_name(target)
-        if (group = @group_lookup[target])
+        if (group = group_lookup[target])
           group.all_targets
         else
           # Try to wildcard match targets in inventory
           # Ignore case because hostnames are generally case-insensitive
           regexp = Regexp.new("^#{Regexp.escape(target).gsub('\*', '.*?')}$", Regexp::IGNORECASE)
 
-          targets = @groups.all_targets.select { |targ| targ =~ regexp }
-          targets += @groups.target_aliases.select { |target_alias, _target| target_alias =~ regexp }.values
+          targets = groups.all_targets.select { |targ| targ =~ regexp }
+          targets += groups.target_aliases.select { |target_alias, _target| target_alias =~ regexp }.values
 
           if targets.empty?
             raise(WildcardError, target) if target.include?('*')
@@ -164,7 +188,7 @@ module Bolt
       # associated references. This is used when a target is resolved by
       # get_targets.
       def create_target_from_inventory(target_name)
-        target_data = @groups.target_collect(target_name) || { 'uri' => target_name }
+        target_data = groups.target_collect(target_name) || { 'uri' => target_name }
 
         target = Bolt::Inventory::Target.new(target_data, self)
         @targets[target.name] = target
@@ -186,24 +210,24 @@ module Bolt
         @targets[new_target.name] = new_target
 
         if existing_target
-          clear_alia_from_group(@groups, new_target.name)
+          clear_alia_from_group(groups, new_target.name)
         else
           add_to_group([new_target], 'all')
         end
 
         if new_target.target_alias
-          @groups.insert_alia(new_target.name, Array(new_target.target_alias))
+          groups.insert_alia(new_target.name, Array(new_target.target_alias))
         end
 
         new_target
       end
 
       def validate_target_from_hash(target)
-        groups = Set.new(group_names)
-        targets = target_names
+        used_groups  = Set.new(group_names)
+        used_targets = target_names
 
         # Make sure there are no group name conflicts
-        if groups.include?(target.name)
+        if used_groups.include?(target.name)
           raise ValidationError.new("Target name #{target.name} conflicts with group of the same name", nil)
         end
 
@@ -216,11 +240,11 @@ module Bolt
         end
 
         # Make sure there are no conflicts with the new target aliases
-        used_aliases = @groups.target_aliases
+        used_aliases = groups.target_aliases
         Array(target.target_alias).each do |alia|
-          if groups.include?(alia)
+          if used_groups.include?(alia)
             raise ValidationError.new("Alias #{alia} conflicts with group of the same name", nil)
-          elsif targets.include?(alia)
+          elsif used_targets.include?(alia)
             raise ValidationError.new("Alias #{alia} conflicts with target of the same name", nil)
           elsif used_aliases[alia] && used_aliases[alia] != target.name
             raise ValidationError.new(
@@ -249,7 +273,7 @@ module Bolt
         end
 
         if group_names.include?(desired_group)
-          remove_target(@groups, @targets[target.first.name], desired_group)
+          remove_target(groups, @targets[target.first.name], desired_group)
         else
           raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)
         end
@@ -259,7 +283,7 @@ module Bolt
         if group_names.include?(desired_group)
           targets.each do |target|
             # Add the inventory copy of the target
-            add_target(@groups, @targets[target.name], desired_group)
+            add_target(groups, @targets[target.name], desired_group)
           end
         else
           raise ValidationError.new("Group #{desired_group} does not exist in inventory", nil)

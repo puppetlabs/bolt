@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'semantic_puppet'
-require 'bolt/module_installer/puppetfile/module'
+require_relative '../../../bolt/module_installer/puppetfile/module'
 
 # This class represents a resolved Forge module.
 #

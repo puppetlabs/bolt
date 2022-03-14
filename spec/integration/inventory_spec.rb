@@ -48,7 +48,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       }],
       config: {
         ssh: { 'host-key-check' => false },
-        winrm: { ssl: false, 'ssl-verify' => false }
+        winrm: { ssl: false, 'ssl-verify' => false, 'connect-timeout' => 20 }
       },
       vars: {
         daffy: "duck"
@@ -661,6 +661,18 @@ describe 'running with an inventory file', reset_puppet_settings: true do
     it 'shows targets from a configured inventory' do
       expect { run_cli(%w[inventory show -t all], outputter: Bolt::Outputter::Human) }
         .not_to raise_error
+    end
+
+    it 'shows inventory source' do
+      result = run_cli(%w[inventory show -t all], outputter: Bolt::Outputter::Human, project: @project)
+      expect(result).to match(/Inventory source.*#{@project.inventory_file}/m)
+    end
+  end
+
+  context 'when showing groups' do
+    it 'shows inventory source' do
+      result = run_cli(%w[group show -t all], outputter: Bolt::Outputter::Human, project: @project)
+      expect(result).to match(/Inventory source.*#{@project.inventory_file}/m)
     end
   end
 

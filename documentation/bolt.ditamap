@@ -38,7 +38,19 @@
       </topicref>
       <topicref href="running_bolt_network.md" format="markdown">
         <topicmeta>
-          <shortdesc>Tips for running Bolt when targeting network devices</shortdesc>
+          <shortdesc>Tips for running Bolt when targeting network devices.</shortdesc>
+        </topicmeta>
+      </topicref>
+    </topichead>
+    <topichead navtitle="Scripts">
+      <topicref href="bolt_running_scripts.md" format="markdown">
+        <topicmeta>
+          <shortdesc>How to run scripts using Bolt.</shortdesc>
+        </topicmeta>
+      </topicref>
+      <topicref href="creating_a_script_plan.md" format="markdown">
+        <topicmeta>
+          <shortdesc>How to create a plan that runs a script.</shortdesc>
         </topicmeta>
       </topicref>
     </topichead>
@@ -63,6 +75,7 @@
                 <shortdesc>Plans allow you to run more than one task with a single command, compute values for the input to a task, process the results of tasks, or make decisions based on the result of running a task.</shortdesc>
             </topicmeta>
         </topicref>
+        <topicref href="debugging_plans.md" format="markdown"/>
         <topicref href="testing_plans.md" format="markdown"/>
     </topicref>    
     <topicref href="tasks.md" format="markdown" navtitle="Tasks" locktitle="yes">
@@ -115,6 +128,7 @@
     <topichead navtitle="Reference">
         <topicref href="bolt_command_reference.md" format="markdown"/>
         <topicref href="bolt_cmdlet_reference.md" format="markdown"/>
+        <topicref href="json_output_reference.md" format="markdown"/>
         <topicref href="plan_functions.md" format="markdown"/>
         <topicref href="bolt_types_reference.md" format="markdown" />
         <topicref href="bolt_transports_reference.md" format="markdown"/>
@@ -124,4 +138,5 @@
         <topicref href="boltspec_reference.md" format="markdown"/>
     </topichead>
     <topicref href="troubleshooting.md" format="markdown"/>
+    <topicref href="glossary.md" format="markdown"/>
 </map>

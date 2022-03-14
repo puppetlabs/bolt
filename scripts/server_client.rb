@@ -29,7 +29,7 @@ class Client
 
   def initialize
     config = Bolt::Config.default
-    plugins = Bolt::Plugin.setup(config, nil)
+    plugins = Bolt::Plugin.new(config, nil)
     @inventory = Bolt::Inventory::Inventory.new(
       conn_inventory.merge(easy_config),
       config.transport,

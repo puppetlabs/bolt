@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/util/puppet_log_level'
+require_relative '../../bolt/util/puppet_log_level'
 
 Puppet::Util::Log.newdesttype :logging do
   match "Logging::Logger"

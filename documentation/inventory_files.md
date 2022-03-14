@@ -175,6 +175,81 @@ target or group of targets:
   Get-BoltInventory -Targets <TARGET LIST> -Detail
   ```
 
+## How Bolt loads inventory
+
+Bolt only loads inventory for commands that accept targeting options (`query`,
+`rerun`, and `targets`). For example, Bolt loads inventory when it runs a task
+but does not load inventory when it installs modules.
+
+When Bolt loads inventory, it loads the entirety of the inventory, not just the
+targets or groups provided to the targeting option. It's important to understand
+how the inventory is resolved, because loading the entire inventory can impact
+performance and result in different target configuration than you might expect.
+
+For example, the following inventory includes two groups: `ssh` and `winrm`.
+Both groups define a target named `server`, which is configured to use a
+different transport and different authentication credentials dependening on
+which group is referenced:
+
+```yaml
+# ~/.puppetlabs/bolt/inventory.yaml
+groups:
+  - name: ssh
+    targets:
+      - uri: server.example.com
+        name: server
+        config:
+          transport: ssh
+          ssh:
+            user: root
+            password: SSHP@ssword!
+  - name: winrm
+    targets:
+      - uri: server.example.com
+        name: server
+        config:
+          transport: winrm
+          winrm:
+            user: admin
+            password: WinRMP@ssword!
+```
+
+If you run a command on the `ssh` group, the `server` target uses the SSH
+transport and configuration. However, if you run a command on the `winrm`
+group, the `server` target still uses the SSH transport and configuration,
+not the WinRM transport and configuration. You can see this by showing
+the inventory detail for the `winrm` group:
+
+```shell
+$ bolt inventory show --targets winrm --detail
+
+server
+  name: server
+  uri: server.example.com
+  config:
+    transport: ssh
+    ssh:
+      password: SSHP@ssword!
+      user: root
+  groups:
+  - ssh
+  - winrm
+  - all
+
+...
+```
+
+Even though the command only specifies a single group, Bolt loads the entire
+inventory file. Because the `server` target is defined in both the `ssh` and
+`winrm` groups, Bolt merges all of the configuration for the target, with
+configuration from definitions earlier in the inventory taking precedence.
+Bolt's merge strategy is covered in more detail in the [Precedence](#precedence)
+section.
+
+To avoid merging configuration and data for targets with the same URI, you can
+give the targets different names. In the previous example, you might name the
+targets `ssh_server` and `winrm_server` instead of `server`.
+
 ## Precedence
 
 When searching for a target's configuration data, Bolt matches a target's URI
@@ -269,6 +344,87 @@ Use plugins to dynamically load information into the inventory file. Plugins
 either ship with Bolt, or are installed as Puppet modules that have the same
 name as the plugin. The plugin framework is based on a set of plugin hooks that
 are implemented by plugin authors and called by Bolt.
+
+### How Bolt resolves plugins
+
+Bolt resolves Plugins in an inventory file at specific times:
+- Bolt resolves plugins used under a `groups` or `targets` key when the
+  inventory is loaded.
+- Bolt loads plugins under data keys such as `config`, `facts`, `features`, and
+  `vars` when it runs on a group or target that includes that data.
+
+For example, the following inventory file includes two groups: `fruits` and
+`vegetables`. The `vegetables` group is injected from a separate file using the
+`yaml` plugin. Because this plugin is under the `groups` key, it is immediately
+resolved when loading inventory:
+
+```yaml
+# ~/.puppetlabs/bolt/inventory.yaml
+groups:
+  - name: fruits
+    targets:
+      - uri: apple.example.org
+        name: apple
+      - uri: banana.example.org
+        name: banana
+  - _plugin: yaml
+    filepath: ~/.puppetlabs/etc/bolt/vegetable_inventory.yaml
+```
+
+```yaml
+# ~/.puppetlabs/etc/bolt/vegetable_inventory.yaml
+name: vegetables
+targets:
+  - uri: carrot.example.org
+    name: carrot
+  - uri: daikon.example.org
+    name: daikon
+```
+
+While the `yaml` plugin resolves quickly and has little impact on performance,
+plugins that interact with external services (such as the `puppetdb` and
+`aws_inventory` plugins) take longer to resolve. Consider how your inventory
+file is structured and where plugins are used. Using several plugins to load
+groups and targets can have a significant impact on Bolt's performance.
+
+The following inventory file includes two groups: `fruits` and `vegetables`.
+Both groups share a common target named `tomato`. The `vegetables` group
+loads configuration from an external file using the `yaml` plugin. Because
+this plugin is under the `config` key, it is only resolved when Bolt runs
+on a target or group that uses the configuration:
+
+```yaml
+# ~/.puppetlabs/bolt/inventory.yaml
+groups:
+  - name: fruits
+    targets:
+      - uri: apple.example.org
+        name: apple
+      - uri: tomato.example.org
+        name: tomato
+  - name: vegetables
+    targets:
+      - uri: okra.example.org
+        name: okra
+      - uri: tomato.example.org
+        name: okra
+    config:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/vegetable_config.yaml
+```
+
+```yaml
+# ~/.puppetlabs/etc/bolt/vegetable_config.yaml
+ssh:
+  user: macdonald
+  password: 0nHisF@rm!
+```
+
+Because group configuration applies to all targets in a group, the plugin
+is resolved whenever Bolt starts running on the `vegetables` group or the
+`okra` or `tomato` targets. Because the `tomato` target is also part of the
+`fruits` group, and Bolt merges all configuration and data in the inventory
+for a given target, running on the `fruits` group also resolves the plugin.
 
 📖 **Related information**
 
@@ -467,6 +623,284 @@ plugins:
         _plugin: prompt
         message: Enter your Vault password
 ```
+
+### Share inventory between projects
+
+Because projects are used to run a specific workflow on a list of targets, it's
+common to have multiple projects that each run a different workflow on the same
+list of targets. If you have multiple projects that all use the same inventory,
+it can be useful to use a shared inventory file so you don't need to maintain
+your inventory in each project individually.
+
+#### Using the command line
+
+The simplest way to specify a shared inventory is to save the inventory file in
+an accessible location such as the Bolt user configuration directory and then
+specify the inventory file from the command line.
+
+Save the shared inventory file to
+`~/.puppetlabs/etc/bolt/shared_inventory.yaml`:
+
+```yaml
+targets:
+  - server-1.example.org
+  - server-2.example.org
+  - server-3.example.org
+config:
+  ssh:
+    user: puppet
+    password: Bolt!
+    host-key-check: false
+```
+
+Specify the shared inventory file from the command line:
+
+_\*nix shell command_
+
+```shell
+bolt inventory show --targets all --inventoryfile ~/.puppetlabs/etc/bolt/shared_inventory.yaml
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Get-BoltInventory -Targets 'all' -Inventoryfile 'C:\Users\Administrator\.puppetlabs\etc\bolt\shared_inventory.yaml'
+```
+
+#### Using the `yaml` plugin
+
+Instead of specifying the path to the shared inventory file for every command,
+you can load the shared inventory into each project's inventory dynamically.
+To do this, create an `inventory.yaml` file for each project and use the `yaml`
+plugin to load the shared inventory.
+
+Save the shared inventory file to
+`~/.puppetlabs/etc/bolt/shared_inventory.yaml`:
+
+```yaml
+targets:
+  - server-1.example.org
+  - server-2.example.org
+  - server-3.example.org
+config:
+  ssh:
+    user: puppet
+    password: Bolt!
+    host-key-check: false
+```
+
+Save an inventory file to each project that loads the shared inventory file:
+
+```yaml
+_plugin: yaml
+filepath: ~/.puppetlabs/bolt/shared_inventory.yaml
+```
+
+When the project loads the inventory, it injects the shared inventory file,
+allowing you to reference the same list of targets across multiple projects.
+
+#### Composing project-specific inventory
+
+If your projects only share some inventory in common, or have project-specific
+configuration for targets, you can use the `yaml` plugin to compose an inventory
+for each project.
+
+For example, you might have two projects where both projects run on a set of web
+servers, but one of the projects also runs on a set of database servers. Both
+projects also specify different login credentials.
+
+To compose an inventory for each project, you can save each set of targets to a
+separate shared inventory, and then reference them as needed using the `yaml`
+plugin in each project's inventory file.
+
+Save the set of web servers to
+`~/.puppetlabs/etc/bolt/server_inventory.yaml`:
+
+```yaml
+- server-1.example.org
+- server-2.example.org
+- server-3.example.org
+```
+
+Save the set of database servers to
+`~/.puppetlabs/etc/bolt/database_inventory.yaml`:
+
+```yaml
+- db-1.example.org
+- db-2.example.org
+- db-3.example.org
+```
+
+Save an inventory file to each project that loads the necessary targets:
+
+```yaml
+# ~/projects/servers/inventory.yaml
+groups:
+  - name: servers
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/server_inventory.yaml
+config:
+  ssh:
+    user: admin
+    password: admin
+```
+
+```yaml
+# ~/projects/webapp/inventory.yaml
+groups:
+  - name: servers
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/server_inventory.yaml
+  - name: databases
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/database_inventory.yaml
+config:
+  ssh:
+    user: puppet
+    password: Bolt!
+```
+
+#### Specifying target defaults
+
+Shared inventory files allow you to specify default configuration and data for
+targets that can be overridden with project-specific configuration and data. If
+you list a target multiple times in an inventory file, the first instance of the
+target in the inventory file [takes precedence](#precedence) over subsequent
+instances of the target.
+
+For example, the following inventory file includes the `example.org` target. The
+target is defined in the project's inventory file and is also defined in a
+shared inventory file with some default configuration and data.
+
+```yaml
+# ~/projects/example/inventory.yaml
+groups:
+  - name: servers
+    targets:
+      - uri: example.org
+        name: example
+        config:
+          ssh:
+            password: Bolt!
+  - name: _defaults
+    targets:
+      _plugin: yaml
+      filepath: ~/.puppetlabs/etc/bolt/shared_inventory.yaml
+```
+
+```yaml
+# ~/.puppetlabs/etc/bolt/shared_inventory.yaml
+- uri: example.org
+  name: example
+  config:
+    ssh:
+      user: admin
+      password: Puppet!
+  vars:
+    role: server
+```
+
+Bolt uses the password `Bolt!` because the project-specific target definition
+comes before the target definition in the shared inventory.
+
+### Switch transports between commands
+
+Targets configured to use a specific transport in the inventory use that
+transport whenever Bolt connects to the target, even if you specify a different
+transport using the `transport` command-line option. While switching between
+transports for a target isn't common, there are cases where it is helpful.
+
+For example, you might have several targets that use the PCP transport and need
+to download files from the targets. Because the PCP transport does not support
+downloading files, you need to use the SSH transport instead. Instead of
+editing your inventory file to use the SSH transport for this one-off command,
+you can use one of the following approaches to switch between transports.
+
+#### Using the `env_var` plugin
+
+You can use the `env_var` plugin to inject the value of an environment variable
+into the inventory file. This allows you to specify a transport on the command
+line and use it to override a default transport.
+
+The following inventory uses the `env_var` plugin to set the transport for the
+inventory:
+
+```yaml
+# ~/.puppetlabs/bolt/inventory.yaml
+targets:
+  - server-1.example.org
+  - server-2.example.org
+  - server-3.example.org
+config:
+  transport:
+    _plugin: env_var
+    var: BOLT_TRANSPORT
+    default: pcp
+  pcp:
+    cacert: ~/.puppetlabs/puppet/cert.pem
+    service-url: https://api.example.org:8143
+    task-environment: development
+    token-file: ~/.puppetlabs/puppet/token.pem
+  ssh:
+    user: root
+    password: Bolt!
+```
+
+When the `BOLT_TRANSPORT` environment variable is not set, the default value is
+`pcp`. To override the transport, set the `BOLT_TRANSPORT` environment
+variable when running a command:
+
+_\*nix shell command_
+
+```shell
+BOLT_TRANSPORT=ssh bolt file download /var/logs downloads --targets all
+```
+
+_PowerShell cmdlet_
+
+```powershell
+$env:BOLT_TRANSPORT = 'ssh'
+Receive-BoltFile -Source '/var/logs' -Destination 'downloads' -Targets 'all'
+Remove-Item Env:\BOLT_TRANSPORT
+```
+
+#### Using `bolt-defaults.yaml`
+
+You can specify a default transport for your targets in the user- or
+system-level configuration file, `bolt-defaults.yaml`. When Bolt merges
+configuration, user- and system-level configuration has a lower precedence
+than command-line options. This allows you to configure a default transport
+that is used by all targets in your inventory and specify a different
+transport as needed.
+
+```yaml
+# ~/.puppetlabs/etc/bolt/bolt-defaults.yaml
+inventory-config:
+  transport: pcp
+```
+
+To override the default `pcp` transport, use the `transport` command-line
+option:
+
+_\*nix shell command_
+
+```shell
+bolt file download /var/logs downloads --targets all --transport ssh
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Receive-BoltFile -Source '/var/logs' -Destination 'downloads' -Targets 'all' -Transport 'ssh'
+```
+
+Specifying a default transport in the `bolt-defaults.yaml` file applies to _all_
+projects that you run. You can override the default transport for specific
+projects by setting the top-level `config.transport` key in the project's
+inventory file.
 
 📖 **Related information**
 

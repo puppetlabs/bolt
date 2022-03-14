@@ -35,7 +35,8 @@ Gem::Specification.new do |spec|
                        Dir['modules/*/templates/**/*'] +
                        Dir['modules/*/types/**/*'] +
                        Dir['Puppetfile'] +
-                       Dir['guides/*.txt']
+                       Dir['resources/bolt_bash_completion.sh'] +
+                       Dir['guides/*.yaml']
   spec.bindir        = "exe"
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
@@ -46,7 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "aws-sdk-ec2", '~> 1'
   spec.add_dependency "CFPropertyList", "~> 2.2"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
-  spec.add_dependency "ffi", "< 1.14.0"
+  spec.add_dependency "ffi", ">= 1.9.25", "< 2.0.0"
   spec.add_dependency "hiera-eyaml", "~> 3"
   spec.add_dependency "jwt", "~> 2.2"
   spec.add_dependency "logging", "~> 2.2"
@@ -59,9 +60,9 @@ Gem::Specification.new do |spec|
   spec.add_dependency "puppetfile-resolver", "~> 0.5"
   spec.add_dependency "puppet-resource_api", ">= 1.8.1"
   spec.add_dependency "puppet-strings", "~> 2.3"
-  spec.add_dependency "r10k", "~> 3.1"
+  spec.add_dependency "r10k", "~> 3.10"
   spec.add_dependency "ruby_smb", "~> 1.0"
-  spec.add_dependency "terminal-table", "~> 1.8"
+  spec.add_dependency "terminal-table", "~> 3.0"
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.3"
 

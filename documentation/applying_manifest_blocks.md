@@ -227,7 +227,7 @@ $results.each |$result| {
 
 The [`ApplyResult` object](bolt_types_reference.md#applyresult) includes a
 `report` method that returns a hash representation of the
-[`Puppet::Transaction::Report`](https://puppet.com/docs/puppet/7.3/format_report.html)
+[`Puppet::Transaction::Report`](https://puppet.com/docs/puppet/latest/format_report.html)
 object. Each property on the object corresponds to a key with the same name in
 the report hash. However, not every property is presented in the hash for every
 result. Only properties that have a value from the apply are present in the

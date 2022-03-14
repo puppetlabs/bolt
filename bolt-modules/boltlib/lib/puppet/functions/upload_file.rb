@@ -70,7 +70,8 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
     # Send Analytics Report
     executor.report_function_call(self.class.name)
 
-    found = Puppet::Parser::Files.find_file(source, scope.compiler.environment)
+    # Find the file path if it exists, otherwise return nil
+    found = Bolt::Util.find_file_from_scope(source, scope)
     unless found && Puppet::FileSystem.exist?(found)
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
         Puppet::Pops::Issues::NO_SUCH_FILE_OR_DIRECTORY, file: source
@@ -83,25 +84,13 @@ Puppet::Functions.create_function(:upload_file, Puppet::Functions::InternalFunct
       call_function('debug', "Simulating file upload of '#{found}' - no targets given - no action taken")
       Bolt::ResultSet.new([])
     else
-      r = if executor.in_parallel
-            require 'concurrent'
-            require 'fiber'
-            future = Concurrent::Future.execute do
-              executor.upload_file(targets,
-                                   found,
-                                   destination,
-                                   options,
-                                   Puppet::Pops::PuppetStack.top_of_stack)
+      file_line = Puppet::Pops::PuppetStack.top_of_stack
+      r = if executor.in_parallel?
+            executor.run_in_thread do
+              executor.upload_file(targets, found, destination, options, file_line)
             end
-
-            Fiber.yield('unfinished') while future.incomplete?
-            future.value || future.reason
           else
-            executor.upload_file(targets,
-                                 found,
-                                 destination,
-                                 options,
-                                 Puppet::Pops::PuppetStack.top_of_stack)
+            executor.upload_file(targets, found, destination, options, file_line)
           end
       if !r.ok && !options[:catch_errors]
         raise Bolt::RunFailure.new(r, 'upload_file', source)

@@ -4,15 +4,19 @@
 begin
   require 'rspec/core/rake_task'
 
+  def generate_opts(include_tags: [], exclude_tags: [])
+    opts = include_tags.map { |t| "--tag #{t}" } + exclude_tags.map { |t| "--tag ~#{t}" }
+    opts.join(' ').chomp
+  end
+
   namespace :tests do
     desc "Run all RSpec tests"
     RSpec::Core::RakeTask.new(:spec)
 
     desc "Run RSpec tests that do not require VM fixtures or a particular shell"
     RSpec::Core::RakeTask.new(:unit) do |t|
-      t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~winrm ' \
-                     '--tag ~windows_agents --tag ~puppetserver --tag ~puppetdb ' \
-                     '--tag ~omi --tag ~kerberos --tag ~lxd_remote --tag ~podman'
+      t.pattern = "spec/unit/**/*_spec.rb"
+      t.rspec_opts = "--fail-fast"
     end
 
     desc 'Run tests that require a host System Under Test configured with WinRM'
@@ -30,21 +34,6 @@ begin
       t.rspec_opts = '--tag docker'
     end
 
-    desc 'Run tests that require a host System Under Test configured with LXD'
-    RSpec::Core::RakeTask.new(:lxd) do |t|
-      t.rspec_opts = '--tag lxd_transport'
-    end
-
-    desc 'Run tests that require a host System Under Test configured with LXD remote'
-    RSpec::Core::RakeTask.new(:lxd_remote) do |t|
-      t.rspec_opts = '--tag lxd_remote'
-    end
-
-    desc 'Run tests that require a host System Under Test configured with Podman'
-    RSpec::Core::RakeTask.new(:podman) do |t|
-      t.rspec_opts = '--tag podman'
-    end
-
     desc 'Run tests that require Bash on the local host'
     RSpec::Core::RakeTask.new(:bash) do |t|
       t.rspec_opts = '--tag bash'
@@ -54,45 +43,113 @@ begin
     RSpec::Core::RakeTask.new(:windows) do |t|
       t.rspec_opts = '--tag windows'
     end
-
-    desc 'Run tests that require OMI docker container'
-    RSpec::Core::RakeTask.new(:omi) do |t|
-      t.rspec_opts = '--tag omi'
-    end
   end
 
   # The following tasks are run during CI and require additional environment setup
   # to run. Jobs that run these tests can be viewed in .github/workflows/
   namespace :ci do
-    namespace :linux do
-      # Run RSpec tests that do not require WinRM
+    namespace :apply do
       desc ''
-      RSpec::Core::RakeTask.new(:fast) do |t|
-        t.rspec_opts = '--tag ~winrm --tag ~lxd_transport --tag ~windows_agents --tag ~puppetserver ' \
-                       '--tag ~puppetdb --tag ~omi --tag ~windows --tag ~kerberos --tag ~expensive ' \
-                       '--tag ~lxd_remote --tag ~podman'
+      RSpec::Core::RakeTask.new(:linux) do |t|
+        t.pattern = "spec/integration/**/*_spec.rb"
+        t.exclude_pattern = "spec/integration/transport/*"
+        t.rspec_opts = generate_opts(include_tags: %w[apply],
+                                     exclude_tags: %w[docker winrm])
       end
 
-      # Run RSpec tests that are slow or require slow to start containers for setup
       desc ''
-      RSpec::Core::RakeTask.new(:slow) do |t|
-        t.rspec_opts = '--tag puppetserver --tag puppetdb --tag expensive'
+      RSpec::Core::RakeTask.new(:windows) do |t|
+        t.pattern = "spec/integration/**/*_spec.rb"
+        t.exclude_pattern = "spec/integration/transport/*"
+        exclude = %w[bash docker puppetdb ssh winrm_agentless]
+        t.rspec_opts = generate_opts(include_tags: %w[apply], exclude_tags: exclude)
+      end
+    end
+
+    namespace :boltserver do
+      desc ''
+      RSpec::Core::RakeTask.new(:linux) do |t|
+        t.pattern = "spec/bolt_server/**/*_spec.rb"
+        t.rspec_opts = '--tag ~winrm'
+      end
+
+      desc ''
+      RSpec::Core::RakeTask.new(:windows) do |t|
+        t.pattern = "spec/bolt_server/**/*_spec.rb"
+        t.rspec_opts = '--tag ~ssh --tag ~puppetserver'
+      end
+    end
+
+    namespace :boltspec do
+      desc ''
+      RSpec::Core::RakeTask.new(:linux) do |t|
+        t.pattern = "spec/bolt_spec/**/*_spec.rb"
+      end
+
+      desc ''
+      RSpec::Core::RakeTask.new(:windows) do |t|
+        t.pattern = "spec/bolt_spec/**/*_spec.rb"
+        t.rspec_opts = '--tag ~ssh'
+      end
+    end
+
+    desc ''
+    RSpec::Core::RakeTask.new(:docker_transport) do |t|
+      t.pattern = "spec/integration/transport/docker_spec.rb"
+    end
+
+    namespace :local_transport do
+      desc ''
+      RSpec::Core::RakeTask.new(:linux) do |t|
+        t.pattern = "spec/integration/transport/local_spec.rb"
+      end
+
+      desc ''
+      RSpec::Core::RakeTask.new(:windows) do |t|
+        t.pattern = "spec/integration/transport/local_spec.rb"
+        t.rspec_opts = '--tag ~sudo'
+      end
+    end
+
+    desc ''
+    RSpec::Core::RakeTask.new(:orch_transport) do |t|
+      t.pattern = "spec/integration/transport/orch_spec.rb"
+    end
+
+    desc ''
+    RSpec::Core::RakeTask.new(:ssh_transport) do |t|
+      t.pattern = "spec/integration/transport/ssh_spec.rb"
+    end
+
+    desc ''
+    RSpec::Core::RakeTask.new(:winrm_transport) do |t|
+      t.pattern = "spec/integration/transport/winrm_spec.rb"
+    end
+
+    namespace :linux do
+      desc ''
+      RSpec::Core::RakeTask.new(:integration) do |t|
+        t.pattern = "spec/integration/**/*_spec.rb"
+        t.exclude_pattern = "spec/integration/transport/*"
+        exclude = %w[winrm apply]
+        t.rspec_opts = generate_opts(exclude_tags: exclude)
       end
     end
 
     namespace :windows do
-      # Run RSpec tests that do not require Puppet Agents on Windows
       desc ''
       RSpec::Core::RakeTask.new(:agentless) do |t|
-        t.rspec_opts = '--tag ~ssh --tag ~docker --tag ~lxd_transport --tag ~bash --tag ~windows_agents ' \
-                       '--tag ~orchestrator --tag ~puppetserver --tag ~puppetdb --tag ~omi ' \
-                       '--tag ~kerberos --tag ~lxd_remote --tag ~podman'
+        t.pattern = "spec/integration/**/*_spec.rb"
+        t.exclude_pattern = "spec/integration/transport/*"
+        t.rspec_opts = '--tag winrm_agentless'
       end
 
-      # Run RSpec tests that require Puppet Agents configured with Windows
       desc ''
-      RSpec::Core::RakeTask.new(:agentful) do |t|
-        t.rspec_opts = '--tag windows_agents'
+      RSpec::Core::RakeTask.new(:integration) do |t|
+        t.pattern = "spec/integration/**/*_spec.rb"
+        t.exclude_pattern = "spec/integration/transport/*"
+        exclude = %w[apply bash docker puppetdb ssh sudo winrm_agentless]
+        t.rspec_opts = generate_opts(exclude_tags: exclude)
       end
     end
 
@@ -100,8 +157,8 @@ begin
     task :modules do
       success = true
       # Test core modules
-      %w[boltlib ctrl file dir out prompt system].each do |mod|
-        Dir.chdir("#{__dir__}/../bolt-modules/#{mod}") do
+      Pathname.new("#{__dir__}/../bolt-modules").each_child do |mod|
+        Dir.chdir(mod) do
           sh 'rake spec' do |ok, _|
             success = false unless ok
           end

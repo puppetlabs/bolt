@@ -1,4 +1,4 @@
-FROM puppet/puppetserver
+FROM puppet/puppetserver:edge
 
 ARG hostname="boltserver"
 ENV PUPPETSERVER_HOSTNAME "$hostname"

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/shell/bash/tmpdir'
+require_relative 'bash/tmpdir'
 require 'shellwords'
 
 module Bolt
@@ -94,7 +94,17 @@ module Bolt
           with_tmpdir do |dir|
             path = write_executable(dir.to_s, script)
             dir.chown(run_as)
-            output = execute([path, *arguments], environment: options[:env_vars], sudoable: true)
+
+            exec_args   = [path, *arguments]
+            interpreter = select_interpreter(script, target.options['interpreters'])
+
+            # Only use interpreter if script_interpreter config is enabled
+            if options[:script_interpreter] && interpreter
+              exec_args.unshift(interpreter).flatten!
+              logger.trace("Running '#{script}' using '#{interpreter}' interpreter")
+            end
+
+            output = execute(exec_args, environment: options[:env_vars], sudoable: true)
             Bolt::Result.for_command(target,
                                      output.to_h,
                                      'script',
@@ -244,7 +254,7 @@ module Bolt
         if interpreter
           StringIO.new(<<~SCRIPT)
             #!/bin/sh
-            '#{interpreter}' '#{task_path}' <<'EOF'
+            #{Array(interpreter).map { |word| "'#{word}'" }.join(' ')} '#{task_path}' <<'EOF'
             #{stdin}
             EOF
           SCRIPT
@@ -325,11 +335,7 @@ module Bolt
       # Returns string with the interpreter conditionally prepended
       def inject_interpreter(interpreter, command)
         if interpreter
-          if command.is_a?(Array)
-            command.unshift(interpreter)
-          else
-            command = [interpreter, command]
-          end
+          command = Array(command).unshift(interpreter).flatten
         end
 
         command.is_a?(String) ? command : Shellwords.shelljoin(command)

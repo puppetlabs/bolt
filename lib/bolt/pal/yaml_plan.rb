@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/pal/yaml_plan/parameter'
-require 'bolt/pal/yaml_plan/step'
+require_relative 'yaml_plan/parameter'
+require_relative 'yaml_plan/step'
 
 module Bolt
   class PAL

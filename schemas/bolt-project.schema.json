@@ -58,6 +58,9 @@
     "plugins": {
       "$ref": "#/definitions/plugins"
     },
+    "policies": {
+      "$ref": "#/definitions/policies"
+    },
     "puppetdb": {
       "$ref": "#/definitions/puppetdb"
     },
@@ -149,7 +152,11 @@
       "type": "object",
       "properties": {
         "file_paths": {
-          "description": "Load scripts from the `scripts/` directory of a module",
+          "description": "Load scripts from the `scripts/` directory of a module.",
+          "type": "boolean"
+        },
+        "script_interpreter": {
+          "description": "Use a target's [`interpreters` configuration](bolt_transports_reference.md#interpreters) when running a script.",
           "type": "boolean"
         }
       }
@@ -181,8 +188,7 @@
                 "error",
                 "info",
                 "warn",
-                "fatal",
-                "any"
+                "fatal"
               ]
             }
           }
@@ -211,8 +217,7 @@
               "error",
               "info",
               "warn",
-              "fatal",
-              "any"
+              "fatal"
             ]
           }
         }
@@ -233,9 +238,20 @@
       "type": "object",
       "properties": {
         "forge": {
-          "description": "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge operations only, and a `baseurl` setting to specify a different Forge host.",
+          "description": "A subsection for configuring connections to a Forge host.",
           "type": "object",
           "properties": {
+            "authorization_token": {
+              "description": "The token used to authorize requests to the Forge host. Must also specify `baseurl` when using this option.",
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "baseurl": {
               "description": "The URL to the Forge host.",
               "type": "string",
@@ -256,7 +272,7 @@
       }
     },
     "modules": {
-      "description": "A list of module dependencies for the project. Each dependency is a map of data specifying the module to install. To install the project's module dependencies, run the `bolt module install` command.",
+      "description": "A list of module dependencies for the project. Each dependency is a map of data specifying the module to install. To install the project's module dependencies, run the `bolt module install` command. For more information about specifying modules, see [the documentation](https://pup.pt/bolt-module-specs).",
       "type": "array",
       "items": {
         "type": [
@@ -362,6 +378,10 @@
           }
         ]
       }
+    },
+    "policies": {
+      "description": "A list of policy names and glob patterns to filter the project's policies by. This option is used to specify which policies are available to a project and can be applied to targets. When this option is not configured, policies are not available to the project and cannot be applied to targets.",
+      "type": "array"
     },
     "puppetdb": {
       "description": "A map containing options for [configuring the Bolt PuppetDB client](bolt_connect_puppetdb.md).",

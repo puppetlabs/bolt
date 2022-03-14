@@ -6,7 +6,138 @@ while iterating on new functionality. Almost all experimental features are
 eventually stabilized in future releases. While a feature is experimental, its
 API might change, requiring the user to update their code or configuration. The
 Bolt team attempts to make these changes painless by providing useful warnings
-around breaking behavior where possible. 
+around breaking behavior where possible.
+
+## Configuration policies and the `policy` command
+
+This feature was introduced in [Bolt 3.21.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-3210-2021-12-16). 
+
+### What are policies?
+
+Configuration policies are public Puppet classes stored in the `manifests/`
+directory of modules on the modulepath. Just like other Puppet code, you can
+apply policies directly to one or more targets.
+
+### Policies in a Bolt project's configuration file
+
+The project configuration file, `bolt-project.yaml`, supports a `policies` key
+which lists the policies available to a project. A Puppet class becomes a policy
+when you list it under the `policies` key. If you do not configure the
+`policies` key, no policies will be available for Bolt to apply.
+
+You can manually add policies to the `policies` key in `bolt-project.yaml`, or
+manage policies using the Bolt command line. The `policies` key supports glob
+patterns for easily listing multiple policies. For example, `myproject::*`
+includes both the `myproject::admin` and `myproject::sshkeys` policies.
+
+The following configuration file makes the `myproject::admin` and
+`myproject::sshkeys` policies available to the project:
+```
+---
+# bolt-project.yaml
+name: myproject
+policies:
+- myproject::admin
+- myproject::sshkeys
+```
+
+### Creating new policies 
+
+You can use Bolt to create a new policy in your project and add it to the
+`policies` key in your project configuration. For example, to create a new
+project-level policy named `myproject::user`, run:
+
+* _*nix shell command_
+  ```
+  bolt policy new myproject::user
+  ```
+
+* _PowerShell cmdlet_
+  ```
+  New-BoltPolicy -Name myproject::user
+  ```
+
+Bolt creates an empty class in the project's `manifests/` directory that you can
+populate with code. Policy names must follow [class naming
+conventions](https://puppet.com/docs/puppet/7/lang_reserved.html#classes-and-defined-resource-type-names).
+
+
+Example output:
+```
+Created policy 'myproject::user' at '/Users/puppet.user/myproject/manifests/user.pp'
+```
+
+Create policies manually by:
+
+1. Adding the file to a module's or project's `manifests/` directory.
+2. Modifying the project's `bolt-project.yaml` to include the policy in the
+   `policies` key.
+
+### Listing available policies
+
+You can list available policies for the project:
+
+* _*nix shell command_ 
+  ```
+  bolt policy show 
+  ```
+
+* _PowerShell cmdlet_ 
+  ``` 
+  Get-BoltPolicy 
+  ```
+
+Example output:
+```
+Policies
+  myproject::admin
+  myproject::sshkeys
+
+Modulepath
+  /Users/puppet.user/myproject/modules:/Users/puppet.user/myproject/.modules
+```
+
+### Applying policies to targets
+
+Applying policies is similar to [applying Puppet
+code](https://puppet.com/docs/bolt/latest/applying_manifest_blocks.html), with
+the addition that you can apply one or more policies at a time. The Bolt
+commands for applying policies accept a single policy name or a comma-separated
+list of policy names to apply to a list of one or more targets. 
+
+For example, to apply both `myproject::admin` and `myproject::sshkeys` policies
+to a target:
+
+* _*nix shell command_
+  ```
+  bolt policy apply myproject::admin,myproject::sshkeys -t mytarget                                
+  ```
+
+* _PowerShell cmdlet_
+  ```
+  Invoke-BoltPolicy -Name myproject::admin,myproject::sshkeys -Targets mytarget
+  ```
+
+Example output:
+```
+Starting: install puppet and gather facts on mytarget
+Finished: install puppet and gather facts with 0 failures in 6.51 sec
+Starting: apply catalog on mytarget
+Started on mytarget...
+Finished on mytarget:
+  changed: 1, failed: 0, unchanged: 0 skipped: 0, noop: 0
+Finished: apply catalog with 0 failures in 8.59 sec
+Successful on 1 target: mytarget
+Ran on 1 target in 15.2 sec
+```
+
+Before applying policies, Bolt uses the `apply_prep` function to collect facts and
+ensure that the puppet-agent package is available on each target. For more
+information on how Bolt uses `apply_prep`, see [Applying manifest
+blocks](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan).
+Bolt creates a single line of Puppet code to compile and apply to the provided
+targets. This line of code includes the syntax `include <POLICIES>` and Bolt
+logs the line at the debug level.
 
 ## `run_container` plan step
 
@@ -79,8 +210,10 @@ Finished on docker://puppet_6_node:
   Hello!
 ```
 
-As you can see, when you configure output to stream, Bolt might print to the console twice:
-once as the actions are running, and again after Bolt prints the results.
+As you can see, when you configure output to stream, Bolt may print to the console twice:
+once as the actions are running, and again after Bolt prints the results. You can prevent
+Bolt from printing the results once the action has completed by specifying the `--no-verbose`
+command-line option.
 
 ## LXD Transport
 
@@ -152,15 +285,16 @@ plugin-cache:
 > **NOTE**: The same cache and cache configuration is used for the `resolve_reference()` plan
 function.
 
-## `Parallelize()` function
+## Parallelism in Bolt plans
 
-This feature was introduced in [Bolt
+The `parallelize()` plan function was introduced in [Bolt
 2.35.0](https://github.com/puppetlabs/bolt/tree/main/CHANGELOG.md#bolt-2350-2020-11-16).
+The `background()` and `wait()` plan functions were introduced in [Bolt 3.9.0](https://github.com/puppetlabs/bolt/tree/main/CHANGELOG.md#bolt-390-2021-05-25).
 
-Bolt plan functions have always run concurrently across targets - that is, if a function takes a
-list of targets and operates on them, the function runs that step on each target in parallel. For
-example, the following plan runs `hostname` on all targets at the same time, waits for all targets
-to finish, and then runs `whoami` on all targets at the same time. 
+For context, Bolt plan functions have always run concurrently across targets - that is, if a
+function takes a list of targets and operates on them, the function runs that step on each target in
+parallel. For example, the following plan runs `hostname` on all targets at the same time, waits for
+all targets to finish, and then runs `whoami` on all targets at the same time. 
 
 ```
 # $targets = target1,target2,target3
@@ -171,10 +305,100 @@ plan myplan(TargetSpec $targets) {
 ```
 
 In the example above, `target3` has to wait for `hostname` to finish on `target1` and `target2`
-before it can run `whoami`. The experimental `parallelize()` function accepts an array and a block,
+before it can run `whoami`.
+
+While useful, this form of parallelism is limited. Bolt plans have a few methods that allow a block
+of plan steps to execute in the background while other parts of the plan execute in parallel:
+* The `background` plan function begins executing a block of code in parellel with the main plan
+  and other backgrounded code blocks. This is great for use cases where you want to start a process
+  and don't care about the results, or don't need the results until much later in the plan. This
+  function returns a [Future](bolt_types_reference.md#Future) object so that the result can be
+  accessed later in the plan.
+* The `wait` function is a sister to `background`. It accepts a Future or array of Futures and
+  blocks until they are finished, optionally with a timeout, then returns the results.
+* The `parallelize` function accepts an array and a block of plan steps, and then creates a Future
+  for each block in the array. It blocks until all the Futures have finished.
+
+These two function invocations are equivalent:
+```
+parallelize(['./file1', './file2']) |$file| {
+  file_upload($file, '/home/user/', $targets)
+  ...
+}
+
+# Is equivalent to
+['./file1', './file2'].map |$file| {
+  background() || {
+    file_upload($file,...)
+    ...
+  }
+}.wait
+```
+
+### `background()` and `wait()` plan functions
+
+The `background()` plan function creates a new Future object, and begins running the code block in
+the background in parallel with the main plan and other backgrounded code blocks. The function
+accepts an optional name for the Future to make log messages easier to follow.
+
+The code block has access to all existing variables when it's created, and has its own scope, so any
+new variables are not accessible outside the code block.
+
+Plans will return normally even when they have Futures running in the background, and those
+Futures will continue to execute in parallel. However, Bolt itself will not exit until all Futures
+have completed in order to ensure that all work is finished. Any errors raised after the calling
+plan has finished will be logged at warn level for visibility.
+
+The `wait()` plan function accepts either a single Future object, an array of Futures, or no
+Futures. If not provided any Futures, the function implicitly waits for all Futures created up
+to that point in the calling plan. The `wait()` function does not wait on any Futures created
+in subplans, even if the subplan is called inside a `background()` block. If you want a plan to wait
+on a Future object created in a subplan then you must call `wait()` in the subplan directly, or
+return Future objects to the calling plan to be explicitly passed to `wait()`.
+
+For example, the following plan runs the code block with three `run_command()` calls on
+the provided targets in the background, then executes a task in parallel. Once the task has
+finished, the commands may still be running in the background. Another task is kicked off in the
+background. Then the backgrounded commands and tasks are waited on before continuing.
+
+```
+# $targets = target1,target2,target3
+plan myplan(TargetSpec $targets) {
+  $binary_future = background("Run mycoolbinary") || {
+    # These commands execute sequentially per target. Bolt connects to the targets in 
+    # parallel, but waits for the cp command to finish before running chmod
+    run_command("cp /home/user/Downloads/mycoolbinary /home/user/bin", $targets)
+    run_command("chmod +x /home/user/bin/mycoolbinary", $targets)
+    run_command("mycoolbinary", $targets)
+  }
+
+  # This task runs while the commands above are running
+  run_task("mytask", $targets)
+  
+  # Once the task 'mytask' has finished, start more commands in the background
+  $status_future = background("Check service status") || {
+    $r = run_command("systemctl status myservice", $targets)
+    out::message($r)
+  }
+
+  # This is equivalent to wait() in this plan
+  wait([$binary_future, $status_future])
+}
+```
+
+The function blocks until the Futures finish, with an optional timeout. If provided a timeout,
+unfinished Futures raise a timeout error if they have not completed within the timeout. You can
+return errors instead of raising them by passing `_catch_errors => true` to `wait()`. The `wait()`
+function returns the results from the Future blocks once they've all finished. If a Future errors,
+Bolt only raises the error after all other Futures finish executing and return to `wait()`.
+
+### `parallelize()` plan function
+
+The experimental `parallelize()` function accepts an array and a block,
 and runs the entire block on each array element in parallel. Inside a parallelize block, targets can
-run subsequent plan functions before all targets have finished each step. For example, here is the
-same plan with a parallelize block:
+run subsequent plan functions before all targets have finished each step. For example, this plan
+runs the block to execute two commands on each target in parallel, regardless of how long it takes
+the block to run on any one target:
 
 ```
 # $targets = target1,target2,target3
@@ -192,20 +416,23 @@ plan myplan(TargetSpec $targets) {
 Here, if `target3` completes running `hostname` before `target1` or `target2`, it can continue directly to
 running `whoami`.
 
-This functionality is particularly useful for plan functions that might take a long time on certain
-targets but not on others, or for plans where some long running process might fail on a target but the
+This functionality is particularly useful for plan functions that may take a long time on certain
+targets but not on others, or for plans where some long running process may fail on a target but the
 plan author wants the plan to be able to continue quickly on successful targets.
 
-Within the parallelize block, only the following functions can run in parallel: 
+
+#### How plan functions run in parallel
+
+Within a backgrounded code block, only the following functions can run in parallel: 
 - `run_command`
 - `run_task`
 - `run_task_with`
 - `run_script`
 - `upload_file`
 - `download_file`. 
-You can run other functions from a parallelize block, but those functions will block execution
-on other targets until they complete. For example, in the following plan, Bolt can start running
-`task2` and `task3` while `task1` is still executing. However, it cannot start `task4` while
+You can run other functions from a parallelize or background block, but those functions will block
+execution on other targets until they complete. For example, in the following plan, Bolt can start
+running `task2` and `task3` while `task1` is still executing. However, it cannot start `task4` while
 `out::message` is executing on any of the targets.
 
 ```
@@ -224,16 +451,18 @@ plan myplan(TargetSpec $targets) {
 }
 ```
 
-The `parallelize()` function returns an array that contains the results of executing the block in
-the same order as the input array. You can think of `parallelize()` as a `map` function that runs in
-parallel. The 'result' of the block for a particular input is either a value passed to a `return`
-statement, the result of the last function in the block, or an error. For example, consider the
-following plan:
+#### Getting results from parallel blocks
 
+The `parallelize()` and `wait()` functions return an array that contains the results of executing
+the block in the same order as the input array. You can think of them as `map` functions
+that run in parallel. The `result` of the block for a particular input is either a value passed to
+a `return` statement, the result of the last function in the block, or an error.
+
+For example, consider the following plan:
 ```
-# $ts = [target1, target2, target3]
+$ts = get_targets($targets)
 $result = parallelize($ts) |$target| {
-    if target.name == 'target1' {
+    if $target.name == 'target1' {
       return "Don't run the task on this target"
     }
     run_task('task1', $target)
@@ -244,11 +473,106 @@ $result = parallelize($ts) |$target| {
 out::message($result)
 ```
 
+Similarly, using `wait()`:
+```
+$ts = get_targets($targets)
+$futures = $ts.map |$target| {
+  background() || {
+    if $target.name == 'target1' {
+      return "Don't run the task on this target"
+    }
+    run_task('task1', $target)
+    run_command('hostname', $target)
+  }
+}
+$result = wait($futures)
+
+# This will print ["Don't run the task on this target", "target2", "target3"]
+out::message($result)
+```
+
 If any step of the block errors, Bolt stops executing the block for that target, but continues
 executing for all other targets from the input array. When the block finishes, if there is an error
 in the result array, the plan throws a `PlanFailure` and includes the entire result array in the
 `details` key of the failure. If the block is wrapped in a `catch_errors()` block, Bolt catches the
-`PlanFailure` and continues executing the plan.
+`PlanFailure` and continues to execute the plan. If you've provided `_catch_errors => true`
+to `wait()`, Bolt returns any errors raised and the plan continues to execute.
+
+#### Viewing failing results in parallel blocks
+
+When an action fails in a parallel block, such as a task returning an error, Bolt
+does not print the error result to the console. For example, the following plan
+runs a non-existent command on targets in parallel:
+
+```puppet
+plan example (
+  TargetSpec $targets
+) {
+  $_targets = get_targets($targets)
+
+  $results = parallelize($_targets) |$target| {
+    run_command('badcommand', $target)
+  }
+
+  return $results
+}
+```
+
+Bolt does not print the error result from the targets the command is run on,
+making it difficult to know why the command failed:
+
+```shell
+$ bolt plan run example -t target1,target2
+
+Starting: plan example
+Starting: command 'badcommand' on target1
+Starting: command 'badcommand' on target2
+Finished: command 'badcommand' with 1 failure in 0.01 sec
+Finished: command 'badcommand' with 1 failure in 0.02 sec
+Error in future '2': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Error in future '3': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Finished: plan example in 1.53 sec
+parallel block failed on 2 targets
+  (file: /Users/bolt/.puppetlabs/bolt/plans/init.pp, line: 4, column: 14)
+```
+
+To view error results from parallel blocks, you can run the plan in verbose mode.
+To run in verbose mode, use the `verbose` flag:
+
+_\*nix shell command_
+
+```shell
+bolt plan run <PLAN NAME> --verbose
+```
+
+_PowerShell cmdlet_
+
+```powershell
+Invoke-BoltPlan -Name <PLAN NAME> -Verbose
+```
+
+Running the same plan in verbose mode shows the error results for each target:
+
+```shell
+$ bolt plan run example -t target1,target2
+
+Starting: plan example
+Starting: command 'badcommand' on target1
+Starting: command 'badcommand' on target2
+Started on target1...
+Failed on target1:
+  No such file or directory - badcommand
+Started on target2...
+Failed on target2:
+  No such file or directory - badcommand
+Finished: command 'badcommand' with 1 failure in 0.01 sec
+Finished: command 'badcommand' with 1 failure in 0.02 sec
+Error in future '2': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Error in future '3': run_command 'badcommand' failed on 1 target [ID: errored_futures]
+Finished: plan example in 1.53 sec
+parallel block failed on 2 targets
+  (file: /Users/bolt/.puppetlabs/bolt/plans/init.pp, line: 4, column: 14)
+```
 
 ## `ResourceInstance` data type
 

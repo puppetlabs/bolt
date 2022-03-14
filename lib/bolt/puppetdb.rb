@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/puppetdb/client'
-require 'bolt/puppetdb/config'
+require_relative '../bolt/error'
+require_relative 'puppetdb/client'
+require_relative 'puppetdb/config'
 
 module Bolt
   class PuppetDBError < Bolt::Error

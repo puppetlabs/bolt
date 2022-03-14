@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/resource_instance'
+require_relative '../../bolt/resource_instance'
 
 module Bolt
   class Inventory

@@ -58,6 +58,91 @@ describe 'upload_file' do
         .and_return(result_set)
     end
 
+    context 'when locating files' do
+      let(:module_root) { File.expand_path(fixtures('modules')) }
+
+      before(:each) do
+        inventory.stubs(:get_targets).with(hostname).returns([target])
+      end
+
+      context 'with nonspecific module syntax' do
+        it 'does not load from scripts/ subdir' do
+          is_expected.to run
+            .with_params('with_scripts/hostname.sh', destination, hostname)
+            .and_raise_error(/No such file or directory: .*with_scripts.*hostname\.sh/)
+        end
+
+        it 'loads from files/' do
+          full_path = File.join(module_root, 'with_files/files/hostname.sh')
+
+          executor.expects(:upload_file)
+                  .with([target], full_path, destination, {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_files/hostname.sh', destination, hostname)
+            .and_return(result_set)
+        end
+      end
+
+      context 'with scripts/ specified' do
+        # hostname.sh is in with_both/files/scripts/ and with_both/scripts/
+        it 'prefers loading from files/scripts/' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_both/files/scripts/hostname.sh')
+
+          executor.expects(:upload_file)
+                  .with([target], full_path, destination, {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_both/scripts/hostname.sh', destination, hostname)
+            .and_return(result_set)
+        end
+
+        it 'falls back to scripts/ if not found in files/' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_scripts/scripts/hostname.sh')
+
+          executor.expects(:upload_file)
+                  .with([target], full_path, destination, {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_scripts/scripts/hostname.sh', destination, hostname)
+            .and_return(result_set)
+        end
+      end
+
+      context 'with files/ specified' do
+        it 'prefers loading from files/files/' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_files/files/files/hostname.sh')
+
+          executor.expects(:upload_file)
+                  .with([target], full_path, destination, {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_files/files/hostname.sh', destination, hostname)
+            .and_return(result_set)
+        end
+
+        it 'falls back to files/ if enabled' do
+          # Path that should be loaded from
+          full_path = File.join(module_root, 'with_files/files/toplevel.sh')
+
+          executor.expects(:upload_file)
+                  .with([target], full_path, destination, {}, [])
+                  .returns(result_set)
+
+          is_expected.to run
+            .with_params('with_files/files/toplevel.sh', destination, hostname)
+            .and_return(result_set)
+        end
+      end
+    end
+
     it 'with target specified as a Target' do
       executor.expects(:upload_file)
               .with([target], full_dir_path, destination, {}, [])
@@ -212,10 +297,8 @@ describe 'upload_file' do
     it 'executes in a thread if the executor is in parallel mode' do
       inventory.expects(:get_targets).with(hostname).returns([target])
 
-      Concurrent::Future.expects(:execute).returns(future)
-      future.expects(:incomplete?).returns(false)
-      future.expects(:value).returns(result_set)
-      executor.expects(:in_parallel).returns(true)
+      executor.expects(:in_parallel?).returns(true)
+      executor.expects(:run_in_thread).returns(result_set)
 
       is_expected.to run
         .with_params('test/uploads/index.html', destination, hostname)

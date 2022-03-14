@@ -22,6 +22,12 @@ module BoltSpec
           File.join(@moduledir, *parts)
         end
       end
+
+      def get_cached_project_file(_versioned_project, _file_name); end
+
+      def cache_project_file(_versioned_project, _file_name, data)
+        data
+      end
     end
 
     # TODO: support more than just the sample module

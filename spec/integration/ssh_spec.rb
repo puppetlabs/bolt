@@ -85,51 +85,122 @@ describe "when runnning over the ssh transport", ssh: true do
 
   context 'when using a project', :reset_puppet_settings do
     let(:config) do
-      { 'format' => 'json',
-        'modulepath' => modulepath }
+      {
+        'format'     => 'json',
+        'future'     => future_config,
+        'modulepath' => modulepath
+      }
     end
+
+    let(:future_config) { {} }
+
     let(:default_inv) do
-      { 'config' =>
-      { 'ssh' => {
-        'user' => user,
-        'password' => password,
-        'host-key-check' => false
-      } } }
+      {
+        'config' => {
+          'ssh' => {
+            'user' => user,
+            'password' => password,
+            'host-key-check' => false
+          }
+        }
+      }
     end
-    let(:inv)                 { default_inv }
-    let(:uri)                 { (1..2).map { |i| "#{conn_uri('ssh')}?id=#{i}" }.join(',') }
-    let(:project)             { @project }
-    let(:config_flags)        { %W[--targets #{uri} --project #{project.path}] }
-    let(:single_target_conf)  { %W[--targets #{conn_uri('ssh')} --project #{project.path}] }
-    let(:interpreter_task)    { 'sample::interpreter' }
+
+    let(:inv)                { default_inv }
+    let(:uri)                { (1..2).map { |i| "#{conn_uri('ssh')}?id=#{i}" }.join(',') }
+    let(:project)            { @project }
+    let(:config_flags)       { %W[--targets #{uri} --project #{project.path}] }
+    let(:single_target_conf) { %W[--targets #{conn_uri('ssh')} --project #{project.path}] }
+    let(:interpreter_task)   { 'sample::interpreter' }
+    let(:interpreter_script) { 'sample/scripts/script.py' }
+
     let(:run_as_conf) do
-      { 'config' => {
-        'ssh' => { 'run-as' => user }
-      } }
+      {
+        'config' => {
+          'ssh' => {
+            'run-as' => user
+          }
+        }
+      }
     end
+
     let(:interpreter_ext) do
-      { 'config' => {
-        'ssh' => {
-          'interpreters' => {
-            '.py' => '/usr/bin/python3'
+      {
+        'config' => {
+          'ssh' => {
+            'interpreters' => {
+              '.py' => '/usr/bin/python3'
+            }
           }
         }
-      } }
+      }
     end
+
     let(:interpreter_no_ext) do
-      { 'config' => {
-        'ssh' => {
-          'interpreters' => {
-            'py' => '/usr/bin/python3'
+      {
+        'config' => {
+          'ssh' => {
+            'interpreters' => {
+              'py' => '/usr/bin/python3'
+            }
           }
         }
-      } }
+      }
+    end
+
+    let(:interpreter_array) do
+      {
+        'config' => {
+          'ssh' => {
+            'interpreters' => {
+              'py' => ['/usr/bin/python3', '-d']
+            }
+          }
+        }
+      }
+    end
+
+    let(:interpreter_array_wrapper) do
+      {
+        'config' => {
+          'ssh' => {
+            'tty' => true,
+            'interpreters' => {
+              'py' => ['/usr/bin/python3', '-d']
+            }
+          }
+        }
+      }
     end
 
     around :each do |example|
       with_project(config: config, inventory: inv) do |project|
         @project = project
         example.run
+      end
+    end
+
+    shared_examples 'script interpreter' do
+      it 'does not run script with specified interpreter' do
+        result = run_cli_json(%W[script run #{interpreter_script}] + config_flags)['items'][0]
+        expect(result['status']).to eq('failure')
+        expect(result['value']['exit_code']).to eq(2)
+        expect(result['value']['stderr']).to match(/word unexpected/)
+      end
+
+      context 'with future.script_interpreter configured' do
+        let(:future_config) do
+          {
+            'script_interpreter' => true
+          }
+        end
+
+        it 'runs script with specified interpreter' do
+          result = run_cli_json(%W[script run #{interpreter_script}] + config_flags)['items'][0]
+          expect(result['status']).to eq('success')
+          expect(result['value']['exit_code']).to eq(0)
+          expect(result['value']['stdout']).to match(/Hello, world!/)
+        end
       end
     end
 
@@ -155,6 +226,8 @@ describe "when runnning over the ssh transport", ssh: true do
     context 'with interpreters without dots configured' do
       let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_no_ext) }
 
+      include_examples 'script interpreter'
+
       it 'runs task with specified interpreter key py' do
         result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
         expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
@@ -172,7 +245,31 @@ describe "when runnning over the ssh transport", ssh: true do
     context 'with interpreters with dots configured' do
       let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_ext) }
 
+      include_examples 'script interpreter'
+
       it 'runs task with interpreter key .py' do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
+      end
+    end
+
+    context 'with interpreters as an array' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_array) }
+
+      include_examples 'script interpreter'
+
+      it 'runs task with interpreter value as array' do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
+      end
+    end
+
+    context 'with interpreters as an array that gets wrapped' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, interpreter_array_wrapper) }
+
+      it 'runs task with interpreter value as array' do
         result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
         expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
         expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'logging'
-require 'bolt/node/errors'
+require_relative '../../../bolt/node/errors'
 
 module Bolt
   module Transport
@@ -27,6 +27,10 @@ module Bolt
                      end
         end
 
+        def reset_cwd?
+          true
+        end
+
         # The full ID of the target container
         #
         # @return [String] The full ID of the target container
@@ -46,8 +50,8 @@ module Bolt
         def connect
           # We don't actually have a connection, but we do need to
           # check that the container exists and is running.
-          output = execute_local_json_command('ps')
-          index = output.find_index { |item| item["ID"] == target.host || item["Names"] == target.host }
+          output = execute_local_json_command('ps', ['--no-trunc'])
+          index = output.find_index { |item| item["ID"].start_with?(target.host) || item["Names"] == target.host }
           raise "Could not find a container with name or ID matching '#{target.host}'" if index.nil?
           # Now find the indepth container information
           output = execute_local_json_command('inspect', [output[index]["ID"]])
@@ -74,7 +78,6 @@ module Bolt
           # CODEREVIEW: Is it always safe to pass --interactive?
           args += %w[--interactive]
           args += %w[--tty] if target.options['tty']
-          args += %W[--env DOCKER_HOST=#{@docker_host}] if @docker_host
           args += @env_vars if @env_vars
 
           if target.options['shell-command'] && !target.options['shell-command'].empty?
@@ -86,7 +89,7 @@ module Bolt
           docker_command = %w[docker exec] + args + [container_id] + Shellwords.split(command)
           @logger.trace { "Executing: #{docker_command.join(' ')}" }
 
-          Open3.popen3(*docker_command)
+          Open3.popen3(env_hash, *docker_command)
         rescue StandardError
           @logger.trace { "Command aborted" }
           raise

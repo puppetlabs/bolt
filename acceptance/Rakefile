@@ -28,7 +28,7 @@ rototiller_task :host_config do |task|
       n_new << node
     end
     nodes_final = n_new.join('-')
-    generate = "beaker-hostgenerator"
+    generate = "bundle exec beaker-hostgenerator"
     generate += " #{nodes_final}"
     generate += " > hosts.yaml"
     sh generate
@@ -49,7 +49,7 @@ beaker_options = [
     add_argument: {
       name: 'hosts.yaml',
       add_env: {
-        name: 'BEAKER_HOSTS_FILE',
+        name: 'BEAKER_HOSTS',
         message: 'Beaker hosts file'
       }
     } },

@@ -259,86 +259,6 @@ plan mymodule::myplan {
 }
 ```
 
-## Debugging plans
-
-By default, Bolt does not print verbose logs for each plan execution to stdout.
-However, you can use one of the following methods to investigate a plan
-execution:
-- Each time you run a Bolt command, Bolt prints a debug log to a
-  `bolt-debug.log` file in the root of your project directory.
-- You can use the `--verbose` CLI option for verbose logging to stdout.
-- You can print a message to stdout using the `out::message` function. 
-- You can adjust your log level for detailed information on how Bolt is
-  executing your plan.
-
-### Using `out::message` to debug a plan
-
-You can print a message, or a variable, to stdout using the `out::message`
-function. If the variable contains a valid plan result, Bolt formats the plan
-result using a JSON representation of the result object. If the object is not a
-plan result, Bolt prints the object as a string.
-
-To print a variable to stdout with `out::message`, use the following syntax:
-
-```puppet
-out::message($variable) 
-```
-
-For example, the following plan uses a `run_task` function to check targets for
-the MySQL package and assigns the result to a variable called `$check_mysql`.
-The plan uses `out::message($check_mysql)` to print the result set from
-`$check_mysql` to stdout.
-
-```puppet
-plan website::test(
-  TargetSpec $targets
-) {
-  $check_mysql = run_task('package', $targets, "Check for MySQL", {'action' => 'status', 'name' => 'mysql'})
-  out::message($check_mysql)
-}
-```
-
-The output from this plan looks something like this:
-
-```console
-Starting: plan website::test
-Starting: Check for MySQL on target0
-Finished: Check for MySQL with 0 failures in 0.76 sec
-[
-  {
-    "target": "target0",
-    "action": "task",
-    "object": "package",
-    "status": "success",
-    "value": {
-      "status": "uninstalled",
-      "version": ""
-    }
-  }
-]
-Finished: plan website::test in 0.77 sec
-Plan completed successfully with no result
-```
-
-### Debug logs
-
-Bolt logs additional information about a plan run, including output sent to
-standard error (stderr), at the `debug` level. Use the `--log-level debug` CLI
-option or the [`log` configuration setting](bolt_project_reference.md#log).
-
-```shell
-$ bolt task run mytask param1=foo param2=bar -t all --log-level debug
-```
-
-Each time you run a Bolt command, Bolt prints a debug level log to a
-`bolt-debug.log` file in the root of your project directory. You can disable the
-log file by specifying the following in your `bolt-project.yaml`:
-
-```yaml
-log:
-  bolt-debug.log: disable
-```
-
 ## Success and failure in plans
 
 If `upload_file`, `run_command`, `run_script`, or `run_task` are called without
@@ -847,69 +767,6 @@ plan pdb_discover {
 
 - [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md)
 
-## Plan logging
-
-Print message strings to `STDOUT` using the plan function `out::message`. This
-function always prints messages regardless of the log level and doesn't log them
-to the log file.
-
-### Default action logging
-
-Bolt logs actions that a plan takes on targets through the  `upload_file`,
- `run_command`, `run_script`, or `run_task` functions. By default, it logs
-a notice level message when an action starts and another when it completes. If
-you pass a description to the function, that is used in place of the generic log
-message.
-
-```
-run_task('my_task', $targets, 'Better description', 'param1' => 'val')
-```
-
-If your plan contains many small actions, you might want to suppress these
-messages and use explicit calls to the Puppet log functions instead. This can be
-accomplished by wrapping actions in a `without_default_logging` block, which
-causes the action messages to be logged at info level instead of notice. For
-example to loop over a series of targets without logging each action:
-
-```
-plan deploy( TargetSpec $targets) {
-  without_default_logging() || {
-    get_targets($targets).each |$target| {
-      run_task('deploy', $target)
-    }
-  }
-}
-```
-
-To avoid complications with parser ambiguity, always
-call `without_default_logging` with `()` and empty block args `||`.
-
-```
-without_default_logging() || { run_command('echo hi', $targets) }
-```
-
-not
-
-```
-without_default_logging { run_command('echo hi', $targets) }
-```
-
-For information on configuring log levels, see [Logs](logs.md).
-
-### Puppet log functions in Bolt
-
-You can use Puppet log functions in Bolt plans, but Bolt log levels do not map
-directly to Puppet log levels. For example, a `notice` function in a plan logs
-at the `info` level in Bolt. Log levels map as follows:
-
-| Puppet log level | Bolt log level |
-| --- | --- |
-| `debug` | `trace` |
-| `info` | `debug` |
-| `notice` | `info` |
-| `warning` | `warn` |
-| `err` | `error` |
-
 ## Documenting plans
 
 When writing plans, it's helpful to document what the plan does and the
@@ -1035,13 +892,13 @@ MODULE:
 
 As a plan author, you might not want users to run your plan directly or know it exists. This is useful
 for plans that are used by other plans 'under the hood', but aren't designed to be run by a human.
-You can hide plans from `bolt plan show` and `Get-BoltPlan` output by specifying the `# @private
-true` Puppet strings tag. Private plans are still viewable with `bolt plan show <PLAN NAME>` and
+You can hide plans from `bolt plan show` and `Get-BoltPlan` output by specifying the `# @api
+private` Puppet strings tag. Private plans are still viewable with `bolt plan show <PLAN NAME>` and
 `Get-BoltPlan -Name <PLAN NAME>`, and can still be run with Bolt.
 
 ```
 # This plan isn't shown in plan list output
-# @private true
+# @api private
 # @param targets The list of targets to run the command on.
 plan single_command (
   TargetSpec $targets,

@@ -1,5 +1,750 @@
 # Changelog
 
+## Bolt 3.21.0 (2021-12-16)
+
+### New features
+
+* **`policies` configuration setting**
+  ([#3041](https://github.com/puppetlabs/bolt/pull/3041))
+
+  The project configuration file, `bolt-project.yaml`, has a new
+  `policies` setting which lists the configuration policies available to
+  a project.
+  
+  _This feature is experimental and subject to change._
+
+* **`policy` subcommands**
+  ([#3041](https://github.com/puppetlabs/bolt/pull/3041))
+
+  Bolt now includes three new subcommands for interacting with a
+  project's configuration policies:
+
+  - The `policy new` command can be used to create a new configuration
+    policy in the project and add it to the project's configuration.
+  - The `policy show` command can be used to view which configuration
+    policies are available to a project.
+  - The `policy apply` command can be used to apply one or more
+    configuration policies to a list of targets.
+
+  _This feature is experimental and subject to change._
+
+## Bolt 3.20.0 (2021-10-26)
+
+### New features
+
+* **Support arrays and strings for `interpreters` transport configuration**
+  ([#3035](https://github.com/puppetlabs/bolt/pull/3035))
+
+  Bolt now supports arrays in addition to strings as the value for the
+  `interpreters` transport configuration option, which enables passing
+  flags in addition to a binary.
+
+### Bug fixes
+
+* **Resolve puppetdb client configuration plugins as needed**
+  ([#3034](https://github.com/puppetlabs/bolt/issues/3034))
+
+  Bolt now only resolves plugins for the puppetdb client when needed.
+  Previously, Bolt would attempt to resolve plugins for the puppetdb
+  client for every command, which would cause Bolt to error if the
+  plugin module was not available, such as when installing a project's
+  modules for the first time.
+
+## Bolt 3.19.0 (2021-10-04)
+
+### New features
+
+* **Debian 11 packages**
+  ([#3027](https://github.com/puppetlabs/bolt/pull/3027))
+
+  Bolt now ships packages for Debian 11.
+
+* **Update bundled modules to latest versions**
+  ([#3030](https://github.com/puppetlabs/bolt/pull/3030))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [augeas_core 1.2.0](https://forge.puppet.com/puppetlabs/augeas_core/1.2.0/changelog)
+  - [cron_core 1.1.0](https://forge.puppet.com/puppetlabs/cron_core/1.1.0/changelog)
+  - [host_core 1.1.0](https://forge.puppet.com/puppetlabs/host_core/1.1.0/changelog)
+  - [mount_core 1.1.0](https://forge.puppet.com/puppetlabs/mount_core/1.1.0/changelog)
+  - [selinux_core 1.2.0](https://forge.puppet.com/puppetlabs/selinux_core/1.2.0/changelog)
+  - [sshkeys_core 2.3.0](https://forge.puppet.com/puppetlabs/sshkeys_core/2.3.0/changelog)
+  - [stdlib 8.1.0](https://forge.puppet.com/puppetlabs/stdlib/8.1.0/changelog)
+  - [yumrepo_core 1.1.0](https://forge.puppet.com/puppetlabs/yumrepo_core/1.1.0/changelog)
+  - [zfs_core 1.3.0](https://forge.puppet.com/puppetlabs/zfs_core/1.3.0/changelog)
+
+### Bug fixes
+
+* **Correctly set inventory config when resolving plugins**
+  ([#3029](https://github.com/puppetlabs/bolt/pull/3029))
+
+  Previously, Bolt would resolve plugins then set the config in the
+  Inventory to `nil`, causing errors like `undefined method 'merge' for
+  nil:NilClass`. Bolt now correctly returns the resolved config to the
+  inventory.
+
+## Bolt 3.18.0 (2021-09-20)
+
+### New features
+
+* **Support `interpreters` configuration when running scripts**
+  ([#2698](https://github.com/puppetlabs/bolt/issues/2698))
+
+  Bolt now supports the `interpreters` transport configuration when running
+  scripts. To enable this feature, set the `future.script_interpreter`
+  configuration to `true`.
+
+* **Create `.gitignore` in new projects with local Bolt files**
+  ([#2985](https://github.com/puppetlabs/bolt))
+
+  The `bolt project init` command now lays down a `.gitignore` file to ignore
+  local files that Bolt creates while executing.
+
+* **Update bundled modules to latest versions**
+  ([#3019](https://github.com/puppetlabs/bolt/pull/3019))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [package 2.1.0](https://forge.puppet.com/puppetlabs/package/2.1.0/changelog)
+
+  - [puppet_agent 4.9.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.9.0/changelog)
+
+  - [puppet_conf 1.2.0](https://forge.puppet.com/puppetlabs/puppet_conf/1.2.0/changelog)
+
+  - [reboot 4.1.0](https://forge.puppet.com/puppetlabs/reboot/4.1.0/changelog)
+
+  - [service 2.1.0](https://forge.puppet.com/puppetlabs/service/2.1.0/changelog)
+
+  - [stdlib 8.0.0](https://forge.puppet.com/puppetlabs/stdlib/8.0.0/changelog)
+
+    The `stdlib 8.0.0` module includes breaking changes to the
+    `ensure_packages` function. If you need to use an older version of
+    the module, you can [install the module](http://pup.pt/bolt-modules)
+    in your project configuration.
+
+* **Support Forge authorization token when installing modules**
+  ([#3022](https://github.com/puppetlabs/bolt/pull/3022))
+
+  Bolt now supports using a token to authorizing requests to the Forge when
+  installing modules using the `module-install.forge.authorization_token`
+  setting.
+
+* **Look for scripts in a `scripts` directory**
+  ([#3025](https://github.com/puppetlabs/bolt/pull/3025))
+
+  Bolt now looks for scripts in a project's or module's `scripts` directory when
+  provided a Puppet file path with the form `<module>/scripts/<file>`.
+  Previously, this behavior was opt-in only by setting the `future.file_paths`
+  configuration option.
+
+### Bug fixes
+
+* **Return exit code 1 instead of 2 when Bolt errors**
+  ([#2998](https://github.com/puppetlabs/bolt/issues/2998))
+
+  Bolt will now exit with code 1 instead of 2 whenever a Bolt operation fails.
+
+* **Update BoltSpec functions to allow absolute paths**
+  ([#2905](https://github.com/puppetlabs/bolt/issues/2905))
+
+  BoltSpec's `allow_upload`, `expect_upload`, `allow_script`, and
+  `expect_script` functions now support passing absolute paths that rather than
+  a module reference. The referenced path must refer to a real file or upload
+  and script functions will still error.
+
+* **Correctly set main plan ID**
+  ([#2977](https://github.com/puppetlabs/bolt/issues/2977))
+
+  Bolt now sets the main plan's ID to the correct value. Previously, the main
+  plan ID was set incorrectly, causing Bolt to issue warnings during plan runs
+  when it should not have.
+
+* **Allow using the scripts file mount in Puppet manifests**
+  ([#2921](https://github.com/puppetlabs/bolt/issues/2921))
+
+  This fixes a bug where `scripts/` directory files needed for the new Puppet
+  scripts mount were not included in the tarball of dependencies for applying
+  manifests. Users can now use the scripts mount from Puppet manifests.
+
+### Deprecations
+
+* **Deprecate `future.file_paths` configuration option**
+  ([#3025](https://github.com/puppetlabs/bolt/pull/3025))
+
+  The `future.file_paths` configuration option has been deprecated.
+
+## Bolt 3.17.0 (2021-08-30)
+
+### New features
+
+* **Pass `--script` to `bolt plan new` to wrap a script in a plan** (hack)
+  The `bolt plan new` command now accepts a `--script SCRIPT` parameter
+  that will generate a plan that simply runs the script and returns the
+  result. The flag only supports detailed (new-style) Puppet file
+  references. Learn more about file references at http://pup.pt/bolt-scripts
+
+### Bug fixes
+
+* **Do not wrap commands in `sh -c` when not using environment variables
+  or privilege escalation**
+
+  Bolt no longer wraps commands in `sh -c` when environment variables
+  are not specified and not using privilege escalation. Previously, Bolt
+  would wrap all commands in `sh -c` when using the SSH transport, which
+  caused commands to fail on targets that do not recognize `sh`, such as
+  some Windows targets.
+
+* **Resolve plugins as needed**
+  ([#2992](https://github.com/puppetlabs/bolt/issues/2992))
+
+  Bolt now only resolves plugin configuration, plugin hooks, and
+  inventory plugins as needed. Previously, Bolt resolved all plugins
+  each time a command was run, causing some commands to fail when
+  they should not.
+
+## Bolt 3.16.1 (2021-08-16)
+
+### Bug fixes
+
+* **Handle empty response bodies in `http_request` task**
+  [(#2984)](https://github.com/puppetlabs/bolt/pull/2984)
+
+  The `http_request` task no longer errors when a response does not
+  include a body.
+
+* **Fix stacktrace for conflicting `module add` and Puppetfile**
+  [(#2966)](https://github.com/puppetlabs/bolt/issues/2966)
+
+  When a project's `Puppetfile` has a forge module without a version specified,
+  Bolt now offers a more helpful error when attempting to do a `module install/add` of
+  the same module.
+
+## Bolt 3.16.0 (2021-08-09)
+
+### New features
+
+* **Continue executing when a plan over PCP restarts the Orchestrator**
+  ([#2964](https://github.com/puppetlabs/bolt/issues/2964))
+
+  Bolt will now retry a task once when running over PCP as part of a
+  plan, if the task errors with `plan-already-finished`.
+
+### Bug fixes
+
+* **Do not remove variables from scope when using `parallelize()`**
+  ([#2889](https://github.com/puppetlabs/bolt/issues/2889))
+
+  Bolt no longer removes variables from a plan's scope when invoking
+  a custom Puppet language function that invokes a `run_*` function from
+  a `parallelize()` block. Previously, a race condition would result in
+  the current plan's variables to be removed from the plan's scope.
+
+* **Attempt to restore Ruby environment on local with bundled-ruby false**
+  ([#2922](https://github.com/puppetlabs/bolt/issues/2922))
+
+  When executing, Bolt will unset several Ruby environment variables in
+  it's own environment to avoid unexpected behavior. This can interfere
+  with running Ruby on the local transport with Bolt though. Bolt will now
+  attempt to restore Ruby environment variables like `GEM_HOME` and
+  `GEM_PATH` when running over the local transport with `bundled-ruby` set
+  to false.
+
+## Bolt 3.15.0 (2021-08-02)
+
+### New features
+
+* **Add ability for `--clear-cache` to clear plan/task metadata cache.**
+  ([#2915](https://github.com/puppetlabs/bolt/issues/2915))
+
+  `--clear-cache` flag now clears plan/task metadata cache.
+
+* **Support `_catch_errors` in `apply_prep`**
+  ([#2925](https://github.com/puppetlabs/bolt/issues/2925))
+
+  The `apply_prep` function now accepts the `_catch_errors` parameter.
+  Additionally, the `bolt apply` and `Invoke-BoltApply` commands set
+  `_catch_errors` to `true`, allowing an apply action to complete on as
+  many targets as possible instead of erroring if even one target fails
+  the `apply_prep` portion of the command.
+
+* **Respect `@api` tag in Puppet language plans**
+  ([#2945](https://github.com/puppetlabs/bolt/issues/2945))
+
+  Bolt now respects the `@api` tag in Puppet language plans. If the
+  `@api private` tag is present, the plan will be hidden from `bolt plan
+  show` and `Get-BoltPlan` output.
+
+### Bug fixes
+
+* **Ship with Bolt guides**
+  ([#2959](https://github.com/puppetlabs/bolt/pull/2959))
+
+  Bolt 3.14.1 neglected to updated the `bolt.gemspec` to include new
+  guide files. This updates the gemspec to include the new guide files.
+
+### Deprecations
+
+* **Deprecate `@private` tag in Puppet language plans**
+  ([#2945](https://github.com/puppetlabs/bolt/issues/2945))
+
+  The `@private` tag for Puppet language plans is deprecated. Use the
+  `@api` tag instead.
+
+## Bolt 3.14.1 (2021-07-26)
+
+### New features
+
+* **`wait()` without arguments waits on all Futures from plan**
+  ([#2877](https://github.com/puppetlabs/bolt/issues/2877))
+
+  Calling the `wait()` plan function without a list of Futures will now
+  wait on all Futures created so far in the plan.
+
+* **Ship puppetlabs/http_request 0.3.0**
+  ([#2939](https://github.com/puppetlabs/bolt/pull/2939))
+
+  Bolt now ships with the latest version of the http_request module,
+  which includes support for making `patch` requests.
+
+* **YAML plan verbose step**
+  ([#2926](https://github.com/puppetlabs/bolt/issues/2926))
+
+  YAML plans now support a verbose step that prints a message
+  when run in verbose mode.
+
+* **Log messages from `out::message` and `out::verbose`**
+  ([#2900](https://github.com/puppetlabs/bolt/issues/2900))
+
+  The `out::message` plan function now logs messages at the `info` level
+  and the `out::verbose` plan function now logs messages at the `debug`
+  level. Both functions continue to print messages to the console.
+
+* **Show detailed module information**
+  ([#2938](https://github.com/puppetlabs/bolt/pull/2938))
+
+  Bolt now supports showing detailed information about a module using
+  the `bolt module show <module>` command and `Get-BoltModule -Name
+  <module>` PowerShell cmdlet.
+
+* **Beautify `bolt guide` output**
+  ([#2937](https://github.com/puppetlabs/bolt/pull/2937))
+
+  This converts our existing guides from flat text to YAML so that they
+  can be pretty printed.
+
+* **Add `batch-mode` configuration option for `native-ssh` transport**
+  ([#2875](https://github.com/puppetlabs/bolt/issues/2875))
+
+  The `native-ssh` transport has a new `batch-mode` configuration option
+  that can be used to enable or disable `BatchMode`. For more
+  information, see [the
+  documentation](https://puppet.com/docs/bolt/latest/troubleshooting.html#providing-a-password-non-interactively-using-native-ssh).
+
+* **Format PlanResults if they are Bolt datatypes**
+  ([#2941](https://github.com/puppetlabs/bolt/pull/2941))
+
+  Bolt will now print a more human readable message for plan results
+  that are Bolt datatypes when using the human output format, rather than
+  printing JSON.
+
+### Bug fixes
+
+* **Do not warn about analytics when analytics is disabled**
+  ([#2947](https://github.com/puppetlabs/bolt/pull/2947))
+
+  Bolt no longer displays a warning about analytics collection when
+  analytics is disabled and the `analytics.yaml` file does not exist.
+
+### Removals
+
+* **Remove support for Fedora 30, Fedora 31, and MacOS 10.14**
+  ([#2948](https://github.com/puppetlabs/bolt/pull/2948))
+
+## Bolt 3.13.0 (2021-07-12)
+
+### New features
+
+* **Add built-in `log` module**
+  ([#2899](https://github.com/puppetlabs/bolt/issues/2899))
+
+  Bolt now ships with a new built-in `log` module that includes plan
+  functions for logging messages at each of Bolt's log levels. The new
+  plan functions include `log::trace`, `log::debug`, `log::warn`,
+  `log::info`, `log::error`, and `log::fatal`.
+
+* **Fedora 34 packages**
+  ([#2903](https://github.com/puppetlabs/bolt/issues/2903))
+
+  Bolt now ships packages for Fedora 34.
+
+* **Add `out::verbose` plan function** 
+  ([#2879](https://github.com/puppetlabs/bolt/issues/2879))
+
+  Bolt now has `out::verbose` plan function, which allows for 
+  printing output when run in verbose mode.
+
+## Bolt 3.12.0 (2021-07-06)
+
+### New features
+
+* **Support macOS 11 in `puppet_agent::install task**
+  ([#2901](https://github.com/puppetlabs/bolt/pull/2901))
+
+  The `puppet_agent::install` task now supports installing the
+  puppet-agent package on macOS 11.
+
+* **Disable 'exported resources' warnings from Puppet**
+  ([#2889](https://github.com/puppetlabs/bolt/issues/2889))
+
+  Warnings logged by Puppet when declaring or collecting exported
+  resources in a manifest can now be disabled. To disable these warnings
+  add the `exported_resources` ID under the `disable-warnings`
+  configuration option.
+
+### Bug fixes
+
+* **Do not stacktrace with non-existent files in plan or task cache**
+  ([#2912](https://github.com/puppetlabs/bolt/pull/2912))
+
+  Bolt no longer errors with a stacktrace when listing plans or tasks
+  when the plan or task cache include paths to files that no longer
+  exist.
+
+## Bolt 3.11.0 (2021-06-21)
+
+### New features
+
+* **macOS 11 packages**
+  ([#2855](https://github.com/puppetlabs/bolt/issues/2855))
+
+  Bolt now ships packages for macOS 11 (Big Sur).
+
+* **Update bundled modules to latest versions**
+  ([#2883](https://github.com/puppetlabs/bolt/pull/2883))
+
+  The following bundled modules have been updated to their latest
+  versions:
+
+  - [pkcs7 0.1.2](https://forge.puppet.com/puppetlabs/pkcs7/0.1.2/changelog)
+
+  - [puppet_agent 4.7.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.7.0/changelog)
+    
+    The `puppet_agent::install` task now supports running in `noop` mode.
+
+  - [scheduled_task 3.0.1](https://forge.puppet.com/puppetlabs/scheduled_task/3.0.1/changelog)
+
+  - [stdlib 7.1.0](https://forge.puppet.com/puppetlabs/stdlib/7.1.0/changelog)
+
+* **Ship with Puppet 7.7.0**
+  ([#2864](https://github.com/puppetlabs/bolt/issues/2864))
+
+  Bolt now ships with Puppet 7.7.0.
+
+### Bug fixes
+
+* **Handle printing command and script results with no output**
+  ([#2863](https://github.com/puppetlabs/bolt/issues/2863))
+
+  Bolt no longer errors when printing results from a command or script when the
+  result does not include output on `stdout` or `stderr`. Previously, Bolt would
+  error with an undefined method message.
+
+* **Handle printing command and script results with `pcp` transport**
+  ([#2863](https://github.com/puppetlabs/bolt/issues/2863))
+
+  Bolt no longer errors when printing command and script results when using the
+  `pcp` transport. Previously, Bolt would error with an undefined method
+  message.
+
+* **Install modules when using Bolt as a gem**
+  ([#2891](https://github.com/puppetlabs/bolt/pull/2891))
+
+  Bolt no longer errors when installing modules using the `bolt` gem.
+  Previously, Bolt would error with a missing parameter message.
+
+## Bolt 3.10.0 (2021-06-14)
+
+### New features
+
+* **Add `plugin show` command**
+  ([#2872](https://github.com/puppetlabs/bolt/pull/2872))
+
+  The `bolt plugin show` command and `Get-BoltPlugin` PowerShell cmdlet
+  can be used to list plugins available to the current project.
+
+* **Lookup hiera `plan_hierarchy` values from the CLI**
+  ([#2815](https://github.com/puppetlabs/bolt/issues/2815))
+
+  The `bolt lookup` command now has a `--plan-hierarchy` flag that will
+  lookup values from Hiera's `plan_hierarchy`.
+
+* **New Bolt debugging guide**
+  ([#2871](https://github.com/puppetlabs/bolt/pull/2871))
+
+  Bolt has a new guide with common debugging tips that can be accessed
+  by running `bolt guide debugging`.
+
+* **Builtin tab completion**
+  ([#2869](https://github.com/puppetlabs/bolt/pull/2869))
+
+  Bolt now supports tab completion for Bolt commands, subcommands, and
+  any flags available for a command. It also supports tab completing tasks
+  and plans for certain project types when tasks and plans have been
+  cached.
+
+### Bug fixes
+
+* **Test plans that use `parallelize()` plan function in BoltSpec**
+  ([#2882](https://github.com/puppetlabs/bolt/pull/2882))
+
+  BoltSpec no longer fails when testing plans that include the
+  `parallelize()` plan function. Previously, testing plans that used
+  this function would cause the plan to fail with an argument mismatch
+  error.
+
+* **Pass remaining arguments to PowerShell `-Arguments` parameter**
+  ([#2788](https://github.com/puppetlabs/bolt/issues/2788))
+
+  The PuppetBolt PowerShell module now correctly supports passing
+  multiple arguments to the `-Arguments` parameter. Previously, any
+  unbound arguments were not passed to this parameter, causing the
+  PowerShell parser to error.
+
+### Deprecations
+
+* **PuppetBolt PowerShell module will not ship with Bolt packages in a
+  future release**
+  ([#2550](https://github.com/puppetlabs/bolt/issues/2550))
+
+  The PuppetBolt PowerShell module will no longer ship with Bolt
+  packages on Windows in a future release. The PuppetBolt PowerShell
+  module should instead be installed from PowerShell Gallery.
+
+## Bolt 3.9.2 (2021-06-08)
+
+### Bug fixes
+
+* **Do not error when using `--run-as` on a Windows controller**
+  ([#2874](https://github.com/puppetlabs/bolt/pull/2874))
+
+  Bolt no longer raises an error when using the `--run-as` command-line
+  option on a Windows controller.
+
+## Bolt 3.9.1 (2021-06-07)
+
+### New features
+
+* **Ship PuppetBolt PowerShell module to PowerShell Gallery**
+  ([#2550](https://github.com/puppetlabs/bolt/issues/2550))
+
+  The PuppetBolt PowerShell module is now shipped to the [PowerShell
+  Gallery](https://www.powershellgallery.com/packages/PuppetBolt). For more
+  information about installing the PuppetBolt PowerShell module, see the
+  [documentation](bolt_installing.md#puppetbolt-powershell-module).
+
+* **Report whether tasks are run in no-operation mode**
+  ([#2840](https://github.com/puppetlabs/bolt/issues/2840))
+
+  Bolt now reports whether or not a task is run in no-operation mode when it
+  collects analytics.
+
+### Bug fixes
+
+* **Provide project for `BoltSpec::Run::Runner#pal`**
+  ([#2858](https://github.com/puppetlabs/bolt/pull/2858))
+
+  Fixes a project null reference in the invocation of the `download_file()`
+  function in a plan driven by the `BoltSpec::Run` runner.
+
+* **Undef variables are now included in Future block scopes**
+  ([#2866](https://github.com/puppetlabs/bolt/issues/2866))
+
+  Previously, Bolt would not include variables with a value `undef` in Future
+  block scopes, leading them to be undefined. Bolt now includes those variables
+  when creating the new scope for Future blocks.
+
+## Bolt 3.9.0 (2021-05-25)
+
+### New features
+
+* **Plan functions to support fire-and-forget parallelism**
+  ([#2764](https://github.com/puppetlabs/bolt/issues/2764))
+
+  Bolt now includes two new plan functions, `background()` and `wait()`, to
+  support fire-and-forget parallelism. Read more at
+  https://pup.pt/bolt-parallelism.
+
+* **Support run-as for container transports when running on nix**
+  ([#2806](https://github.com/puppetlabs/bolt/issues/2806))
+
+  The Docker, LXD, and Podman transports now support `run-as`
+  configuration and related configuration options when running on nix
+  systems. `run-as` is not supported for any Windows systems or the
+  PowerShell shell over SSH.
+
+### Bug fixes
+
+* **Upload project plugin files to correct directory when running an
+  apply**
+  ([#2832](https://github.com/puppetlabs/bolt/issues/2832))
+
+  Project plugin files are now uploaded to the correct directory when
+  running an apply. Previously, if a project used a `Boltdir` or had a
+  directory name that did not match the project's configured name, apply
+  blocks could not correctly reference files in the project using Puppet
+  file syntax (`puppet:///modules/<project name>/<file name>`).
+
+* **Correctly set `DOCKER_HOST` environment variable when connecting
+  to remote Docker hosts**
+  ([#2813](https://github.com/puppetlabs/bolt/pull/2813))
+
+  Bolt now correctly sets the `DOCKER_HOST` environment variable when
+  the `docker.service-url` configuration is set. Previously, this
+  environment variable was not set correctly, preventing the transport
+  from connecting to remote Docker hosts.
+
+  _Contributed by [Mic Kaczmarczik](https://github.com/mpkut)_
+
+## Bolt 3.8.1 (2021-05-17)
+
+### Bug fixes
+
+* **Support _run_as passed to apply_prep()**
+  ([#2808](https://github.com/puppetlabs/bolt/pull/2808))
+
+  Bolt now respects the `_run_as` metaparameter when passed to the
+  `apply_prep()` plan function. This is the only supported metaparameter, and
+  takes highest precedence per the [Bolt configuration
+  precedence](https://puppet.com/docs/bolt/latest/configuring_bolt.html#configuration-precedence)
+
+* **Don't stacktrace if welcome message file can't be written**
+  ([#2814](https://github.com/puppetlabs/bolt/pull/2814))
+
+  Previously, Bolt would stacktrace if it failed to make the directory to store
+  the welcome message file in, which relies on tilde `~` expansion. Bolt now
+  falls back to a system-level path, and then omits the welcome message entirely
+  if the system-level path also fails to be created or written to.
+
+* **Do not error in `file::*` plan functions when `future` is not configured**
+  ([#2828](https://github.com/puppetlabs/bolt/pull/2828))
+
+  The `file::exists`, `file::read`, and `file::readable` plan functions no
+  longer error when invoked outside of an apply block when `future` is not
+  configured.
+
+### Documentation
+
+* **JSON output documentation**
+  ([#2773](https://github.com/puppetlabs/bolt/issues/2773))
+
+  The format for JSON output for each of Bolt's commands is [now
+  documented](https://puppet.com/docs/bolt/latest/json_output_reference.md).
+
+## Bolt 3.8.0 (2021-05-03)
+
+### New features
+
+* **Facts diff task accepts `exclude` parameter**
+  ([#2804](https://github.com/puppetlabs/bolt/pull/2804))
+
+  The `puppet_agent::facts_diff` task now accepts an `exclude` parameter
+  to filter output based on a provided regex.
+
+* **`lookup` command to look up values with Hiera**
+  ([#2499](https://github.com/puppetlabs/bolt/issues/2499))
+
+  The new `bolt lookup` and `Invoke-BoltLookup` commands can be used to
+  look up values with Hiera.
+
+* **Load files from specified Puppet paths**
+  ([#2731](https://github.com/puppetlabs/bolt/issues/2731))
+
+  If the project-level `future.file_paths` configuration is enabled,
+  Puppet files can be loaded using the new loading syntax. For more
+  information see https://pup.pt/bolt-loading-files.
+
+### Removals
+
+* **Puppet5 collection no longer available for `puppet_agent::install`
+  task**
+  ([#2804](https://github.com/puppetlabs/bolt/pull/2804))
+
+  Now that this collection is unavailable to download from, it's not a
+  valid parameter to the `puppet_agent::install` task.
+
+## Bolt 3.7.1 (2021-04-26)
+
+### New features
+
+* **Developer Update: Script loading changes**
+
+  There's a new Developer Update in town, [read it
+  here](https://puppet.com/docs/bolt/latest/developer_updates.html).
+
+### Bug fixes
+
+* **Allow Docker connections using full ID as the host**
+
+  The Bolt Docker transport now successfully connects to containers
+  when the full SHA 256 container ID string is provided as a name or
+  URL. Previously, Bolt could only connect when the 12 character
+  shortened form of the ID string was used.
+
+* **Fixed incorrect param in Get-BoltTask text** ([#2795](https://github.com/puppetlabs/bolt/issues/2795))
+
+  Fixed the 'Additional Information' section of the help text for the Get-BoltTask cmdlet having an
+  incorrect parameter for the task name
+
+  _Contributed by [Malivil](https://github.com/Malivil)_
+
+## Bolt 3.7.0 (2021-04-13)
+
+### New features
+
+* **Default to showing all targets with `bolt inventory show`**
+  ([#2747](https://github.com/puppetlabs/bolt/issues/2747))
+
+  The `bolt inventory show` and `Get-BoltInventory` commands now default
+  ot showing all targets in the inventory if a targetting option
+  (`--targets`, `--query`, `--rerun`) are not provided.
+
+* **Improved group information output**
+  ([#2766](https://github.com/puppetlabs/bolt/pull/2766))
+
+  The `bolt group show` and `Get-BoltGroup` commands now display `human`
+  output in a similar format to other `show` commands. The `json` output
+  now includes the path to the inventory file that the groups are loaded
+  from.
+
+* **`puppetdb_command` plan function**
+  ([#2771](https://github.com/puppetlabs/bolt/issues/2771))
+
+  The `puppetdb_command` plan function can be used to invoke commands in
+  PuppetDB. Currently, only the `replace_facts` command is officially
+  tested and supported, though other commands might work as well.
+
+  _This feature is experimental and subject to change._
+
+### Bug fixes
+
+* **Do not error when using metaparameters in YAML plans**
+  ([#2777](https://github.com/puppetlabs/bolt/issues/2777))
+
+  Bolt no longer errors for YAML plans that include a plan or task step
+  that includes an additional option (e.g. `_catch_errors`) under the
+  `parameters` key.
+
+* **Output correct inventory source with `inventory show`**
+  ([#2766](https://github.com/puppetlabs/bolt/pull/2766))
+
+  The `bolt inventory show` and `Get-BoltInventory` commands now output
+  the correct source of inventory when using the `BOLT_INVENTORY`
+  environment variable. Previously, Bolt would output the path to the
+  default inventory file.
+
 ## Bolt 3.6.1 (2021-04-07)
 
 ### Bug fixes

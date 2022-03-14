@@ -16,7 +16,10 @@
         }
       },
       "additionalProperties": false
+    },
+    "versioned_project": {
+      "type": "string"
     }
   },
-  "required": ["puppet_connect_data"]
+  "required": ["puppet_connect_data", "versioned_project"]
 }

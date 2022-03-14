@@ -16,6 +16,18 @@ module Bolt
             _default: false,
             _example: true
           },
+          "batch-mode" => {
+            type: [TrueClass, FalseClass],
+            description: "Whether to disable password querying. When set to `false`, SSH will fall back to "\
+                         "prompting for a password if key authentication fails. This might cause Bolt to hang. "\
+                         "To prevent Bolt from hanging, you can configure `ssh-command` to use an SSH utility "\
+                         "such as sshpass that supports providing a password non-interactively. For more "\
+                         "information, see [Providing a password non-interactively using "\
+                         "`native-ssh`](troubleshooting.md#providing-a-password-non-interactively-using-native-ssh).",
+            _plugin: true,
+            _default: true,
+            _example: false
+          },
           "bundled-ruby" => {
             description: "Whether to use the Ruby bundled with Bolt packages for local targets.",
             type: [TrueClass, FalseClass],
@@ -143,14 +155,15 @@ module Bolt
                          "`task.py`) and the extension is case sensitive. When a target's name is `localhost`, "\
                          "Ruby tasks run with the Bolt Ruby interpreter by default.",
             additionalProperties: {
-              type: String,
+              type: [String, Array],
               _plugin: false
             },
             propertyNames: {
               pattern: "^.?[a-zA-Z0-9]+$"
             },
             _plugin: true,
-            _example: { "rb" => "/usr/bin/ruby" }
+            _example: { "rb" => ["/usr/bin/ruby", "-r", "puppet"],
+                        ".py" => "/usr/bin/python3" }
           },
           "job-poll-interval" => {
             type: Integer,
@@ -235,7 +248,8 @@ module Bolt
           "private-key" => {
             type: [Hash, String],
             description: "Either the path to the private key file to use for authentication, or "\
-                         "a hash with the key `key-data` and the contents of the private key.",
+            "a hash with the key `key-data` and the contents of the private key. Note that "\
+            "the key cannot be encrypted if using the `key-data` hash.",
             required: ["key-data"],
             properties: {
               "key-data" => {

@@ -17,6 +17,7 @@ module Bolt
                        remote supports_noop].freeze
 
     attr_reader :name, :files, :metadata, :remote
+    attr_accessor :mtime
 
     # name [String] name of the task
     # files [Array<Hash>] where each entry includes `name` and `path`
@@ -75,6 +76,12 @@ module Bolt
     # to be fetched or computed.
     def file_path(file_name)
       file_map[file_name]['path']
+    end
+
+    def add_mtimes
+      @files.each do |f|
+        f['mtime'] = File.mtime(f['path']) if File.exist?(f['path'])
+      end
     end
 
     def implementations

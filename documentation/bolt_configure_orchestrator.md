@@ -12,4 +12,4 @@ For more information on tasks and plans in PE, see [Orchestrating tasks and plan
 
 For information on connecting Bolt to PE using the `bolt-shim` module, see
 [Connecting Bolt to
-PE](https://github.com/puppetlabs/puppetlabs-bolt_shim/blob/master/docs/connect_bolt_pe.md).
+PE](https://github.com/puppetlabs/puppetlabs-bolt_shim/blob/main/docs/connect_bolt_pe.md).

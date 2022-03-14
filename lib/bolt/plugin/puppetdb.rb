@@ -27,7 +27,13 @@ module Bolt
       end
 
       def hooks
-        [:resolve_reference]
+        hook_descriptions.keys
+      end
+
+      def hook_descriptions
+        {
+          resolve_reference: 'Query PuppetDB for a group of targets.'
+        }
       end
 
       def warn_missing_fact(certname, fact)

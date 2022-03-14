@@ -112,17 +112,13 @@ Puppet::Functions.create_function(:download_file, Puppet::Functions::InternalFun
       call_function('debug', "Simulating file download of '#{source}' - no targets given - no action taken")
       Bolt::ResultSet.new([])
     else
-      r = if executor.in_parallel
-            require 'concurrent'
-            require 'fiber'
-            future = Concurrent::Future.execute do
-              executor.download_file(targets, source, destination, options, Puppet::Pops::PuppetStack.top_of_stack)
+      file_line = Puppet::Pops::PuppetStack.top_of_stack
+      r = if executor.in_parallel?
+            executor.run_in_thread do
+              executor.download_file(targets, source, destination, options, file_line)
             end
-
-            Fiber.yield('unfinished') while future.incomplete?
-            future.value || future.reason
           else
-            executor.download_file(targets, source, destination, options, Puppet::Pops::PuppetStack.top_of_stack)
+            executor.download_file(targets, source, destination, options, file_line)
           end
 
       if !r.ok && !options[:catch_errors]

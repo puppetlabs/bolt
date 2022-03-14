@@ -9,6 +9,7 @@ Puppet::Functions.create_function(:write_file) do
   # @param content File content to write.
   # @param destination An absolute path on the target(s).
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param options A hash of additional options.
   # @option options [Boolean] _catch_errors Whether to catch raised errors.
   # @option options [String] _run_as User to run as using privilege escalation.
   # @return A list of results, one entry per target.

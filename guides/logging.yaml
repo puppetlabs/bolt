@@ -1,0 +1,17 @@
+---
+topic: logging
+guide: |
+    Bolt prints messages both to the console and to log files. Messages can
+    either come from Bolt's 'outputter', which logs user-facing messages like
+    progress and results, or from the 'logger', which logs warnings, errors, and
+    log-structured output to log files. Both of these message streams are
+    configurable.
+
+    By default, Bolt logs to the console at 'warn' level and writes a log file to
+    '<project>/bolt-debug.log' at 'debug' level. Unless you are running a plan,
+    Bolt runs in verbose mode by default.
+
+    To learn more about projects, see the 'project' guide.
+
+documentation:
+  - https://pup.pt/bolt-logging

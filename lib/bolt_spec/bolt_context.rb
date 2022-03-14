@@ -39,12 +39,14 @@ require 'bolt/plugin'
 #
 # Stubs:
 # - allow_command(cmd), expect_command(cmd): expect the exact command
-# - allow_script(script), expect_script(script): expect the script as <module>/path/to/file
+# - allow_script(script), expect_script(script): expect the script as <module>/path/to/file or an absolute path
 # - allow_task(task), expect_task(task): expect the named task
 # - allow_download(file), expect_download(file): expect the identified source file
-# - allow_upload(file), expect_upload(file): expect the identified source file
+# - allow_upload(file), expect_upload(file): expect the source file as <module>/path/to/file or an absolute path
 # - allow_out_message, expect_out_message: expect a message to be passed to out::message (only modifiers are
 #   be_called_times(n), with_params(params), and not_be_called)
+#
+# Files with absolute path (for upload and script) must exist or those functions will fail.
 #
 # Stub modifiers:
 # - be_called_times(n): if allowed, fail if the action is called more than 'n' times
@@ -154,7 +156,7 @@ module BoltSpec
     end
 
     def plugins
-      @plugins ||= Bolt::Plugin.setup(config, pal)
+      @plugins ||= Bolt::Plugin.new(config, pal)
     end
 
     def pal
@@ -191,6 +193,15 @@ module BoltSpec
       allow_out_message.expect_call
     end
 
+    def allow_out_verbose
+      executor.stub_out_verbose.add_stub
+    end
+    alias allow_any_out_verbose allow_out_verbose
+
+    def expect_out_verbose
+      allow_out_verbose.expect_call
+    end
+
     # Example helpers to mock other run functions
     # The with_targets method makes sense for all stubs
     # with_params could be reused for options
@@ -202,8 +213,8 @@ module BoltSpec
     # def allow_script(script_name)
     #
     # file uploads and downloads have a single destination and no arguments
-    # def allow_file_upload(source_name)
-    # def allow_file_download(source_name)
+    # def allow_upload(source_name)
+    # def allow_download(source_name)
     #
     # Most of the information in commands is in the command string itself
     # we may need more flexible allows than just the name/command string

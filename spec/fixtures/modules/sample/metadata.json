@@ -1,0 +1,27 @@
+{
+  "name": "bolt-sample",
+  "author": "bolt",
+  "license": "Apache-2.0",
+  "source": "https://github.com/puppetlabs/bolt",
+  "version": "1.0.0",
+  "summary": "A sample module",
+  "dependencies": [
+    {
+      "name": "puppetlabs/stdlib",
+      "version_requirement": ">= 4.0.0 < 8.0.0"
+    }
+  ],
+  "operatingsystem_support": [
+    {
+      "operatingsystem": "RedHat",
+      "operatingsystemrelease": [
+        "5",
+        "6",
+        "7"
+      ]
+    },
+    {
+      "operatingsystem": "CentOS"
+    }
+  ]
+}

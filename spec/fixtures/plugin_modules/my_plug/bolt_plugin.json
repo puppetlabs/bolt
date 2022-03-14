@@ -1,1 +1,1 @@
-{ "hooks": {"createkeys": { "task": "my_plug::resolve_reference" } } }
+{ "hooks": {"secret_createkeys": { "task": "my_plug::resolve_reference" } } }

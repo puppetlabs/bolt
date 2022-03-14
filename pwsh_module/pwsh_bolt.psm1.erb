@@ -90,3 +90,20 @@ end
 
 }
 <% end %>
+
+<% unless ENV['BOLT_DISABLE_PWSH_WARNING'] -%>
+function Write-DeprecationWarning
+{
+  $FirstRunFile = "$HOME/.puppetlabs/etc/bolt/.first_runs_free"
+
+  if (-not(Test-Path -Path $FirstRunFile)) {
+    New-Item -ItemType File -Path $FirstRunFile -Force -ErrorAction SilentlyContinue
+
+    $Warning =  "The PuppetBolt PowerShell module will no longer ship with Bolt packages in a future release. ";
+    $Warning += "Install the PuppetBolt PowerShell module from PowerShell Gallery instead using 'Import-Module PuppetBolt'."
+    Write-Warning $Warning
+  }
+}
+
+Write-DeprecationWarning
+<% end -%>

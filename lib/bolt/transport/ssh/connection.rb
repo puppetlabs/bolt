@@ -2,9 +2,9 @@
 
 require 'logging'
 require 'shellwords'
-require 'bolt/node/errors'
-require 'bolt/node/output'
-require 'bolt/util'
+require_relative '../../../bolt/node/errors'
+require_relative '../../../bolt/node/output'
+require_relative '../../../bolt/util'
 
 module Bolt
   module Transport
@@ -38,8 +38,6 @@ module Bolt
             end
           end
         end
-
-        PAGEANT_NAME = "Pageant\0".encode(Encoding::UTF_16LE)
 
         def connect
           options = {
@@ -115,10 +113,9 @@ module Bolt
                 options[:use_agent] = false
               end
             elsif Bolt::Util.windows?
-              require 'Win32API' # case matters in this require!
-              # https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-findwindoww
-              @find_window ||= Win32API.new('user32', 'FindWindowW', %w[P P], 'L')
-              if @find_window.call(nil, PAGEANT_NAME).to_i == 0
+              pageant = Net::SSH::Authentication::Pageant::Win.FindWindow("Pageant", "Pageant")
+              # If pageant is not running
+              if pageant.to_i == 0
                 @logger.debug { "Disabling use_agent in net-ssh: pageant process not running" }
                 options[:use_agent] = false
               end

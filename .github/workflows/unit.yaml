@@ -1,0 +1,42 @@
+name: Unit tests
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+
+  unit:
+    name: Unit
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+      - name: Update gems
+        run: bundle update
+      - name: Cache modules
+        id: modules
+        uses: actions/cache@v1
+        with:
+          path: modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
+      - name: Install modules
+        if: steps.modules.outputs.cache-hit != 'true'
+        run: bundle exec r10k puppetfile install
+      - name: Unit tests
+        run: bundle exec rake tests:unit

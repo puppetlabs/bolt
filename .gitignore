@@ -38,6 +38,7 @@ Gemfile.local
 .rerun.json
 .plugin_cache.json
 .plan_cache.json
+.task_cache.json
 Boltdir/
 bolt.yaml
 project.yaml
@@ -62,6 +63,7 @@ documentation/bolt_defaults_reference.md
 documentation/bolt_pwsh_reference.md
 documentation/bolt_project_reference.md
 documentation/bolt_transports_reference.md
+documentation/bolt_types_reference.md
 documentation/packaged_modules.md
 tasks/
 plans/

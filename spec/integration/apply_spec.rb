@@ -13,7 +13,7 @@ TEST_VERSIONS = [
   [7, 'puppet']
 ].freeze
 
-describe 'apply', expensive: true do
+describe 'apply', apply: true do
   include BoltSpec::Conn
   include BoltSpec::Files
   include BoltSpec::Integration
@@ -23,8 +23,9 @@ describe 'apply', expensive: true do
 
   let(:apply_settings) { {} }
   let(:project)        { @project }
+  let(:project_config) { base_config }
 
-  let(:project_config) do
+  let(:base_config) do
     {
       'apply-settings' => apply_settings,
       'hiera-config'   => fixtures_path('hiera', 'empty.yaml'),
@@ -59,6 +60,14 @@ describe 'apply', expensive: true do
         expect(result['status']).to eq('success')
         expect(result.dig('value', 'report', 'resource_statuses')).to include(/Notify\[Hello .*\]/)
       end
+    end
+
+    it 'warns about exported resources with an ID' do
+      allow(Bolt::Logger).to receive(:warn)
+      expect(Bolt::Logger).to receive(:warn).with('exported_resources', /the export is ignored/).at_least(:once)
+      expect(Bolt::Logger).to receive(:warn).with('exported_resources',
+                                                  /the collection will be ignored/).at_least(:once)
+      run_cli_json(%W[plan run basic::exported_resources -t #{targets}], project: project)
     end
   end
 
@@ -138,6 +147,20 @@ describe 'apply', expensive: true do
                                 project: project)
 
           expect(result.first).to include('status' => 'success')
+        end
+
+        context 'in a project with a name different than the directory' do
+          let(:project_config) { base_config.merge('name' => 'example') }
+
+          it 'can reference project files with Puppet file syntax' do
+            FileUtils.mkdir_p(project.path + 'files')
+            FileUtils.touch(project.path + 'files' + 'testfile')
+
+            result = run_cli_json(%W[plan run basic::project_files -t nix_agents project_name=#{project.name}],
+                                  project: project)
+
+            expect(result.first).to include('status' => 'success')
+          end
         end
 
         context 'with show_diff configured' do
@@ -316,6 +339,27 @@ describe 'apply', expensive: true do
         uninstall(uri, inventory: inventory)
       end
 
+      context 'with _run_as passed to apply_prep' do
+        let(:config) do
+          {
+            'ssh' => {
+              'host-key-check' => false,
+              'password' => password
+            }
+          }
+        end
+
+        it 'installs puppet' do
+          result = run_cli_json(%W[plan run prep::run_as -t #{uri}], project: project)
+
+          expect(result).not_to include('kind')
+          expect(result.count).to eq(1)
+          expect(result[0]['status']).to eq('success')
+          report = result[0]['value']['report']
+          expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
+        end
+      end
+
       it 'installs puppet' do
         result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
 
@@ -326,55 +370,18 @@ describe 'apply', expensive: true do
         expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
       end
 
-      it 'succeeds when run twice' do
-        result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
-        expect(result).not_to include('kind')
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
-        report = result[0]['value']['report']
-        expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
+      it 'returns both failing and successful results' do
+        result = run_cli_json(%W[apply -e notice('hello') -t #{uri},foobar], project: project)
 
-        # Includes agent facts from apply_prep
-        agent_facts = report['resource_statuses']['Notify[agent facts]']['events'][0]['desired_value'].split("\n")
-        expect(agent_facts[0]).to match(/^\w+/)
-        expect(agent_facts[1]).to eq(agent_facts[0])
-        expect(agent_facts[2]).to match(/^\d+\.\d+\.\d+$/)
-        expect(agent_facts[3]).to eq(agent_facts[2])
-        expect(agent_facts[4]).to eq('false')
-
-        result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
-        expect(result.count).to eq(1)
-        expect(result[0]['status']).to eq('success')
-        report = result[0]['value']['report']
-        expect(report['resource_statuses']).to include("Notify[Hello #{conn_uri('ssh')}]")
-      end
-
-      context 'with plugin configured' do
-        let(:inventory) do
-          {
-            'targets' => [
-              {
-                'uri' => uri,
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'puppet_agent'
-                  }
-                }
-              }
-            ],
-            'config' => config
-          }
-        end
-
-        it 'installs puppet' do
-          result = run_cli_json(%W[plan run prep -t #{uri}], project: project)
-
-          expect(result).not_to include('kind')
-          expect(result.count).to eq(1)
-          expect(result[0]['status']).to eq('success')
-          report = result[0]['value']['report']
-          expect(report['resource_statuses']).to include("Notify[Hello #{uri}]")
-        end
+        expect(result.size).to eq(2)
+        expect(result[0]).to include(
+          'target' => 'foobar',
+          'status' => 'failure'
+        )
+        expect(result[1]).to include(
+          'target' => uri,
+          'status' => 'success'
+        )
       end
 
       context 'with task plugin configured' do
@@ -415,72 +422,10 @@ describe 'apply', expensive: true do
           expect(result[0]['value']['version']).to match(/^7\.0/)
         end
       end
-
-      context 'with bad plugin configuration' do
-        let(:inventory) do
-          {
-            'targets' => [
-              {
-                'uri' => uri,
-                'name' => 'error',
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'task',
-                    'task' => 'prep::error'
-                  }
-                }
-              },
-              {
-                'uri' => uri,
-                'name' => 'badparams',
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'task',
-                    'task' => 'puppet_agent::install',
-                    'parameters' => {
-                      'collection' => 'The act or process of collecting.'
-                    }
-                  }
-                }
-              },
-              {
-                'uri' => uri,
-                'name' => 'badplugin',
-                'plugin_hooks' => {
-                  'puppet_library' => {
-                    'plugin' => 'what plugin?'
-                  }
-                }
-              }
-            ],
-            'config' => config
-          }
-        end
-
-        it 'errors appropriately for each target' do
-          result = run_cli_json(%w[plan run prep -t all], project: project)
-
-          expect(result['kind']).to eq('bolt/run-failure')
-          expect(result['msg']).to eq("Plan aborted: apply_prep failed on 3 targets")
-
-          result_set = result['details']['result_set']
-          task_error = result_set.select { |h| h['target'] == 'error' }[0]['value']['_error']
-          expect(task_error['kind']).to eq('puppetlabs.tasks/task-error')
-          expect(task_error['msg']).to include("The task failed with exit code 1")
-
-          param_error = result_set.select { |h| h['target'] == 'badparams' }[0]['value']['_error']
-          expect(param_error['kind']).to eq('bolt/plugin-error')
-          expect(param_error['msg']).to include("Invalid parameters for Task puppet_agent::install")
-
-          plugin_error = result_set.select { |h| h['target'] == 'badplugin' }[0]['value']['_error']
-          expect(plugin_error['kind']).to eq('bolt/unknown-plugin')
-          expect(plugin_error['msg']).to include("Unknown plugin: 'what plugin?'")
-        end
-      end
     end
   end
 
-  describe 'over winrm on Windows with Puppet Agents', windows_agents: true do
+  describe 'over winrm on Windows with Puppet Agents', winrm: true do
     around(:each) do |example|
       with_project(config: project_config, inventory: conn_inventory) do |project|
         @project = project

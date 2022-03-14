@@ -4,12 +4,12 @@ require 'spec_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/plans'
 
-# Requires targets, plan_name, return_expects to be set.
+# Requires targets, plan_name, plan_params, return_expects to be set.
 # Requires expect_action to be defined.
 shared_examples 'action tests' do
   it 'runs' do
     expect_action
-    result = run_plan(plan_name, 'nodes' => targets)
+    result = run_plan(plan_name, plan_params.merge('nodes' => targets))
     expect(result).to be_ok
     expect(result.value.class).to eq(Bolt::ResultSet)
   end
@@ -18,7 +18,7 @@ shared_examples 'action tests' do
     expect_action.return do |targets:, **kwargs|
       Bolt::ResultSet.new(targets.map { |targ| Bolt::Result.new(targ, value: kwargs) })
     end
-    result = run_plan(plan_name, 'nodes' => targets)
+    result = run_plan(plan_name, plan_params.merge('nodes' => targets))
     expect(result).to be_ok
     expect(result.value.class).to eq(Bolt::ResultSet)
     results = result.value.result_hash
@@ -29,18 +29,22 @@ shared_examples 'action tests' do
 
   it 'errors' do
     expect_action.error_with('msg' => 'failed', 'kind' => 'min')
-    result = run_plan(plan_name, 'nodes' => targets)
+    result = run_plan(plan_name, plan_params.merge('nodes' => targets))
     expect(result).not_to be_ok
   end
 
   it 'fails when not stubbed' do
-    expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /Unexpected call to/)
+    expect {
+      run_plan(plan_name, plan_params.merge('nodes' => targets))
+    }.to raise_error(RuntimeError, /Unexpected call to/)
   end
 
   it 'prints expected parameters when erroring' do
     params = Regexp.escape(expect_action.parameters.to_s)
     expect_action.not_be_called
-    expect { run_plan(plan_name, 'nodes' => targets) }.to raise_error(RuntimeError, /#{params}/)
+    expect {
+      run_plan(plan_name, plan_params.merge('nodes' => targets))
+    }.to raise_error(RuntimeError, /#{params}/)
   end
 end
 
@@ -53,6 +57,7 @@ describe "BoltSpec::Plans" do
   end
 
   let(:targets) { %w[foo bar] }
+  let(:plan_params) { {} }
 
   it 'prints notice' do
     result = run_plan('plans', {})
@@ -106,8 +111,14 @@ describe "BoltSpec::Plans" do
     let(:plan_name) { 'plans::script' }
     let(:return_expects) { { script: 'plans/script', params: { 'arguments' => ['arg'] } } }
 
-    before(:each) do
-      allow_script('plans/dir/prep').with_targets(targets)
+    let(:plan_params) { { 'source' => @source } }
+
+    around(:each) do |example|
+      with_tempfile_containing('prep', '') do |file|
+        @source = file.path
+        allow_script(@source).with_targets(targets)
+        example.run
+      end
     end
 
     def expect_action
@@ -190,9 +201,14 @@ describe "BoltSpec::Plans" do
   context 'with uploads' do
     let(:plan_name) { 'plans::upload' }
     let(:return_expects) { { source: 'plans/script', destination: '/d', params: {} } }
+    let(:plan_params) { { 'source' => @source } }
 
-    before(:each) do
-      allow_upload('plans/dir/prep').with_targets(targets)
+    around(:each) do |example|
+      with_tempfile_containing('prep', '') do |file|
+        @source = file.path
+        allow_upload(@source).with_targets(targets)
+        example.run
+      end
     end
 
     def expect_action
@@ -312,6 +328,59 @@ describe "BoltSpec::Plans" do
       expect_out_message.with_params(other_message)
       expect { run_plan(plan_name, 'messages' => [message]) }
         .to raise_error(RuntimeError, /Expected out::message to be called 1 times with parameters #{other_message}/)
+    end
+  end
+
+  context 'with out::verbose' do
+    let(:plan_name) { 'plans::out_verbose' }
+    let(:message) { 'foo' }
+    let(:other_message) { 'bar' }
+
+    it 'allows with params' do
+      allow_out_verbose.with_params(message)
+      result = run_plan(plan_name, 'messages' => [message])
+      expect(result).to be_ok
+    end
+
+    it 'allows any out message' do
+      allow_any_out_verbose
+      result = run_plan(plan_name, 'messages' => [message])
+      expect(result).to be_ok
+    end
+
+    it 'errors when not allowed' do
+      expect { run_plan(plan_name, 'messages' => [message]) }.to raise_error(RuntimeError, /Unexpected call to/)
+    end
+
+    it 'expects with params' do
+      expect_out_verbose.with_params(message)
+      result = run_plan(plan_name, 'messages' => [message])
+      expect(result).to be_ok
+    end
+
+    it 'expects multiple times with params' do
+      expect_out_verbose.be_called_times(2).with_params(message)
+      result = run_plan(plan_name, 'messages' => [message, message])
+      expect(result).to be_ok
+    end
+
+    it 'expects with different params' do
+      expect_out_verbose.with_params(message)
+      expect_out_verbose.with_params(other_message)
+      result = run_plan(plan_name, 'messages' => [message, other_message])
+      expect(result).to be_ok
+    end
+
+    it 'errors when not expected' do
+      expect_out_verbose.not_be_called
+      expect { run_plan(plan_name, 'messages' => [message]) }
+        .to raise_error(RuntimeError, /Expected out::verbose to be called 0 times/)
+    end
+
+    it 'errors with wrong params' do
+      expect_out_verbose.with_params(other_message)
+      expect { run_plan(plan_name, 'messages' => [message]) }
+        .to raise_error(RuntimeError, /Expected out::verbose to be called 1 times with parameters #{other_message}/)
     end
   end
 

@@ -40,6 +40,19 @@ You can resolve this by [configuring an alternate tmpdir](bolt_transports_refere
 transport you're using, or by talking to your administrator about updating permissions for the
 directory.
 
+## My `plan/task show` output is not correct
+
+Bolt caches task and plan metadata when listing plans and tasks, and only
+updates the cache when modules in the `<PROJECT DIRECTORY>/modules/` directory
+are modified. Try rerunning the command with `--clear-cache` to refresh the
+cache and update task and plan metadata.
+The task or plan may also be present at a higher precedence on the modulepath.
+To verify that the specific task or plan is being loaded from the place you
+expect, run `bolt task show [task name]`, `bolt plan show [plan name]`,
+`Get-BoltTask -Name <TASK NAME>`, or `Get-BoltPlan -Name <PLAN NAME>`to see
+the path the task or plan is loaded from.
+
+
 ## My task fails mysteriously
 
 Try running Bolt with `--log-level debug` to see the exact output from your task.
@@ -92,6 +105,42 @@ By default, Bolt tries to connect over the standard SSH port 22. If you need to
 connect over a different port, either include the port in the name of the target
 (`hostname.example.com:2345`) or set it in your Bolt config or inventory.
 
+### Providing a password non-interactively using `native-ssh`
+
+By default, the `native-ssh` transport enables `BatchMode` when establishing
+connections to targets. When `BatchMode` is enabled, SSH does not fall back to
+querying for a password, which might make it impossible to connect to a target
+if you are unable to authenticate using keys.
+
+You can disable `BatchMode` in your transport configuration using the
+`batch-mode` setting, which allows SSH to fall back to querying for a password
+when key authentication fails. However, `native-ssh` uses the `ssh` client by
+default, which prompts for passwords interactively and causes Bolt to hang. 
+
+To avoid hanging when `BatchMode` is disabled, you must configure `ssh-command`
+to use an SSH utility like `sshpass` to provide a password to the SSH client
+non-interactively. Additionally, ensure the `user` is configured and
+`host-key-check` is disabled.
+
+The following configuration shows how to disable `BatchMode` and provide a
+password to the SSH client using sshpass and the `prompt` plugin.
+
+```yaml
+# inventory.yaml
+config:
+  ssh:
+    native-ssh: true
+    host-key-check: false
+    batch-mode: false
+    user: root
+    ssh-command:
+      - sshpass
+      - -p
+      - _plugin: prompt
+        message: Enter your SSH password
+      - ssh
+```
+
 ## Bolt can't connect to my Windows hosts
 
 ### Timeout or connection refused
@@ -128,23 +177,30 @@ the following ways:
 
 ## Puppet log functions are not logging to the console
 
-The default log level for the console is `warn`. If you use a `notice` function
-in a plan, Bolt does not print it to the console. When you have messages
-you want to be printed to the console regardless of log level you should use the
-`out::message` plan function. The
-[`out::message`](plan_functions.md#outmessage) function is not
-available for use in an apply block and only accepts string values.
+Puppet logs might not be printing to the console because they are logged at a
+lower level than Bolt is configured to print at. By default, Bolt prints all
+logs at the `warn` level or higher to the console.
 
-If you need to send a message that is not a string value or is in an apply
-block, you can use the `warning` Puppet log function. 
+Additionally, Puppet logs are printed at a different level in Bolt than they
+would be in Puppet. For example, Puppet `notice` level logs are equivalent to
+the `info` level in Bolt. As a result, if you use the `notice()` Puppet log
+function, Bolt does not print the contents of `notice` to the console by
+default. You can see which Bolt log level each Puppet log level maps to in
+[Puppet log functions in Bolt](writing_plans.md#puppet-log-functions-in-bolt).
 
-If you only wish to see the output in the console when executing your plan with
-the `--log-level debug` command-line option, use the `notice` Puppet log
-function. The `notice` function sets the console log level to `debug` for that
-run.
+To print logs and messages in Bolt to the console you can do one or more of the
+following:
 
-For more information, see the docs for configuring [Bolt's log
-level](https://puppet.com/docs/bolt/latest/bolt_configuration_options.html#log-file-configuration-options).
+- When you want to view all logs at a specific level on the console, [set the
+  log level](logs.md#setting-log-level) from the command line or in your
+  configuration file.
+
+- When you have messages you want to log directly from Bolt, use Bolt's [log
+  plan functions](writing_plans.md#log-functions).
+
+- When you have messages you want printed to the console regardless of log
+  level, you should use the [`out::message` plan
+  function](plan_functions.md#outmessage).
 
 ## 'Extensions are not built' error message
 If you see a `gem` related error similar to the following: 
@@ -178,12 +234,6 @@ SSL_connect returned=1 errno=0 state=error: certificate verify failed (unable to
 
 Set the `SSL_CERT_DIR` and `SSL_CERT_FILE` environment variables to use a valid
 certificate and certificate directory.
-
-## I still need help
-
-Visit the **#bolt** channel in the [Puppet Community
-Slack](https://slack.puppet.com) to find a whole community of people waiting
-to help!
 
 ## PowerShell does not recognize Bolt cmdlets
 
@@ -251,3 +301,84 @@ To change your script execution policy:
     documentation about [execution
     policies](http://go.microsoft.com/fwlink/?LinkID=135170) and [how to set
     them](https://msdn.microsoft.com/en-us/powershell/reference/5.1/microsoft.powershell.security/set-executionpolicy).
+
+## 'Could not parse PKey: no start line' error message when using SSH private key
+
+Bolt does not support encrypted SSH private keys if the keys are provided using the
+`key-data` field in your transport configuration. If providing a decrypted key is feasible
+for your use case and security practices, you can manually decrypt the key by running
+`openssl rsa -in <KEY FILE>` and providing your passphrase. Alternatively, you can
+add the key to your SSH agent and *not* specify a `private-key` for Bolt to use. Bolt
+will use the agent to authenticate your connection.
+
+## Running commands with the Docker transport does not use environment variables
+
+When Bolt runs a command using the Docker transport, it shells out to the
+`docker exec` command and sets environment variables using the `--env`
+command-line option to set environment variables. When you run a command
+using the Docker transport, and the command includes environment variable
+interpolations, the environment variables are not interpolated as expected.
+
+For example, the following command:
+
+```shell
+bolt command run 'echo \"\$PHRASE\"' --env-var PHRASE=hello --targets docker://example
+```
+
+Results in output similar to:
+
+```shell
+Started on docker://example...
+Finished on docker://example:
+  $PHRASE
+Successful on 1 target: docker://example
+Ran on 1 target in 0.59 sec
+```
+
+To run commands that interpolate environment variables using the Docker
+transport, update the command to execute a new shell process and then read
+the command from a string. For example, you can update the command to:
+
+```shell
+bolt command run "/bin/sh -c 'echo \"\$PHRASE\"'" --env-var PHRASE=hello --targets docker://example
+```
+
+This results in the expected output:
+
+```shell
+Started on docker://example...
+Finished on docker://example:
+  hello
+Successful on 1 target: docker://example
+Ran on 1 target in 0.59 sec
+```
+
+You can configure the Docker transport to always execute a new shell process
+when running commands by setting the `docker.shell-command` configuration option
+in your inventory file or `bolt-defaults.yaml` file:
+
+```yaml
+# inventory.yaml
+config:
+  docker:
+    shell-command: /bin/sh -c
+```
+
+```yaml
+# bolt-defaults.yaml
+inventory-config:
+  docker:
+    shell-command: /bin/sh -c
+```
+
+## I can't access sensitive output from a task using the `pcp` transport
+
+Sensitive output is not supported when running tasks using the `pcp` transport.
+For more information, see the [`bolt_shim`
+documentation](https://github.com/puppetlabs/puppetlabs-bolt_shim/blob/main/docs/sensitive_task_output.md).
+
+## I still need help
+
+Visit the **#bolt** channel in the [Puppet Community
+Slack](https://slack.puppet.com) to find a whole community of people waiting
+to help!

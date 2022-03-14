@@ -6,16 +6,33 @@ require 'fileutils'
 namespace :pwsh do
   desc "Generate the PowerShell module structure and supporting files"
   task generate_module: :generate_powershell_cmdlets do
-    # Move 'guides' to 'en-US' directory in module, renaming the text files
-    # so they are recognized by the PowerShell help system
-    source = File.expand_path(File.join(__dir__, '..', 'guides'))
-    dest   = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'PuppetBolt', 'en-US'))
-
+    dest = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'PuppetBolt', 'en-US'))
     FileUtils.mkdir_p(dest) unless File.exist?(dest)
 
-    Dir.glob('*.txt', base: source).each do |file|
-      topic = File.basename(file, '.txt')
-      FileUtils.cp(File.join(source, file), File.join(dest, "about_bolt_#{topic}.help.txt"))
+    begin
+      source = File.expand_path(File.join(__dir__, '..', 'guides'))
+      files  = Dir.children(source).sort.map { |f| File.join(source, f) }
+      files.each_with_object({}) do |file, _guides|
+        next if file !~ /\.(yaml|yml)\z/
+        info = Bolt::Util.read_yaml_hash(file, 'guide')
+
+        # Make sure both topic and guide keys are defined
+        unless (%w[topic guide] - info.keys).empty?
+          raise "Guide file #{file} must have a 'topic' key and 'guide' key, but has #{info.keys} keys."
+        end
+
+        txt = +"#{info['topic']}\n"
+        txt << info['guide'].gsub(/^/, '  ')
+
+        if info['documentation']
+          txt << "\nDocumentation\n"
+          txt << info['documentation'].join("\n").gsub(/^/, '  ')
+        end
+
+        File.write(File.join(dest, "about_bolt_#{info['topic']}.help.txt"), txt)
+      end
+    rescue SystemCallError => e
+      raise Bolt::FileError.new("#{e.message}: unable to load guides directory", source)
     end
 
     # pwsh_module.psm1 ==> PuppetBolt.psm1
@@ -47,6 +64,7 @@ namespace :pwsh do
       'download'   => 'Receive',
       'init'       => 'New',
       'install'    => 'Install',
+      'lookup'     => 'Invoke',
       'migrate'    => 'Update',
       'new'        => 'New',
       'run'        => 'Invoke',
@@ -86,10 +104,10 @@ namespace :pwsh do
       actions << nil if actions.empty?
       actions.each do |action|
         help_text = parser.get_help_text(subcommand, action)
-        matches = help_text[:banner].match(/USAGE(?<usage>.+?)DESCRIPTION(?<desc>.+?)(EXAMPLES|\z)/m)
+        matches = help_text[:banner].match(/Usage(?<usage>.+?)Description(?<desc>.+?)(Documentation|Examples|\z)/m)
         action.chomp unless action.nil?
 
-        if action.nil? && subcommand == 'apply'
+        if action.nil? && %w[apply lookup].include?(subcommand)
           cmdlet_verb = 'Invoke'
           cmdlet_noun = "Bolt#{subcommand.capitalize}"
         elsif @hardcoded_cmdlets["#{subcommand}:#{action}"]
@@ -160,14 +178,15 @@ namespace :pwsh do
             validate_not_null_or_empty: true
           }
           @pwsh_command[:options] << {
-            name:       'Arguments',
-            ruby_short: 'a',
-            help_msg:   'The arguments to the script',
-            type:       'string',
-            switch:     false,
-            mandatory:  false,
-            position:   1,
-            ruby_arg:   'bare'
+            name:                           'Arguments',
+            ruby_short:                     'a',
+            help_msg:                       'The arguments to the script',
+            type:                           'string[]',
+            switch:                         false,
+            mandatory:                      false,
+            position:                       1,
+            ruby_arg:                       'bare',
+            value_from_remaining_arguments: true
           }
         when 'task'
           # bolt task show|run <task> [parameters] [options]
@@ -261,7 +280,8 @@ namespace :pwsh do
         when 'module'
           # bolt module install
           # bolt module add [module]
-          if @pwsh_command[:verb] == 'Add'
+          case @pwsh_command[:verb]
+          when 'Add'
             @pwsh_command[:options] << {
               name:                       'Module',
               ruby_short:                 'md',
@@ -269,6 +289,62 @@ namespace :pwsh do
               mandatory:                  true,
               type:                       'string',
               switch:                     false,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          # bolt module show
+          when 'Get'
+            @pwsh_command[:options] << {
+              name:                       'Name',
+              ruby_short:                 'n',
+              help_msg:                   "The module to show",
+              type:                       'string',
+              switch:                     false,
+              mandatory:                  false,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          end
+        when 'lookup'
+          # bolt lookup <key> [options]
+          @pwsh_command[:options] << {
+            name:                       'Key',
+            ruby_short:                 'k',
+            parameter_set:              'key',
+            help_msg:                   'The key to look up',
+            type:                       'string',
+            switch:                     false,
+            mandatory:                  true,
+            position:                   0,
+            ruby_arg:                   'bare',
+            validate_not_null_or_empty: true
+          }
+        when 'policy'
+          case @pwsh_command[:verb]
+          # bolt policy apply <policy>
+          when 'Invoke'
+            @pwsh_command[:options] << {
+              name:                       'Name',
+              ruby_short:                 'n',
+              help_msg:                   "The policy or policies to apply",
+              type:                       'string',
+              switch:                     false,
+              mandatory:                  true,
+              position:                   0,
+              ruby_arg:                   'bare',
+              validate_not_null_or_empty: true
+            }
+          # bolt policy new <policy>
+          when 'New'
+            @pwsh_command[:options] << {
+              name:                       'Name',
+              ruby_short:                 'n',
+              help_msg:                   "The policy to create",
+              type:                       'string',
+              switch:                     false,
+              mandatory:                  true,
               position:                   0,
               ruby_arg:                   'bare',
               validate_not_null_or_empty: true
@@ -319,7 +395,7 @@ namespace :pwsh do
           when 'transport'
             pwsh_param[:validate_set] = Bolt::Config::Options::TRANSPORT_CONFIG.keys
           when 'loglevel'
-            pwsh_param[:validate_set] = %w[trace debug info notice warn error fatal any]
+            pwsh_param[:validate_set] = %w[trace debug info notice warn error fatal]
           when 'filter'
             pwsh_param[:validate_pattern] = '^[a-z0-9_:]+$'
           when 'rerun'

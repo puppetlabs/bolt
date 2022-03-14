@@ -46,7 +46,8 @@ describe "CLI parses input" do
         "nodes" => { "type" => "TargetSpec", "sensitive" => false },
         "array" => { "type" => "Optional[Array]", "default_value" => 'undef', "sensitive" => false },
         "hash" => { "type" => "Optional[Hash]", "default_value" => 'undef', "sensitive" => false }
-      }
+      },
+      "private" => false
     )
   end
 

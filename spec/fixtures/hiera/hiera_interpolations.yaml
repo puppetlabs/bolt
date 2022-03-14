@@ -5,8 +5,14 @@ defaults:
   data_hash: yaml_data
 
 hierarchy:
-  - name: "Interpolations"
+  - name: "Fact interpolations"
     path: "os/%{facts.os.name}.yaml"
+
+  - name: "Var interpolations"
+    path: "%{lookup}.yaml"
+
+  - name: "Trusted interpolations"
+    path: "nodes/%{trusted.certname}.yaml"
 
   - name: "Common"
     path: "common.yaml"

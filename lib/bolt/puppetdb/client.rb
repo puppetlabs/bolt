@@ -95,6 +95,60 @@ module Bolt
         make_query(query, path)
       end
 
+      # Sends a command to PuppetDB using version 1 of the commands API.
+      # https://puppet.com/docs/puppetdb/latest/api/command/v1/commands.html
+      #
+      # @param command [String] The command to invoke.
+      # @param version [Integer] The version of the command to invoke.
+      # @param payload [Hash] The payload to send with the command.
+      # @return A UUID identifying the submitted command.
+      #
+      def send_command(command, version, payload)
+        command = command.dup.force_encoding('utf-8')
+        body    = JSON.generate(payload)
+
+        # PDB requires the following query parameters to the POST request.
+        # Error early if there's no certname, as PDB does not return a
+        # message indicating it's required.
+        unless payload['certname']
+          raise Bolt::Error.new(
+            "Payload must include 'certname', unable to invoke command.",
+            'bolt/pdb-command'
+          )
+        end
+
+        url = uri.tap do |u|
+          u.path         = 'pdb/cmd/v1'
+          u.query_values = { 'command'  => command,
+                             'version'  => version,
+                             'certname' => payload['certname'] }
+        end
+
+        # Send the command to PDB
+        begin
+          @logger.debug("Sending PuppetDB command '#{command}' to #{url}")
+          response = http_client.post(url.to_s, body: body, header: headers)
+        rescue StandardError => e
+          raise Bolt::PuppetDBFailoverError, "Failed to invoke PuppetDB command: #{e}"
+        end
+
+        @logger.debug("Got response code #{response.code} from PuppetDB")
+        if response.code != 200
+          raise Bolt::PuppetDBError, "Failed to invoke PuppetDB command: #{response.body}"
+        end
+
+        # Return the UUID string from the response body
+        begin
+          JSON.parse(response.body).fetch('uuid', nil)
+        rescue JSON::ParserError
+          raise Bolt::PuppetDBError, "Unable to parse response as JSON: #{response.body}"
+        end
+      rescue Bolt::PuppetDBFailoverError => e
+        @logger.error("Request to puppetdb at #{@current_url} failed with #{e}.")
+        reject_url
+        send_command(command, version, payload)
+      end
+
       def http_client
         return @http if @http
         # lazy-load expensive gem code

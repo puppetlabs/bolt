@@ -1,10 +1,10 @@
 # frozen_string_literal: true
 
 require 'pathname'
-require 'bolt/config'
-require 'bolt/validator'
-require 'bolt/pal'
-require 'bolt/module'
+require_relative '../bolt/config'
+require_relative '../bolt/validator'
+require_relative '../bolt/pal'
+require_relative '../bolt/module'
 
 module Bolt
   class Project
@@ -14,7 +14,8 @@ module Bolt
     attr_reader :path, :data, :inventory_file, :hiera_config,
                 :puppetfile, :rerunfile, :type, :resource_types, :project_file,
                 :downloads, :plans_path, :modulepath, :managed_moduledir,
-                :backup_dir, :plugin_cache_file, :plan_cache_file
+                :backup_dir, :plugin_cache_file, :plan_cache_file, :task_cache_file,
+                :manifests
 
     def self.default_project
       create_project(File.expand_path(File.join('~', '.puppetlabs', 'bolt')), 'user')
@@ -114,7 +115,9 @@ module Bolt
       @backup_dir        = @path + '.bolt-bak'
       @plugin_cache_file = @path + '.plugin_cache.json'
       @plan_cache_file   = @path + '.plan_cache.json'
+      @task_cache_file   = @path + '.task_cache.json'
       @modulepath        = [(@path + 'modules').to_s]
+      @manifests         = @path + 'manifests'
 
       if (tc = Bolt::Config::INVENTORY_OPTIONS.keys & data.keys).any?
         Bolt::Logger.warn(
@@ -206,13 +209,6 @@ module Bolt
         message = "No project name is specified in bolt-project.yaml. Project-level content will not be available."
 
         Bolt::Logger.warn("missing_project_name", message)
-      end
-    end
-
-    def check_deprecated_file
-      if (@path + 'project.yaml').file?
-        msg = "Project configuration file 'project.yaml' is deprecated; use 'bolt-project.yaml' instead."
-        Bolt::Logger.warn("project_yaml", msg)
       end
     end
   end

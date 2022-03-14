@@ -1,0 +1,13 @@
+{
+  "description": "A successful task",
+  "implementations": [
+    {
+      "name": "success.sh",
+      "requirements": ["shell"]
+    },
+    {
+      "name": "success.ps1",
+      "requirements": ["powershell"]
+    }
+  ]
+}

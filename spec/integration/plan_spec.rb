@@ -68,20 +68,78 @@ describe 'plans' do
     end
 
     context "using the human outputter" do
-      let(:config_flags) {
-        ['--project', fixtures_path('configs', 'empty'),
-         '--modulepath', modulepath,
-         '--no-host-key-check']
-      }
+      around(:each) do |example|
+        with_project(config: { 'modulepath' => [modulepath] }) do |project|
+          @project = project
+          example.run
+        end
+      end
+
+      let(:config_flags) { ['--no-host-key-check'] }
+      let(:opts)         { { outputter: Bolt::Outputter::Human, project: @project } }
+      let(:project)      { @project }
+
+      context 'output' do
+        context 'out::message' do
+          it 'outputs messages' do
+            result = run_cli(%w[plan run output], outputter: Bolt::Outputter::Human, project: project)
+            expect(result).to match(/Outputting a message/)
+          end
+
+          it 'logs messages at the info level' do
+            run_cli(%w[plan run output], outputter: Bolt::Outputter::Human, project: project)
+            expect(@log_output.readlines).to include(/INFO.*Outputting a message/)
+          end
+        end
+
+        context 'out::verbose' do
+          it 'outputs verbose messages in verbose mode' do
+            result = run_cli(%w[plan run output::verbose --verbose], outputter: Bolt::Outputter::Human,
+                                                                     project: project)
+            expect(result).to match(/Hi, I'm Dave/)
+          end
+
+          it 'does not output verbose messages' do
+            result = run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human, project: project)
+            expect(result).not_to match(/Hi, I'm Dave/)
+          end
+
+          it 'logs verbose messages at the debug level' do
+            run_cli(%w[plan run output::verbose], outputter: Bolt::Outputter::Human, project: project)
+            expect(@log_output.readlines).to include(/DEBUG.*Hi, I'm Dave/)
+          end
+        end
+      end
 
       it "prints the spinner when running executor functions", ssh: true do
         expect_any_instance_of(Bolt::Outputter::Human).to receive(:start_spin).at_least(:once)
-        run_cli(%w[plan run sample::noop --targets #{target}] + config_flags, outputter: Bolt::Outputter::Human)
+        run_cli(%w[plan run sample::noop --targets #{target}] + config_flags, **opts)
       end
 
       it "doesn't print the spinner when running non-executor functions", ssh: true do
         expect_any_instance_of(Bolt::Outputter::Human).not_to receive(:start_spin)
-        run_cli(%w[plan run output] + config_flags, outputter: Bolt::Outputter::Human)
+        run_cli(%w[plan run output] + config_flags, **opts)
+      end
+
+      it 'prints formatted Puppet errors' do
+        output = run_cli(%w[plan run output::error] + config_flags, **opts)
+        expect(output).to match(Regexp.escape("Error({'msg' => 'Something went horribly, horribly wrong'})"))
+      end
+    end
+
+    context 'using the logger outputter' do
+      it 'logs messages' do
+        with_project do |project|
+          run_cli_json(%W[plan run logs -m #{modulepath}], project: project)
+          expect(@log_output.readlines).to include(
+            /TRACE.*This is a trace message/,
+            /DEBUG.*This is a debug message/,
+            /WARN.*This is a warn message/,
+            /INFO.*This is an info message/,
+            /ERROR.*This is an error message/,
+            /FATAL.*This is a fatal message/
+          )
+        end
       end
     end
 
@@ -127,7 +185,8 @@ describe 'plans' do
                 "sensitive" => false,
                 "type" => "TargetSpec"
               }
-            }
+            },
+            "private" => false
           }
         }
 

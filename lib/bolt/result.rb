@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'json'
-require 'bolt/error'
+require_relative '../bolt/error'
 
 module Bolt
   class Result
@@ -26,6 +26,11 @@ module Bolt
 
     def self.create_details(position)
       %w[file line].zip(position).to_h.compact
+    end
+
+    def self.for_lookup(target, key, value)
+      val = { 'value' => value }
+      new(target, value: val, action: 'lookup', object: key)
     end
 
     def self.for_command(target, value, action, command, position)

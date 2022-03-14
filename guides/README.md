@@ -7,7 +7,7 @@ information they are looking for.
 
 ## Adding new topic guides
 
-To add a new topic guide, create a text file with the name `<topic>.txt` in this
+To add a new topic guide, create a YAML file with the name `<topic>.yaml` in this
 directory. Topics should be a single word containing only lowercase letters. The
 format for a guide should follow the same format as existing guides.
 

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/config/options'
+require_relative '../../bolt/config/options'
 
 module Bolt
   class Inventory

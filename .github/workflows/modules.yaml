@@ -8,11 +8,7 @@ on:
     types: [opened, reopened, edited, synchronize]
     paths-ignore: ['**.md', '**.erb', 'schemas/*']
 
-env:
-  BOLT_SUDO_USER: true
-
 jobs:
-
   linux:
     name: Linux
     runs-on: ubuntu-latest

@@ -4,6 +4,7 @@ require 'spec_helper'
 require 'bolt_spec/bolt_server'
 require 'bolt_spec/conn'
 require 'bolt_spec/file_cache'
+require 'bolt_spec/files'
 require 'bolt_server/config'
 require 'bolt_server/transport_app'
 require 'json'
@@ -11,21 +12,23 @@ require 'rack/test'
 require 'puppet/environments'
 require 'digest'
 require 'pathname'
+require 'puppet/module_tool/tar'
 
 describe "BoltServer::TransportApp" do
   include BoltSpec::BoltServer
   include BoltSpec::Conn
   include BoltSpec::FileCache
+  include BoltSpec::Files
   include Rack::Test::Methods
 
-  let(:basedir) { File.join(__dir__, '..', 'fixtures', 'bolt_server') }
+  let(:basedir) { fixtures_path('bolt_server') }
   let(:environment_dir) { File.join(basedir, 'environments', 'production') }
   let(:project_dir) { File.join(basedir, 'projects') }
 
   def app
     # The moduledir and mock file cache are used in the tests for task
     # execution tests. Everything else uses the fixtures above.
-    moduledir = File.join(__dir__, '..', 'fixtures', 'modules')
+    moduledir = fixtures_path('modules')
     mock_file_cache(moduledir)
     config = BoltServer::Config.new({ 'projects-dir' => project_dir, 'environments-codedir' => basedir })
     BoltServer::TransportApp.new(config)
@@ -47,6 +50,23 @@ describe "BoltServer::TransportApp" do
       File.write(File.join(tmpdir, inventory_name), inventory_content.to_yaml) unless inventory_content.nil?
       yield tmpdir
     end
+  end
+
+  def unpack_tarball(base64_encoding, tmpdir)
+    plugins = File.join(tmpdir, "plugins.tar.gz")
+    File.binwrite(plugins, Base64.decode64(base64_encoding))
+    user = Etc.getpwuid.nil? ? Etc.getlogin : Etc.getpwuid.name
+    moduledir = File.join(tmpdir, "modules")
+    Puppet::ModuleTool::Tar.instance.unpack(plugins, moduledir, user)
+    moduledir
+  end
+
+  # Returns all files under dir relative to dir
+  def list_all_files(dir)
+    parent = Pathname.new(dir)
+    Find.find(dir)
+        .select { |file| File.file?(file) }
+        .map { |file| Pathname.new(file).relative_path_from(parent).to_s }
   end
 
   it 'responds ok' do
@@ -86,7 +106,7 @@ describe "BoltServer::TransportApp" do
       }
     end
     let(:action) { 'run_task' }
-    let(:result) { double(Bolt::Result, to_data: { status: 'test_status' }) }
+    let(:result) { double(Bolt::Result, to_data: { status: 'test_status' }, ok?: true) }
 
     before(:each) do
       allow_any_instance_of(BoltServer::TransportApp)
@@ -102,7 +122,8 @@ describe "BoltServer::TransportApp" do
           {
             'name' => 'bolt_server_test::simple_plan',
             'description' => 'Simple plan testing',
-            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } }
+            'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
+            'private' => false
           }
         }
         it '/plans/:module_name/:plan_name handles module::plan_name' do
@@ -118,7 +139,8 @@ describe "BoltServer::TransportApp" do
           {
             'name' => 'bolt_server_test',
             'description' => 'Init plan testing',
-            'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } }
+            'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } },
+            'private' => false
           }
         }
         it '/plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
@@ -127,11 +149,14 @@ describe "BoltServer::TransportApp" do
           expect(resp).to eq(expected_response)
         end
       end
-      context 'with non-existant plan' do
+      context 'with non-existent plan' do
         let(:path) { '/plans/foo/bar?environment=production' }
-        it 'returns 400 if an unknown plan error is thrown' do
+        it 'returns 404 if an unknown plan error is thrown' do
           get(path)
-          expect(last_response.status).to eq(400)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a plan named 'foo::bar'")
         end
       end
     end
@@ -147,11 +172,22 @@ describe "BoltServer::TransportApp" do
           end
         end
 
-        context 'with a non-existant environment' do
+        context 'with a non-existent environment' do
           let(:path) { "/plans?environment=not_an_env" }
           it 'returns 400 if an environment not found error is thrown' do
             get(path)
             expect(last_response.status).to eq(400)
+          end
+        end
+
+        context 'with a non existent environment' do
+          let(:path) { "/plans" }
+          it 'returns 400 if an environment query parameter not supplied' do
+            get(path)
+            expect(last_response.status).to eq(400)
+            resp = JSON.parse(last_response.body)
+            expect(resp['kind']).to eq('bolt-server/request-error')
+            expect(resp['msg']).to eq("'environment' is a required argument")
           end
         end
       end
@@ -163,7 +199,8 @@ describe "BoltServer::TransportApp" do
             'bolt_server_test' => {
               'name' => 'bolt_server_test',
               'description' => 'Init plan testing',
-              'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } }
+              'parameters' => { 'bar' => { 'sensitive' => false, 'type' => 'String' } },
+              'private' => false
             }
           }
         }
@@ -183,7 +220,8 @@ describe "BoltServer::TransportApp" do
             'name' => 'bolt_server_test_project::simple_plan',
             'description' => 'Simple plan testing',
             'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
-            'allowed' => false
+            'allowed' => false,
+            'private' => false
           }
         }
         it '/project_plans/:module_name/:plan_name handles module::plan_name' do
@@ -200,7 +238,8 @@ describe "BoltServer::TransportApp" do
             'name' => 'bolt_server_test_project',
             'description' => 'Project plan testing',
             'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
-            'allowed' => true
+            'allowed' => true,
+            'private' => false
           }
         }
         it '/project_plans/:module_name/:plan_name handles plan name = module name (init.pp) plan' do
@@ -219,7 +258,8 @@ describe "BoltServer::TransportApp" do
             'name' => 'bolt_server_test_project::allowlist_glob',
             'description' => 'Project plan testing',
             'parameters' => { 'foo' => { 'sensitive' => false, 'type' => 'String' } },
-            'allowed' => true
+            'allowed' => true,
+            'private' => false
           }
         }
         it 'properly filters allowed and disallowed plans' do
@@ -229,11 +269,14 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with non-existant plan' do
-        let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
-        it 'returns 400 if an unknown plan error is thrown' do
+      context 'with non-existent plan' do
+        let(:path) { "/project_plans/foo/bar?versioned_project=bolt_server_test_project" }
+        it 'returns 404 if an unknown plan error is thrown' do
           get(path)
-          expect(last_response.status).to eq(400)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a plan named 'foo::bar'")
         end
       end
     end
@@ -253,12 +296,12 @@ describe "BoltServer::TransportApp" do
           end
         end
 
-        context 'with a non existant project' do
+        context 'with a non existent project' do
           let(:path) { "/project_plans/foo/bar?versioned_project=not_a_real_project" }
           it 'returns 400 if an versioned_project not found error is thrown' do
             get(path)
-            error = last_response.body
-            expect(error).to include("#{project_dir}/not_a_real_project does not exist")
+            error = JSON.parse(last_response.body)
+            expect(error['msg']).to match(/not_a_real_project' does not exist/)
             expect(last_response.status).to eq(400)
           end
         end
@@ -266,7 +309,7 @@ describe "BoltServer::TransportApp" do
     end
 
     describe '/tasks' do
-      context 'with a non existant project' do
+      context 'with a non existent environment' do
         let(:path) { "/tasks?environment=production" }
         it 'returns just the list of task names' do
           get(path)
@@ -275,11 +318,22 @@ describe "BoltServer::TransportApp" do
         end
       end
 
-      context 'with a non existant project' do
+      context 'with a non existent environment' do
         let(:path) { "/tasks?environment=not_a_real_env" }
         it 'returns 400 if an environment not found error is thrown' do
           get(path)
           expect(last_response.status).to eq(400)
+        end
+      end
+
+      context 'with a non existent environment' do
+        let(:path) { "/tasks" }
+        it 'returns 400 if an environment query parameter not supplied' do
+          get(path)
+          expect(last_response.status).to eq(400)
+          resp = JSON.parse(last_response.body)
+          expect(resp['kind']).to eq('bolt-server/request-error')
+          expect(resp['msg']).to eq("'environment' is a required argument")
         end
       end
     end
@@ -364,6 +418,17 @@ describe "BoltServer::TransportApp" do
           expect(resp).to eq(expected_response)
         end
       end
+
+      context 'with non-existent task' do
+        let(:path) { "/tasks/foo/bar?environment=production" }
+        it 'returns 404 if an unknown task error is thrown' do
+          get(path)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a task named 'foo::bar'")
+        end
+      end
     end
 
     describe '/project_tasks/:module_name/:task_name' do
@@ -433,6 +498,17 @@ describe "BoltServer::TransportApp" do
           expect(resp).to eq(expected_response)
         end
       end
+
+      context 'with non-existent task' do
+        let(:path) { "/project_tasks/foo/bar?versioned_project=bolt_server_test_project" }
+        it 'returns 404 if an unknown task error is thrown' do
+          get(path)
+          expect(last_response.status).to eq(404)
+          err = JSON.parse(last_response.body)
+          expect(err['kind']).to eq('bolt-server/request-error')
+          expect(err['msg']).to eq("Could not find a task named 'foo::bar'")
+        end
+      end
     end
 
     describe '/ssh/*' do
@@ -462,8 +538,7 @@ describe "BoltServer::TransportApp" do
 
         result = JSON.parse(last_response.body)
         regex = %r{The property '#/target' of type object matched more than one of the required schemas}
-        expect(result['value']['_error']['details'].join).to match(regex)
-        expect(result['status']).to eq('failure')
+        expect(result['details'].join).to match(regex)
       end
 
       it 'fails if no authorization is present' do
@@ -736,32 +811,6 @@ describe "BoltServer::TransportApp" do
           expect(result['value']['_output']).to match(/got passed the message: Hello!/)
         end
 
-        it 'overrides host-key-check default', :ssh do
-          target = conn_info('ssh')
-          body = {
-            target: {
-              hostname: target[:host],
-              user: target[:user],
-              password: target[:password],
-              port: target[:port],
-              'host-key-check': true
-            },
-            task: { name: 'sample::echo',
-                    metadata: {
-                      description: 'Echo a message',
-                      parameters: { message: 'Default message' }
-                    },
-                    files: [{ filename: "echo.sh", sha256: "foo",
-                              uri: { path: 'foo', params: { environment: 'foo' } } }] },
-            parameters: { message: "Hello!" }
-          }
-
-          post('ssh/run_task', JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
-
-          result = last_response.body
-          expect(result).to match(/Host key verification failed for localhost/)
-        end
-
         it 'errors if multiple targets are supplied', :ssh do
           post_over_transport('ssh', 'run_task', simple_ssh_task, multiple: true)
 
@@ -852,9 +901,10 @@ describe "BoltServer::TransportApp" do
       let(:targets) { %w[one two three] }
       let(:bolt_inventory) { { 'targets' => targets } }
 
-      def post_to_project_inventory_targets(versioned_project, connect_data = { 'puppet_connect_data' => {} })
-        path = "/project_inventory_targets?versioned_project=#{versioned_project}"
-        post(path, JSON.generate(connect_data), 'CONTENT_TYPE' => 'text/json')
+      def post_to_project_inventory_targets(versioned_project, connect_data = {})
+        path = "/project_inventory_targets"
+        body = { 'puppet_connect_data' => connect_data, 'versioned_project' => versioned_project }
+        post(path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json')
       end
 
       it 'parses inventory' do
@@ -989,13 +1039,11 @@ describe "BoltServer::TransportApp" do
 
         it 'looks up data included in request' do
           connect_data = {
-            'puppet_connect_data' => {
-              'target_name' => {
-                'value' => 'foo'
-              },
-              'target_password' => {
-                'value' => 'bar'
-              }
+            'target_name' => {
+              'value' => 'foo'
+            },
+            'target_password' => {
+              'value' => 'bar'
             }
           }
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
@@ -1011,13 +1059,11 @@ describe "BoltServer::TransportApp" do
 
         it 'connect plugin fails when "key" is not specified in inventoryfile' do
           connect_data = {
-            'puppet_connect_data' => {
-              'target_name' => {
-                'value' => 'foo'
-              },
-              'target_password' => {
-                'value' => 'bar'
-              }
+            'target_name' => {
+              'value' => 'foo'
+            },
+            'target_password' => {
+              'value' => 'bar'
             }
           }
           targets.first['name'].delete('key')
@@ -1030,10 +1076,10 @@ describe "BoltServer::TransportApp" do
         end
 
         it 'errors when connect_data is not included in the request' do
-          connect_data = {}
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
             versioned_project = path_to_tmp_project.split(File::SEPARATOR).last
-            post_to_project_inventory_targets(versioned_project, connect_data)
+            body = JSON.generate('versioned_project' => versioned_project)
+            post('/project_inventory_targets', body, 'CONTENT_TYPE' => 'text/json')
             expect(last_response.status).to eq(400)
             expect(last_response.body).to match(/did not contain a required property of 'puppet_connect_data'/)
           end
@@ -1041,10 +1087,8 @@ describe "BoltServer::TransportApp" do
 
         it 'errors when connect_data entry does not have a "value"' do
           connect_data = {
-            'puppet_connect_data' => {
-              'oops_missing_value' => {
-                'not_value' => 'foo'
-              }
+            'oops_missing_value' => {
+              'not_value' => 'foo'
             }
           }
           with_project(bolt_project, bolt_inventory) do |path_to_tmp_project|
@@ -1116,187 +1160,342 @@ describe "BoltServer::TransportApp" do
 
       it 'errors when versioned_project is invalid' do
         post_to_project_inventory_targets('foo')
-        expect(last_response.status).to eq(500)
-        expect(last_response.body).to match(/foo does not exist/)
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/foo' does not exist/)
       end
     end
 
     describe '/project_file_metadatas/:module_name/:file' do
       let(:versioned_project) { 'bolt_server_test_project' }
+      let(:mod) { 'project_module' }
+      let(:modpath) {
+        File.join(project_dir, versioned_project, 'modules', 'project_module')
+      }
 
       it 'returns 400 if versioned_project is not specified' do
         get('/project_file_metadatas/foo_module/foo_file')
-        error = last_response.body
-        expect(error).to include("`versioned_project` is a required argument")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match("'versioned_project' is a required argument")
       end
 
       it 'returns 400 if versioned_project does not exist' do
         get("/project_file_metadatas/bar/foo?versioned_project=not_a_real_project")
-        error = last_response.body
-        expect(error).to include("#{project_dir}/not_a_real_project does not exist")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_project' does not exist/)
       end
 
       it 'returns 400 if module_name does not exist' do
         get("/project_file_metadatas/bar/foo?versioned_project=#{versioned_project}")
-        error = last_response.body
-        expect(error).to include("bar does not exist")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/bar' does not exist/)
       end
 
       it 'returns 400 if file does not exist in the module' do
         get("/project_file_metadatas/project_module/not_a_real_file?versioned_project=#{versioned_project}")
-        error = last_response.body
-        expect(error).to include("not_a_real_file does not exist")
         expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_file' does not exist/)
       end
 
-      context "with a valid filepath to one file", ssh: true do
-        let(:test_file) {
-          Pathname.new(
-            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_file')
-          ).cleanpath.to_s
-        }
-        let(:file_checksum) {
-          Digest::SHA256.hexdigest(
-            File.read(test_file)
-          )
-        }
-        let(:expected_response) {
-          [
-            {
-              "path" => test_file,
-              "relative_path" => ".",
-              "links" => "follow",
-              "owner" => File.stat(test_file).uid,
-              "group" => File.stat(test_file).gid,
-              "checksum" => {
-                "type" => "sha256",
-                "value" => "{sha256}#{file_checksum}"
-              },
-              "type" => "file",
-              "destination" => nil
-            }
-          ]
-        }
-        it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_file?versioned_project=#{versioned_project}")
-          file_metadatas = JSON.parse(last_response.body)
-          # I don't know why the mode returned by puppet is not the same as the mode returned
-          # from ruby's File.stat(test_file) function. But these tests probably don't need to
-          # cover the specifics of what puppet returns, plus we don't use this metadata in
-          # orch anyway, so ignore the mode part of the respose.
-          #                                     - Sean P. McDonald 10/15/2020
-          file_metadatas.each do |entry|
-            entry.delete("mode")
+      it 'returns 400 if the file includes scripts/ and does not exist' do
+        get("/project_file_metadatas/project_module/scripts/not_a_real_file?versioned_project=#{versioned_project}")
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_file' does not exist/)
+      end
+
+      shared_examples 'valid data' do
+        context "with a valid filepath to one file", ssh: true do
+          let(:file_checksum) { Digest::SHA256.hexdigest(File.read(test_file)) }
+          let(:expected_response) {
+            [
+              {
+                "path" => test_file,
+                "relative_path" => ".",
+                "links" => "follow",
+                "owner" => File.stat(test_file).uid,
+                "group" => File.stat(test_file).gid,
+                "checksum" => {
+                  "type" => "sha256",
+                  "value" => "{sha256}#{file_checksum}"
+                },
+                "type" => "file",
+                "destination" => nil,
+                "puppetserver_root" => test_file_puppetserver_root
+              }
+            ]
+          }
+
+          it 'returns the file metadata of the file, prefering the files directory' do
+            get("/project_file_metadatas/project_module/#{file_request}?versioned_project=#{versioned_project}")
+            file_metadatas = JSON.parse(last_response.body)
+            # I don't know why the mode returned by puppet is not the same as the mode returned
+            # from ruby's File.stat(test_file) function. But these tests probably don't need to
+            # cover the specifics of what puppet returns, plus we don't use this metadata in
+            # orch anyway, so ignore the mode part of the respose.
+            #                                     - Sean P. McDonald 10/15/2020
+            file_metadatas.each do |entry|
+              entry.delete("mode")
+            end
+            expect(file_metadatas).to eq(expected_response)
+            expect(last_response.status).to eq(200)
           end
-          expect(file_metadatas).to eq(expected_response)
-          expect(last_response.status).to eq(200)
+        end
+
+        context "with a directory", ssh: true do
+          let(:file_checksum) { Digest::SHA256.hexdigest(File.read(file_in_dir)) }
+          let(:expected_response) {
+            [
+              {
+                "path" => test_dir,
+                "relative_path" => ".",
+                "links" => "follow",
+                "owner" => File.stat(test_dir).uid,
+                "group" => File.stat(test_dir).gid,
+                "checksum" => {
+                  "type" => "ctime",
+                  "value" => "{ctime}#{File.ctime(test_dir)}"
+                },
+                "type" => "directory",
+                "destination" => nil,
+                "puppetserver_root" => test_dir_puppetserver_root
+              },
+              {
+                "path" => test_dir,
+                "relative_path" => File.basename(file_in_dir),
+                "links" => "follow",
+                "owner" => File.stat(file_in_dir).uid,
+                "group" => File.stat(file_in_dir).gid,
+                "checksum" => {
+                  "type" => "sha256",
+                  "value" => "{sha256}#{file_checksum}"
+                },
+                "type" => "file",
+                "destination" => nil,
+                "puppetserver_root" => test_dir_puppetserver_root
+              }
+            ]
+          }
+
+          it 'returns the file metadata of the directory and all its children' do
+            get("/project_file_metadatas/project_module/#{dir_request}?versioned_project=#{versioned_project}")
+            file_metadatas = JSON.parse(last_response.body)
+            # I don't know why the mode returned by puppet is not the same as the mode returned
+            # from ruby's File.stat(test_file) function. But these tests probably don't need to
+            # cover the specifics of what puppet returns, plus we don't use this metadata in
+            # orch anyway, so ignore the mode part of the respose.
+            #                                     - Sean P. McDonald 10/15/2020
+            file_metadatas.each do |entry|
+              entry.delete("mode")
+            end
+            expect(file_metadatas).to eq(expected_response)
+            expect(last_response.status).to eq(200)
+          end
         end
       end
 
-      context "when the file path contains '/'", ssh: true do
-        let(:test_file) {
-          Pathname.new(
-            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_dir', 'test_dir_file')
-          ).cleanpath.to_s
-        }
-        let(:file_checksum) {
-          Digest::SHA256.hexdigest(
-            File.read(test_file)
-          )
-        }
-        let(:expected_response) {
-          [
-            {
-              "path" => test_file,
-              "relative_path" => ".",
-              "links" => "follow",
-              "owner" => File.stat(test_file).uid,
-              "group" => File.stat(test_file).gid,
-              "checksum" => {
-                "type" => "sha256",
-                "value" => "{sha256}#{file_checksum}"
-              },
-              "type" => "file",
-              "destination" => nil
-            }
-          ]
-        }
-        it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_dir/test_dir_file?versioned_project=#{versioned_project}")
-          file_metadatas = JSON.parse(last_response.body)
-          # I don't know why the mode returned by puppet is not the same as the mode returned
-          # from ruby's File.stat(test_file) function. But these tests probably don't need to
-          # cover the specifics of what puppet returns, plus we don't use this metadata in
-          # orch anyway, so ignore the mode part of the respose.
-          #                                     - Sean P. McDonald 10/15/2020
-          file_metadatas.each do |entry|
-            entry.delete("mode")
+      context "using nonspecific Puppet file ref (<module>/<path>)" do
+        let(:test_file)                   { File.join(modpath, 'files', 'test_file') }
+        let(:file_request)                { 'test_file' }
+        let(:test_file_puppetserver_root) { "modules/#{mod}/test_file" }
+        let(:test_dir)                    { File.join(modpath, 'files', 'test_dir') }
+        let(:dir_request)                 { 'test_dir' }
+        let(:test_dir_puppetserver_root)  { "modules/#{mod}/test_dir" }
+        let(:file_in_dir)                 { File.join(test_dir, 'test_dir_file') }
+
+        include_examples 'valid data'
+
+        context "when the file path contains '/'", ssh: true do
+          let(:file_in_dir) { File.join(modpath, 'files', 'test_dir', 'test_dir_file') }
+          let(:file_checksum) { Digest::SHA256.hexdigest(File.read(file_in_dir)) }
+          let(:expected_response) {
+            [
+              {
+                "path" => file_in_dir,
+                "relative_path" => ".",
+                "links" => "follow",
+                "owner" => File.stat(file_in_dir).uid,
+                "group" => File.stat(file_in_dir).gid,
+                "checksum" => {
+                  "type" => "sha256",
+                  "value" => "{sha256}#{file_checksum}"
+                },
+                "type" => "file",
+                "destination" => nil,
+                "puppetserver_root" => "modules/#{mod}/test_dir/test_dir_file"
+              }
+            ]
+          }
+
+          it 'returns the file metadata of the file' do
+            get("/project_file_metadatas/project_module/test_dir/test_dir_file?versioned_project=#{versioned_project}")
+            file_metadatas = JSON.parse(last_response.body)
+            # I don't know why the mode returned by puppet is not the same as the mode returned
+            # from ruby's File.stat(file_in_dir) function. But these tests probably don't need to
+            # cover the specifics of what puppet returns, plus we don't use this metadata in
+            # orch anyway, so ignore the mode part of the respose.
+            #                                     - Sean P. McDonald 10/15/2020
+            file_metadatas.each do |entry|
+              entry.delete("mode")
+            end
+            expect(file_metadatas).to eq(expected_response)
+            expect(last_response.status).to eq(200)
           end
-          expect(file_metadatas).to eq(expected_response)
-          expect(last_response.status).to eq(200)
         end
       end
 
-      context "with a directory", ssh: true do
-        let(:test_dir) {
-          Pathname.new(
-            File.join(project_dir, versioned_project, 'modules', 'project_module', 'files', 'test_dir')
-          ).cleanpath.to_s
-        }
-        let(:file_in_dir) {
-          File.join(test_dir, 'test_dir_file')
-        }
-        let(:file_checksum) {
-          Digest::SHA256.hexdigest(
-            File.read(file_in_dir)
-          )
-        }
-        let(:expected_response) {
-          [
-            {
-              "path" => test_dir,
-              "relative_path" => ".",
-              "links" => "follow",
-              "owner" => File.stat(test_dir).uid,
-              "group" => File.stat(test_dir).gid,
-              "checksum" => {
-                "type" => "ctime",
-                "value" => "{ctime}#{File.ctime(test_dir)}"
-              },
-              "type" => "directory",
-              "destination" => nil
-            },
-            {
-              "path" => test_dir,
-              "relative_path" => "test_dir_file",
-              "links" => "follow",
-              "owner" => File.stat(file_in_dir).uid,
-              "group" => File.stat(file_in_dir).gid,
-              "checksum" => {
-                "type" => "sha256",
-                "value" => "{sha256}#{file_checksum}"
-              },
-              "type" => "file",
-              "destination" => nil
-            }
+      context "getting files from the 'scripts/' directory" do
+        let(:test_file)                   { File.join(modpath, 'scripts', 'script.sh') }
+        let(:file_request)                { 'scripts/script.sh' }
+        let(:test_file_puppetserver_root) { "scripts/#{mod}/script.sh" }
+        let(:test_dir)                    { File.join(modpath, 'scripts', 'test_dir') }
+        let(:dir_request)                 { 'scripts/test_dir/' }
+        let(:test_dir_puppetserver_root)  { "scripts/#{mod}/test_dir/" }
+        let(:file_in_dir)                 { File.join(test_dir, 'dir_script.sh') }
+
+        include_examples 'valid data'
+      end
+
+      context "getting files from the 'files/' directory with specific ref" do
+        let(:test_file)                   { File.join(modpath, 'files', 'test_file') }
+        let(:file_request)                { 'files/test_file' }
+        let(:test_file_puppetserver_root) { "modules/#{mod}/test_file" }
+        let(:test_dir)                    { File.join(modpath, 'files', 'test_dir') }
+        let(:dir_request)                 { 'files/test_dir' }
+        let(:test_dir_puppetserver_root)  { "modules/#{mod}/test_dir" }
+        let(:file_in_dir)                 { File.join(test_dir, 'test_dir_file') }
+
+        include_examples 'valid data'
+      end
+
+      it 'without specific Puppet file reference does not find script' do
+        get("/project_file_metadatas/project_module/script.sh?versioned_project=#{versioned_project}")
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/'script.sh' does not exist/)
+      end
+
+      it 'prefers loading from files/files/ when file also exists in files/' do
+        abs_path = File.join(modpath, 'files', 'files', 'duplicate')
+        get("/project_file_metadatas/project_module/files/duplicate?versioned_project=#{versioned_project}")
+        file_metadatas = JSON.parse(last_response.body)
+        expect(file_metadatas.first['path']).to eq(abs_path)
+        expect(file_metadatas.first['puppetserver_root']).to eq('modules/project_module/files/duplicate')
+        expect(last_response.status).to eq(200)
+      end
+    end
+
+    describe '/project_facts_plugin_tarball' do
+      let(:versioned_project) { 'bolt_server_test_project' }
+
+      it 'returns 400 if versioned_project is not specified' do
+        get('/project_facts_plugin_tarball')
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match("'versioned_project' is a required argument")
+      end
+
+      it 'returns 400 if versioned_project does not exist' do
+        get("/project_facts_plugin_tarball?versioned_project=not_a_real_project")
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_project' does not exist/)
+      end
+
+      it "returns a base64 encoded tar archive of the project's plugin code for custom facts" do
+        get("/project_facts_plugin_tarball?versioned_project=#{versioned_project}")
+        expect(last_response.status).to eq(200)
+        Dir.mktmpdir("project_facts_plugin_tarball_test") do |tmpdir|
+          unpacked_pluginsdir = unpack_tarball(JSON.parse(last_response.body), tmpdir)
+
+          unpacked_plugin_files = list_all_files(unpacked_pluginsdir)
+          expected_plugin_files = [
+            'plugin_module/lib/puppet/functions/some_function.rb',
+            'pluginfacts_module/facts.d/external_fact.sh'
           ]
-        }
-        it 'returns the file metadata of the file and all its children' do
-          get("/project_file_metadatas/project_module/test_dir?versioned_project=#{versioned_project}")
-          file_metadatas = JSON.parse(last_response.body)
-          # I don't know why the mode returned by puppet is not the same as the mode returned
-          # from ruby's File.stat(test_file) function. But these tests probably don't need to
-          # cover the specifics of what puppet returns, plus we don't use this metadata in
-          # orch anyway, so ignore the mode part of the respose.
-          #                                     - Sean P. McDonald 10/15/2020
-          file_metadatas.each do |entry|
-            entry.delete("mode")
+          expect(unpacked_plugin_files.sort).to eql(expected_plugin_files.sort)
+
+          # Make sure the contents also match
+          unpacked_plugin_files.each do |plugin_file|
+            file_fixture_path = File.join(
+              project_dir,
+              versioned_project,
+              'modules',
+              plugin_file
+            )
+            file_unpacked_path = File.join(
+              unpacked_pluginsdir,
+              plugin_file
+            )
+
+            expected_content = File.read(file_fixture_path)
+            actual_content = File.read(file_unpacked_path)
+
+            expect(expected_content).to eql(actual_content)
           end
-          expect(file_metadatas).to eq(expected_response)
-          expect(last_response.status).to eq(200)
+        end
+      end
+    end
+
+    describe '/project_plugin_tarball' do
+      let(:versioned_project) { 'bolt_server_test_project' }
+
+      it 'returns 400 if versioned_project is not specified' do
+        get('/project_plugin_tarball')
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match("'versioned_project' is a required argument")
+      end
+
+      it 'returns 400 if versioned_project does not exist' do
+        get("/project_plugin_tarball?versioned_project=not_a_real_project")
+        expect(last_response.status).to eq(400)
+        error = JSON.parse(last_response.body)
+        expect(error['msg']).to match(/not_a_real_project' does not exist/)
+      end
+
+      it "returns a base64 encoded tar archive of the project's plugin code" do
+        get("/project_plugin_tarball?versioned_project=#{versioned_project}")
+        expect(last_response.status).to eq(200)
+        Dir.mktmpdir("project_plugin_tarball_test") do |tmpdir|
+          unpacked_pluginsdir = unpack_tarball(JSON.parse(last_response.body), tmpdir)
+
+          unpacked_plugin_files = list_all_files(unpacked_pluginsdir)
+          expected_plugin_files = [
+            'plugin_module/lib/puppet/functions/some_function.rb',
+            'plugin_module/types/some_alias.pp',
+            'pluginfacts_module/facts.d/external_fact.sh',
+            'project_module/files/test_dir/test_dir_file',
+            'project_module/files/test_file',
+            'project_module/files/duplicate',
+            'project_module/files/files/duplicate',
+            'project_module/scripts/script.sh',
+            'project_module/scripts/test_dir/dir_script.sh'
+          ]
+          expect(unpacked_plugin_files.sort).to eql(expected_plugin_files.sort)
+
+          # Make sure the contents also match
+          unpacked_plugin_files.each do |plugin_file|
+            file_fixture_path = File.join(
+              project_dir,
+              versioned_project,
+              'modules',
+              plugin_file
+            )
+            file_unpacked_path = File.join(
+              unpacked_pluginsdir,
+              plugin_file
+            )
+
+            expected_content = File.read(file_fixture_path)
+            actual_content = File.read(file_unpacked_path)
+
+            expect(expected_content).to eql(actual_content)
+          end
         end
       end
     end

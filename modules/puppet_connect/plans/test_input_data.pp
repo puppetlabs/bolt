@@ -1,8 +1,13 @@
 # @summary
 #   Tests that the provided Puppet Connect input data is complete, meaning that all consuming inventory targets are connectable.
-#
-# This plan should only be used as part of the copy-pastable "test input data"
-# workflow specified in the Puppet Connect docs.
+#   You should run this plan with the following command:
+#       PUPPET_CONNECT_INPUT_DATA=/path/to/input_data.yaml bolt plan run puppet_connect::test_input_data
+#   where /path/to/input_data.yaml is the path to the input_data.yaml file containing the key-value input for the
+#   puppet_connect_data plugin. If the plan fails on some targets, then you can use Bolt's --rerun option to rerun the plan on
+#   just the failed targets:
+#       PUPPET_CONNECT_INPUT_DATA=/path/to/input_data.yaml bolt plan run puppet_connect::test_input_data --rerun failure
+#   Note that this plan should only be used as part of the copy-pastable "test input data" workflow specified in the Puppet
+#   Connect docs.
 #
 # @param targets
 #   The set of targets to test. Usually this should be 'all', the default.

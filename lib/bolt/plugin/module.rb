@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'bolt/task/run'
+require_relative '../../bolt/task/run'
 
 module Bolt
   class Plugin
@@ -24,7 +24,7 @@ module Bolt
         end
       end
 
-      attr_reader :config
+      attr_reader :config, :hook_map
 
       def initialize(mod:, context:, config:, **_opts)
         @module = mod

@@ -62,6 +62,10 @@
     "interpreters": {
       "type": "object",
       "description": "Map of file extensions to remote executable"
+    },
+    "plugin_hooks": {
+      "type": "object",
+      "description": "Configuration for plugins to use"
     }
   },
   "oneOf": [

@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
 require 'base64'
-require 'bolt/apply_result'
-require 'bolt/apply_target'
-require 'bolt/config'
-require 'bolt/error'
-require 'bolt/task'
-require 'bolt/util/puppet_log_level'
+require_relative '../bolt/apply_result'
+require_relative '../bolt/apply_target'
+require_relative '../bolt/config'
+require_relative '../bolt/error'
+require_relative '../bolt/task'
+require_relative '../bolt/util/puppet_log_level'
 require 'find'
 require 'json'
 require 'logging'
@@ -87,7 +87,7 @@ module Bolt
         variables: @inventory.vars(target),
         trusted: trusted.to_h
       }
-      catalog_request = scope.merge(target: target_data)
+      catalog_request = scope.merge(target: target_data).merge(future: @executor.future || {})
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
       old_path = ENV['PATH']
@@ -122,7 +122,13 @@ module Bolt
         logs.each do |log|
           bolt_level = Bolt::Util::PuppetLogLevel::MAPPING[log['level'].to_sym]
           message = log['message'].chomp
-          @logger.send(bolt_level, "#{target.name}: #{message}")
+
+          case bolt_level
+          when :warn
+            handle_warning(target, message)
+          else
+            @logger.send(bolt_level, "#{target.name}: #{message}")
+          end
         end
       end
 
@@ -136,6 +142,22 @@ module Bolt
       end
 
       result
+    end
+
+    # Handles logging Puppet warnings, some of which are suppressable.
+    #
+    # @param target [Bolt::Target] The target the apply ran on.
+    # @param message [String] The log message.
+    #
+    private def handle_warning(target, message)
+      # Messages about exported resource declaration and collection, which are
+      # not supported in manifest blocks.
+      if message.include?(Puppet::Pops::Issues::RT_NO_STORECONFIGS_EXPORT.format) ||
+         message.include?(Puppet::Pops::Issues::RT_NO_STORECONFIGS.format)
+        Bolt::Logger.warn('exported_resources', "#{target.name}: #{message}")
+      else
+        @logger.send(:warn, "#{target.name}: #{message}")
+      end
     end
 
     def validate_hiera_config(hiera_config)
@@ -217,6 +239,7 @@ module Bolt
           search_dirs << mod.plugins if mod.plugins?
           search_dirs << mod.pluginfacts if mod.pluginfacts?
           search_dirs << mod.files if mod.files?
+          search_dirs << mod.scripts if mod.scripts?
           type_files = "#{mod.path}/types"
           search_dirs << type_files if File.exist?(type_files)
           search_dirs
@@ -306,11 +329,12 @@ module Bolt
       Puppet.lookup(:current_environment).override_with(modulepath: @plugin_dirs).modules.each do |mod|
         search_dirs = yield mod
 
-        parent = Pathname.new(mod.path).parent
+        tar_dir = Pathname.new(mod.name) # goes great with fish
+        mod_dir = Pathname.new(mod.path)
         files = Find.find(*search_dirs).select { |file| File.file?(file) }
 
         files.each do |file|
-          tar_path = Pathname.new(file).relative_path_from(parent)
+          tar_path = tar_dir + Pathname.new(file).relative_path_from(mod_dir)
           @logger.trace("Packing plugin #{file} to #{tar_path}")
           stat = File.stat(file)
           content = File.binread(file)

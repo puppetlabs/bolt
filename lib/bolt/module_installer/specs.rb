@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/module_installer/specs/forge_spec'
-require 'bolt/module_installer/specs/git_spec'
+require_relative '../../bolt/error'
+require_relative 'specs/forge_spec'
+require_relative 'specs/git_spec'
 
 module Bolt
   class ModuleInstaller
@@ -55,7 +55,7 @@ module Bolt
           Invalid module specification:
           #{hash.to_yaml.lines.drop(1).join.chomp}
 
-          To read more about specifying modules, see https://pup.pt/bolt-modules
+          To read more about specifying modules, see https://pup.pt/bolt-module-specs
         MESSAGE
       end
 

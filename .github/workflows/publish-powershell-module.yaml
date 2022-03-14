@@ -1,0 +1,32 @@
+name: Publish PowerShell Module
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: The ref to build the PowerShell module from.
+        required: true
+        default: main
+
+jobs:
+  publish_module:
+    name: Publish
+    runs-on: windows-latest
+    env:
+      BOLT_DISABLE_PWSH_WARNING: 'true'
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.inputs.ref }}
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+      - name: Update gems
+        run: bundle update
+      - name: Generate PowerShell module
+        run: bundle exec rake pwsh:generate_module
+      - name: Publish module to PowerShell Gallery
+        run: Publish-Module -Path ./pwsh_module/PuppetBolt -NuGetApiKey ${{ secrets.PS_GALLERY_TOKEN }}

@@ -1,0 +1,23 @@
+---
+topic: inventory
+guide: |
+    The inventory describes the targets that you run Bolt commands on, along
+    with any data and configuration for the targets. Targets in an inventory can
+    belong to one or more groups, allowing you to share data and configuration
+    across multiple targets and to specify multiple targets for your Bolt
+    commands without the need to list each target individually.
+
+    In most cases, Bolt loads the inventory from an inventory file in your Bolt
+    project. The inventory file is a YAML file named 'inventory.yaml'. Because
+    Bolt loads the inventory file from a Bolt project, you must have an existing
+    project configuration file named 'bolt-project.yaml' alongside the inventory
+    file.
+
+    When Bolt loads inventory, it loads the entire inventory, not just the
+    groups and targets specified on the command line. If you've defined a
+    target in multiple groups, this might result in target configuration that
+    is different than expected.
+
+documentation:
+  - https://pup.pt/bolt-inventory
+  - https://pup.pt/bolt-inventory-reference

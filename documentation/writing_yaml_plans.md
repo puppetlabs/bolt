@@ -69,7 +69,7 @@ Each plan name segment must begin with a lowercase letter and:
 -   Can include digits.
 -   Can include underscores.
 -   Must not be a [reserved
-    word](https://docs.puppet.com/puppet/5.3/lang_reserved.html).
+    word](https://docs.puppet.com/puppet/latest/lang_reserved.html).
 -   Must not have the same name as any Puppet data types.
 -   Namespace segments must match the following regular expression
     `\A[a-z][a-z0-9_]*\Z`
@@ -107,7 +107,7 @@ Message steps support the following keys:
 
 | Key | Type | Description | Required |
 | --- | --- | --- | --- |
-| `message` | `String` | The message to print. | ✓ |
+| `message` | `Any` | The message to print. | ✓ |
 
 For example:
 
@@ -122,7 +122,31 @@ representation of the result object. If the object is not a plan result, Bolt
 prints the object as a string.
 
 For information on printing a step result with `message`, see [Debugging
-plans](#debugging-plans).
+plans](debugging_plans.md).
+
+### Verbose step
+
+Use a `verbose` step to print a message in verbose mode. The step prints a message to standard
+out (stdout) when using the `human` output format, and prints to standard error
+(stderr) when using the `json` output format. 
+
+Verbose steps support the following keys:
+
+| Key | Type | Description | Required |
+| --- | --- | --- | --- |
+| `verbose` | `Any` | The message to print. | ✓ |
+
+For example:
+
+```yaml
+steps:
+  - verbose: hello world
+```
+
+You can pass variables to the verbose step to print them to stdout. If the 
+variable is a [Bolt datatype](bolt_types_reference.md) it will be formatted 
+as a Hash. Once the object is formatted, if it's a Hash or Array it is printed
+as JSON, otherwise Bolt prints the object as a string.
 
 ### Command step
 
@@ -345,10 +369,9 @@ the desired state for part of a target. Bolt ensures each resource is in its
 desired state. Like the steps in a `plan`, if any resource in the list fails,
 the rest are skipped.
 
-For each `resources` step, Bolt executes the `apply_prep` plan function against
-the targets specified with the `targets` field. For more information about
-`apply_prep` see the [Applying manifest blocks](applying_manifest_blocks.md#)
-section.
+> **Note:** For each `resources` step, Bolt executes the `apply_prep` plan function against 
+> the targets specified with the `targets` field. For more information about `apply_prep`, see 
+> [Applying manifest blocks](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan).
 
 Resources steps support the following keys:
 
@@ -661,100 +684,6 @@ steps:
 return: $hostnames.map |$hostname_result| { $hostname_result['stdout'] }
 ```
 
-## Debugging plans
-
-By default, Bolt does not print the result for each step to stdout. However, you
-can use one of the following methods to investigate a plan execution:
-- Each time you run a Bolt command, Bolt prints a debug log to a
-  `bolt-debug.log` file in the root of your project directory.
-- Certain steps print to stdout when you use the `--verbose` CLI option.
-- You can print the result of any step to stdout using a `message` step. 
-- You can adjust your log level for detailed information on how Bolt is
-  executing your plan, including the results returned from each step.
-
-### Using the `--verbose` option for debugging 
-
-You can see the results for the following types of steps by running the plan
-with the `--verbose` CLI option:
-- commands
-- scripts
-- plans
-- tasks
-
-### Using a message step for debugging
-
-You can print the result of a step to stdout by passing the step name to a
-message step as a parameter.
-
-To print the result of a step to stdout using `message`, use the
-following structure:
-
-```yaml
-- message: $<STEP_NAME> 
-```
-
-For example, the following plan uses a task step named `check_mysql` to run the
-`package` task and check for MySQL. A message step prints the result of the
-`check_mysql` task:
-
-```yaml
-parameters:
-  targets:
-    type: TargetSpec   
-
-steps:
-  - name: check_mysql
-    targets: $targets
-    task: package
-    parameters:
-     action: status
-     name: mysql
-    description: "Check for MySQL"
-
-  - message: $check_mysql
-```
-
-The output from this plan looks something like this:
-
-```console
-Starting: plan wordpress::test
-Starting: Check for MySQL on target1
-Finished: Check for MySQL with 0 failures in 0.59 sec
-[
-  {
-    "target": "target1",
-    "action": "task",
-    "object": "package",
-    "status": "success",
-    "value": {
-      "status": "uninstalled",
-      "version": ""
-    }
-  }
-]
-Finished: plan wordpress::test in 0.6 sec
-Plan completed successfully with no result
-```
-
-### Debug logs
-
-Bolt logs additional information about a plan run, including output sent to
-standard error (stderr), at the `debug` level. Use the `--log-level debug` CLI
-option or the [`log` configuration setting](bolt_project_reference.md#log).
-
-```shell
-$ bolt task run mytask param1=foo param2=bar -t all --log-level debug
-```
-
-Each time you run a Bolt command, Bolt prints a debug level log to a
-`bolt-debug.log` file in the root of your project directory. You can disable the
-log file by specifying the following in your `bolt-project.yaml`:
-
-```yaml
-log:
-  bolt-debug.log: disable
-```
-
 ## Computing complex values
 
 To compute complex values, you can use a Puppet code expression as the value of
@@ -922,34 +851,9 @@ natural or readable as it could be.
 ### Resource step variable interpolation
 
 When applying Puppet resources in a `resource` step, variable interpolation
-behaves differently in YAML plans and Puppet language plans. To illustrate this
-difference, consider this YAML plan:
+behaves differently in YAML plans and Puppet language plans. For example:
 
-```yaml
-steps:
-  - targets: localhost
-    description: Apply a file resource
-    resources:
-    - type: file
-      title: '/tmp/foo'
-      parameters:
-        content: $facts['os']['family']
-        ensure: present
-  - name: file_contents
-    description: Read contents of file managed with file resource
-    eval: >
-      file::read('/tmp/foo')
-      
-return: $file_contents
-
-```
-
-This plan performs `apply_prep` on a localhost target. Then it uses a Puppet
-`file` resource to write the OS family discovered from the Puppet `$facts` hash
-to a temporary file. Finally, it reads the value written to the file and returns
-it. Running `bolt plan convert` on this plan produces this Puppet code:
-
-```
+```pp
 plan yaml_plans::interpolation_pp() {
   apply_prep('localhost')
   $interpolation = apply('localhost') {
@@ -964,10 +868,13 @@ plan yaml_plans::interpolation_pp() {
 }
 ```
 
-This Puppet language plan works as expected, whereas the YAML plan it was
-converted from fails. The failure stems from the `$facts`variable being resolved
-as a plan variable, instead of being evaluated as part of compiling the manifest
-code in an `apply`block.
+This Puppet language plan 
+- Performs `apply_prep` on the target `localhost`.
+- Uses a Puppet `file` resource to write the OS family discovered from the Puppet `$facts` hash
+to a temporary file.
+- Reads the value written to the file and returns it.
+
+Trying to access `$facts['os']['family']` in a YAML plan would fail because Bolt would try to resolve `$facts` as a plan variable instead of evaluating it as manifest code in an `apply` block.
 
 ### Dependency order
 

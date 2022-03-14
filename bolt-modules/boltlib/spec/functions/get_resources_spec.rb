@@ -64,7 +64,7 @@ describe 'get_resources' do
       executor.expects(:run_task).with(targets, query_resources_task, includes('plugins')).returns(results)
 
       is_expected.to run.with_params(hostnames, []).and_raise_error(
-        Bolt::RunFailure, "Plan aborted: run_task 'query_resources_task' failed on #{targets.count} targets"
+        Bolt::RunFailure, "run_task 'query_resources_task' failed on #{targets.count} targets"
       )
     end
 

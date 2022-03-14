@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require 'bolt/error'
-require 'bolt/config/transport/base'
+require_relative '../../../bolt/error'
+require_relative '../../../bolt/config/transport/base'
 
 module Bolt
   class Config
@@ -11,7 +11,7 @@ module Bolt
           cleanup
           remote
           tmpdir
-        ].freeze
+        ].concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {
           'cleanup' => true,

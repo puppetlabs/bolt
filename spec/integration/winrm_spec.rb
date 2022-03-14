@@ -89,6 +89,14 @@ describe "when runnning over the winrm transport", winrm: true do
   end
 
   context 'when using an inventoryfile', :reset_puppet_settings do
+    let(:config) do
+      {
+        'future' => future_config
+      }
+    end
+
+    let(:future_config) { {} }
+
     let(:default_inv) do
       {
         'config' => {
@@ -101,43 +109,66 @@ describe "when runnning over the winrm transport", winrm: true do
         }
       }
     end
-    let(:inv)               { default_inv }
-    let(:uri)               { (1..2).map { |i| "#{conn_uri('winrm')}?id=#{i}" }.join(',') }
-    let(:project)           { @project }
-    let(:common_flags)      { %W[--format json --modulepath #{modulepath} --project #{project.path}] }
-    let(:config_flags)      { %W[--targets #{uri}] + common_flags }
-    let(:single_target)     { %W[--targets #{conn_uri('winrm')}] + common_flags }
-    let(:interpreter_task)  { 'sample::bolt_ruby' }
+
+    let(:inv)                { default_inv }
+    let(:uri)                { (1..2).map { |i| "#{conn_uri('winrm')}?id=#{i}" }.join(',') }
+    let(:project)            { @project }
+    let(:common_flags)       { %W[--format json --modulepath #{modulepath} --project #{project.path}] }
+    let(:config_flags)       { %W[--targets #{uri}] + common_flags }
+    let(:single_target)      { %W[--targets #{conn_uri('winrm')}] + common_flags }
+    let(:interpreter_task)   { 'sample::bolt_ruby' }
+    let(:interpreter_script) { 'sample/scripts/script.rb' }
+
     let(:interpreter_ext) do
-      { 'config' => {
-        'winrm' => {
-          'interpreters' => {
-            '.rb' => RbConfig.ruby
+      {
+        'config' => {
+          'winrm' => {
+            'interpreters' => {
+              '.rb' => RbConfig.ruby
+            }
           }
         }
-      } }
+      }
     end
+
     let(:interpreter_no_ext) do
-      { 'config' => {
-        'winrm' => {
-          'interpreters' => {
-            'rb' => RbConfig.ruby
+      {
+        'config' => {
+          'winrm' => {
+            'interpreters' => {
+              'rb' => RbConfig.ruby
+            }
           }
         }
-      } }
+      }
     end
+
     let(:bad_interpreter) do
-      { 'config' => {
-        'winrm' => {
-          'interpreters' => {
-            'rb' => 'C:\dev\null'
+      {
+        'config' => {
+          'winrm' => {
+            'interpreters' => {
+              'rb' => 'C:\dev\null'
+            }
           }
         }
-      } }
+      }
+    end
+
+    let(:array_interpreter) do
+      {
+        'config' => {
+          'winrm' => {
+            'interpreters' => {
+              '.rb' => [RbConfig.ruby]
+            }
+          }
+        }
+      }
     end
 
     around :each do |example|
-      with_project(inventory: inv) do |project|
+      with_project(config: config, inventory: inv) do |project|
         @project = project
         example.run
       end
@@ -181,6 +212,46 @@ describe "when runnning over the winrm transport", winrm: true do
       it 'task fails with bad interpreter', windows: true do
         result = run_failed_node(%W[task run #{interpreter_task} message=short] + single_target)
         expect(result['_error']['msg']).to match(/'C:\\dev\\null' is not recognized/)
+      end
+    end
+
+    context 'with an array interpreter' do
+      let(:inv) { Bolt::Util.deep_merge(default_inv, array_interpreter) }
+
+      it 'runs task with interpreter array', windows: true do
+        result = run_nodes(%W[task run #{interpreter_task} message=short] + config_flags)
+        expect(result.map { |r| r['env'].strip }).to eq(%w[short short])
+        expect(result.map { |r| r['stdin'].strip }).to eq(%w[short short])
+      end
+    end
+
+    context 'script interpreter' do
+      # Windows automatically searches for an interpreter if one is not
+      # specified. We use a bad interpreter here to check that the interpreter
+      # is being set correctly, otherwise Windows would just find the Ruby
+      # interpreter on its own.
+      let(:inv) { Bolt::Util.deep_merge(default_inv, bad_interpreter) }
+
+      context 'without future.script_interpreter configured' do
+        it 'does not run script with specified interpreter' do
+          result = run_cli_json(%W[script run #{interpreter_script}] + config_flags)['items'][0]
+          expect(result['status']).to eq('success')
+          expect(result['value']['stdout']).to match(/Hello, world!/)
+        end
+      end
+
+      context 'with future.script_interpreter configured' do
+        let(:future_config) do
+          {
+            'script_interpreter' => true
+          }
+        end
+
+        it 'runs script with specified interpreter' do
+          result = run_cli_json(%W[script run #{interpreter_script}] + config_flags)['items'][0]
+          expect(result['status']).to eq('failure')
+          expect(result['value']['stdout']).not_to match(/Hello, world!/)
+        end
       end
     end
   end

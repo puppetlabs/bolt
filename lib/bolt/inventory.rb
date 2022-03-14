@@ -1,14 +1,14 @@
 # frozen_string_literal: true
 
 require 'set'
-require 'bolt/config'
-require 'bolt/inventory/group'
-require 'bolt/inventory/inventory'
-require 'bolt/inventory/options'
-require 'bolt/target'
-require 'bolt/util'
-require 'bolt/plugin'
-require 'bolt/validator'
+require_relative '../bolt/config'
+require_relative 'inventory/group'
+require_relative 'inventory/inventory'
+require_relative 'inventory/options'
+require_relative '../bolt/target'
+require_relative '../bolt/util'
+require_relative '../bolt/plugin'
+require_relative '../bolt/validator'
 require 'yaml'
 
 module Bolt
@@ -86,13 +86,9 @@ module Bolt
         if config.default_inventoryfile.exist?
           logger.debug("Loaded inventory from #{config.default_inventoryfile}")
         else
+          source = nil
           logger.debug("Tried to load inventory from #{config.default_inventoryfile}, but the file does not exist")
         end
-      end
-
-      # Resolve plugin references from transport config
-      config.transports.each_value do |t|
-        t.resolve(plugins) unless t.resolved?
       end
 
       Bolt::Validator.new.tap do |validator|
@@ -100,17 +96,15 @@ module Bolt
         validator.warnings.each { |warning| Bolt::Logger.warn(warning[:id], warning[:msg]) }
       end
 
-      inventory = create_version(data, config.transport, config.transports, plugins)
-      inventory.validate
-      inventory
+      create_version(data, config.transport, config.transports, plugins, source)
     end
 
-    def self.create_version(data, transport, transports, plugins)
+    def self.create_version(data, transport, transports, plugins, source = nil)
       version = (data || {}).delete('version') { 2 }
 
       case version
       when 2
-        Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
+        Bolt::Inventory::Inventory.new(data, transport, transports, plugins, source)
       else
         raise ValidationError.new("Unsupported version #{version} specified in inventory", nil)
       end
@@ -118,9 +112,9 @@ module Bolt
 
     def self.empty
       config  = Bolt::Config.default
-      plugins = Bolt::Plugin.setup(config, nil)
+      plugins = Bolt::Plugin.new(config, nil)
 
-      create_version({}, config.transport, config.transports, plugins)
+      create_version({}, config.transport, config.transports, plugins, nil)
     end
   end
 end

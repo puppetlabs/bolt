@@ -1,0 +1,36 @@
+name: Docker transport
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
+  pull_request:
+    types: [opened, reopened, edited, synchronize]
+    paths-ignore: ['**.md', '**.erb', 'schemas/*']
+
+jobs:
+  docker_transport:
+    name: Docker Transport
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 2.7
+          bundler-cache: true
+      - name: Update gems
+        run: bundle update
+      - name: Cache modules
+        id: modules
+        uses: actions/cache@v1
+        with:
+          path: modules
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/Puppetfile') }}
+      - name: Install modules
+        if: steps.modules.outputs.cache-hit != 'true'
+        run: bundle exec r10k puppetfile install
+      - uses: ./.github/actions/sudo_setup
+      - name: Run tests
+        run: bundle exec rake ci:docker_transport

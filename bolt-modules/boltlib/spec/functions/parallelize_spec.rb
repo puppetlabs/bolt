@@ -5,67 +5,41 @@ require 'puppet_pal'
 require 'bolt/executor'
 require 'bolt/inventory'
 require 'bolt/plan_result'
-# require 'bolt/plugin'
-# require 'puppet/pops/types/p_sensitive_type'
 
 describe 'parallelize' do
   include PuppetlabsSpec::Fixtures
-  let(:array) { %w[a b c d] }
+  let(:array) { %w[a b c d a b a] }
+  let(:future) { Bolt::PlanFuture.new(nil, 1, name: 'name', plan_id: 1234) }
   let(:executor) { Bolt::Executor.new }
-  let(:result_array) { %w[ea eb ec ed] }
+  let(:result_array) { %w[ea eb ec ed ea eb ea] }
   let(:tasks_enabled) { true }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks_enabled
-    Puppet.override(bolt_executor: executor) do
+    Puppet.override(bolt_executor: executor, plan_stack: []) do
       example.run
     end
+  end
+
+  before :each do
+    array.each do
+      executor.expects(:create_future).returns(future)
+    end
+    executor.expects(:wait).returns(result_array)
   end
 
   it 'reports the function call to analytics' do
     executor.expects(:report_function_call).with('parallelize')
 
-    array.each_with_index do |elem, index|
-      yarn = mock('yarn', alive?: false, value: 'e' + elem, index: index)
-      executor.expects(:create_yarn)
-              .with(anything, anything, elem, index)
-              .returns(yarn)
-    end
-
     is_expected.to(run
       .with_params(array)
-      .with_lambda { |elem| 'e' + elem })
+      .with_lambda { |obj| 'e' + obj })
   end
 
-  it 'returns an array in order' do
-    array.each_with_index do |elem, index|
-      yarn = mock('yarn', alive?: false, value: 'e' + elem, index: index)
-      executor.expects(:create_yarn)
-              .with(anything, anything, elem, index)
-              .returns(yarn)
-    end
-
+  it 'returns the results from the executor' do
     is_expected.to(run
       .with_params(array)
-      .with_lambda { |elem| 'e' + elem }
+      .with_lambda { |obj| 'e' + obj }
       .and_return(result_array))
-  end
-
-  context "with errors in the block" do
-    it "returns a ParallelFailure" do
-      error = Bolt::Error.new("error", 'bolt/test-failure')
-
-      array.each_with_index do |elem, index|
-        yarn = mock('yarn', alive?: false, value: error, index: index)
-        executor.expects(:create_yarn)
-                .with(anything, anything, elem, index)
-                .returns(yarn)
-      end
-
-      is_expected.to(run
-        .with_params(array)
-        .with_lambda { |elem| 'e' + elem }
-        .and_raise_error(Bolt::ParallelFailure, /parallel block failed on 4 targets/))
-    end
   end
 end

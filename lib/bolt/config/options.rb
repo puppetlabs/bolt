@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
-require 'bolt/config/transport/docker'
-require 'bolt/config/transport/local'
-require 'bolt/config/transport/lxd'
-require 'bolt/config/transport/orch'
-require 'bolt/config/transport/podman'
-require 'bolt/config/transport/remote'
-require 'bolt/config/transport/ssh'
-require 'bolt/config/transport/winrm'
+require_relative '../../bolt/config/transport/docker'
+require_relative '../../bolt/config/transport/local'
+require_relative '../../bolt/config/transport/lxd'
+require_relative '../../bolt/config/transport/orch'
+require_relative '../../bolt/config/transport/podman'
+require_relative '../../bolt/config/transport/remote'
+require_relative '../../bolt/config/transport/ssh'
+require_relative '../../bolt/config/transport/winrm'
 
 module Bolt
   class Config
@@ -147,14 +147,23 @@ module Bolt
           type: Hash,
           properties: {
             "file_paths" => {
-              description: "Load scripts from the `scripts/` directory of a module",
+              description: "Load scripts from the `scripts/` directory of a module.",
+              type: [TrueClass, FalseClass],
+              _example: true,
+              _default: false,
+              _deprecation: "Bolt no longer honors this option and enables loading scripts from the scripts "\
+                            "directory by default."
+            },
+            "script_interpreter" => {
+              description: "Use a target's [`interpreters` configuration](bolt_transports_reference.md#interpreters) "\
+                           "when running a script.",
               type: [TrueClass, FalseClass],
               _example: true,
               _default: false
             }
           },
           _plugin: false,
-          _example: { 'file_paths' => true }
+          _example: { 'script_interpreter' => true }
         },
         "hiera-config" => {
           description: "The path to the Hiera configuration file.",
@@ -202,7 +211,7 @@ module Bolt
                 "level" => {
                   description: "The type of information to log.",
                   type: String,
-                  enum: %w[trace debug error info warn fatal any],
+                  enum: %w[trace debug error info warn fatal],
                   _default: "warn"
                 }
               }
@@ -221,7 +230,7 @@ module Bolt
               "level" => {
                 description: "The type of information to log.",
                 type: String,
-                enum: %w[trace debug error info warn fatal any],
+                enum: %w[trace debug error info warn fatal],
                 _default: "warn"
               }
             }
@@ -248,10 +257,16 @@ module Bolt
           type: Hash,
           properties: {
             "forge" => {
-              description: "A subsection that can have its own `proxy` setting to set an HTTP proxy for Forge "\
-                           "operations only, and a `baseurl` setting to specify a different Forge host.",
+              description: "A subsection for configuring connections to a Forge host.",
               type: Hash,
               properties: {
+                "authorization_token" => {
+                  description: "The token used to authorize requests to the Forge host. Must also specify "\
+                               "`baseurl` when using this option.",
+                  type: String,
+                  _example: "Bearer eyJhbGciOiJIUzI1NiIsInR5c...",
+                  _plugin: true
+                },
                 "baseurl" => {
                   description: "The URL to the Forge host.",
                   type: String,
@@ -265,7 +280,11 @@ module Bolt
                   _example: "https://my-forge-proxy.com:8080"
                 }
               },
-              _example: { "baseurl" => "https://forge.example.com", "proxy" => "https://my-forge-proxy.com:8080" }
+              _example: {
+                "authorization_token" => "Bearer eyJhbGciOiJIUzI1NiIsInR5c...",
+                "baseurl" => "https://forge.example.com",
+                "proxy" => "https://my-forge-proxy.com:8080"
+              }
             },
             "proxy" => {
               description: "The HTTP proxy to use for Git and Forge operations.",
@@ -279,7 +298,8 @@ module Bolt
         "modules" => {
           description: "A list of module dependencies for the project. Each dependency is a map of data specifying "\
                        "the module to install. To install the project's module dependencies, run the `bolt module "\
-                       "install` command.",
+                       "install` command. For more information about specifying modules, see [the "\
+                       "documentation](https://pup.pt/bolt-module-specs).",
           type: Array,
           items: {
             type: [Hash, String],
@@ -375,6 +395,15 @@ module Bolt
           },
           _plugin: false,
           _example: { "pkcs7" => { "keysize" => 1024 } }
+        },
+        "policies" => {
+          description: "A list of policy names and glob patterns to filter the project's policies by. This option "\
+                       "is used to specify which policies are available to a project and can be applied to targets. "\
+                       "When this option is not configured, policies are not available to the project and cannot "\
+                       "be applied to targets.",
+          type: Array,
+          _plugin: false,
+          _example: ["myproject::apache", "myproject::postgres"]
         },
         "puppetdb" => {
           description: "A map containing options for [configuring the Bolt PuppetDB "\
@@ -599,6 +628,7 @@ module Bolt
         plugin-cache
         plugin-hooks
         plugins
+        policies
         puppetdb
         save-rerun
         spinner

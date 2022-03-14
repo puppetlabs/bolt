@@ -3,10 +3,12 @@
 require 'spec_helper'
 require 'bolt_spec/files'
 require 'bolt_spec/integration'
+require 'bolt_spec/project'
 
 describe "when running over the local transport" do
   include BoltSpec::Files
   include BoltSpec::Integration
+  include BoltSpec::Project
 
   let(:modulepath) { fixtures_path('modules') }
   let(:uri) { 'localhost,local://foo' }
@@ -44,6 +46,25 @@ describe "when running over the local transport" do
       result = run_one_node(%w[task run sample::bolt_ruby message=somemessage] + config_flags)
       expect(result['env']).to match(/somemessage/)
       expect(result['stdin']).to match(/somemessage/)
+    end
+
+    context 'with bundled-ruby false' do
+      around :each do |example|
+        inv = { 'config' => { 'local' => { 'bundled-ruby' => false } } }
+        with_project(inventory: inv) do |project|
+          @project = project
+          example.run
+        end
+      end
+
+      it 'restores original Ruby environment variables' do
+        cmd = %W[task run env_var::ruby_env --project #{@project.path}]
+        result = run_one_node(cmd + config_flags)
+        env = Bundler.with_unbundled_env do
+          ENV['GEM_HOME']
+        end
+        expect(result['_output'].strip).to eq(env.to_s)
+      end
     end
 
     context 'specifying transport on the CLI' do

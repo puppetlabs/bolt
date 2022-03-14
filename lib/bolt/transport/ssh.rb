@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-require 'bolt/logger'
-require 'bolt/node/errors'
-require 'bolt/transport/simple'
+require_relative '../../bolt/logger'
+require_relative '../../bolt/node/errors'
+require_relative '../../bolt/transport/simple'
 
 module Bolt
   module Transport
@@ -44,5 +44,5 @@ module Bolt
   end
 end
 
-require 'bolt/transport/ssh/connection'
-require 'bolt/transport/ssh/exec_connection'
+require_relative 'ssh/connection'
+require_relative 'ssh/exec_connection'
