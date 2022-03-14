@@ -43,6 +43,17 @@ describe Bolt::Transport::SSH::ExecConnection do
         .and_return(['{}', '', double(:status, success?: true)])
       subject.upload_file('good', 'night')
     end
+
+    it 'omits BatchMode when disabled' do
+      # Requires ssh-command is set to change batch-mode
+      inventory.set_config(target, %w[ssh ssh-command], 'ssh')
+      inventory.set_config(target, %w[ssh batch-mode], false)
+
+      expect(Open3).to receive(:capture3)
+        .with("scp", "-r", "good", "sshuser@foo.example.com:night")
+        .and_return(['{}', '', double(:status, success?: true)])
+      subject.upload_file('good', 'night')
+    end
   end
 
   context 'when executing' do
@@ -50,7 +61,7 @@ describe Bolt::Transport::SSH::ExecConnection do
       inventory.set_config(target, %w[ssh ssh-command], ['good', '-morning'])
 
       expect(Open3).to receive(:popen3)
-        .with("good", "-morning", "-o", "BatchMode=yes", "sshuser@foo.example.com", "is it Friday?")
+        .with("good", "-morning", "-o", "BatchMode=yes", "sshuser@foo.example.com", "--", "is it Friday?")
       subject.execute('is it Friday?')
     end
 
@@ -58,7 +69,7 @@ describe Bolt::Transport::SSH::ExecConnection do
       inventory.set_config(target, %w[ssh port], 23)
 
       expect(Open3).to receive(:popen3)
-        .with("ssh", "-o", "BatchMode=yes", "-o", "Port=23", "sshuser@foo.example.com", "I don't know")
+        .with("ssh", "-o", "BatchMode=yes", "-o", "Port=23", "sshuser@foo.example.com", "--", "I don't know")
       subject.execute("I don't know")
     end
 
@@ -67,7 +78,17 @@ describe Bolt::Transport::SSH::ExecConnection do
       inventory.set_config(target, %w[ssh private-key], keypath)
 
       expect(Open3).to receive(:popen3)
-        .with("ssh", "-o", "BatchMode=yes", "-i", keypath, "sshuser@foo.example.com", "what is time?")
+        .with("ssh", "-o", "BatchMode=yes", "-i", keypath, "sshuser@foo.example.com", "--", "what is time?")
+      subject.execute('what is time?')
+    end
+
+    it 'builds ssh command without batch-mode when false' do
+      # Currently requires ssh-command is set to change batch-mode
+      inventory.set_config(target, %w[ssh ssh-command], 'ssh')
+      inventory.set_config(target, %w[ssh batch-mode], false)
+
+      expect(Open3).to receive(:popen3)
+        .with("ssh", "sshuser@foo.example.com", "--", "what is time?")
       subject.execute('what is time?')
     end
 
