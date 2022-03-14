@@ -159,6 +159,8 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
     it "catches EMFILE error and raises helpful message" do
+      puts('whats the message?')
+      puts(winrm.run_command(target, 'ls'))
       # Wait for first connection after bad attempts
       3.times { |_| break if winrm.connected?(target) }
       allow(Thread).to receive(:new)

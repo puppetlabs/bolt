@@ -51,10 +51,14 @@ module Bolt
 
           Timeout.timeout(target.options['connect-timeout']) do
             @connection = ::WinRM::Connection.new(options)
+            puts('options')
+            puts(options)
             @connection.logger = @transport_logger
 
             @session = @connection.shell(:powershell)
+            puts('timeout?')
             @session.run('$PSVersionTable.PSVersion')
+            puts('after run')
             @logger.trace { "Opened session" }
           end
         rescue Timeout::Error
