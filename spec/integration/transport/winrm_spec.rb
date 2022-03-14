@@ -159,6 +159,8 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
     it "catches EMFILE error and raises helpful message" do
+      # Wait for first connection after bad attempts
+      3.times { |_| break if winrm.connected?(target) }
       allow(Thread).to receive(:new)
         .and_raise(Errno::EMFILE)
 
@@ -176,6 +178,8 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
     let(:target) { make_target(port_: ssl_port, conf: ssl_config) }
 
     it "can test whether the target is available" do
+      # Wait for first connection after bad attempts
+      3.times { |_| break if winrm.connected?(target) }
       expect(winrm.connected?(target)).to eq(true)
     end
 
