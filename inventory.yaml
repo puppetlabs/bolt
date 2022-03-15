@@ -1,0 +1,17 @@
+targets:
+  - name: winrm-target
+config:
+  transport: winrm
+  winrm:
+    user:
+      _plugin: env_var
+      var: BOLT_WINRM_USER
+    host:
+      _plugin: env_var
+      var: BOLT_WINRM_HOST
+    port: 5985
+    ssl: false
+    connect-timeout: 120
+    password:
+      _plugin: env_var
+      var: BOLT_WINRM_PASSWORD

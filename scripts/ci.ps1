@@ -135,6 +135,30 @@ function Test-WinRMConfiguration($userName, $password, $retries = 15, $timeout =
   Invoke-ScriptBlockWithRetry @retryArgs
 }
 
+function Test-WinRMConfigurationNoSSL($userName, $password, $retries = 15, $timeout = 1)
+{
+  $retryArgs = @{
+    FailMessage    = 'Failed to establish WinRM connection over SSL'
+    SuccessMessage = "Successfully established WinRM connection with $userName"
+    Retries        = $retries
+    Timeout        = $timeout
+    Script         = {
+      $pass = ConvertTo-SecureString $password -AsPlainText -Force
+      $sessionArgs = @{
+        ComputerName = 'localhost'
+        Credential   = New-Object System.Management.Automation.PSCredential ($userName, $pass)
+        UseSSL       = $false
+        SessionOption = New-PSSessionOption -SkipRevocationCheck -SkipCACheck
+        Port         = 5985
+      }
+
+      if (New-PSSession @sessionArgs) { return $true }
+    }
+  }
+
+  Invoke-ScriptBlockWithRetry @retryArgs
+}
+
 # Ensure Puppet Ruby 5 / 6 takes precedence over system Ruby
 function Set-ActiveRubyFromPuppet
 {
@@ -155,4 +179,5 @@ Enable-PSRemoting
 Set-WSManQuickConfig -Force
 Set-WinRMHostConfiguration
 Test-WinRMConfiguration @User | Out-Null
+Test-WinRMConfigurationNoSSL @User | Out-Null
 Add-Content -Path $ENV:GITHUB_ENV -Value "BOLT_WINRM_PASSWORD=$pass"

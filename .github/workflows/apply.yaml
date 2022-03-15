@@ -49,5 +49,18 @@ jobs:
         name: Run tests
         run: bundle exec rake ci:apply:linux
       - if: matrix.os == 'windows-2019'
+        name: see if winrm is ready
+        run: |
+          echo "host: ${Env:BOLT_WINRM_HOST}"
+          echo $Env:BOLT_WINRM_HOST
+          Test-WSMan -ComputerName localhost
+          bundle exec bolt command run whoami -t winrm-target --inventoryfile inventory.yaml
+          Test-WSMan -ComputerName localhost
+          bundle exec bolt command run whoami -t winrm-target --inventoryfile inventory.yaml 
+          Test-WSMan -ComputerName localhost
+          bundle exec bolt command run whoami -t winrm-target --inventoryfile inventory.yaml 
+          Test-WSMan -ComputerName localhost
+          bundle exec bolt command run whoami -t winrm-target --inventoryfile inventory.yaml 
+      - if: matrix.os == 'windows-2019'
         name: Run tests
         run: bundle exec rake ci:apply:windows
