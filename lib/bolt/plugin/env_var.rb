@@ -1,8 +1,16 @@
 # frozen_string_literal: true
 
+require 'json'
 module Bolt
   class Plugin
     class EnvVar
+      class InvalidPluginData < Bolt::Plugin::PluginError
+        def initialize(msg, plugin)
+          msg = "Invalid Plugin Data for #{plugin}: #{msg}"
+          super(msg, 'bolt/invalid-plugin-data')
+        end
+      end
+
       def initialize(*_args); end
 
       def name
@@ -31,7 +39,15 @@ module Bolt
       end
 
       def resolve_reference(opts)
-        ENV[opts['var']] || opts['default']
+        reference = ENV[opts['var']]
+        if opts['json'] && reference
+          begin
+            reference = JSON.parse(reference)
+          rescue JSON::ParserError => e
+            raise InvalidPluginData.new(e.message, name)
+          end
+        end
+        reference || opts['default']
       end
     end
   end
