@@ -727,6 +727,7 @@ describe "BoltServer::TransportApp" do
         password: target_data[:password],
         port: target_data[:port]
       }
+      target[:'connect-timeout'] = target_data[:'connect-timeout'] if target_data[:'connect-timeout']
 
       body = if multiple
                body_content.merge(targets: [target])

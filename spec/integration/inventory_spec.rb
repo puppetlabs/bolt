@@ -23,7 +23,8 @@ describe 'running with an inventory file', reset_puppet_settings: true do
           transport: conn[:protocol],
           conn[:protocol] => {
             user: conn[:user],
-            port: conn[:port]
+            port: conn[:port],
+            'connect-timeout': conn[:'connect-timeout'] || 10
           }
         } },
       { name: 'uriless',

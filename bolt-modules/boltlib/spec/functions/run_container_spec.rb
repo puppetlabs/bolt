@@ -12,7 +12,7 @@ describe 'run_container' do
   # So that this can be called in the before block
   def image
     @image ||= if Bolt::Util.windows?
-                 'mcr.microsoft.com/windows/servercore:ltsc2019'
+                 'mcr.microsoft.com/windows/servercore:ltsc2022'
                else
                  'ubuntu:20.04'
                end
