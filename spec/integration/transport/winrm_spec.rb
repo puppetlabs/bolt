@@ -44,7 +44,7 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
 
   def mk_config(conf)
     conf = Bolt::Util.walk_keys(conf, &:to_s)
-    conf['connect-timeout'] ||= 30
+    conf['connect-timeout'] ||= 45
     conf
   end
 
@@ -78,7 +78,7 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
 
       # The connection should fail immediately; this timeout helps ensure that
       # and avoids a hang
-      Timeout.timeout(3) do
+      Timeout.timeout(45) do
         expect_node_error(Bolt::Node::ConnectError,
                           'CONNECT_ERROR',
                           /Failed to connect to/) do
@@ -103,7 +103,7 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
         port = socket.addr[1]
         conf = config.merge('connect-timeout' => 2)
 
-        Timeout.timeout(3) do
+        Timeout.timeout(45) do
           expect_node_error(Bolt::Node::ConnectError,
                             'CONNECT_ERROR',
                             /Timeout after \d+ seconds connecting to/) do

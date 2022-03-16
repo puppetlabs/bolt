@@ -22,7 +22,7 @@ module BoltSpec
       when 'winrm'
         default_port      = 25985
         additional_config = { ssl: false,
-                              'connect-timeout': 30 }
+                              'connect-timeout': 45 }
       when 'docker', 'podman'
         default_user     = ''
         default_password = ''

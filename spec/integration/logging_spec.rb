@@ -242,7 +242,7 @@ describe 'streaming output over WinRM', winrm: true do
   let(:user)          { conn_info('winrm')[:user] }
   let(:whoami)        { '$env:UserName' }
   let(:err_cmd)       { '$host.ui.WriteErrorLine("error")' }
-  let(:config_flags)  { %W[--no-ssl --no-ssl-verify --password #{pw}] }
+  let(:config_flags)  { %W[--no-ssl --no-ssl-verify --connect-timeout 45 --password #{pw}] }
 
   include_examples 'streaming output'
 end

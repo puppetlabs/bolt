@@ -20,7 +20,7 @@ describe "when runnning over the winrm transport", winrm: true do
   context 'when using CLI options' do
     let(:config_flags) {
       %W[--targets #{uri} --no-ssl --no-ssl-verify --format json --modulepath #{modulepath}
-         --password #{password}]
+         --password #{password} --connect-timeout 45]
     }
 
     it 'runs a command' do
@@ -83,7 +83,9 @@ describe "when runnning over the winrm transport", winrm: true do
     end
 
     it 'handles disconnects gracefully', :reset_puppet_settings do
-      result = run_cli_json(%w[plan run error::winrm_disconnect] + config_flags)
+      longer_timeout = %W[--targets #{uri} --no-ssl --no-ssl-verify --format json --modulepath #{modulepath}
+                          --password #{password} --connect-timeout 120]
+      result = run_cli_json(%w[plan run error::winrm_disconnect] + longer_timeout)
       expect(result.first['status']).to eq("success")
     end
   end
@@ -104,7 +106,8 @@ describe "when runnning over the winrm transport", winrm: true do
             'user' => user,
             'password' => password,
             'ssl' => false,
-            'ssl-verify' => false
+            'ssl-verify' => false,
+            'connect-timeout' => 45
           }
         }
       }
