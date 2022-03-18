@@ -42,6 +42,13 @@ module Bolt
 
       def fact_path(raw_fact)
         fact_path = raw_fact.split(".")
+        fact_path = fact_path.map do |segment|
+          # Turn it into an integer if we can
+          Integer(segment)
+        rescue ArgumentError
+          # Otherwise return the value
+          segment
+        end
         if fact_path[0] == 'facts'
           fact_path.drop(1)
         elsif fact_path == ['certname']
