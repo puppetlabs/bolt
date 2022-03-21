@@ -461,6 +461,13 @@ module Bolt
           },
           _plugin: true
         },
+        "rerunfile" => {
+          description: "The path to the project's rerun file. The rerun file is used to store information "\
+                       "about targets from the most recent run. Expands relative to the project directory.",
+          type: String,
+          _example: "/Users/bolt/project/rerun.json",
+          _plugin: true
+        },
         "save-rerun" => {
           description: "Whether to update `.rerun.json` in the Bolt project directory. If "\
                        "your target names include passwords, set this value to `false` to avoid "\
@@ -603,6 +610,7 @@ module Bolt
         plugin-hooks
         plugins
         puppetdb
+        rerunfile
         save-rerun
         spinner
         stream
@@ -630,6 +638,7 @@ module Bolt
         plugins
         policies
         puppetdb
+        rerunfile
         save-rerun
         spinner
         stream
