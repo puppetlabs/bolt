@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+require 'bolt/plugin'
 require 'bolt/plugin/env_var'
 require 'io/console'
+require 'json'
 
 describe Bolt::Plugin::EnvVar do
   let(:env_var_data) { { '_plugin' => 'env_var', 'var' => 'BOLT_ENV_VAR' } }
@@ -51,6 +53,27 @@ describe Bolt::Plugin::EnvVar do
     it 'returns the default value when no var is provided' do
       ENV.delete('BOLT_ENV_VAR')
       expect(subject.resolve_reference(env_var_data)).to eq 'DEFAULT_STRING'
+    end
+  end
+
+  describe 'when parse-as-json is true' do
+    let(:env_var_data) { super().merge({ 'json' => true }) }
+    let(:some_data) { { "foo" => "bar" } }
+
+    it 'json data is parsed' do
+      ENV['BOLT_ENV_VAR'] = some_data.to_json
+      expect(subject.resolve_reference(env_var_data)).to eq(some_data)
+    end
+
+    it 'ignores missing values' do
+      ENV.delete('BOLT_ENV_VAR')
+      expect(subject.resolve_reference(env_var_data)).to eq(nil)
+    end
+
+    it 'raises nice error when json cannot be parsed' do
+      ENV['BOLT_ENV_VAR'] = "{:bad json :>"
+      expect { subject.resolve_reference(env_var_data) }
+        .to raise_error(Bolt::Plugin::EnvVar::InvalidPluginData)
     end
   end
 end

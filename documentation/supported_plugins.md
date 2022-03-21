@@ -60,6 +60,7 @@ The following parameters are available to the `env_var` plugin:
 | `var` | **Required.** The name of the environment variable to read from. | `String` | None |
 | `default` | A value to use if the environment variable `var` isn't set. | `String` | None |
 | `optional` | Unless `true`, `env_var` raises an error when the environment variable `var` does not exist.  When `optional` is `true` and `var` does not exist, env_var returns `nil`. | `Boolean` | `false` |
+| `json` | The environment variable value is encoded in a json string, parse it and use the resolved data. | `Boolean` | `false` |
 
 #### Example usage
 
