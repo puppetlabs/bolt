@@ -44,11 +44,12 @@ module Bolt
         end
 
         def ssh_opts
+          # NOTE: not all commands we might use here support various `-o` options,
+          # always provide a way to run without them.
           cmd = []
           # BatchMode is SSH's noninteractive option: if key authentication
           # fails it will error out instead of falling back to password prompt
-          batch_mode = @target.transport_config['batch-mode'] ? 'yes' : 'no'
-          cmd += %W[-o BatchMode=#{batch_mode}]
+          cmd += %w[-o BatchMode=yes] if @target.transport_config['batch-mode']
 
           cmd += %W[-o Port=#{@target.port}] if @target.port
 
@@ -68,6 +69,8 @@ module Bolt
           ssh_cmd = Array(ssh_conf)
           ssh_cmd += ssh_opts
           ssh_cmd << userhost
+          # Add option separator before command for wrappers around SSH
+          ssh_cmd << '--'
           ssh_cmd << command
         end
 
