@@ -43,9 +43,6 @@
     "puppetdb": {
       "$ref": "#/definitions/puppetdb"
     },
-    "rerunfile": {
-      "$ref": "#/definitions/rerunfile"
-    },
     "save-rerun": {
       "$ref": "#/definitions/save-rerun"
     },
@@ -345,17 +342,6 @@
               ]
             }
           }
-        },
-        {
-          "$ref": "#/definitions/_plugin"
-        }
-      ]
-    },
-    "rerunfile": {
-      "description": "The path to the project's rerun file. The rerun file is used to store information about targets from the most recent run. Expands relative to the project directory.",
-      "oneOf": [
-        {
-          "type": "string"
         },
         {
           "$ref": "#/definitions/_plugin"

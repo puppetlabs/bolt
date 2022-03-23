@@ -610,7 +610,6 @@ module Bolt
         plugin-hooks
         plugins
         puppetdb
-        rerunfile
         save-rerun
         spinner
         stream
