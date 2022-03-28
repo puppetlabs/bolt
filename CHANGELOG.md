@@ -1,5 +1,57 @@
 # Changelog
 
+## Bolt 3.22.0 (2022-03-28)
+
+### New features
+
+* **Warn when `bolt-plugin.json` is found**
+  ([BOLT-1572](https://tickets.puppetlabs.com/browse/BOLT-1572))
+
+  Bolt will now warn if, while loading plugins, it finds a
+  `bolt-plugin.json` file in a module. The correct filename is
+  `bolt_plugin.json`, and Bolt will advise renaming the file in order for
+  it to be loaded.
+
+  _Contributed by [Lucy Wyman](https://github.com/lucywyman)_
+
+* **Allow reading manifests from a named pipe**
+  ([#3057](https://github.com/puppetlabs/bolt/pull/3057))
+
+  Bolt will now read manifests from a named pipe, treating them as
+  files.
+
+  _Contributed by [Jesse Hathaway](https://github.com/lollipopman)_
+
+* **Configure path to the rerun file**
+  ([#3049](https://github.com/puppetlabs/bolt/issues/3049))
+
+  You can now configure the path to Bolt's rerun file at the project
+  level with the new `rerunfile` config option.
+
+* **Option to parse data as JSON looked up with `env_var` plugin**
+  ([#3072](https://github.com/puppetlabs/bolt/pull/3072))
+
+  The env_var plugin now accepts a `json` option to allow
+  the plugin to use data encoded as JSON stored in environment
+  variables.
+
+### Bug fixes
+
+* **Make native-ssh more portable**
+  ([#3069](https://github.com/puppetlabs/bolt/issues/3069))
+
+  Updates `native-ssh` so setting `batch-mode: false` omits `-o
+  BatchMode=` and adds a double-dash separater `--` before commands to
+  execute.
+
+* **Support resolving facts from nested arrays with puppetdb plugin**
+  ([#3065](https://github.com/puppetlabs/bolt/issues/3065))
+
+  Previously, indexing into arrays when resolving values from puppetdb
+  facts using the `target_mapping` for the puppetdb plugin did not work.
+  This is now possible by specifying the index of the array, for example:
+  `facts.my_fact_array.0.nested_value`.
+
 ## Bolt 3.21.0 (2021-12-16)
 
 ### New features
