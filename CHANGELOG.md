@@ -1,5 +1,15 @@
 # Changelog
 
+## Bolt 3.22.1 (2022-03-30)
+
+### Bug fixes
+
+* **Fix codesigning error for macOS packages**
+
+  Previously, Bolt would fail when making SSH connections when run on
+  macOS due to Bolt's packaged Ruby being erronously codesigned. Bolt
+  packages no longer codesign Bolt's packaged Ruby.
+
 ## Bolt 3.22.0 (2022-03-28)
 
 ### New features
