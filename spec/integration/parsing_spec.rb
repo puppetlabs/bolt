@@ -47,7 +47,9 @@ describe "CLI parses input" do
         "array" => { "type" => "Optional[Array]", "default_value" => 'undef', "sensitive" => false },
         "hash" => { "type" => "Optional[Hash]", "default_value" => 'undef', "sensitive" => false }
       },
-      "private" => false
+      "private" => false,
+      "summary" => nil,
+      "docstring" => nil
     )
   end
 

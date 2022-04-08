@@ -531,7 +531,9 @@ module Bolt
           'description' => description,
           'parameters'  => parameters,
           'module'      => mod,
-          'private'     => private_plan?(plan)
+          'private'     => private_plan?(plan),
+          'summary'     => plan.tag(:summary)&.text,
+          'docstring'   => (plan.docstring unless plan.docstring.empty?)
         }
 
         pp_info.merge!(get_plan_mtime(plan.file)) if with_mtime
@@ -564,7 +566,9 @@ module Bolt
           'description' => plan.description,
           'parameters'  => parameters,
           'module'      => mod,
-          'private'     => !!plan.private
+          'private'     => !!plan.private,
+          'docstring'   => plan.description,
+          'summary'     => nil
         }
 
         yaml_info.merge!(get_plan_mtime(yaml_path)) if with_mtime
