@@ -152,7 +152,9 @@ describe 'installing modules' do
               "type" => "TargetSpec"
             }
           },
-          "private" => false
+          "private" => false,
+          "summary" => /A plan that retrieves facts and stores/,
+          "docstring" => nil
         }
       }
 

@@ -405,10 +405,15 @@ module Bolt
 
         # Add plan name and description
         info << colorize(:cyan, "#{plan['name']}\n")
-        info << if plan['description']
-                  indent(2, plan['description'].chomp)
-                else
+
+        description = +''
+        description << "#{plan['summary']}\n\n" if plan['summary']
+        description << plan['docstring'] if plan['docstring']
+
+        info << if description.empty?
                   indent(2, 'No description available.')
+                else
+                  indent(2, description.strip)
                 end
         info << "\n\n"
 

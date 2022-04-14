@@ -186,7 +186,9 @@ describe 'plans' do
                 "type" => "TargetSpec"
               }
             },
-            "private" => false
+            "private" => false,
+            "docstring" => nil,
+            "summary" => /A plan that retrieves facts and stores/
           }
         }
 
