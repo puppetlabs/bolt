@@ -15,7 +15,7 @@ and Microsoft Windows.
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
 | RHEL                      | 6, 7, 8, 9          |
-| SLES                      | 12                  |
+| SLES                      | 12, 15              |
 | Ubuntu                    | 16.04, 18.04, 20.04 |
 
 > **Note:** Windows packages are automatically tested on the versions listed
@@ -359,6 +359,13 @@ have installed:
 
   ```shell
   sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-sles-12.noarch.rpm
+  sudo zypper install puppet-bolt
+  ```
+
+- _SLES 15_
+
+  ```shell
+  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-sles-15.noarch.rpm
   sudo zypper install puppet-bolt
   ```
 
