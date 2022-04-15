@@ -14,7 +14,7 @@ and Microsoft Windows.
 | macOS                     | 10.15, 11           |
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
-| RHEL                      | 6, 7, 8             |
+| RHEL                      | 6, 7, 8, 9          |
 | SLES                      | 12                  |
 | Ubuntu                    | 16.04, 18.04, 20.04 |
 
@@ -322,6 +322,13 @@ have installed:
 
   ```shell
   sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-8.noarch.rpm
+  sudo yum install puppet-bolt
+  ```
+
+- _RHEL 9_
+
+  ```shell
+  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-el-9.noarch.rpm
   sudo yum install puppet-bolt
   ```
 
