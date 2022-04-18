@@ -450,6 +450,39 @@ it 'configures servers and databases' do
 end
 ```
 
+### Stubbing and Mocking PuppetDB Calls
+
+Plans that use the `puppetdb_*` set of functions can stub and mock values
+to PuppetDB using standard RSpec mechanisms on `puppetdb_client`, which is
+an automatically provided instance of the PuppetDB client in the
+`BoltSpec` testing context.
+
+If you attempt to test a plan that uses one of the `puppetdb_*` functions
+and have not stubbed or mocked the invocation then BoltSpec will raise an
+error similar to: `Bolt::PAL::PALError: undefined method 'make_query' for #<BoltSpec::Plans::MockPuppetDBClient:0x0000000004745500>` where the method
+you need to stub/mock will depend on which of the `puppetdb_*` set of
+functions you called.
+
+List of methods to stub/mock on the `puppetdb_client` instance for each
+Bolt function:
+
+- `puppetdb_command`: `send_command(command, version, payload)`
+- `puppetdb_fact`: `facts_for_node(certnames)`
+- `puppetdb_query`: `make_query(query)`
+
+You may use the standard RSpec approach to stub and mock. For example, using
+RSpec mocking to stub a query:
+
+```ruby
+it 'runs a plan that needs puppetdb_query' do
+  allow(puppetdb_client).to receive(:make_query)
+    .with('nodes [certname] { limit 1 }')
+    .and_return([ {'certname' => 'mynode'} ])
+
+  run_plan('pdb_using_plan', 'targets' => 'servers')
+end
+```
+
 ## Execution modes
 
 Plans often execute sub-plans with the `run_plan` function to build complex
