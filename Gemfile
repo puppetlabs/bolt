@@ -32,7 +32,7 @@ group(:test) do
 end
 
 group(:packaging) do
-  gem 'packaging', '~> 0.99.35'
+  gem 'packaging', '~> 0.105'
 end
 
 local_gemfile = File.join(__dir__, 'Gemfile.local')
