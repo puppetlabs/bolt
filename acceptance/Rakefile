@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 require 'rototiller'
+require 'json'
+require 'open3'
+require 'beaker-hostgenerator'
+require 'fileutils'
+require 'securerandom'
 require_relative 'lib/acceptance/bolt_setup_helper'
 
 # rubocop:disable Style/MixinUsage
@@ -45,20 +50,20 @@ beaker_options = [
         message: 'Beaker log level'
       }
     } },
-  { name: '--hosts',
-    add_argument: {
-      name: 'hosts.yaml',
-      add_env: {
-        name: 'BEAKER_HOSTS',
-        message: 'Beaker hosts file'
-      }
-    } },
   { name: '--tests',
     add_argument: {
       name: 'tests',
       add_env: {
         name: 'BEAKER_TESTS',
         message: 'Beaker test path(s)'
+      }
+    } },
+  { name: '--hosts',
+    add_argument: {
+      name: 'hosts.yaml',
+      add_env: {
+        name: 'BEAKER_HOSTS',
+        message: 'Beaker hosts file'
       }
     } },
   { name: '--preserve-hosts',
@@ -78,12 +83,70 @@ beaker_options = [
       }
     } }
 ]
+
 beaker_env = [
   { name: 'SSH_USER',       default: ssh_user },
   { name: 'SSH_PASSWORD',   default: ssh_password },
   { name: 'WINRM_USER',     default: winrm_user },
   { name: 'WINRM_PASSWORD', default: winrm_password }
 ]
+
+def test_targets
+  # TODO: make this compatable with BOLT_CONTROLER and BOLT_NODES
+  ENV['LAYOUT'] || 'fedora32-64bolt,ssh.{type=aio}-ubuntu2004-64ssh.{type=aio}-windows10ent-64winrm.{type=aio}'
+end
+
+# Use beaker-hostgenerator to get a list of platform names used by ABS based on
+# the test targets for this run. Then use the list of platform names to create
+# a string usable in the floaty API to check out hosts
+def abs_targets
+  cli = BeakerHostGenerator::CLI.new([test_targets, '--disable-default-role', '--hypervisor=abs'])
+  output = cli.execute.to_s
+  FileUtils.mkdir_p('tmp') # -p ignores when dir already exists
+  File.open("hosts.yaml", 'w') do |fh|
+    fh.print(cli.execute)
+  end
+  raw_targets = YAML.safe_load(output)
+  abs_platforms = Hash.new(0)
+  raw_targets['HOSTS'].each do |_, raw_target|
+    abs_platforms[raw_target['template']] += 1
+  end
+  abs_platforms.map { |platform, num| "#{platform}=#{num}" }.join(' ')
+end
+
+def provision_abs_hosts
+  abs_hosts = abs_targets
+  priority = ENV['PRIORITY'] || 1
+  token_str = if ENV['ABS_TOKEN']
+                "--token #{ENV['ABS_TOKEN']}"
+              else
+                ''
+              end
+  floaty_cmd = "floaty get --force --priority #{priority} --json #{abs_hosts} #{token_str}"
+  puts("Requesting resources from ABS, this depends on floaty and assumes you have the proper configuration")
+  puts(floaty_cmd)
+  floaty_response, stderr, status = Open3.capture3(floaty_cmd)
+  raise "Failed to provision hosts with error: #{stderr}" unless status.exitstatus.zero?
+
+  host_hash = JSON.parse(floaty_response)
+  puts 'Job ID:', host_hash['job_id']
+  host_hash.delete('job_id')
+  transform_floaty_to_beaker_abs(host_hash)
+end
+
+def transform_floaty_to_beaker_abs(floaty_hash)
+  abs_array = floaty_hash.each_with_object([]) do |(host_type, vm_array), arr|
+    vm_array.each do |hostname|
+      arr << {
+        'hostname' => hostname,
+        'type' => host_type,
+        'engine' => 'vmpooler'
+      }
+    end
+  end
+  abs_array.to_json
+end
+
 namespace :test do
   desc "Run bolt acceptance tests against a published gem"
   task gem: :host_config
@@ -141,6 +204,47 @@ namespace :test do
       # with 'beaker not found'. We do not know why so
       # for now use bundle exec to keep things working
       #             - Sean P. McDonald 4/24/18
+      cmd.name = 'bundle exec beaker'
+      cmd.add_option(*beaker_options)
+    end
+  end
+
+  desc "Run bolt acceptance tests against git sha on hosts provisioned from ABS"
+  task :preserve
+  rototiller_task :preserve do |task|
+    beaker_options << {
+      name: '--options',
+      add_argument: { name: 'config/git/options.rb' }
+    }
+    beaker_env.each { |env| task.add_env(env) }
+    task.add_env(name: 'GIT_SERVER', default: git_server)
+    task.add_env(name: 'GIT_FORK', default: git_fork)
+    task.add_env(name: 'GIT_BRANCH', default: git_branch)
+    task.add_env(name: 'GIT_SHA', default: git_sha)
+    task.add_env(name: 'BEAKER_PRESERVE_HOSTS', default: 'always')
+    task.add_env(name: 'ABS_RESOURCE_HOSTS', default: provision_abs_hosts)
+    task.add_command do |cmd|
+      cmd.name = 'bundle exec beaker'
+      cmd.add_option(*beaker_options)
+    end
+  end
+
+  desc "Run bolt acceptance tests against git sha on preserved hosts"
+  task :preserved
+  rototiller_task :preserved do |task|
+    beaker_options << {
+      name: '--options',
+      add_argument: { name: 'config/git/options.rb' }
+    }
+    beaker_env.each { |env| task.add_env(env) }
+    task.add_env(name: 'GIT_SERVER', default: git_server)
+    task.add_env(name: 'GIT_FORK', default: git_fork)
+    task.add_env(name: 'GIT_BRANCH', default: git_branch)
+    task.add_env(name: 'GIT_SHA', default: git_sha)
+    task.add_env(name: 'BEAKER_PRESERVE_HOSTS', default: 'always')
+    task.add_env(name: 'BEAKER_HOSTS', default: 'log/latest/hosts_preserved.yml')
+    task.add_env(name: 'ABS_RESOURCE_HOSTS', default: '[]')
+    task.add_command do |cmd|
       cmd.name = 'bundle exec beaker'
       cmd.add_option(*beaker_options)
     end
