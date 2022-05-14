@@ -43,6 +43,9 @@
     "puppetdb": {
       "$ref": "#/definitions/puppetdb"
     },
+    "puppetdb-instances": {
+      "$ref": "#/definitions/puppetdb-instances"
+    },
     "save-rerun": {
       "$ref": "#/definitions/save-rerun"
     },
@@ -341,6 +344,108 @@
                 }
               ]
             }
+          }
+        },
+        {
+          "$ref": "#/definitions/_plugin"
+        }
+      ]
+    },
+    "puppetdb-instances": {
+      "description": "A map of named PuppetDB instances and their configuration, where keys are the name of a PuppetDB instance and values are maps of configuration options. For more information, see [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md).",
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "cacert": {
+                    "description": "The path to the ca certificate for PuppetDB.",
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
+                  },
+                  "cert": {
+                    "description": "The path to the client certificate file to use for authentication.",
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
+                  },
+                  "connect_timeout": {
+                    "description": "How long to wait in seconds when establishing connections with PuppetDB.",
+                    "oneOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
+                  },
+                  "key": {
+                    "description": "The private key for the certificate.",
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
+                  },
+                  "read_timeout": {
+                    "description": "How long to wait in seconds for a response from PuppetDB.",
+                    "oneOf": [
+                      {
+                        "type": "integer",
+                        "minimum": 1
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
+                  },
+                  "server_urls": {
+                    "description": "An array containing the PuppetDB host to connect to. Include the protocol `https` and the port, which is usually `8081`. For example, `https://my-puppetdb-server.com:8081`.",
+                    "oneOf": [
+                      {
+                        "type": "array"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
+                  },
+                  "token": {
+                    "description": "The path to the PE RBAC Token.",
+                    "oneOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "$ref": "#/definitions/_plugin"
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "$ref": "#/definitions/_plugin"
+              }
+            ]
           }
         },
         {

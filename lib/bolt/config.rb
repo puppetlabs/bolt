@@ -181,6 +181,7 @@ module Bolt
         'plugin-hooks'        => {},
         'plugins'             => {},
         'puppetdb'            => {},
+        'puppetdb-instances'  => {},
         'save-rerun'          => true,
         'spinner'             => true,
         'transport'           => 'ssh'
@@ -252,14 +253,14 @@ module Bolt
       config_data.inject({}) do |acc, config|
         acc.merge(config) do |key, val1, val2|
           case key
-          # Plugin config is shallow merged for each plugin
+          # Shallow merge config for each plugin
           when 'plugins'
             val1.merge(val2) { |_, v1, v2| v1.merge(v2) }
           # Transports are deep merged
           when *TRANSPORT_CONFIG.keys
             Bolt::Util.deep_merge(val1, val2)
           # Hash values are shallow merged
-          when 'apply-settings', 'log', 'plugin-hooks', 'puppetdb'
+          when 'apply-settings', 'log', 'plugin-hooks', 'puppetdb', 'puppetdb-instances'
             val1.merge(val2)
           # Disabled warnings are concatenated
           when 'disable-warnings'
@@ -405,6 +406,10 @@ module Bolt
 
     def puppetdb
       @data['puppetdb']
+    end
+
+    def puppetdb_instances
+      @data['puppetdb-instances']
     end
 
     def color
