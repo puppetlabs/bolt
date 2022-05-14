@@ -2,34 +2,77 @@
 
 require 'json'
 require 'logging'
+require_relative '../../bolt/puppetdb/instance'
 
 module Bolt
   module PuppetDB
     class Client
-      attr_reader :config
-
-      def initialize(config)
-        @config = config
-        @bad_urls = []
-        @current_url = nil
+      # @param config [Hash] A map of default PuppetDB configuration.
+      # @param instances [Hash] A map of configuration for named PuppetDB instances.
+      # @param project [String] The path to the Bolt project.
+      #
+      def initialize(config:, instances: {}, project: nil)
         @logger = Bolt::Logger.logger(self)
+
+        @default_instance = Bolt::PuppetDB::Instance.new(config: config, project: project, load_defaults: true)
+
+        @instances = instances.transform_values do |instance_config|
+          Bolt::PuppetDB::Instance.new(config: instance_config, project: project)
+        end
       end
 
-      def query_certnames(query)
+      # Yields the PuppetDB instance to connect to.
+      #
+      # @param instance [String] The name of the PuppetDB instance.
+      # @yield [Bolt::PuppetDB::Instance]
+      #
+      private def with_instance(instance = nil)
+        yield instance(instance)
+      end
+
+      # Selects the PuppetDB instance to connect to. If an instance is not specified,
+      # the default instance is used.
+      #
+      # @param instance [String] The name of the PuppetDB instance.
+      # @return [Bolt::PuppetDB::Instance]
+      #
+      def instance(instance = nil)
+        if instance
+          unless @instances[instance]
+            raise Bolt::PuppetDBError, "PuppetDB instance '#{instance}' has not been configured, unable to connect"
+          end
+
+          @instances[instance]
+        else
+          @default_instance
+        end
+      end
+
+      # Queries certnames from the PuppetDB instance.
+      #
+      # @param query [String] The PDB query.
+      # @param instance [String] The name of the PuppetDB instance.
+      #
+      def query_certnames(query, instance = nil)
         return [] unless query
 
         @logger.debug("Querying certnames")
-        results = make_query(query)
+        results = make_query(query, nil, instance)
 
         if results&.first && !results.first&.key?('certname')
           fields = results.first&.keys
           raise Bolt::PuppetDBError, "Query results did not contain a 'certname' field: got #{fields.join(', ')}"
         end
+
         results&.map { |result| result['certname'] }&.uniq
       end
 
-      # This method expects an array of certnames to get facts for
-      def facts_for_node(certnames)
+      # Retrieve facts from PuppetDB for a list of nodes.
+      #
+      # @param certnames [Array] The list of certnames to retrieve facts for.
+      # @param instance [String] The name of the PuppetDB instance.
+      #
+      def facts_for_node(certnames, instance = nil)
         return {} if certnames.empty? || certnames.nil?
 
         certnames.uniq!
@@ -37,14 +80,20 @@ module Bolt
         name_query.insert(0, "or")
 
         @logger.debug("Querying certnames")
-        result = make_query(name_query, 'inventory')
+        result = make_query(name_query, 'inventory', instance)
 
         result&.each_with_object({}) do |node, coll|
           coll[node['certname']] = node['facts']
         end
       end
 
-      def fact_values(certnames = [], facts = [])
+      # Retrive fact values for a list of nodes.
+      #
+      # @param certnames [Array] The list of certnames to retrieve fact values for.
+      # @param facts [Array] The list of facts to retrive.
+      # @param instance [String] The name of the PuppetDB instance.
+      #
+      def fact_values(certnames = [], facts = [], instance = nil)
         return {} if certnames.empty? || facts.empty?
 
         certnames.uniq!
@@ -57,135 +106,34 @@ module Bolt
         query = ['and', name_query, facts_query]
 
         @logger.debug("Querying certnames")
-        result = make_query(query, 'fact-contents')
+        result = make_query(query, 'fact-contents', instance)
         result.map! { |h| h.delete_if { |k, _v| %w[environment name].include?(k) } }
         result.group_by { |c| c['certname'] }
       end
 
-      def make_query(query, path = nil)
-        body = JSON.generate(query: query)
-        url = "#{uri}/pdb/query/v4"
-        url += "/#{path}" if path
-
-        begin
-          @logger.debug("Sending PuppetDB query to #{url}")
-          response = http_client.post(url, body: body, header: headers)
-        rescue StandardError => e
-          raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{e}"
-        end
-
-        @logger.debug("Got response code #{response.code} from PuppetDB")
-        if response.code != 200
-          msg = "Failed to query PuppetDB: #{response.body}"
-          if response.code == 400
-            raise Bolt::PuppetDBError, msg
-          else
-            raise Bolt::PuppetDBFailoverError, msg
-          end
-        end
-
-        begin
-          JSON.parse(response.body)
-        rescue JSON::ParserError
-          raise Bolt::PuppetDBError, "Unable to parse response as JSON: #{response.body}"
-        end
-      rescue Bolt::PuppetDBFailoverError => e
-        @logger.error("Request to puppetdb at #{@current_url} failed with #{e}.")
-        reject_url
-        make_query(query, path)
-      end
-
-      # Sends a command to PuppetDB using version 1 of the commands API.
-      # https://puppet.com/docs/puppetdb/latest/api/command/v1/commands.html
+      # Sends a command to PuppetDB using the commands API.
       #
       # @param command [String] The command to invoke.
       # @param version [Integer] The version of the command to invoke.
       # @param payload [Hash] The payload to send with the command.
-      # @return A UUID identifying the submitted command.
+      # @param instance [String] The name of the PuppetDB instance.
       #
-      def send_command(command, version, payload)
-        command = command.dup.force_encoding('utf-8')
-        body    = JSON.generate(payload)
-
-        # PDB requires the following query parameters to the POST request.
-        # Error early if there's no certname, as PDB does not return a
-        # message indicating it's required.
-        unless payload['certname']
-          raise Bolt::Error.new(
-            "Payload must include 'certname', unable to invoke command.",
-            'bolt/pdb-command'
-          )
+      def send_command(command, version, payload, instance = nil)
+        with_instance(instance) do |pdb|
+          pdb.send_command(command, version, payload)
         end
-
-        url = uri.tap do |u|
-          u.path         = 'pdb/cmd/v1'
-          u.query_values = { 'command'  => command,
-                             'version'  => version,
-                             'certname' => payload['certname'] }
-        end
-
-        # Send the command to PDB
-        begin
-          @logger.debug("Sending PuppetDB command '#{command}' to #{url}")
-          response = http_client.post(url.to_s, body: body, header: headers)
-        rescue StandardError => e
-          raise Bolt::PuppetDBFailoverError, "Failed to invoke PuppetDB command: #{e}"
-        end
-
-        @logger.debug("Got response code #{response.code} from PuppetDB")
-        if response.code != 200
-          raise Bolt::PuppetDBError, "Failed to invoke PuppetDB command: #{response.body}"
-        end
-
-        # Return the UUID string from the response body
-        begin
-          JSON.parse(response.body).fetch('uuid', nil)
-        rescue JSON::ParserError
-          raise Bolt::PuppetDBError, "Unable to parse response as JSON: #{response.body}"
-        end
-      rescue Bolt::PuppetDBFailoverError => e
-        @logger.error("Request to puppetdb at #{@current_url} failed with #{e}.")
-        reject_url
-        send_command(command, version, payload)
       end
 
-      def http_client
-        return @http if @http
-        # lazy-load expensive gem code
-        require 'httpclient'
-        @logger.trace("Creating HTTP Client")
-        @http = HTTPClient.new
-        @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
-        @http.ssl_config.add_trust_ca(@config.cacert)
-        @http.connect_timeout = @config.connect_timeout if @config.connect_timeout
-        @http.receive_timeout = @config.read_timeout if @config.read_timeout
-
-        @http
-      end
-
-      def reject_url
-        @bad_urls << @current_url if @current_url
-        @current_url = nil
-      end
-
-      def uri
-        require 'addressable/uri'
-
-        @current_url ||= (@config.server_urls - @bad_urls).first
-        unless @current_url
-          msg = "Failed to connect to all PuppetDB server_urls: #{@config.server_urls.to_a.join(', ')}."
-          raise Bolt::PuppetDBError, msg
+      # Sends a query to PuppetDB.
+      #
+      # @param query [String] The query to send to PuppetDB.
+      # @param path [String] The API path to append to the query URL.
+      # @param instance [String] The name of the PuppetDB instance.
+      #
+      def make_query(query, path = nil, instance = nil)
+        with_instance(instance) do |pdb|
+          pdb.make_query(query, path)
         end
-
-        uri = Addressable::URI.parse(@current_url)
-        uri.port ||= 8081
-        uri
-      end
-
-      def headers
-        headers = { 'Content-Type' => 'application/json' }
-        headers['X-Authentication'] = @config.token if @config.token
-        headers
       end
     end
   end
