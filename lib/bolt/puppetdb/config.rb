@@ -35,8 +35,8 @@ module Bolt
         File.expand_path(File.join(ENV['ALLUSERSPROFILE'], 'PuppetLabs/client-tools/puppetdb.conf'))
       end
 
-      # Loads default configuration from the puppetdb.conf file on system. This file
-      # is only loaded once. If the file is not present, defaults to an empty hash.
+      # Loads default configuration from the puppetdb.conf file on system. If
+      # the file is not present, defaults to an empty hash.
       #
       # @return [Hash]
       #
