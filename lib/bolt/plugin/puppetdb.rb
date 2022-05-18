@@ -12,7 +12,7 @@ module Bolt
       end
 
       TEMPLATE_OPTS = %w[alias config facts features name uri vars].freeze
-      PLUGIN_OPTS = %w[_plugin _cache query target_mapping].freeze
+      PLUGIN_OPTS = %w[_plugin _cache query target_mapping instance].freeze
 
       attr_reader :puppetdb_client
 
@@ -59,7 +59,7 @@ module Bolt
       end
 
       def resolve_reference(opts)
-        targets = @puppetdb_client.query_certnames(opts['query'])
+        targets = @puppetdb_client.query_certnames(opts['query'], opts['instance'])
         facts = []
 
         template = opts.delete('target_mapping') || {}

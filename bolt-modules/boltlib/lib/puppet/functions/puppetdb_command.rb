@@ -17,6 +17,8 @@ require 'bolt/error'
 # > **Note:** Not available in apply block
 #
 Puppet::Functions.create_function(:puppetdb_command) do
+  # Send a command with a payload to PuppetDB.
+  #
   # @param command The command to invoke.
   # @param version The version of the command to invoke.
   # @param payload The payload to the command.
@@ -38,7 +40,36 @@ Puppet::Functions.create_function(:puppetdb_command) do
     return_type 'String'
   end
 
+  # Send a command with a payload to a named PuppetDB instance.
+  #
+  # @param command The command to invoke.
+  # @param version The version of the command to invoke.
+  # @param payload The payload to the command.
+  # @param instance The PuppetDB instance to send the command to.
+  # @return The UUID identifying the response sent by PuppetDB.
+  # @example Replace facts for a target using a named PuppetDB instance
+  #   $payload = {
+  #     'certname'           => 'localhost',
+  #     'environment'        => 'dev',
+  #     'producer'           => 'bolt',
+  #     'producer_timestamp' => '1970-01-01',
+  #     'values'             => { 'orchestrator' => 'bolt' }
+  #   }
+  #
+  #   puppetdb_command('replace_facts', 5, $payload, 'instance-1')
+  dispatch :puppetdb_command_with_instance do
+    param 'String[1]', :command
+    param 'Integer', :version
+    param 'Hash[Data, Data]', :payload
+    param 'String', :instance
+    return_type 'String'
+  end
+
   def puppetdb_command(command, version, payload)
+    puppetdb_command_with_instance(command, version, payload, nil)
+  end
+
+  def puppetdb_command_with_instance(command, version, payload, instance)
     # Disallow in apply blocks.
     unless Puppet[:tasks]
       raise Puppet::ParseErrorWithIssue.from_issue_and_stack(
@@ -61,6 +92,6 @@ Puppet::Functions.create_function(:puppetdb_command) do
       )
     end
 
-    puppetdb_client.send_command(command, version, payload)
+    puppetdb_client.send_command(command, version, payload, instance)
   end
 end
