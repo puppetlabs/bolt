@@ -17,9 +17,9 @@ module Bolt
       attr_reader :puppetdb_client
 
       def initialize(config:, context:)
-        pdb_config = Bolt::PuppetDB::Config.load_config(config, context.boltdir)
-        @puppetdb_client = Bolt::PuppetDB::Client.new(pdb_config)
-        @logger = Bolt::Logger.logger(self)
+        instances        = config.delete('instances') || {}
+        @puppetdb_client = Bolt::PuppetDB::Client.new(config: config, instances: instances, project: context.boltdir)
+        @logger          = Bolt::Logger.logger(self)
       end
 
       def name

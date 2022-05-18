@@ -151,7 +151,7 @@ module Bolt
         msg = "Configuration for the PuppetDB plugin must be in the 'puppetdb' config section, not 'plugins'"
         raise Bolt::Error.new(msg, 'bolt/plugin-error')
       end
-      @unresolved_plugin_configs['puppetdb'] = config.puppetdb if config.puppetdb
+      @unresolved_plugin_configs['puppetdb'] = config.puppetdb.merge('instances' => config.puppetdb_instances)
     end
 
     # Returns a map of configured plugin hooks. Any unresolved plugin references
