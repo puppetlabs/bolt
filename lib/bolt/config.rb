@@ -226,7 +226,7 @@ module Bolt
 
       # Pull out config options. We need to add 'transport' and 'inventoryfile' as they're
       # not part of the OPTIONS hash but are valid options that can be set with CLI options
-      overrides = opts.slice(*OPTIONS.keys, 'inventoryfile', 'transport')
+      overrides = opts.slice(*OPTIONS.keys, 'inventoryfile', 'transport', 'default_puppetdb')
 
       # Pull out transport config options
       TRANSPORT_CONFIG.each do |transport, config|
@@ -410,6 +410,10 @@ module Bolt
 
     def puppetdb_instances
       @data['puppetdb-instances']
+    end
+
+    def default_puppetdb
+      @data['default_puppetdb']
     end
 
     def color

@@ -9,40 +9,53 @@ module Bolt
     class Client
       # @param config [Hash] A map of default PuppetDB configuration.
       # @param instances [Hash] A map of configuration for named PuppetDB instances.
+      # @param default [String] The name of PuppetDB instance to use as the default.
       # @param project [String] The path to the Bolt project.
       #
-      def initialize(config:, instances: {}, project: nil)
+      def initialize(config:, instances: {}, default: nil, project: nil)
         @logger = Bolt::Logger.logger(self)
-
-        @default_instance = Bolt::PuppetDB::Instance.new(config: config, project: project, load_defaults: true)
 
         @instances = instances.transform_values do |instance_config|
           Bolt::PuppetDB::Instance.new(config: instance_config, project: project)
+        end
+
+        @default_instance = if default
+                              validate_instance(default)
+                              @instances[default]
+                            else
+                              Bolt::PuppetDB::Instance.new(config: config, project: project, load_defaults: true)
+                            end
+      end
+
+      # Checks whether a given named instance is configured, erroring if not.
+      #
+      # @param name [String] The name of the PuppetDB instance.
+      #
+      private def validate_instance(name)
+        unless @instances[name]
+          raise Bolt::PuppetDBError, "PuppetDB instance '#{name}' has not been configured, unable to connect"
         end
       end
 
       # Yields the PuppetDB instance to connect to.
       #
-      # @param instance [String] The name of the PuppetDB instance.
+      # @param name [String] The name of the PuppetDB instance.
       # @yield [Bolt::PuppetDB::Instance]
       #
-      private def with_instance(instance = nil)
-        yield instance(instance)
+      private def with_instance(name = nil)
+        yield instance(name)
       end
 
       # Selects the PuppetDB instance to connect to. If an instance is not specified,
       # the default instance is used.
       #
-      # @param instance [String] The name of the PuppetDB instance.
+      # @param name [String] The name of the PuppetDB instance.
       # @return [Bolt::PuppetDB::Instance]
       #
-      def instance(instance = nil)
-        if instance
-          unless @instances[instance]
-            raise Bolt::PuppetDBError, "PuppetDB instance '#{instance}' has not been configured, unable to connect"
-          end
-
-          @instances[instance]
+      def instance(name = nil)
+        if name
+          validate_instance(name)
+          @instances[name]
         else
           @default_instance
         end

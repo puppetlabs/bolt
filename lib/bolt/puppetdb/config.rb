@@ -19,7 +19,7 @@ module Bolt
 
       def initialize(config:, project: nil, load_defaults: false)
         @settings = if load_defaults
-                      self.default_config.merge(config)
+                      self.class.default_config.merge(config)
                     else
                       config
                     end
