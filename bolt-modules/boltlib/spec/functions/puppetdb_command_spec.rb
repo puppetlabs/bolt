@@ -10,9 +10,10 @@ describe 'puppetdb_command' do
   let(:pdb_client) { mock('pdb_client') }
   let(:tasks)      { true }
 
-  let(:command) { 'replace_facts' }
-  let(:payload) { {} }
-  let(:version) { 5 }
+  let(:command)  { 'replace_facts' }
+  let(:payload)  { {} }
+  let(:version)  { 5 }
+  let(:instance) { 'instance' }
 
   around(:each) do |example|
     Puppet[:tasks] = tasks
@@ -22,8 +23,13 @@ describe 'puppetdb_command' do
   end
 
   it 'calls Bolt::PuppetDB::Client.send_command' do
-    pdb_client.expects(:send_command).with(command, version, payload).returns('uuid')
+    pdb_client.expects(:send_command).with(command, version, payload, nil).returns('uuid')
     is_expected.to run.with_params(command, version, payload)
+  end
+
+  it 'calls Bolt::PuppetDB::Client.send_command with a named instance' do
+    pdb_client.expects(:send_command).with(command, version, payload, instance).returns('uuid')
+    is_expected.to run.with_params(command, version, payload, instance)
   end
 
   it 'errors if client does not implement :send_command' do

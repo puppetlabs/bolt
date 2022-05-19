@@ -15,12 +15,19 @@ describe 'puppetdb_fact' do
   end
 
   context 'it calls puppetdb_facts' do
-    let(:facts) { { 'a.com' => {}, 'b.com' => {} } }
+    let(:facts)    { { 'a.com' => {}, 'b.com' => {} } }
+    let(:instance) { 'instance' }
 
     it 'with list of targets' do
       pdb_client.expects(:facts_for_node).with(facts.keys).returns(facts)
 
       is_expected.to run.with_params(facts.keys).and_return(facts)
+    end
+
+    it 'with a named instance' do
+      pdb_client.expects(:facts_for_node).with(facts.keys, instance).returns(facts)
+
+      is_expected.to run.with_params(facts.keys, instance).and_return(facts)
     end
   end
 end

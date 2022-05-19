@@ -15,11 +15,11 @@ describe Bolt::Applicator do
   let(:inventory) { Bolt::Inventory.empty }
   let(:executor) { Bolt::Executor.new }
   let(:config) do
-    Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',
-                               'cacert' => '/path/to/cacert',
-                               'token' => 'token')
+    { 'server_urls' => 'https://localhost:8081',
+      'cacert' => '/path/to/cacert',
+      'token' => 'token' }
   end
-  let(:pdb_client) { Bolt::PuppetDB::Client.new(config) }
+  let(:pdb_client) { Bolt::PuppetDB::Client.new(config: config) }
   let(:modulepath) { [Bolt::Config::Modulepath::BOLTLIB_PATH, Bolt::Config::Modulepath::MODULES_PATH] }
   let(:applicator) { Bolt::Applicator.new(inventory, executor, modulepath, plugindirs, nil, pdb_client, nil, 2, {}) }
   let(:ast) { { 'resources' => [] } }

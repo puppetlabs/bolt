@@ -103,6 +103,16 @@ module BoltSpec
 
     # Provided as a class so expectations can be placed on it.
     class MockPuppetDBClient
+      def initialize(config)
+        @instance = MockPuppetDBInstance.new(config)
+      end
+
+      def instance(_instance)
+        @instance
+      end
+    end
+
+    class MockPuppetDBInstance
       attr_reader :config
 
       def initialize(config)
@@ -111,7 +121,7 @@ module BoltSpec
     end
 
     def puppetdb_client
-      @puppetdb_client ||= MockPuppetDBClient.new(Bolt::PuppetDB::Config.new({}))
+      @puppetdb_client ||= MockPuppetDBClient.new({})
     end
 
     def run_plan(name, params)

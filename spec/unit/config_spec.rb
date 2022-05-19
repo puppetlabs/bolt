@@ -229,7 +229,15 @@ describe Bolt::Config do
             '_run_as' => 'root'
           }
         },
-        'disable-warnings' => ['foo']
+        'disable-warnings' => ['foo'],
+        'puppetdb-instances' => {
+          'instance-2' => {
+            'connect_timeout' => 2
+          },
+          'instance-3' => {
+            'read_timeout' => 3
+          }
+        }
       }
     }
 
@@ -255,7 +263,15 @@ describe Bolt::Config do
             'plugin' => 'fake_plugin'
           }
         },
-        'disable-warnings' => ['bar']
+        'disable-warnings' => ['bar'],
+        'puppetdb-instances' => {
+          'instance-1' => {
+            'read_timeout' => 1
+          },
+          'instance-2' => {
+            'read_timeout' => 2
+          }
+        }
       }
     }
 
@@ -344,6 +360,20 @@ describe Bolt::Config do
     it 'removes log files that are disabled' do
       project_config['log'] = { '~/.puppetlabs/debug.log' => 'disable' }
       expect(config.log).not_to include('~/.puppetlabs/debug.log')
+    end
+
+    it 'shallow merges puppetdb-instances' do
+      expect(config.puppetdb_instances).to eq(
+        'instance-1' => {
+          'read_timeout' => 1
+        },
+        'instance-2' => {
+          'connect_timeout' => 2
+        },
+        'instance-3' => {
+          'read_timeout' => 3
+        }
+      )
     end
 
     context 'analytics' do
