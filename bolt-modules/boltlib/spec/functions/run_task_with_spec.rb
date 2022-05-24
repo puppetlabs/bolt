@@ -394,6 +394,25 @@ describe 'run_task_with' do
           .and_return(result_set)
       end
     end
+
+    context 'using the pcp transport' do
+      let(:task_name)   { 'Test::Noop' }
+      let(:hostname)    { 'pcp://a.b.com' }
+      let(:hostname2)   { 'pcp://x.y.com' }
+      let(:task_params) { { '_noop' => true } }
+
+      it 'sets the noop metaparameter when running in noop mode' do
+        executor.expects(:run_task_with)
+                .with(target_mapping, anything, { noop: true }, [])
+                .returns(result_set)
+        inventory.expects(:get_targets).with(hosts).returns(targets)
+
+        is_expected.to run
+          .with_params('Test::Noop', hosts, '_noop' => true)
+          .with_lambda { |_| {} }
+          .and_return(result_set)
+      end
+    end
   end
 
   context 'it validates the task parameters' do

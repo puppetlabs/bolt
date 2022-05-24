@@ -77,7 +77,7 @@ Puppet::Functions.create_function(:run_task) do
     options[:description] = description if description
 
     # Don't bother loading the local task definition if all targets use the 'pcp' transport.
-    if !targets.empty? && targets.all? { |t| t.transport == 'pcp' }
+    if (pcp_only = targets.any? && targets.all? { |t| t.transport == 'pcp' })
       # create a fake task
       task = Bolt::Task.new(task_name, {}, [{ 'name' => '', 'path' => '' }])
     else
@@ -123,7 +123,9 @@ Puppet::Functions.create_function(:run_task) do
     # executor.noop is set when run task is called from the CLI
     # options[:noop] is set when it's called from a plan
     if executor.noop || options[:noop]
-      if task.supports_noop
+      # If using the pcp transport, we don't have the task metadata. Set the noop
+      # metaparameter in this case.
+      if task.supports_noop || pcp_only
         params['_noop'] = true
       else
         raise with_stack(:TASK_NO_NOOP, 'Task does not support noop')

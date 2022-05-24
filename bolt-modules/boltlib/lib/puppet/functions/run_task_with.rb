@@ -168,7 +168,9 @@ Puppet::Functions.create_function(:run_task_with) do
 
     # Add a noop parameter if the function was called with the noop metaparameter.
     if options[:noop]
-      if task.supports_noop
+      # If using the pcp transport, we don't have the task metadata. Set the noop
+      # metaparameter in this case.
+      if task.supports_noop || pcp_only
         target_mapping.each_value { |params| params['_noop'] = true }
       else
         raise with_stack(:TASK_NO_NOOP, 'Task does not support noop')
