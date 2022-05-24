@@ -10,7 +10,7 @@ RUN mkdir /bolt-server
 # Gemfile requires gemspec which requires bolt/version which requires bolt
 ADD . /bolt-server
 WORKDIR /bolt-server
-RUN bundle install --no-cache --path vendor/bundle
+RUN bundle install --no-cache --path vendor/bundle --jobs=$(nproc)
 
 # Final image
 FROM alpine:3.14
