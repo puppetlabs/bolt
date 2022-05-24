@@ -300,3 +300,17 @@ Example of running test suite using gem install using an existing hosts file:
     ```
     bundle exec beaker exec ./tests
     ```
+
+### Local acceptance tests with ABS resources
+
+The above workflows work for CI and if you are using vmpooler and fog for credentials.
+If instead you are using floaty and ABS the following workflow may be better suited.
+
+1. Provision SUTs and run tests
+```
+bundle exec rake test:preserve
+```
+1. Once provisioned, run based on preserved hosts
+```
+bundle exec rake test:preserved
+```

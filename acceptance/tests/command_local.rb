@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'bolt_command_helper'
+require 'bolt_setup_helper'
 
 test_name "bolt command run should execute command on localhost via local transport" do
   extend Acceptance::BoltCommandHelper
