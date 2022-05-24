@@ -31,17 +31,11 @@ Before you can write and run tests, you need to set up the test environment.
 1. Ensure your module has `Gemfile`, `Rakefile`, and `spec/spec_helper.rb`
    files.
 
-1. Install the `bundler` gem with Ruby:
-
-    ```shell
-    gem install bundler
-    ```
-
 1. Install the module's gem dependencies, which include Bolt and other testing
    tools:
 
     ```shell
-    bundle install
+    pdk bundle install
     ```
 
 ## Directory and file structure
@@ -133,7 +127,7 @@ To run tests for your modules, including tests that you write for plans, run the
 following command:
 
 ```shell
-bundle exec rake spec
+pdk bundle exec rake spec
 ```
 
 This command runs a rake task that is defined in the `Rakefile` created by PDK,
@@ -144,9 +138,9 @@ console together with each test's pass or fail status.
 To run tests for a single plan, run the following:
 
 ```shell
-bundle exec rake spec_prep
-bundle exec rspec spec/plans/<TEST FILE>
-bundle exec rake spec_clean
+pdk bundle exec rake spec_prep
+pdk bundle exec rspec spec/plans/<TEST FILE>
+pdk bundle exec rake spec_clean
 ```
 
 ## Configuration
@@ -654,7 +648,7 @@ end
 Run the tests:
 
 ```shell
-bundle exec rake spec
+pdk bundle exec rake spec
 ```
 
 ### Testing a plan with sub-plans
@@ -865,7 +859,7 @@ end
 Run the tests:
 
 ```shell
-bundle exec rake spec
+pdk bundle exec rake spec
 ```
 
 ### Testing a plan that uses `run_task_with`
@@ -1013,7 +1007,7 @@ end
 Run the tests:
 
 ```shell
-bundle exec rake spec
+pdk bundle exec rake spec
 ```
 
 📖 **Related information**
