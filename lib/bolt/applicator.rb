@@ -162,7 +162,13 @@ module Bolt
 
     def validate_hiera_config(hiera_config)
       if File.exist?(File.path(hiera_config))
-        data = File.open(File.path(hiera_config), "r:UTF-8") { |f| YAML.safe_load(f.read, [Symbol]) }
+        data = File.open(File.path(hiera_config), "r:UTF-8") do |f|
+          if Psych.method(:safe_load).parameters.rassoc(:permitted_classes)
+            YAML.safe_load(f.read, permitted_classes: [Symbol])
+          else
+            YAML.safe_load(f.read, [Symbol])
+          end
+        end
         if data.nil?
           return nil
         elsif data['version'] != 5
