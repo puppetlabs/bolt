@@ -50,7 +50,7 @@ module Bolt
         def self.parse_plan(yaml_string, source_ref)
           # This passes the filename as the second arg for compatibility with Psych used with ruby < 2.6
           # This can be removed when we remove support for ruby 2.5
-          parse_tree = if Psych.method(:parse).parameters.include?('legacy_filename')
+          parse_tree = if Psych.method(:parse).parameters.rassoc(:filename)
                          Psych.parse(yaml_string, filename: source_ref)
                        else
                          Psych.parse(yaml_string, source_ref)
