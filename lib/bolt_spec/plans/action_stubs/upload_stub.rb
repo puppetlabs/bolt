@@ -40,7 +40,7 @@ module BoltSpec
         @invocation[:options]
       end
 
-      def result_for(_target, _data)
+      def result_for(_target, **_data)
         raise 'Upload result cannot be changed'
       end
 

@@ -210,7 +210,7 @@ module BoltSpec
         @allow_apply = true
       end
 
-      def wait_until_available(targets, _options)
+      def wait_until_available(targets, **_options)
         Bolt::ResultSet.new(targets.map { |target| Bolt::Result.new(target) })
       end
 

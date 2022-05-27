@@ -93,7 +93,7 @@ module BoltSpec
         when Bolt::Error
           Bolt::Result.from_exception(target, @data[:default])
         when Hash
-          result_for(target, Bolt::Util.walk_keys(@data[:default], &:to_sym))
+          result_for(target, **Bolt::Util.walk_keys(@data[:default], &:to_sym))
         else
           raise 'Default result must be a Hash'
         end
@@ -156,7 +156,7 @@ module BoltSpec
           # set the inventory from the BoltSpec::Plans, otherwise if we try to convert
           # this target to a string, it will fail to string conversion because the
           # inventory is nil
-          hsh[target] = result_for(Bolt::Target.new(target, @inventory), Bolt::Util.walk_keys(result, &:to_sym))
+          hsh[target] = result_for(Bolt::Target.new(target, @inventory), **Bolt::Util.walk_keys(result, &:to_sym))
         end
         raise "Cannot set return values and return block." if @return_block
         @data_set = true

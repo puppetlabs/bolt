@@ -28,7 +28,7 @@ describe "BoltSpec::Run", ssh: true do
     end
 
     it 'should accept _catch_errors' do
-      result = run_task('sample::echo', 'non_existent_node', '_catch_errors' => true)
+      result = run_task('sample::echo', 'non_existent_node', { '_catch_errors' => true })
 
       expect(result[0]['status']).to eq('failure')
       expect(result[0]['value']['_error']['kind']).to eq('puppetlabs.tasks/connect-error')
@@ -85,20 +85,20 @@ describe "BoltSpec::Run", ssh: true do
 
   describe 'run_plan' do
     it 'should run a plan' do
-      result = run_plan('sample::single_task', 'nodes' => 'ssh')
+      result = run_plan('sample::single_task', { 'nodes' => 'ssh' })
       expect(result['status']).to eq('success')
       data = result['value'][0]
       expect(data['status']).to eq('success')
     end
 
     it 'should return a failure' do
-      result = run_plan('error::run_fail', 'targets' => 'ssh')
+      result = run_plan('error::run_fail', { 'targets' => 'ssh' })
       expect(result['status']).to eq('failure')
       expect(result['value']['kind']).to eq('bolt/run-failure')
     end
 
     it 'runs a plan that downloads a file' do
-      result = run_plan('sample::download_file', 'nodes' => 'ssh')
+      result = run_plan('sample::download_file', { 'nodes' => 'ssh' })
       expect(result['status']).to eq('success')
       data = result['value'][0]
       expect(data['value']['path']).to match(%r{^/tmp/})

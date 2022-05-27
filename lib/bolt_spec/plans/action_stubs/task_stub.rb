@@ -37,7 +37,7 @@ module BoltSpec
       end
 
       # Allow any data.
-      def result_for(target, data)
+      def result_for(target, **data)
         Bolt::Result.new(target, value: Bolt::Util.walk_keys(data, &:to_s))
       end
 
