@@ -27,7 +27,7 @@ mod 'puppetlabs-powershell_task_helper', '0.1.0'
 mod 'puppetlabs-puppet_conf', '1.2.0'
 mod 'puppetlabs-python_task_helper', '0.5.0'
 mod 'puppetlabs-reboot', '4.1.0'
-mod 'puppetlabs-ruby_task_helper', '0.6.0'
+mod 'puppetlabs-ruby_task_helper', '0.6.1'
 mod 'puppetlabs-ruby_plugin_helper', '0.2.0'
 mod 'puppetlabs-stdlib', '8.1.0'
 
