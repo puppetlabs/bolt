@@ -57,6 +57,7 @@ Puppet::Functions.create_function(:run_task) do
 
     options, params = args.partition { |k, _v| k.start_with?('_') }.map(&:to_h)
     options = options.transform_keys { |k| k.sub(/^_/, '').to_sym }
+    options[:description] = description if description
 
     executor = Puppet.lookup(:bolt_executor)
     inventory = Puppet.lookup(:bolt_inventory)
@@ -68,18 +69,24 @@ Puppet::Functions.create_function(:run_task) do
       executor.report_function_call(self.class.name)
     end
 
-    # Report Analytics for bundled content, this should capture tasks run from both CLI and Plans
+    # Report Analytics for bundled content, this should capture tasks run from
+    # both CLI and Plans.
     executor.report_bundled_content('Task', task_name)
 
-    # Ensure that given targets are all Target instances
+    # Ensure that given targets are all Target instances.
     targets = inventory.get_targets(targets)
 
-    options[:description] = description if description
+    # Return early if there are no targets.
+    if targets.empty?
+      return Bolt::ResultSet.new([])
+    end
 
-    # Don't bother loading the local task definition if all targets use the 'pcp' transport.
-    if (pcp_only = targets.any? && targets.all? { |t| t.transport == 'pcp' })
-      # create a fake task
-      task = Bolt::Task.new(task_name, {}, [{ 'name' => '', 'path' => '' }])
+    # If all targets use the PCP transport, create a fake task instead of
+    # loading the actual task definition.
+    if targets.all? { |t| t.transport == 'pcp' }
+      task = Bolt::Task.new(task_name,
+                            { 'supports_noop' => true },
+                            [{ 'name' => '', 'path' => '' }])
     else
       # TODO: use the compiler injection once PUP-8237 lands
       task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
@@ -89,7 +96,8 @@ Puppet::Functions.create_function(:run_task) do
 
       task = Bolt::Task.from_task_signature(task_signature)
 
-      # Set the default value for any params that have one and were not provided or are undef
+      # Set the default value for any params that have one and were not provided
+      # or are undef.
       params = task.parameter_defaults.merge(params) do |_, default, passed|
         passed.nil? ? default : passed
       end
@@ -99,9 +107,9 @@ Puppet::Functions.create_function(:run_task) do
       end || (raise with_stack(:TYPE_MISMATCH, 'Task parameters do not match'))
     end
 
+    # Generate a helpful error message about the type-mismatch between the type
+    # Data and the actual type of params.
     unless Puppet::Pops::Types::TypeFactory.data.instance?(params)
-      # generate a helpful error message about the type-mismatch between the type Data
-      # and the actual type of params
       params_t = Puppet::Pops::Types::TypeCalculator.infer_set(params)
       desc = Puppet::Pops::Types::TypeMismatchDescriber.singleton.describe_mismatch(
         'Task parameters are not of type Data. run_task()',
@@ -123,9 +131,7 @@ Puppet::Functions.create_function(:run_task) do
     # executor.noop is set when run task is called from the CLI
     # options[:noop] is set when it's called from a plan
     if executor.noop || options[:noop]
-      # If using the pcp transport, we don't have the task metadata. Set the noop
-      # metaparameter in this case.
-      if task.supports_noop || pcp_only
+      if task.supports_noop
         params['_noop'] = true
       else
         raise with_stack(:TASK_NO_NOOP, 'Task does not support noop')
@@ -135,23 +141,20 @@ Puppet::Functions.create_function(:run_task) do
     # Report whether the task was run in noop mode.
     executor.report_noop_mode(executor.noop || options[:noop])
 
-    if targets.empty?
-      Bolt::ResultSet.new([])
-    else
-      file_line = Puppet::Pops::PuppetStack.top_of_stack
-      result = if executor.in_parallel?
-                 executor.run_in_thread do
-                   executor.run_task(targets, task, params, options, file_line)
-                 end
-               else
+    file_line = Puppet::Pops::PuppetStack.top_of_stack
+    result = if executor.in_parallel?
+               executor.run_in_thread do
                  executor.run_task(targets, task, params, options, file_line)
                end
+             else
+               executor.run_task(targets, task, params, options, file_line)
+             end
 
-      if !result.ok && !options[:catch_errors]
-        raise Bolt::RunFailure.new(result, 'run_task', task_name)
-      end
-      result
+    if !result.ok && !options[:catch_errors]
+      raise Bolt::RunFailure.new(result, 'run_task', task_name)
     end
+
+    result
   end
 
   def with_stack(kind, msg)

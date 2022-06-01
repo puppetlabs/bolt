@@ -339,10 +339,10 @@ describe 'run_task_with' do
     end
 
     it 'when called with non existing task - reports an unknown task error' do
-      inventory.expects(:get_targets).with([]).returns([])
+      inventory.expects(:get_target).with(hostname).returns([target])
 
       is_expected.to run
-        .with_params('test::nonesuch', [])
+        .with_params('test::nonesuch', [hostname])
         .with_lambda { |_| {} }
         .and_raise_error(
           /Could not find a task named 'test::nonesuch'/
