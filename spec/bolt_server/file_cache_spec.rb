@@ -155,6 +155,8 @@ describe BoltServer::FileCache, puppetserver: true do
       num_threads = 10
       file_chars = 10000
       file_content = 'a' * file_chars
+      # Prime the cache (even though the thread that writes is started first, there is no guarantee it executes first)
+      file_cache.cache_project_file('foo_bar', 'baz', file_content)
       threads = num_threads.times.map do |i|
         if i.even?
           Thread.new { file_cache.cache_project_file('foo_bar', 'baz', file_content) }
