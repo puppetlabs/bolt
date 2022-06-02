@@ -92,10 +92,17 @@ Puppet::Functions.create_function(:run_task_with) do
     # Get all the targets
     targets = Array(inventory.get_targets(targets))
 
+    # Return early if there are no targets.
+    if targets.empty?
+      return Bolt::ResultSet.new([])
+    end
+
     # If all targets use the 'pcp' transport, use a fake task instead of loading the local definition
     # Otherwise, load the local task definition
-    if (pcp_only = targets.any? && targets.all? { |t| t.transport == 'pcp' })
-      task = Bolt::Task.new(task_name, {}, [{ 'name' => '', 'path' => '' }])
+    if (pcp_only = targets.all? { |t| t.transport == 'pcp' })
+      task = Bolt::Task.new(task_name,
+                            { 'supports_noop' => true },
+                            [{ 'name' => '', 'path' => '' }])
     else
       task_signature = Puppet::Pal::ScriptCompiler.new(closure_scope.compiler).task_signature(task_name)
 
@@ -178,27 +185,23 @@ Puppet::Functions.create_function(:run_task_with) do
     # Report whether the task was run in noop mode.
     executor.report_noop_mode(executor.noop || options[:noop])
 
-    if targets.empty?
-      Bolt::ResultSet.new([])
-    else
-      # Combine the results from the task run with any failing results that were
-      # generated earlier when creating the target mapping
-      file_line = Puppet::Pops::PuppetStack.top_of_stack
-      task_result = if executor.in_parallel?
-                      executor.run_in_thread do
-                        executor.run_task_with(target_mapping, task, options, file_line)
-                      end
-                    else
+    # Combine the results from the task run with any failing results that were
+    # generated earlier when creating the target mapping
+    file_line = Puppet::Pops::PuppetStack.top_of_stack
+    task_result = if executor.in_parallel?
+                    executor.run_in_thread do
                       executor.run_task_with(target_mapping, task, options, file_line)
                     end
-      result = Bolt::ResultSet.new(task_result.results + error_set)
+                  else
+                    executor.run_task_with(target_mapping, task, options, file_line)
+                  end
+    result = Bolt::ResultSet.new(task_result.results + error_set)
 
-      if !result.ok && !options[:catch_errors]
-        raise Bolt::RunFailure.new(result, 'run_task', task_name)
-      end
-
-      result
+    if !result.ok && !options[:catch_errors]
+      raise Bolt::RunFailure.new(result, 'run_task', task_name)
     end
+
+    result
   end
 
   def with_stack(kind, msg)

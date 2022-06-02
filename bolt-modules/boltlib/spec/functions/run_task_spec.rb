@@ -348,10 +348,10 @@ describe 'run_task' do
     end
 
     it 'when called with non existing task - reports an unknown task error' do
-      inventory.expects(:get_targets).with([]).returns([])
+      inventory.expects(:get_target).with(hostname).returns([target])
 
       is_expected.to run
-        .with_params('test::nonesuch', [])
+        .with_params('test::nonesuch', hostname)
         .and_raise_error(
           /Could not find a task named 'test::nonesuch'/
         )
@@ -396,6 +396,24 @@ describe 'run_task' do
         is_expected.to run
           .with_params('Test::Sensitive_Meta', hostname, input_params)
           .and_return(result_set)
+      end
+    end
+
+    context 'using the pcp transport' do
+      let(:task_name)   { 'Test::Noop' }
+      let(:hostname)    { 'pcp://a.b.com' }
+      let(:task_params) { { '_noop' => true } }
+
+      it 'sets the noop metaparameter when running in noop mode' do
+        executor.expects(:run_task).with([target],
+                                         anything,
+                                         { '_noop' => true },
+                                         { noop: true },
+                                         [])
+                .returns(result_set)
+
+        is_expected.to run
+          .with_params(task_name, hostname, task_params)
       end
     end
   end
