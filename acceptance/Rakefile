@@ -23,8 +23,9 @@ rototiller_task :host_config do |task|
     n_new = []
     n.each_with_index do |node, i|
       roles = []
-      roles << 'bolt' if i.zero?
-      roles << if /win/ =~ node
+      roles << if i.zero?
+                 'bolt'
+               elsif /win/ =~ node
                  'winrm'
                else
                  'ssh'
@@ -93,7 +94,7 @@ beaker_env = [
 
 def test_targets
   # TODO: make this compatable with BOLT_CONTROLER and BOLT_NODES
-  ENV['LAYOUT'] || 'fedora32-64bolt,ssh.{type=aio}-ubuntu2004-64ssh.{type=aio}-windows10ent-64winrm.{type=aio}'
+  ENV['LAYOUT'] || 'fedora32-64bolt.{type=aio}-ubuntu2004-64ssh.{type=aio}-windows10ent-64winrm.{type=aio}'
 end
 
 # Use beaker-hostgenerator to get a list of platform names used by ABS based on
