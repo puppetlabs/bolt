@@ -17,11 +17,11 @@ describe Bolt::Catalog do
   let(:executor) { Bolt::Executor.new }
   let(:boltlib) { Bolt::Config::Modulepath::BOLTLIB_PATH }
   let(:pdb_config) do
-    Bolt::PuppetDB::Config.new('server_urls' => 'https://localhost:8081',
-                               'cacert' => '/path/to/cacert',
-                               'cert' => '/path/to/cert',
-                               'key' => '/path/to/key',
-                               'token' => 'token')
+    { 'server_urls' => 'https://localhost:8081',
+      'cacert' => '/path/to/cacert',
+      'cert' => '/path/to/cert',
+      'key' => '/path/to/key',
+      'token' => 'token' }
   end
   let(:catalog) { Bolt::Catalog.new('warning') }
   let(:notify) { "notify { \"trusted ${trusted}\": }" }
@@ -42,7 +42,7 @@ describe Bolt::Catalog do
   let(:request) do
     { 'code_ast' => {},
       'modulepath' => [],
-      'pdb_config' => pdb_config.to_hash,
+      'pdb_config' => pdb_config,
       'project' => project,
       'hiera_config' => nil,
       'plan_vars' => {},

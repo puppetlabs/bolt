@@ -10,7 +10,7 @@ module Bolt
     OPTIONS = { inventory: %w[targets query rerun],
                 authentication: %w[user password password-prompt private-key host-key-check ssl ssl-verify],
                 escalation: %w[run-as sudo-password sudo-password-prompt sudo-executable],
-                run_context: %w[concurrency inventoryfile save-rerun cleanup],
+                run_context: %w[concurrency inventoryfile save-rerun cleanup puppetdb],
                 global_config_setters: PROJECT_PATHS + %w[modulepath],
                 transports: %w[transport connect-timeout tty native-ssh ssh-command copy-command],
                 display: %w[format color verbose trace stream],
@@ -1053,6 +1053,9 @@ module Bolt
       end
       define('--[no-]save-rerun', 'Whether to update the rerun file after this command.') do |save|
         @options[:'save-rerun'] = save
+      end
+      define('--puppetdb INSTANCE', 'The named PuppetDB instance to connect to by default.') do |instance|
+        @options[:default_puppetdb] = instance
       end
 
       separator "\n#{self.class.colorize(:cyan, 'Remote environment options')}"

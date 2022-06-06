@@ -54,6 +54,58 @@ module Bolt
         }
       }.freeze
 
+      # PuppetDB options.
+      PUPPETDB_OPTIONS = {
+        "cacert" => {
+          description: "The path to the ca certificate for PuppetDB.",
+          type: String,
+          _example: "/etc/puppetlabs/puppet/ssl/certs/ca.pem",
+          _plugin: true
+        },
+        "cert" => {
+          description: "The path to the client certificate file to use for authentication.",
+          type: String,
+          _example: "/etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem",
+          _plugin: true
+        },
+        "connect_timeout" => {
+          description: "How long to wait in seconds when establishing connections with PuppetDB.",
+          type: Integer,
+          minimum: 1,
+          _default: 60,
+          _example: 120,
+          _plugin: true
+        },
+        "key" => {
+          description: "The private key for the certificate.",
+          type: String,
+          _example: "/etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem",
+          _plugin: true
+        },
+        "read_timeout" => {
+          description: "How long to wait in seconds for a response from PuppetDB.",
+          type: Integer,
+          minimum: 1,
+          _default: 60,
+          _example: 120,
+          _plugin: true
+        },
+        "server_urls" => {
+          description: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\
+                        "and the port, which is usually `8081`. For example, "\
+                        "`https://my-puppetdb-server.com:8081`.",
+          type: Array,
+          _example: ["https://puppet.example.com:8081"],
+          _plugin: true
+        },
+        "token" => {
+          description: "The path to the PE RBAC Token.",
+          type: String,
+          _example: "~/.puppetlabs/token",
+          _plugin: true
+        }
+      }.freeze
+
       # Definitions used to validate config options.
       # https://github.com/puppetlabs/bolt/blob/main/schemas/README.md
       OPTIONS = {
@@ -409,55 +461,17 @@ module Bolt
           description: "A map containing options for [configuring the Bolt PuppetDB "\
                        "client](bolt_connect_puppetdb.md).",
           type: Hash,
-          properties: {
-            "cacert" => {
-              description: "The path to the ca certificate for PuppetDB.",
-              type: String,
-              _example: "/etc/puppetlabs/puppet/ssl/certs/ca.pem",
-              _plugin: true
-            },
-            "cert" => {
-              description: "The path to the client certificate file to use for authentication.",
-              type: String,
-              _example: "/etc/puppetlabs/puppet/ssl/certs/my-host.example.com.pem",
-              _plugin: true
-            },
-            "connect_timeout" => {
-              description: "How long to wait in seconds when establishing connections with PuppetDB.",
-              type: Integer,
-              minimum: 1,
-              _default: 60,
-              _example: 120,
-              _plugin: true
-            },
-            "key" => {
-              description: "The private key for the certificate.",
-              type: String,
-              _example: "/etc/puppetlabs/puppet/ssl/private_keys/my-host.example.com.pem",
-              _plugin: true
-            },
-            "read_timeout" => {
-              description: "How long to wait in seconds for a response from PuppetDB.",
-              type: Integer,
-              minimum: 1,
-              _default: 60,
-              _example: 120,
-              _plugin: true
-            },
-            "server_urls" => {
-              description: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\
-                           "and the port, which is usually `8081`. For example, "\
-                           "`https://my-puppetdb-server.com:8081`.",
-              type: Array,
-              _example: ["https://puppet.example.com:8081"],
-              _plugin: true
-            },
-            "token" => {
-              description: "The path to the PE RBAC Token.",
-              type: String,
-              _example: "~/.puppetlabs/token",
-              _plugin: true
-            }
+          properties: PUPPETDB_OPTIONS,
+          _plugin: true
+        },
+        "puppetdb-instances" => {
+          description: "A map of named PuppetDB instances and their configuration, where keys are the name "\
+                       "of a PuppetDB instance and values are maps of configuration options. For more "\
+                       "information, see [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md).",
+          type: Hash,
+          additionalProperties: {
+            type: Hash,
+            properties: PUPPETDB_OPTIONS
           },
           _plugin: true
         },
@@ -610,6 +624,7 @@ module Bolt
         plugin-hooks
         plugins
         puppetdb
+        puppetdb-instances
         save-rerun
         spinner
         stream
@@ -637,6 +652,7 @@ module Bolt
         plugins
         policies
         puppetdb
+        puppetdb-instances
         rerunfile
         save-rerun
         spinner

@@ -9,21 +9,25 @@ require 'httpclient'
 describe Bolt::PuppetDB::Client do
   let(:uri) { 'https://puppetdb:8081' }
   let(:cacert) { File.expand_path('/path/to/cacert') }
-  let(:client) { Bolt::PuppetDB::Client.new(config) }
+  let(:client) { Bolt::PuppetDB::Client.new(config: pdb_config) }
+  let(:instance) { client.instance }
+  let(:config) { instance.config }
   let(:connect_timeout) { 45 }
   let(:read_timeout) { 45 }
+  let(:pdb_config) do
+    {
+      'server_urls'     => [uri],
+      'cacert'          => cacert,
+      'token'           => nil,
+      'cert'            => nil,
+      'key'             => nil,
+      'connect_timeout' => nil,
+      'read_timeout'    => nil
+    }
+  end
 
-  let(:config) do
-    double(
-      'config',
-      server_urls: [uri],
-      cacert: cacert,
-      token: nil,
-      cert: nil,
-      key: nil,
-      connect_timeout: nil,
-      read_timeout: nil
-    )
+  before(:each) do
+    allow(File).to receive(:exist?).and_return(true)
   end
 
   describe "#http_client" do
@@ -37,40 +41,40 @@ describe Bolt::PuppetDB::Client do
     it 'sets connect_timeout when connect_timeout is set' do
       allow(config).to receive(:connect_timeout).and_return(connect_timeout)
       expect(http_client).to receive(:connect_timeout=).with(connect_timeout)
-      client.http_client
+      instance.http_client
     end
 
     it 'does not connect_timeout when connect_timeout is not set' do
       expect(http_client).not_to receive(:connect_timeout=)
-      client.http_client
+      instance.http_client
     end
 
     it 'sets receive_timeout when read_timeout is set' do
       allow(config).to receive(:read_timeout).and_return(read_timeout)
       expect(http_client).to receive(:receive_timeout=).with(read_timeout)
-      client.http_client
+      instance.http_client
     end
 
     it 'does not set receive_timeout when read_timeout is not set' do
       expect(http_client).not_to receive(:receive_timeout=)
-      client.http_client
+      instance.http_client
     end
   end
 
   describe "#headers" do
     it 'sets content-type' do
-      expect(client.headers['Content-Type']).to eq('application/json')
+      expect(instance.headers['Content-Type']).to eq('application/json')
     end
 
     it 'includes the token if specified' do
       token = 'footokentest'
       allow(config).to receive(:token).and_return(token)
 
-      expect(client.headers['X-Authentication']).to eq(token)
+      expect(instance.headers['X-Authentication']).to eq(token)
     end
 
     it 'omits token if not specified' do
-      expect(client.headers).not_to include('X-Authentication')
+      expect(instance.headers).not_to include('X-Authentication')
     end
   end
 
@@ -79,7 +83,7 @@ describe Bolt::PuppetDB::Client do
     let(:http_client) { double('http_client', post: response) }
 
     before :each do
-      allow(client).to receive(:http_client).and_return(http_client)
+      allow(instance).to receive(:http_client).and_return(http_client)
     end
 
     it 'returns unique certnames' do
@@ -110,7 +114,7 @@ describe Bolt::PuppetDB::Client do
 
   describe "#facts_for_node" do
     it 'should not make a request to pdb if there are no nodes' do
-      expect(client).to receive(:http_client).never
+      expect(instance).to receive(:http_client).never
       facts = client.facts_for_node([])
       expect(facts).to eq({})
     end
@@ -196,8 +200,8 @@ describe Bolt::PuppetDB::Client do
       it 'should set the port to 8081 if no port is specified' do
         conf = pdb_conf
         conf['server_urls'] = ['https://puppetdb']
-        client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
-        expect(client.uri.to_s).to eq('https://puppetdb:8081')
+        client = Bolt::PuppetDB::Client.new(config: conf)
+        expect(client.instance.uri.to_s).to eq('https://puppetdb:8081')
       end
     end
 
@@ -208,7 +212,7 @@ describe Bolt::PuppetDB::Client do
     it 'should fail after all servers fail' do
       conf = pdb_conf
       conf['server_urls'] = ['https://bad1.example.com', 'https://bad2.example.com']
-      client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
+      client = Bolt::PuppetDB::Client.new(config: conf)
       msg = "Failed to connect to all PuppetDB server_urls: https://bad1.example.com, https://bad2.example.com."
       expect { client.facts_for_node(%w[node1 node2]) }.to raise_error(Bolt::PuppetDBError, msg)
     end
@@ -216,7 +220,7 @@ describe Bolt::PuppetDB::Client do
     it 'should failover if the first server fails' do
       conf = pdb_conf
       conf['server_urls'] = ['https://bad.example.com', pdb_conf['server_urls']]
-      client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(conf))
+      client = Bolt::PuppetDB::Client.new(config: conf)
       facts = client.facts_for_node(%w[node1 node2])
       expect(facts).to eq(facts_hash)
     end
@@ -224,7 +228,7 @@ describe Bolt::PuppetDB::Client do
 
   describe "#fact_values" do
     it 'should not make a request to pdb if there are no nodes' do
-      expect(client).to receive(:http_client).never
+      expect(instance).to receive(:http_client).never
       facts = client.fact_values([])
       expect(facts).to eq({})
     end

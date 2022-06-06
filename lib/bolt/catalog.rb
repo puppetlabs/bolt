@@ -56,7 +56,7 @@ module Bolt
     end
 
     def compile_catalog(request)
-      pdb_client = Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(request['pdb_config']))
+      pdb_client = Bolt::PuppetDB::Client.new(config: request['pdb_config'])
       project = request['project']
       bolt_project = Struct.new(:name, :path, :load_as_module?).new(project['name'],
                                                                     project['path'],

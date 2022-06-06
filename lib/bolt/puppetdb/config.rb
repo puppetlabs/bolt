@@ -17,11 +17,30 @@ module Bolt
 
       end
 
+      def initialize(config:, project: nil, load_defaults: false)
+        @settings = if load_defaults
+                      self.class.default_config.merge(config)
+                    else
+                      config
+                    end
+
+        expand_paths(project)
+      end
+
+      # Returns the path to the puppetdb.conf file on Windows.
+      #
+      # @return [String]
+      #
       def self.default_windows_config
         File.expand_path(File.join(ENV['ALLUSERSPROFILE'], 'PuppetLabs/client-tools/puppetdb.conf'))
       end
 
-      def self.load_config(options, project_path = nil)
+      # Loads default configuration from the puppetdb.conf file on system. If
+      # the file is not present, defaults to an empty hash.
+      #
+      # @return [Hash]
+      #
+      def self.default_config
         config = {}
         global_path = Bolt::Util.windows? ? default_windows_config : DEFAULT_CONFIG[:global]
 
@@ -37,13 +56,7 @@ module Bolt
           Bolt::Logger.logger(self).error("Could not load puppetdb.conf from #{filepath}: #{e.message}")
         end
 
-        config = config.fetch('puppetdb', {})
-        new(config.merge(options), project_path)
-      end
-
-      def initialize(settings, project_path = nil)
-        @settings = settings
-        expand_paths(project_path)
+        config.fetch('puppetdb', {})
       end
 
       def token

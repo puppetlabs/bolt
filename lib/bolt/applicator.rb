@@ -225,7 +225,7 @@ module Bolt
         code_ast: ast,
         modulepath: @modulepath,
         project: @project.to_h,
-        pdb_config: @pdb_client.config.to_hash,
+        pdb_config: @pdb_client.instance(options[:puppetdb]).config.to_hash,
         hiera_config: @hiera_config,
         plan_vars: plan_vars,
         # This data isn't available on the target config hash

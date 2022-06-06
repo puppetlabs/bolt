@@ -12,13 +12,16 @@ module Bolt
       end
 
       TEMPLATE_OPTS = %w[alias config facts features name uri vars].freeze
-      PLUGIN_OPTS = %w[_plugin _cache query target_mapping].freeze
+      PLUGIN_OPTS = %w[_plugin _cache query target_mapping instance].freeze
 
       attr_reader :puppetdb_client
 
       def initialize(config:, context:)
-        pdb_config = Bolt::PuppetDB::Config.load_config(config, context.boltdir)
-        @puppetdb_client = Bolt::PuppetDB::Client.new(pdb_config)
+        @puppetdb_client = Bolt::PuppetDB::Client.new(default:   config.delete('default'),
+                                                      instances: config.delete('instances') || {},
+                                                      config:    config,
+                                                      project:   context.boltdir)
+
         @logger = Bolt::Logger.logger(self)
       end
 
@@ -59,7 +62,7 @@ module Bolt
       end
 
       def resolve_reference(opts)
-        targets = @puppetdb_client.query_certnames(opts['query'])
+        targets = @puppetdb_client.query_certnames(opts['query'], opts['instance'])
         facts = []
 
         template = opts.delete('target_mapping') || {}

@@ -19,7 +19,7 @@ module BoltSpec
 
     def make_command(command:, version:, payload:, wait: nil)
       client = pdb_client
-      url = "#{client.uri}/pdb/cmd/v1"
+      url = "#{client.instance.uri}/pdb/cmd/v1"
       url += "?secondsToWaitForCompletion=#{wait}" if wait
 
       body = { command: command, version: version, payload: payload }
@@ -27,7 +27,7 @@ module BoltSpec
 
       headers = { "Content-Type" => "application/json" }
 
-      client.http_client.post(url, body: body, header: headers)
+      client.instance.http_client.post(url, body: body, header: headers)
     end
 
     def replace_facts(certname, facts, wait: nil)
@@ -58,7 +58,7 @@ module BoltSpec
     end
 
     def pdb_client
-      Bolt::PuppetDB::Client.new(Bolt::PuppetDB::Config.new(pdb_conf))
+      Bolt::PuppetDB::Client.new(config: pdb_conf)
     end
   end
 end

@@ -324,6 +324,11 @@ begin
                           "returning a report of the changes it would make while taking no action.",
                 "type" => "Boolean"
               },
+              "_puppetdb" => {
+                "desc" => "The named PuppetDB instance to connect to when making PuppetDB queries "\
+                          "during catalog compilation.",
+                "type" => "String"
+              },
               "_run_as" => {
                 "desc" => "The user to apply the manifest block as. Only available for transports "\
                           "that support the `run-as` option.",

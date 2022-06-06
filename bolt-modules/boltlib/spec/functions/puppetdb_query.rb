@@ -15,12 +15,20 @@ describe 'puppetdb_query' do
   end
 
   context 'it calls puppetdb_facts' do
+    let(:query)    { 'inventory {}' }
+    let(:result)   { [1, 2, 3] }
+    let(:instance) { 'instance' }
+
     it 'with list of targets' do
-      query = 'inventory {}'
-      result = [1, 2, 3]
       pdb_client.expects(:make_query).with(query).returns(result)
 
       is_expected.to run.with_params(query).and_return(result)
+    end
+
+    it 'with a named instance' do
+      pdb_client.expects(:make_query).with(query, instance).returns(result)
+
+      is_expected.to run.with_params(query, instance).and_return(result)
     end
   end
 end

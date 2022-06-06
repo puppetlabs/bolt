@@ -18,7 +18,7 @@ describe Bolt::PuppetDB::Config do
       }
     end
 
-    let(:config) { Bolt::PuppetDB::Config.new(options, project) }
+    let(:config) { Bolt::PuppetDB::Config.new(config: options, project: project) }
 
     it 'expands the cacert relative to the project if project is available' do
       allow(config).to receive(:validate_file_exists).with('cacert').and_return true
@@ -46,7 +46,7 @@ describe Bolt::PuppetDB::Config do
       }
     end
 
-    let(:config) { Bolt::PuppetDB::Config.new(options) }
+    let(:config) { Bolt::PuppetDB::Config.new(config: options) }
 
     context "#uri" do
       it 'uses server_urls value if it is a string' do
@@ -219,19 +219,19 @@ describe Bolt::PuppetDB::Config do
     end
   end
 
-  context "::load_config" do
+  context "load_defaults" do
     it "on non-windows OS loads from default location" do
       allow(Bolt::Util).to receive(:windows?).and_return(false)
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user])
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:global])
-      Bolt::PuppetDB::Config.load_config({})
+      Bolt::PuppetDB::Config.new(config: {}, load_defaults: true)
     end
 
     it "on windows OS loads from default location", if: Bolt::Util.windows? do
       allow(Bolt::Util).to receive(:windows?).and_return(true)
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user])
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config.default_windows_config)
-      Bolt::PuppetDB::Config.load_config({})
+      Bolt::PuppetDB::Config.new(config: {}, load_defaults: true)
     end
 
     it "Does not error if puppetdb.conf fails to load" do
@@ -239,7 +239,7 @@ describe Bolt::PuppetDB::Config do
       expect(File).to receive(:exist?).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user]).and_return true
       expect(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_CONFIG[:user]).and_return 'bad"json'
       expect(JSON).to receive(:parse).and_raise(JSON::ParserError.new("unexpected token"))
-      Bolt::PuppetDB::Config.load_config({})
+      Bolt::PuppetDB::Config.new(config: {}, load_defaults: true)
     end
   end
 end
