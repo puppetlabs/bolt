@@ -11,7 +11,7 @@ and Microsoft Windows.
 | ------------------------- | ------------------- |
 | Debian                    | 9, 10, 11           |
 | Fedora                    | 32, 34              |
-| macOS                     | 10.15, 11           |
+| macOS                     | 11, 12              |
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
 | RHEL                      | 6, 7, 8, 9          |
@@ -157,8 +157,8 @@ Use the Apple Disk Image (DMG) to install Bolt on macOS:
 
 1. Download the Bolt installer package for your macOS version.
 
-   - [10.15 (Catalina)](https://downloads.puppet.com/mac/puppet-tools/10.15/x86_64/puppet-bolt-latest.dmg)
    - [11 (Big Sur)](https://downloads.puppet.com/mac/puppet-tools/11/x86_64/puppet-bolt-latest.dmg)
+   - [12 (Monterey)](https://downloads.puppet.com/mac/puppet-tools/12/x86_64/puppet-bolt-latest.dmg)
 
 1. Double-click the `puppet-bolt-latest.dmg` file to mount the installer and
    then double-click `puppet-bolt-[version]-installer.pkg` to run the installer.
