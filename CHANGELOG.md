@@ -1,5 +1,74 @@
 # Changelog
 
+## Bolt 3.23.0 (2022-06-06)
+
+### New features
+
+* **RedHat 9 packages**
+  ([#3079](https://github.com/puppetlabs/bolt/pull/3079))
+
+  Bolt now ships packages for RedHat 9.
+
+* **SLES 15 packages**
+  ([#3080](https://github.com/puppetlabs/bolt/pull/3080))
+
+  Bolt now ships packages for SLES 15.
+
+* **macOS 12 packages**
+  ([#3088](https://github.com/puppetlabs/bolt/pull/3088))
+
+  Bolt now ships packages for macOS 12.
+
+* **Bolt can now be run with Ruby 3**
+  ([#2767](https://github.com/puppetlabs/bolt/issues/2767))
+
+  The `bolt` gem can now be run with Ruby 3.
+
+  _Contributed by [Lucy Wyman](https://github.com/lucywyman)_
+
+* **Connect to multiple PuppetDB instances**
+  ([#1527](https://github.com/puppetlabs/bolt/issues/1527))
+
+  Bolt now supports connecting to multiple PuppetDB instances. For more
+  information, see [Connecting Bolt to
+  PuppetDB](documentation/bolt_connect_puppetdb.md#configuring-multiple-puppetdb-instances).
+
+* **Update bundled modules to latest versions**
+  ([#1527](https://github.com/puppetlabs/bolt/issues/1527),
+   [#3093](https://github.com/puppetlabs/bolt/pull/3093),
+   [#3097](https://github.com/puppetlabs/bolt/pull/3097))
+
+  The following bundled modules have been updated to their latest versions:
+
+  - [package 2.2.0](https://forge.puppet.com/puppetlabs/package/2.2.0/changelog)
+  - [puppet_agent 4.11.0](https://forge.puppet.com/puppetlabs/puppet_agent/4.11.0/changelog)
+  - [puppet_conf 1.3.0](https://forge.puppet.com/puppetlabs/puppet_conf/1.3.0/changelog)
+  - [ruby_task_helper 0.6.1](https://forge.puppet.com/puppetlabs/ruby_task_helper/0.6.1/changelog)
+  - [scheduled_task 3.1.0](https://forge.puppet.com/puppetlabs/scheduled_task/3.1.0/changelog)
+  - [service 2.2.0](https://forge.puppet.com/puppetlabs/service/2.2.0/changelog)
+  - [stdlib 8.2.0](https://forge.puppet.com/puppetlabs/stdlib/8.2.0/changelog)
+
+### Bug fixes
+
+* **Include a plan's docstring in `plan show` output**
+  ([#2974](https://github.com/puppetlabs/bolt/issues/2974))
+
+  The `bolt plan show <PLAN>` and `Get-BoltPlan -Name <PLAN>` commands
+  now include a plan's docstring in the output, even when the plan
+  includes a `@summary` tag. Previously, Bolt would only display a
+  plan's summary or docstring, but not both.
+
+* **Support running tasks in no-op mode over pcp**
+  ([#3063](https://github.com/puppetlabs/bolt/issues/3063))
+
+  Bolt no longer errors when running tasks in no-op mode over the pcp
+  transport.
+
+### Removals
+
+* **Remove support for macOS 10.15**
+  ([#3088](https://github.com/puppetlabs/bolt/pull/3088))
+
 ## Bolt 3.22.1 (2022-03-30)
 
 ### Bug fixes
