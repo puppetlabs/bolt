@@ -8,6 +8,7 @@ require 'digest'
 require 'fileutils'
 require 'net/http'
 require 'logging'
+require 'timeout'
 
 require 'bolt/error'
 
@@ -38,8 +39,7 @@ module BoltServer
 
       if do_purge
         @purge = Concurrent::TimerTask.new(execution_interval: purge_interval,
-                                           timeout_interval: purge_timeout,
-                                           run_now: true) { expire(purge_ttl) }
+                                           run_now: true) { expire(purge_ttl, purge_timeout) }
         @purge.execute
       end
     end
@@ -171,13 +171,15 @@ module BoltServer
       serial_execute { download_file(file_path, sha, file_data['uri']) }
     end
 
-    def expire(purge_ttl)
+    def expire(purge_ttl, purge_timeout)
       expired_time = Time.now - purge_ttl
-      @cache_dir_mutex.with_write_lock do
-        Dir.glob(File.join(@cache_dir, '*')).select { |f| File.directory?(f) }.each do |dir|
-          if (mtime = File.mtime(dir)) < expired_time && dir != tmppath
-            @logger.debug("Removing #{dir}, last used at #{mtime}")
-            FileUtils.remove_dir(dir)
+      Timeout.timeout(purge_timeout) do
+        @cache_dir_mutex.with_write_lock do
+          Dir.glob(File.join(@cache_dir, '*')).select { |f| File.directory?(f) }.each do |dir|
+            if (mtime = File.mtime(dir)) < expired_time && dir != tmppath
+              @logger.debug("Removing #{dir}, last used at #{mtime}")
+              FileUtils.remove_dir(dir)
+            end
           end
         end
       end
