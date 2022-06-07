@@ -4,6 +4,13 @@
 # returns an `ApplyResult`. An `ApplyResult` is part of a `ResultSet` object and
 # contains information about the apply action.
 #
+# @param catalog
+#   The Puppet catalog used to configure the target. The catalog describes the desired state
+#   of the target. The catalog is masked with the `Sensitive` data type to protect any
+#   sensitive information in the catalog from being printed to the console or logs. To access
+#   the catalog, unwrap it using `$apply_result.catalog.unwrap`. For more information
+#   about catalogs and the catalog compilation process, see [Catalog
+#   compilation](https://puppet.com/docs/puppet/latest/subsystem_catalog_compilation.html).
 # @param report
 #   The Puppet report from the apply action. Equivalent to calling `ApplyResult.value['report']`.
 #   The report is a hash representation of the [`Puppet::Transaction::Report`
@@ -29,6 +36,7 @@
 Puppet::DataTypes.create_type('ApplyResult') do
   interface <<-PUPPET
     attributes => {
+      'catalog' => Sensitive[Hash[String[1], Data]],
       'report' => Hash[String[1], Data],
       'target' => Target
     },

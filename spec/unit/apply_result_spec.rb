@@ -12,8 +12,9 @@ describe Bolt::ApplyResult do
       "status" => "" }
   }
 
-  let(:task_result) { Bolt::Result.for_task(example_target, result_value.to_json, '', 0, 'catalog', []) }
-  let(:apply_result) { Bolt::ApplyResult.from_task_result(task_result) }
+  let(:catalog)      { Puppet::Pops::Types::PSensitiveType::Sensitive.new({}) }
+  let(:task_result)  { Bolt::Result.for_task(example_target, result_value.to_json, '', 0, 'catalog', []) }
+  let(:apply_result) { Bolt::ApplyResult.from_task_result(task_result, catalog) }
 
   describe '#puppet_missing_error' do
     it 'returns the nil if no identifiable errors are found' do
@@ -86,20 +87,24 @@ describe Bolt::ApplyResult do
   end
 
   describe 'exposes methods for examining data' do
-    let(:expected) {
+    let(:expected) do
       { "target" => "target",
         "action" => "apply",
         "object" => nil,
         "status" => "success",
-        "value" => { "report" => result_value } }
-    }
+        "value" => { "report" => result_value, "catalog" => catalog } }
+    end
+
+    let(:expected_data) do
+      expected.tap { |e| e['value']['catalog'] = e['value']['catalog'].to_s }
+    end
 
     it 'with to_json' do
-      expect(JSON.parse(apply_result.to_json)).to eq(expected)
+      expect(JSON.parse(apply_result.to_json)).to eq(expected_data)
     end
 
     it 'with to_data' do
-      expect(apply_result.to_data).to eq(expected)
+      expect(apply_result.to_data).to eq(expected_data)
     end
 
     it 'with value' do

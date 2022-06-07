@@ -65,23 +65,30 @@ module Bolt
       end
     end
 
-    def self.from_task_result(result)
+    def self.from_task_result(result, catalog = nil)
       if (puppet_missing = puppet_missing_error(result))
         new(result.target,
             error: puppet_missing,
-            report: result.value.reject { |k| k == '_error' })
+            report: result.value.reject { |k| k == '_error' },
+            catalog: catalog)
       elsif !result.ok?
-        new(result.target, error: result.error_hash)
+        new(result.target,
+            error: result.error_hash,
+            catalog: catalog)
       elsif (invalid_report = invalid_report_error(result))
         new(result.target,
             error: invalid_report,
-            report: result.value.reject { |k| %w[_error _output].include?(k) })
+            report: result.value.reject { |k| %w[_error _output].include?(k) },
+            catalog: catalog)
       elsif (resource_error = resource_error(result))
         new(result.target,
             error: resource_error,
-            report: result.value.reject { |k| k == '_error' })
+            report: result.value.reject { |k| k == '_error' },
+            catalog: catalog)
       else
-        new(result.target, report: result.value)
+        new(result.target,
+            report: result.value,
+            catalog: catalog)
       end
     end
 
@@ -92,10 +99,11 @@ module Bolt
         'report' => value['report'] }
     end
 
-    def initialize(target, error: nil, report: nil)
+    def initialize(target, error: nil, report: nil, catalog: nil)
       @target = target
       @value = {}
       @action = 'apply'
+      @value['catalog'] = catalog if catalog
       @value['report'] = report if report
       @value['_error'] = error if error
       @value['_output'] = metrics_message if metrics_message
@@ -129,6 +137,10 @@ module Bolt
 
     def report
       @value['report']
+    end
+
+    def catalog
+      @value['catalog']
     end
 
     def generic_value
