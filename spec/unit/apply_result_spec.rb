@@ -12,7 +12,7 @@ describe Bolt::ApplyResult do
       "status" => "" }
   }
 
-  let(:catalog)      { Puppet::Pops::Types::PSensitiveType::Sensitive.new({}) }
+  let(:catalog)      { {} }
   let(:task_result)  { Bolt::Result.for_task(example_target, result_value.to_json, '', 0, 'catalog', []) }
   let(:apply_result) { Bolt::ApplyResult.from_task_result(task_result, catalog) }
 
@@ -87,28 +87,33 @@ describe Bolt::ApplyResult do
   end
 
   describe 'exposes methods for examining data' do
-    let(:expected) do
+    let(:partial) do
       { "target" => "target",
         "action" => "apply",
         "object" => nil,
-        "status" => "success",
-        "value" => { "report" => result_value, "catalog" => catalog } }
-    end
-
-    let(:expected_data) do
-      expected.tap { |e| e['value']['catalog'] = e['value']['catalog'].to_s }
+        "status" => "success" }
     end
 
     it 'with to_json' do
-      expect(JSON.parse(apply_result.to_json)).to eq(expected_data)
+      result = JSON.parse(apply_result.to_json)
+      expect(result).to include(partial)
+      expect(result['value']).to eq('report' => result_value, '_sensitive' => "Sensitive [value redacted]")
     end
 
     it 'with to_data' do
-      expect(apply_result.to_data).to eq(expected_data)
+      result = apply_result.to_data
+      expect(result).to include(partial)
+      expect(result['value']).to eq('report' => result_value, '_sensitive' => "Sensitive [value redacted]")
     end
 
     it 'with value' do
-      expect(apply_result.value).to eq(expected['value'])
+      expect(apply_result.value).to include('report' => result_value)
+      expect(apply_result.value['_sensitive']).to be_a(Puppet::Pops::Types::PSensitiveType::Sensitive)
+      expect(apply_result.value['_sensitive'].unwrap).to eq('catalog' => catalog)
+    end
+
+    it 'with catalog' do
+      expect(apply_result.catalog).to eq(catalog)
     end
   end
 end

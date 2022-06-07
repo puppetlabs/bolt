@@ -96,17 +96,21 @@ module Bolt
     def _pcore_init_hash
       { 'target' => @target,
         'error' => value['_error'],
-        'report' => value['report'] }
+        'report' => value['report'],
+        'catalog' => catalog }
     end
 
     def initialize(target, error: nil, report: nil, catalog: nil)
       @target = target
       @value = {}
       @action = 'apply'
-      @value['catalog'] = catalog if catalog
       @value['report'] = report if report
       @value['_error'] = error if error
       @value['_output'] = metrics_message if metrics_message
+
+      if catalog
+        @value['_sensitive'] = Puppet::Pops::Types::PSensitiveType::Sensitive.new({ 'catalog' => catalog })
+      end
     end
 
     def event_metrics
@@ -140,7 +144,7 @@ module Bolt
     end
 
     def catalog
-      @value['catalog']
+      sensitive.unwrap['catalog'] if sensitive
     end
 
     def generic_value
