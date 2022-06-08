@@ -13,7 +13,7 @@ describe Bolt::PuppetDB::Client, puppetdb: true do
 
   # Don't run any tests until PDB and puppetserver are responsive
   before(:all) do
-    wait_until_available(timeout: 30, interval: 1)
+    wait_until_available(timeout: 120, interval: 1)
   end
 
   context '#send_command' do

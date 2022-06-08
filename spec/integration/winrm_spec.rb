@@ -20,7 +20,7 @@ describe "when runnning over the winrm transport", winrm: true do
   context 'when using CLI options' do
     let(:config_flags) {
       %W[--targets #{uri} --no-ssl --no-ssl-verify --format json --modulepath #{modulepath}
-         --password #{password} --connect-timeout 45]
+         --password #{password} --connect-timeout 120]
     }
 
     it 'runs a command' do
@@ -107,7 +107,7 @@ describe "when runnning over the winrm transport", winrm: true do
             'password' => password,
             'ssl' => false,
             'ssl-verify' => false,
-            'connect-timeout' => 45
+            'connect-timeout' => 120
           }
         }
       }

@@ -20,7 +20,7 @@ describe "BoltServer::TransportApp", puppetserver: true do
   end
 
   before(:all) do
-    wait_until_available(timeout: 30, interval: 1)
+    wait_until_available(timeout: 120, interval: 1)
   end
 
   after(:all) do
