@@ -13,7 +13,7 @@ describe BoltServer::FileCache, puppetserver: true do
   include BoltSpec::BoltServer
 
   before(:all) do
-    wait_until_available(timeout: 30, interval: 1)
+    wait_until_available(timeout: 120, interval: 1)
   end
 
   before(:each) do
