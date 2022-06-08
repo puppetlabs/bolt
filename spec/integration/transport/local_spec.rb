@@ -1,10 +1,15 @@
 # frozen_string_literal: true
 
 require 'spec_helper'
+
 require 'bolt/inventory'
 require 'bolt/transport/local'
 require 'bolt/util'
+
+require 'bolt_spec/files'
+require 'bolt_spec/integration'
 require 'bolt_spec/pal'
+require 'bolt_spec/project'
 require 'bolt_spec/transport'
 
 require 'shared_examples/transport'
@@ -168,6 +173,52 @@ describe Bolt::Transport::Local do
           # Ensure the strings are the same
           expect(result['input'][-1024..-1]).to eq(str)
         end
+      end
+    end
+  end
+
+  context 'file extensions', windows: true do
+    include BoltSpec::Files
+    include BoltSpec::Integration
+    include BoltSpec::Project
+
+    let(:config) { { 'modulepath' => fixtures_path('modules') } }
+
+    around(:each) do |example|
+      in_project(config: config, inventory: inventory) do |project|
+        @project = project
+        example.run
+      end
+    end
+
+    context 'with an unspecified extension' do
+      let(:inventory) { {} }
+
+      it 'errors' do
+        results = run_cli_json(%w[task run sample::python -t localhost], project: @project)
+        result  = results['items'][0]
+
+        expect(result['status']).to eq('failure')
+        expect(result.dig('value', '_error', 'msg')).to match(/File extension .py is not enabled/)
+      end
+    end
+
+    context 'with a specified extension' do
+      let(:inventory) do
+        {
+          'config' => {
+            'local' => {
+              'extensions' => ['.py']
+            }
+          }
+        }
+      end
+
+      it 'runs the task' do
+        results = run_cli_json(%w[task run sample::python -t localhost], project: @project)
+        result  = results['items'][0]
+
+        expect(result['status']).to eq('success')
       end
     end
   end

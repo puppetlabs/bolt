@@ -10,6 +10,7 @@ module Bolt
         WINDOWS_OPTIONS = %w[
           bundled-ruby
           cleanup
+          extensions
           interpreters
           tmpdir
         ].freeze
