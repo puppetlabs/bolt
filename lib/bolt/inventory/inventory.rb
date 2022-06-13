@@ -8,6 +8,12 @@ module Bolt
     class Inventory
       attr_reader :plugins, :source, :targets, :transport
 
+      # Getting targets from the inventory using '--targets' supports extended glob pattern
+      # matching. In this case, use the extended regex so Bolt only uses commas outside
+      # brackets and braces as delimiters.
+      EXTENDED_TARGET_REGEX = /[[:space:],]+(?=[^\]}]*(?:[\[{]|$))/.freeze
+      TARGET_REGEX          = /[[:space:],]+/.freeze
+
       class WildcardError < Bolt::Error
         def initialize(target)
           super("Found 0 targets matching wildcard pattern #{target}", 'bolt.inventory/wildcard-error')
@@ -85,8 +91,8 @@ module Bolt
       # alias for analytics
       alias node_names target_names
 
-      def get_targets(targets)
-        target_array = expand_targets(targets)
+      def get_targets(targets, ext_glob: false)
+        target_array = expand_targets(targets, ext_glob: ext_glob)
         if target_array.is_a? Array
           target_array.flatten.uniq(&:name)
         else
@@ -107,20 +113,31 @@ module Bolt
         groups.group_collect(target_name)
       end
 
+      # Does a target match the glob-style wildcard?
+      # Ignore case; use extended globs ({a,b}) when running from the CLI.
+      def match_wildcard?(wildcard, target_name, ext_glob: false)
+        if ext_glob
+          File.fnmatch(wildcard, target_name, File::FNM_CASEFOLD | File::FNM_EXTGLOB)
+        else
+          regexp = Regexp.new("^#{Regexp.escape(wildcard).gsub('\*', '.*?')}$", Regexp::IGNORECASE)
+          target_name =~ regexp
+        end
+      end
+
       # If target is a group name, expand it to the members of that group.
       # Else match against targets in inventory by name or alias.
       # If a wildcard string, error if no matches are found.
       # Else fall back to [target] if no matches are found.
-      def resolve_name(target)
+      def resolve_name(target, ext_glob: false)
         if (group = group_lookup[target])
           group.all_targets
         else
           # Try to wildcard match targets in inventory
           # Ignore case because hostnames are generally case-insensitive
-          regexp = Regexp.new("^#{Regexp.escape(target).gsub('\*', '.*?')}$", Regexp::IGNORECASE)
-
-          targets = groups.all_targets.select { |targ| targ =~ regexp }
-          targets += groups.target_aliases.select { |target_alias, _target| target_alias =~ regexp }.values
+          targets = groups.all_targets.select { |targ| match_wildcard?(target, targ, ext_glob: ext_glob) }
+          targets += groups.target_aliases
+                           .select { |tgt_alias, _| match_wildcard?(target, tgt_alias, ext_glob: ext_glob) }
+                           .values
 
           if targets.empty?
             raise(WildcardError, target) if target.include?('*')
@@ -132,16 +149,18 @@ module Bolt
       end
       private :resolve_name
 
-      def expand_targets(targets)
+      def expand_targets(targets, ext_glob: false)
         case targets
         when Bolt::Target
           targets
         when Array
-          targets.map { |tish| expand_targets(tish) }
+          targets.map { |tish| expand_targets(tish, ext_glob: ext_glob) }
         when String
           # Expand a comma-separated list
-          targets.split(/[[:space:],]+/).reject(&:empty?).map do |name|
-            ts = resolve_name(name)
+          # Regex magic below is required to workaround `{foo,bar}` glob syntax
+          regex = ext_glob ? EXTENDED_TARGET_REGEX : TARGET_REGEX
+          targets.split(regex).reject(&:empty?).map do |name|
+            ts = resolve_name(name, ext_glob: ext_glob)
             ts.map do |t|
               # If the target doesn't exist, evaluate it from the inventory.
               # Then return a Bolt::Target.

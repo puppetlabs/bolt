@@ -147,12 +147,12 @@ describe Bolt::Application do
 
   describe '#inventory_show' do
     it 'shows specified targets' do
-      expect(inventory).to receive(:get_targets).with(targets).and_return([target])
+      expect(inventory).to receive(:get_targets).with(targets, ext_glob: true).and_return([target])
       application.show_inventory(targets)
     end
 
     it 'defaults to showing all targets' do
-      expect(inventory).to receive(:get_targets).with(['all']).and_return([target])
+      expect(inventory).to receive(:get_targets).with(['all'], ext_glob: true).and_return([target])
       application.show_inventory(nil)
     end
   end
