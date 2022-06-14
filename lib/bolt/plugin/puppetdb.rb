@@ -88,7 +88,7 @@ module Bolt
 
         facts.uniq!
         # Returns {'mycertname' => [{'path' => ['nested', 'fact'], 'value' => val'}], ... }
-        fact_values = @puppetdb_client.fact_values(targets, facts)
+        fact_values = @puppetdb_client.fact_values(targets, facts, opts['instance'])
 
         targets.map do |certname|
           target_data = fact_values[certname]
