@@ -1,5 +1,23 @@
 # Changelog
 
+## Bolt 3.23.1 (2022-06-15)
+
+### Bug fixes
+
+* **Support `extensions` in `local` transport on Windows controllers**
+  ([#3039](https://github.com/puppetlabs/bolt/issues/3039))
+
+  The `local` transport now supports the `extensions` config option when
+  running Bolt on a Windows controller.
+
+* **Collect fact values from a named PuppetDB instance using `puppetdb`
+  plugin**
+  ([#3106](https://github.com/puppetlabs/bolt/issues/3106))
+
+  The `puppetdb` plugin now correctly connects to a named PuppetDB
+  instance when collecting fact values. Previously, the plugin only
+  connected to the named PuppetDB instance when querying certnames.
+
 ## Bolt 3.23.0 (2022-06-06)
 
 ### New features
