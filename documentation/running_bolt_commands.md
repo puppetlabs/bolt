@@ -121,9 +121,9 @@ Invoke-BoltCommand -Command 'pwd' -Targets servers,databases
 
 ### Specify targets using glob matching
 
-Bolt supports glob matches for targets. This is helpful when you have several
-targets that you want to run a comand on that have similar names. For example,
-to run a command on all targets that start with the word `bolt`:
+Bolt supports extended glob matching for targets. This is helpful when you have
+several targets that you want to run a comand on that have similar names. For
+example, to run a command on all targets that start with the word `bolt`:
 
 _\*nix shell command_
 
@@ -136,6 +136,20 @@ _PowerShell cmdlet_
 ```powershell
 Invoke-BoltCommand -Command 'pwd' -Targets 'bolt*'
 ```
+
+Bolt supports globs using the following metacharacters:
+
+| `Metacharacter` | `Description` |
+| --- | --- |
+| `*` | Matches any number of characters. For example, `target*` matches any target that begins with the word `target`. |
+| `?` | Matches any single character. For example, `target?` matches any target that begins with the word `target` and is followed by a single character. |
+| `[SET]` | Matches any single character in the set. For example, `target[1-3]` matches `target1`, `target2`, and `target3`. |
+| `[^SET]` | Matches any single character that is _not_ in the set. For example, `target[^3]` matches `target1` and `target2`, but not `target3`. |
+| `{a,b}` | Matches all patterns in the set. For example `{target,node}1` matches `target1` and `node1`. |
+| `\` | Escapes the next metacharacter. |
+
+Extended glob matching is only supported when specifying targets from the
+command-line interface. Plans do not support extended glob matching.
 
 ### Read targets from a file
 
