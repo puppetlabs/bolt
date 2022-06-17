@@ -111,7 +111,8 @@ describe Bolt::Inventory::Inventory do
               'ssh' => {
                 'user' => 'me'
               }
-            } }
+            } },
+          'node1'
         ],
         'config' => {
           'ssh' => {
@@ -171,7 +172,7 @@ describe Bolt::Inventory::Inventory do
       it 'finds the all group with a non-empty inventory' do
         inventory = Bolt::Inventory::Inventory.new(data, transport, transports, plugins)
         targets = inventory.get_targets('all')
-        expect(targets.size).to eq(9)
+        expect(targets.size).to eq(10)
       end
 
       it 'finds targets in a subgroup' do
@@ -279,15 +280,31 @@ describe Bolt::Inventory::Inventory do
           expect(targets).to eq(%w[a target4 target5 target6 target7])
         end
 
-        it 'should split a comma-separated list of target URI and group name' do
-          matched_targets = %w[target4 target5 target6 target7 ssh://target8]
-          targets = inventory.get_targets('group1,ssh://target8').map(&:name)
-          expect(targets).to eq(matched_targets)
+        it 'should properly split a comma-separated list of targets, target URI and group name' do
+          matched_targets = %w[node1 ssh://target8 target1 target2 target4 target5 target6 target7 target9]
+          targets = inventory.get_targets('[m-o,s-u]{arget,ode}[1-2,9],  group1 ,,ssh://target8', ext_glob: true)
+          expect(targets.map(&:name).sort).to eq(matched_targets)
         end
 
-        it 'should match wildcard selectors' do
+        it 'should match wildcard selector *' do
           targets = inventory.get_targets('target*')
           expect(targets.map(&:name).sort).to eq(%w[target1 target2 target3 target4 target5 target6 target7 target9])
+        end
+
+        it 'should match wildcard selector ?' do
+          targets = inventory.get_targets('target?', ext_glob: true)
+          expect(targets.map(&:name).sort).to eq(%w[target1 target2 target3 target4 target5 target6 target7 target9])
+        end
+
+        it 'should match wildcard selector []' do
+          targets = inventory.get_targets('target[0-9]', ext_glob: true)
+          expect(targets.map(&:name).sort).to eq(%w[target1 target2 target3 target4 target5 target6 target7 target9])
+        end
+
+        it 'should match wildcard selector {}' do
+          targets = inventory.get_targets('{target,node}[0-9]', ext_glob: true)
+          expect(targets.map(&:name).sort).to eq(%w[node1 target1 target2 target3 target4 target5 target6 target7
+                                                    target9])
         end
 
         it 'should fail if wildcard selector matches nothing' do

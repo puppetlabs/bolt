@@ -49,7 +49,7 @@ module Bolt
                         code
                       end
 
-      targets = inventory.get_targets(targets)
+      targets = inventory.get_targets(targets, ext_glob: true)
 
       Puppet[:tasks] = false
       ast = pal.parse_manifest(manifest_code, manifest)
@@ -90,7 +90,7 @@ module Bolt
     # @return [Bolt::ResultSet]
     #
     def run_command(command, targets, env_vars: nil)
-      targets = inventory.get_targets(targets)
+      targets = inventory.get_targets(targets, ext_glob: true)
 
       with_benchmark do
         executor.run_command(targets, command, env_vars: env_vars)
@@ -106,7 +106,7 @@ module Bolt
     #
     def download_file(source, destination, targets)
       destination = File.expand_path(destination, Dir.pwd)
-      targets     = inventory.get_targets(targets)
+      targets     = inventory.get_targets(targets, ext_glob: true)
 
       with_benchmark do
         executor.download_file(targets, source, destination)
@@ -122,7 +122,7 @@ module Bolt
     #
     def upload_file(source, destination, targets)
       source  = find_file(source)
-      targets = inventory.get_targets(targets)
+      targets = inventory.get_targets(targets, ext_glob: true)
 
       Bolt::Util.validate_file('source file', source, true)
 
@@ -225,7 +225,7 @@ module Bolt
 
       with_benchmark do
         pal.lookup(key,
-                   inventory.get_targets(targets),
+                   inventory.get_targets(targets, ext_glob: true),
                    inventory,
                    executor,
                    plan_vars: vars)
@@ -620,7 +620,10 @@ module Bolt
       Bolt::Util.validate_file('script', script)
 
       with_benchmark do
-        executor.run_script(inventory.get_targets(targets), script, arguments, env_vars: env_vars)
+        executor.run_script(inventory.get_targets(targets, ext_glob: true),
+                            script,
+                            arguments,
+                            env_vars: env_vars)
       end
     end
 
@@ -676,7 +679,7 @@ module Bolt
     # @return [Bolt::ResultSet]
     #
     def run_task(task, targets, params: {})
-      targets = inventory.get_targets(targets)
+      targets = inventory.get_targets(targets, ext_glob: true)
 
       with_benchmark do
         pal.run_task(task, targets, params, executor, inventory)
@@ -775,7 +778,7 @@ module Bolt
       # Retrieve the known group and target names. This needs to be done before
       # updating targets, as that will add adhoc targets to the inventory.
       known_names = inventory.target_names
-      targets     = inventory.get_targets(targets)
+      targets     = inventory.get_targets(targets, ext_glob: true)
 
       inventory_targets, adhoc_targets = targets.partition do |target|
         known_names.include?(target.name)
