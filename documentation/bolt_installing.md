@@ -10,13 +10,13 @@ and Microsoft Windows.
 | Operating system          | Versions            |
 | ------------------------- | ------------------- |
 | Debian                    | 9, 10, 11           |
-| Fedora                    | 32, 34              |
+| Fedora                    | 34                  |
 | macOS                     | 11, 12              |
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
 | RHEL                      | 6, 7, 8, 9          |
 | SLES                      | 12, 15              |
-| Ubuntu                    | 16.04, 18.04, 20.04 |
+| Ubuntu                    | 18.04, 20.04        |
 
 > **Note:** Windows packages are automatically tested on the versions listed
 > above, but might be installable on other versions.
@@ -78,13 +78,6 @@ sudo apt remove puppet-bolt
 
 To install Bolt, run the appropriate command for the version of Fedora you
 have installed:
-
-- _Fedora 32_
-
-  ```shell
-  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-32.noarch.rpm
-  sudo dnf install puppet-bolt
-  ```
 
 - _Fedora 34_
 
@@ -391,15 +384,6 @@ sudo zypper remove puppet-bolt
 
 To install Bolt, run the appropriate command for the version of Ubuntu you
 have installed:
-
-- _Ubuntu 16.04_
-
-  ```shell
-  wget https://apt.puppet.com/puppet-tools-release-xenial.deb
-  sudo dpkg -i puppet-tools-release-xenial.deb
-  sudo apt-get update 
-  sudo apt-get install puppet-bolt 
-  ```
 
 - _Ubuntu 18.04_
 
