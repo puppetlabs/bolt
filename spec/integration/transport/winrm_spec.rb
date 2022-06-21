@@ -67,7 +67,7 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
   def stub_winrm_to_raise(klass, message)
     shell = double('powershell')
     allow_any_instance_of(WinRM::Connection)
-      .to receive(:shell).and_return(shell)
+      .to receive(:shell).and_yield(shell)
     allow(shell).to receive(:run).and_raise(klass, message)
     allow(shell).to receive(:close)
   end

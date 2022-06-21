@@ -276,7 +276,8 @@ Undef:}
        '--verbose',
        '--password', conn_info('winrm')[:password],
        '--no-ssl',
-       '--no-ssl-verify']
+       '--no-ssl-verify',
+       '--connect-timeout', '120']
     }
 
     include_examples 'parallelize plan function'
