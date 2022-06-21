@@ -2,7 +2,6 @@
 
 test_name "Install Ruby" do
   step "Ensure Ruby is installed on Bolt controller" do
-    result = nil
     case bolt['platform']
     when /windows/
       # use chocolatey to install latest ruby
@@ -19,12 +18,10 @@ PS
         version = /ruby (2\.[0-9])/.match(output.stdout)[1].delete('.')
         bolt.add_env_var('PATH', "/cygdrive/c/tools/ruby#{version}/bin:PATH")
       end
-      result = on(bolt, powershell('ruby --version'))
     when /debian|ubuntu/
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-ffi')
-      result = on(bolt, 'ruby --version')
     when /el-|centos/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -32,7 +29,6 @@ PS
       install_package(bolt, 'rubygem-ffi')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
-      result = on(bolt, 'ruby --version')
     when /fedora/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -44,14 +40,11 @@ PS
       install_package(bolt, 'rubygem-json')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
-      result = on(bolt, 'ruby --version')
     when /osx/
       # System ruby for osx is 2.3. winrm-fs and its dependencies require > 2.3.
       on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
-      result = on(bolt, 'ruby --version')
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
-    assert_match(/ruby 2/, result.stdout)
   end
 end
