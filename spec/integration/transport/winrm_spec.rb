@@ -259,39 +259,6 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
       expect(winrm.run_command(target, command, run_as: 'root')['stdout']).to eq("#{user}\r\n")
     end
 
-    it "reuses a PowerShell host / runspace for multiple commands", winrm: true do
-      pending("The code for this is in place, but in practice we reconnect for every command")
-      contents = [
-        "$Host.InstanceId.ToString()",
-        "if ($Host.Runspace.InstanceId) { $Host.Runspace.InstanceId.ToString()} else { 'noid' }",
-        "$ENV:A, $B, $script:C, $local:D, $global:E",
-        "$ENV:A = 'env'",
-        "$B = 'unscoped'",
-        "$script:C = 'script'",
-        "$local:D = 'local'",
-        "$global:E = 'global'",
-        "$ENV:A, $B, $script:C, $local:D, $global:E"
-      ].join('; ')
-
-      result = winrm.run_command(target, contents)
-      instance, runspace, *outputs = result['stdout'].split("\r\n")
-
-      result2 = winrm.run_command(target, contents)
-      instance2, runspace2, *outputs2 = result2['stdout'].split("\r\n")
-
-      # Host should be identical (uniquely identified by Guid)
-      expect(instance).to eq(instance2)
-      # Runspace should be identical (uniquely identified by Guid)
-      expect(runspace).to eq(runspace2)
-
-      # state not yet set, only get one copy
-      expect(outputs).to eq(%w[env unscoped script local global])
-
-      # state carries across invocations, get 2 copies
-      outs = %w[env unscoped script local global env unscoped script local global]
-      expect(outputs2).to eq(outs)
-    end
-
     %w[winrm smb].each do |protocol|
       context "using #{protocol}" do
         let(:conf) do
@@ -470,46 +437,6 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
         expect(
           winrm.run_script(target, file.path, [], run_as: 'root')['stdout']
         ).to eq("hellote\r\n")
-      end
-    end
-
-    it "reuses the host for multiple PowerShell scripts", winrm: true do
-      pending("The code for this is in place, but in practice we reconnect for every command")
-      contents = <<-PS
-        $Host.InstanceId.ToString()
-        if ($Host.Runspace.InstanceId) { $Host.Runspace.InstanceId.ToString()} else { 'noid' }
-
-        $ENV:A, $B, $script:C, $local:D, $global:E
-
-        $ENV:A = 'env'
-        $B = 'unscoped'
-        $script:C = 'script'
-        $local:D = 'local'
-        $global:E = 'global'
-
-        $ENV:A, $B, $script:C, $local:D, $global:E
-      PS
-
-      with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
-        result = winrm.run_script(target, file.path, [])
-        instance, runspace, *outputs = result['stdout'].split("\r\n")
-
-        result2 = winrm.run_script(target, file.path, [])
-        instance2, runspace2, *outputs2 = result2['stdout'].split("\r\n")
-
-        # scripts execute in a completely new process
-        # Host unique Guid is different
-        expect(instance).to eq(instance2)
-        # Runspace unique Guid is different
-        expect(runspace).to eq(runspace2)
-
-        # state not yet set, only get one copy
-        expect(outputs).to eq(%w[env unscoped script local global])
-
-        # environment variable remains set
-        # as do script and global given use of Invoke-Command
-        outs = %w[env script global env unscoped script local global]
-        expect(outputs2).to eq(outs)
       end
     end
 
