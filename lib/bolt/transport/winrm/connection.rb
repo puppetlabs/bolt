@@ -53,9 +53,11 @@ module Bolt
             @connection = ::WinRM::Connection.new(options)
             @connection.logger = @transport_logger
 
-            @session = @connection.shell(:powershell)
-            @session.run('$PSVersionTable.PSVersion')
-            @logger.trace { "Opened session" }
+            @connection.shell(:powershell) do |session|
+              session.run('$PSVersionTable.PSVersion')
+            end
+
+            @logger.trace { "Opened connection" }
           end
         rescue Timeout::Error
           # If we're using the default port with SSL, a timeout probably means the
@@ -95,9 +97,8 @@ module Bolt
         end
 
         def disconnect
-          @session&.close
           @client&.disconnect!
-          @logger.trace { "Closed session" }
+          @logger.trace { "Closed connection" }
         end
 
         def execute(command)
@@ -116,12 +117,18 @@ module Bolt
             # propagate to the main thread via the shell, there's no chance
             # they will be unhandled, so the default stack trace is unneeded.
             Thread.current.report_on_exception = false
-            result = @session.run(command)
-            out_wr << result.stdout
-            err_wr << result.stderr
-            out_wr.close
-            err_wr.close
-            result.exitcode
+
+            # Open a new shell instance for each command executed. PowerShell is
+            # unable to unload any DLLs loaded when running a PowerShell script
+            # or task from the same shell instance they were loaded in, which
+            # prevents Bolt from cleaning up the temp directory successfully.
+            # Using a new PowerShell instance avoids this limitation.
+            @connection.shell(:powershell) do |session|
+              result = session.run(command)
+              out_wr << result.stdout
+              err_wr << result.stderr
+              result.exitcode
+            end
           ensure
             # Close the streams to avoid the caller deadlocking
             out_wr.close
