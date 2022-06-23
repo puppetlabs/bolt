@@ -88,7 +88,7 @@ module Bolt
             modules << Bolt::ModuleInstaller::Puppetfile::GitModule.new(
               spec.name,
               spec.git,
-              spec.sha
+              spec.ref
             )
           end
         end

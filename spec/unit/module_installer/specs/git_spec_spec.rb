@@ -38,10 +38,10 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
     end
 
     it 'errors with invalid git source' do
-      init_hash['git'] = 'https://gitlab.com/puppetlabs/puppetlabs-yaml'
+      init_hash['git'] = 'gitlab.com/puppetlabs/puppetlabs-yaml'
       expect { spec }.to raise_error(
         Bolt::ValidationError,
-        /^.*is not a public GitHub repository/
+        /Invalid URI #{init_hash['git']}/
       )
     end
 
@@ -105,10 +105,7 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
 
   context '#to_resolver_module' do
     it 'returns a puppetfile-resolver module object' do
-      allow(spec).to receive(:sha).and_return(ref)
-      mod = spec.to_resolver_module
-
-      expect(mod).to be_a(PuppetfileResolver::Puppetfile::GitModule)
+      expect(spec.to_resolver_module).to be_a(PuppetfileResolver::Puppetfile::GitModule)
     end
   end
 
@@ -119,75 +116,42 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
       expect(spec.name).to eq(name)
     end
 
-    context 'with missing metadata.json' do
-      let(:git) { 'https://github.com/puppetlabs/bolt' }
+    it 'errors with missing metadata.json' do
+      allow(spec).to receive(:github_metadata).and_return(nil)
+      allow(spec).to receive(:gitlab_metadata).and_return(nil)
+      allow(spec).to receive(:clone_metadata).and_return(nil)
 
-      it 'errors' do
-        expect { spec.name }.to raise_error(
-          Bolt::Error,
-          /Missing metadata\.json/
-        )
-      end
-    end
-  end
-
-  context '#resolve_sha' do
-    context 'with a valid commit' do
-      let(:ref) { '79f98ffd3faf8d3badb1084a676e5fc1cbac464e' }
-
-      it 'resolves and returns a SHA' do
-        expect(spec.sha).to eq('79f98ffd3faf8d3badb1084a676e5fc1cbac464e')
-      end
-    end
-
-    context 'with a valid tag' do
-      let(:ref) { '0.2.0' }
-
-      it 'resolves and returns a SHA' do
-        expect(spec.sha).to eq('79f98ffd3faf8d3badb1084a676e5fc1cbac464e')
-      end
-    end
-
-    context 'with a valid branch' do
-      let(:ref) { 'main' }
-
-      it 'resolves and returns a SHA' do
-        expect(spec.sha).to be_a(String)
-      end
-    end
-
-    context 'with an invalid ref' do
-      let(:ref) { 'foobar' }
-
-      it 'errors' do
-        expect { spec.sha }.to raise_error(
-          Bolt::Error,
-          /not a commit, tag, or branch/
-        )
-      end
-    end
-
-    context 'with an invalid repository' do
-      let(:git) { 'https://github.com/puppetlabs/foobarbaz' }
-
-      it 'errors' do
-        expect { spec.sha }.to raise_error(
-          Bolt::Error,
-          /is not a public GitHub repository/
-        )
-      end
-    end
-
-    it 'errors with an invalid GitHub token' do
-      original = ENV['GITHUB_TOKEN']
-      ENV['GITHUB_TOKEN'] = 'foo'
-
-      expect { spec.sha }.to raise_error(
+      expect { spec.name }.to raise_error(
         Bolt::Error,
-        /Invalid token at GITHUB_TOKEN/
+        /Unable to locate metadata\.json/
       )
-    ensure
-      ENV['GITHUB_TOKEN'] = original
+    end
+
+    it 'errors with unparseable metadata.json' do
+      allow(spec).to receive(:github_metadata).and_return('{"foo":bar}')
+
+      expect { spec.name }.to raise_error(
+        Bolt::Error,
+        /Unable to parse metadata\.json/
+      )
+    end
+
+    it 'errors when metadata is not a hash' do
+      allow(spec).to receive(:github_metadata).and_return('"foo"')
+
+      expect { spec.name }.to raise_error(
+        Bolt::Error,
+        /Invalid metadata\.json.*Expected a Hash/
+      )
+    end
+
+    it 'errors when metadata is missing a name key' do
+      allow(spec).to receive(:github_metadata).and_return('{}')
+
+      expect { spec.name }.to raise_error(
+        Bolt::Error,
+        /Invalid metadata\.json.*must include a 'name' key/
+      )
     end
   end
 end

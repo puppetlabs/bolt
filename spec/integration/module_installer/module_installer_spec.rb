@@ -102,6 +102,106 @@ describe 'installing modules' do
     end
   end
 
+  context 'resolving git modules' do
+    let(:project_config) { { 'modules' => [mod] } }
+
+    context 'public GitHub source' do
+      let(:mod) do
+        {
+          'git' => 'https://github.com/puppetlabs/puppetlabs-yaml.git',
+          'ref' => '0.1.0'
+        }
+      end
+
+      it 'installs the module' do
+        result = run_cli_json(command, project: project)
+
+        expect(result).to eq(
+          'success'    => true,
+          'puppetfile' => project.puppetfile.to_s,
+          'moduledir'  => project.managed_moduledir.to_s
+        )
+        expect(project.puppetfile.exist?).to be(true)
+        expect(project.managed_moduledir.exist?).to be(true)
+
+        puppetfile_content = File.read(project.puppetfile)
+
+        expect(puppetfile_content.lines).to include(
+          /mod 'yaml'/,
+          %r{git: 'https://github.com/puppetlabs/puppetlabs-yaml.git'},
+          /ref: '0.1.0'/
+        )
+      end
+    end
+
+    context 'public GitLab source' do
+      let(:mod) do
+        {
+          'git' => 'https://gitlab.com/simp/pupmod-simp-crypto_policy.git',
+          'ref' => '0.1.0'
+        }
+      end
+
+      it 'installs the module' do
+        result = run_cli_json(command, project: project)
+
+        expect(result).to eq(
+          'success'    => true,
+          'puppetfile' => project.puppetfile.to_s,
+          'moduledir'  => project.managed_moduledir.to_s
+        )
+        expect(project.puppetfile.exist?).to be(true)
+        expect(project.managed_moduledir.exist?).to be(true)
+
+        puppetfile_content = File.read(project.puppetfile)
+
+        expect(puppetfile_content.lines).to include(
+          /mod 'crypto_policy'/,
+          %r{git: 'https://gitlab.com/simp/pupmod-simp-crypto_policy.git'},
+          /ref: '0.1.0'/
+        )
+      end
+    end
+
+    context 'git clone source' do
+      let(:mod) do
+        {
+          'git' => 'https://github.com/puppetlabs/puppetlabs-yaml.git',
+          'ref' => '0.1.0'
+        }
+      end
+
+      it 'installs the module' do
+        # Make Bolt believe this module needs to be cloned since private repos
+        # require authorization that the test runner doesn't have.
+        allow_any_instance_of(Bolt::ModuleInstaller::Specs::GitSpec)
+          .to receive(:github_metadata)
+          .and_return(nil)
+        allow_any_instance_of(Bolt::ModuleInstaller::Specs::GitSpec)
+          .to receive(:gitlab_metadata)
+          .and_return(nil)
+
+        result = run_cli_json(command, project: project)
+
+        expect(result).to eq(
+          'success'    => true,
+          'puppetfile' => project.puppetfile.to_s,
+          'moduledir'  => project.managed_moduledir.to_s
+        )
+        expect(project.puppetfile.exist?).to be(true)
+        expect(project.managed_moduledir.exist?).to be(true)
+
+        puppetfile_content = File.read(project.puppetfile)
+
+        expect(puppetfile_content.lines).to include(
+          /mod 'yaml'/,
+          %r{git: 'https://github.com/puppetlabs/puppetlabs-yaml.git'},
+          /ref: '0.1.0'/
+        )
+      end
+    end
+  end
+
   context 'with forge and git modules' do
     let(:project_config) do
       {
@@ -134,7 +234,7 @@ describe 'installing modules' do
       expect(puppetfile_content.lines).to include(
         /mod 'ruby_task_helper'/,
         %r{git: 'https://github.com/puppetlabs/puppetlabs-ruby_task_helper'},
-        /ref: '23520d05ef8e3f9e1327804bc7d2e1bba33d1df9'/,
+        /ref: '0.4.0'/,
         %r{mod 'puppetlabs/yaml', '0.1.0'}
       )
     end
@@ -210,7 +310,7 @@ describe 'installing modules' do
     it 'errors' do
       expect { run_cli(command, project: project) }.to raise_error(
         Bolt::Error,
-        %r{https://github.com/puppetlabs/puppetlabs-foobarbaz is not a public GitHub repository.}
+        /Unable to locate metadata\.json.*This may not be a valid module/
       )
     end
   end
