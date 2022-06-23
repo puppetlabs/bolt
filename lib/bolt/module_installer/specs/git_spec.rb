@@ -20,12 +20,13 @@ module Bolt
 
         attr_reader :git, :ref, :resolve, :type
 
-        def initialize(init_hash)
+        def initialize(init_hash, config = {})
           @logger  = Bolt::Logger.logger(self)
           @resolve = init_hash.key?('resolve') ? init_hash['resolve'] : true
           @git     = init_hash['git']
           @ref     = init_hash['ref']
           @name    = parse_name(init_hash['name'])
+          @proxy   = config.dig('proxy')
           @type    = :git
 
           unless @resolve == true || @resolve == false
@@ -108,7 +109,7 @@ module Bolt
 
           unless data
             raise Bolt::Error.new(
-              "Unable to locate metadata.json for module at #{@git}. This may not be a valid module. "\
+              "Unable to locate metadata.json for module at #{loc(@git)}. This may not be a valid module. "\
               "For more information about how Bolt attempted to locate the metadata file, check the "\
               "debugging logs.",
               'bolt/missing-module-metadata-error'
@@ -119,14 +120,14 @@ module Bolt
 
           unless data.is_a?(Hash)
             raise Bolt::Error.new(
-              "Invalid metadata.json at #{@git}. Expected a Hash, got a #{data.class}.",
+              "Invalid metadata.json at #{loc(@git)}. Expected a Hash, got a #{data.class}.",
               'bolt/invalid-module-metadata-error'
             )
           end
 
           unless data.key?('name')
             raise Bolt::Error.new(
-              "Invalid metadata.json at #{@git}. Metadata must include a 'name' key.",
+              "Invalid metadata.json at #{loc(@git)}. Metadata must include a 'name' key.",
               'bolt/missing-module-name-error'
             )
           end
@@ -134,7 +135,7 @@ module Bolt
           data
         rescue JSON::ParserError => e
           raise Bolt::Error.new(
-            "Unable to parse metadata.json for module at #{@git}: #{e.message}",
+            "Unable to parse metadata.json for module at #{loc(@git)}: #{e.message}",
             'bolt/metadata-parse-error'
           )
         end
@@ -179,12 +180,13 @@ module Bolt
           # Clone the repo into a temp directory that will be automatically cleaned up.
           Dir.mktmpdir do |dir|
             command = %W[git clone --bare --depth=1 --single-branch --branch=#{@ref} #{@git} #{dir}]
+            command += %W[--config "http.proxy=#{@proxy}" --config "https.proxy=#{@proxy}"] if @proxy
             @logger.debug("Executing command '#{command.join(' ')}'")
 
             out, err, status = Open3.capture3(*command)
 
             unless status.success?
-              @logger.debug("Unable to clone #{@git}: #{err}")
+              @logger.debug("Unable to clone #{loc(@git)}: #{err}")
               return nil
             end
 
@@ -196,7 +198,7 @@ module Bolt
               out, err, status = Open3.capture3(*command)
 
               unless status.success?
-                @logger.debug("Unable to read metadata.json file for #{@git}: #{err}")
+                @logger.debug("Unable to read metadata.json file for #{loc(@git)}: #{err}")
                 return nil
               end
 
@@ -210,23 +212,29 @@ module Bolt
         private def request_metadata(url)
           uri  = URI.parse(url)
           opts = { use_ssl: uri.scheme == 'https' }
+          args = [uri.host, uri.port]
 
-          @logger.debug("Requesting metadata file from #{url}")
+          if @proxy
+            proxy = URI.parse(@proxy)
+            args += [proxy.host, proxy.port, proxy.user, proxy.password]
+          end
 
-          Net::HTTP.start(uri.host, uri.port, opts) do |client|
+          @logger.debug("Requesting metadata file from #{loc(url)}")
+
+          Net::HTTP.start(*args, opts) do |client|
             response = client.request(Net::HTTP::Get.new(uri))
 
             case response
             when Net::HTTPOK
               response.body
             else
-              @logger.debug("Unable to locate metadata file at #{url}")
+              @logger.debug("Unable to locate metadata file at #{loc(url)}")
               nil
             end
           end
         rescue StandardError => e
           raise Bolt::Error.new(
-            "Failed to connect to #{uri}: #{e.message}",
+            "Failed to connect to #{loc(uri)}: #{e.message}",
             "bolt/http-connect-error"
           )
         end
@@ -249,6 +257,12 @@ module Bolt
           uri.is_a?(URI::HTTP) && uri.host
         rescue URI::InvalidURIError
           false
+        end
+
+        # Returns a string describing the URL connected to with an optional proxy.
+        #
+        private def loc(url)
+          @proxy ? "#{url} with proxy #{@proxy}" : url.to_s
         end
       end
     end

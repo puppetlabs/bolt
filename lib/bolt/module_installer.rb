@@ -18,7 +18,7 @@ module Bolt
     # Adds a single module to the project.
     #
     def add(name, specs, puppetfile_path, moduledir, project_file, config)
-      project_specs = Specs.new(specs)
+      project_specs = Specs.new(specs, config)
 
       # Exit early if project config already includes a spec with this name.
       if project_specs.include?(name)
@@ -151,7 +151,7 @@ module Bolt
       @outputter.print_message("Installing project modules\n\n")
 
       if resolve != false
-        specs = Specs.new(specs)
+        specs = Specs.new(specs, config)
 
         # If forcibly installing or if there is no Puppetfile, resolve
         # and write a Puppetfile.

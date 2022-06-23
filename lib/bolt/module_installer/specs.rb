@@ -7,8 +7,10 @@ require_relative 'specs/git_spec'
 module Bolt
   class ModuleInstaller
     class Specs
-      def initialize(specs = [])
-        @specs = []
+      def initialize(specs = [], config = {})
+        @specs  = []
+        @config = config
+
         add_specs(specs)
         assert_unique_names
       end
@@ -49,7 +51,7 @@ module Bolt
       #
       private def spec_from_hash(hash)
         return ForgeSpec.new(hash) if ForgeSpec.implements?(hash)
-        return GitSpec.new(hash)   if GitSpec.implements?(hash)
+        return GitSpec.new(hash, @config) if GitSpec.implements?(hash)
 
         raise Bolt::ValidationError, <<~MESSAGE.chomp
           Invalid module specification:
