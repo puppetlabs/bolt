@@ -7,6 +7,9 @@ require 'set'
 
 require_relative '../../../bolt/error'
 require_relative '../../../bolt/logger'
+require_relative '../../../bolt/module_installer/specs/id/gitclone'
+require_relative '../../../bolt/module_installer/specs/id/github'
+require_relative '../../../bolt/module_installer/specs/id/gitlab'
 
 # This class represents a Git module specification.
 #
@@ -89,163 +92,46 @@ module Bolt
 
           PuppetfileResolver::Puppetfile::GitModule.new(name).tap do |mod|
             mod.remote = @git
-            mod.ref    = @ref
+            mod.ref    = sha
           end
         end
 
-        # Resolves the module's title from the module metadata. This is lazily
-        # resolved since Bolt does not always need to know a Git module's name,
-        # and fetching the metadata to figure it out is expensive.
+        # Returns the module's name.
         #
         def name
-          @name ||= parse_name(metadata['name'])
+          @name ||= parse_name(id.name)
         end
 
-        # Fetches the module's metadata. Attempts to fetch metadata from either
-        # GitHub or GitLab and falls back to cloning the repo if that fails.
+        # Returns the SHA for the module's ref.
         #
-        private def metadata
-          data = github_metadata || gitlab_metadata || clone_metadata
-
-          unless data
-            raise Bolt::Error.new(
-              "Unable to locate metadata.json for module at #{loc(@git)}. This may not be a valid module. "\
-              "For more information about how Bolt attempted to locate the metadata file, check the "\
-              "debugging logs.",
-              'bolt/missing-module-metadata-error'
-            )
-          end
-
-          data = JSON.parse(data)
-
-          unless data.is_a?(Hash)
-            raise Bolt::Error.new(
-              "Invalid metadata.json at #{loc(@git)}. Expected a Hash, got a #{data.class}.",
-              'bolt/invalid-module-metadata-error'
-            )
-          end
-
-          unless data.key?('name')
-            raise Bolt::Error.new(
-              "Invalid metadata.json at #{loc(@git)}. Metadata must include a 'name' key.",
-              'bolt/missing-module-name-error'
-            )
-          end
-
-          data
-        rescue JSON::ParserError => e
-          raise Bolt::Error.new(
-            "Unable to parse metadata.json for module at #{loc(@git)}: #{e.message}",
-            'bolt/metadata-parse-error'
-          )
+        def sha
+          id.sha
         end
 
-        # Returns the metadata for a GitHub-hosted module.
+        # Gets the ID for the module based on the specified ref and git URL.
+        # This is lazily resolved since Bolt does not always need this information,
+        # and requesting it is expensive.
         #
-        private def github_metadata
-          repo = if @git.start_with?('git@github.com:')
-                   @git.split('git@github.com:').last.split('.git').first
-                 elsif @git.start_with?('https://github.com')
-                   @git.split('https://github.com/').last.split('.git').first
-                 end
+        private def id
+          @id ||= begin
+            # The request methods here return an ID object if the module name and SHA
+            # were found and nil otherwise. This lets Bolt try multiple methods for
+            # finding the module name and SHA, and short circuiting as soon as it does.
+            module_id = Bolt::ModuleInstaller::Specs::ID::GitHub.request(@git, @ref, @proxy) ||
+                        Bolt::ModuleInstaller::Specs::ID::GitLab.request(@git, @ref, @proxy) ||
+                        Bolt::ModuleInstaller::Specs::ID::GitClone.request(@git, @ref, @proxy)
 
-          return nil if repo.nil?
-
-          request_metadata("https://raw.githubusercontent.com/#{repo}/#{@ref}/metadata.json")
-        end
-
-        # Returns the metadata for a GitLab-hosted module.
-        #
-        private def gitlab_metadata
-          repo = if @git.start_with?('git@gitlab.com:')
-                   @git.split('git@gitlab.com:').last.split('.git').first
-                 elsif @git.start_with?('https://gitlab.com')
-                   @git.split('https://gitlab.com/').last.split('.git').first
-                 end
-
-          return nil if repo.nil?
-
-          request_metadata("https://gitlab.com/#{repo}/-/raw/#{@ref}/metadata.json")
-        end
-
-        # Returns the metadata by cloning a git-based module.
-        # Because cloning is the last attempt to locate module metadata
-        #
-        private def clone_metadata
-          unless git?
-            @logger.debug("'git' executable not found, unable to use git clone resolution.")
-            return nil
-          end
-
-          # Clone the repo into a temp directory that will be automatically cleaned up.
-          Dir.mktmpdir do |dir|
-            command = %W[git clone --bare --depth=1 --single-branch --branch=#{@ref} #{@git} #{dir}]
-            command += %W[--config "http.proxy=#{@proxy}" --config "https.proxy=#{@proxy}"] if @proxy
-            @logger.debug("Executing command '#{command.join(' ')}'")
-
-            out, err, status = Open3.capture3(*command)
-
-            unless status.success?
-              @logger.debug("Unable to clone #{loc(@git)}: #{err}")
-              return nil
+            unless module_id
+              raise Bolt::Error.new(
+                "Unable to locate metadata and calculate SHA for ref #{@ref} at #{@git}. This may "\
+                "not be a valid module. For more information about how Bolt attempted to locate "\
+                "this information, check the debugging logs.",
+                'bolt/missing-module-metadata-error'
+              )
             end
 
-            # Read the metadata.json file from the cloned repo.
-            Dir.chdir(dir) do
-              command = %W[git show #{@ref}:metadata.json]
-              @logger.debug("Executing command '#{command.join(' ')}'")
-
-              out, err, status = Open3.capture3(*command)
-
-              unless status.success?
-                @logger.debug("Unable to read metadata.json file for #{loc(@git)}: #{err}")
-                return nil
-              end
-
-              out
-            end
+            module_id
           end
-        end
-
-        # Requests module metadata from the specified url.
-        #
-        private def request_metadata(url)
-          uri  = URI.parse(url)
-          opts = { use_ssl: uri.scheme == 'https' }
-          args = [uri.host, uri.port]
-
-          if @proxy
-            proxy = URI.parse(@proxy)
-            args += [proxy.host, proxy.port, proxy.user, proxy.password]
-          end
-
-          @logger.debug("Requesting metadata file from #{loc(url)}")
-
-          Net::HTTP.start(*args, opts) do |client|
-            response = client.request(Net::HTTP::Get.new(uri))
-
-            case response
-            when Net::HTTPOK
-              response.body
-            else
-              @logger.debug("Unable to locate metadata file at #{loc(url)}")
-              nil
-            end
-          end
-        rescue StandardError => e
-          raise Bolt::Error.new(
-            "Failed to connect to #{loc(uri)}: #{e.message}",
-            "bolt/http-connect-error"
-          )
-        end
-
-        # Returns true if the 'git' executable is available.
-        #
-        private def git?
-          Open3.capture3('git', '--version')
-          true
-        rescue Errno::ENOENT
-          false
         end
 
         # Returns true if the URL is valid.
@@ -257,12 +143,6 @@ module Bolt
           uri.is_a?(URI::HTTP) && uri.host
         rescue URI::InvalidURIError
           false
-        end
-
-        # Returns a string describing the URL connected to with an optional proxy.
-        #
-        private def loc(url)
-          @proxy ? "#{url} with proxy #{@proxy}" : url.to_s
         end
       end
     end

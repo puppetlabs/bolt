@@ -115,43 +115,5 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
     it 'resolves and returns the module name' do
       expect(spec.name).to eq(name)
     end
-
-    it 'errors with missing metadata.json' do
-      allow(spec).to receive(:github_metadata).and_return(nil)
-      allow(spec).to receive(:gitlab_metadata).and_return(nil)
-      allow(spec).to receive(:clone_metadata).and_return(nil)
-
-      expect { spec.name }.to raise_error(
-        Bolt::Error,
-        /Unable to locate metadata\.json/
-      )
-    end
-
-    it 'errors with unparseable metadata.json' do
-      allow(spec).to receive(:github_metadata).and_return('{"foo":bar}')
-
-      expect { spec.name }.to raise_error(
-        Bolt::Error,
-        /Unable to parse metadata\.json/
-      )
-    end
-
-    it 'errors when metadata is not a hash' do
-      allow(spec).to receive(:github_metadata).and_return('"foo"')
-
-      expect { spec.name }.to raise_error(
-        Bolt::Error,
-        /Invalid metadata\.json.*Expected a Hash/
-      )
-    end
-
-    it 'errors when metadata is missing a name key' do
-      allow(spec).to receive(:github_metadata).and_return('{}')
-
-      expect { spec.name }.to raise_error(
-        Bolt::Error,
-        /Invalid metadata\.json.*must include a 'name' key/
-      )
-    end
   end
 end

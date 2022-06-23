@@ -129,7 +129,7 @@ describe 'installing modules' do
         expect(puppetfile_content.lines).to include(
           /mod 'yaml'/,
           %r{git: 'https://github.com/puppetlabs/puppetlabs-yaml.git'},
-          /ref: '0.1.0'/
+          /ref: 'bdaa6b531fde16baab5752916a49423925493f2f'/
         )
       end
     end
@@ -158,7 +158,7 @@ describe 'installing modules' do
         expect(puppetfile_content.lines).to include(
           /mod 'crypto_policy'/,
           %r{git: 'https://gitlab.com/simp/pupmod-simp-crypto_policy.git'},
-          /ref: '0.1.0'/
+          /ref: '04fe0b7fd0d4a8fa9db4a32845a11171f1007b3a'/
         )
       end
     end
@@ -174,12 +174,8 @@ describe 'installing modules' do
       it 'installs the module' do
         # Make Bolt believe this module needs to be cloned since private repos
         # require authorization that the test runner doesn't have.
-        allow_any_instance_of(Bolt::ModuleInstaller::Specs::GitSpec)
-          .to receive(:github_metadata)
-          .and_return(nil)
-        allow_any_instance_of(Bolt::ModuleInstaller::Specs::GitSpec)
-          .to receive(:gitlab_metadata)
-          .and_return(nil)
+        allow(Bolt::ModuleInstaller::Specs::ID::GitHub).to receive(:request).and_return(nil)
+        allow(Bolt::ModuleInstaller::Specs::ID::GitLab).to receive(:request).and_return(nil)
 
         result = run_cli_json(command, project: project)
 
@@ -196,7 +192,7 @@ describe 'installing modules' do
         expect(puppetfile_content.lines).to include(
           /mod 'yaml'/,
           %r{git: 'https://github.com/puppetlabs/puppetlabs-yaml.git'},
-          /ref: '0.1.0'/
+          /ref: 'bdaa6b531fde16baab5752916a49423925493f2f'/
         )
       end
     end
@@ -234,7 +230,7 @@ describe 'installing modules' do
       expect(puppetfile_content.lines).to include(
         /mod 'ruby_task_helper'/,
         %r{git: 'https://github.com/puppetlabs/puppetlabs-ruby_task_helper'},
-        /ref: '0.4.0'/,
+        /ref: '23520d05ef8e3f9e1327804bc7d2e1bba33d1df9'/,
         %r{mod 'puppetlabs/yaml', '0.1.0'}
       )
     end
@@ -308,9 +304,12 @@ describe 'installing modules' do
     end
 
     it 'errors' do
+      # Skip GitClone resolution, which requires authentication that the runner does not have
+      allow(Bolt::ModuleInstaller::Specs::ID::GitClone).to receive(:request).and_return(nil)
+
       expect { run_cli(command, project: project) }.to raise_error(
         Bolt::Error,
-        /Unable to locate metadata\.json.*This may not be a valid module/
+        /Unable to locate metadata.*This may not be a valid module/
       )
     end
   end
