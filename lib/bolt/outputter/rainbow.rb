@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../bolt/pal'
+require_relative '../../bolt/util/format'
 
 module Bolt
   class Outputter
@@ -110,7 +111,7 @@ module Bolt
       end
 
       def print_message(message)
-        @stream.puts colorize(:rainbow, message)
+        @stream.puts colorize(:rainbow, Bolt::Util::Format.stringify(message))
       end
     end
   end

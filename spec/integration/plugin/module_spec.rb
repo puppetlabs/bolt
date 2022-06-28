@@ -233,14 +233,14 @@ describe 'using module based plugins' do
       result = run_cli(%w[secret encrypt secret_msg --plugin my_secret] + config_flags,
                        outputter: Bolt::Outputter::Human)
       # This is kind of brittle and we look for plaintext_value because this is really the identity task
-      expect(result).to match(/"plaintext_value"=>"secret_msg"/)
+      expect(result).to match(/"plaintext_value": "secret_msg"/)
     end
 
     it 'calls the decrypt task' do
       result = run_cli(%w[secret decrypt secret_msg --plugin my_secret] + config_flags,
                        outputter: Bolt::Outputter::Human)
       # This is kind of brittle and we look for "encrypted_value because this is really the identity task
-      expect(result).to match(/"encrypted_value"=>"secret_msg"/)
+      expect(result).to match(/"encrypted_value": "secret_msg"/)
     end
   end
 
