@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-forge "http://forge.puppetlabs.com"
+forge 'https://forge.puppetlabs.com'
 
 moduledir File.join(File.dirname(__FILE__), 'modules')
 
