@@ -76,6 +76,7 @@ RSpec.configure do |config|
   config.after :each do
     Bolt::Logger.stream    = nil
     Bolt::Logger.analytics = nil
+    YARD::Registry.clear if defined?(YARD::Registry)
   end
 
   # This will be default in future rspec, leave it on

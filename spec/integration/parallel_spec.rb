@@ -55,8 +55,8 @@ describe 'plans' do
     end
 
     it "fails immediately when a Puppet error is raised" do
-      expect { run_cli_json(%w[plan run parallel::hard_fail] + config_flags) }
-        .to raise_error(Bolt::PAL::PALError, /This Name has no effect./)
+      result = run_cli_json(%w[plan run parallel::hard_fail] + config_flags)
+      expect(result['msg']).to match(/This Name has no effect./)
     end
 
     it "runs normally when no steps are parallelizable" do

@@ -351,6 +351,7 @@ module Bolt
     # @return [Bolt::PlanResult]
     #
     def run_plan(plan, targets, params: {})
+      plan_params = pal.get_plan_info(plan)['parameters']
       if targets && targets.any?
         if params['nodes'] || params['targets']
           key = params.include?('nodes') ? 'nodes' : 'targets'
@@ -360,7 +361,6 @@ module Bolt
                 "in the JSON data passed in the --params option"
         end
 
-        plan_params  = pal.get_plan_info(plan)['parameters']
         target_param = plan_params.dig('targets', 'type') =~ /TargetSpec/
         node_param   = plan_params.include?('nodes')
 
@@ -375,13 +375,17 @@ module Bolt
         end
       end
 
-      plan_context = { plan_name: plan, params: params }
+      sensitive_params = params.keys.select { |param| plan_params.dig(param, 'sensitive') }
+
+      plan_context = { plan_name: plan, params: params, sensitive: sensitive_params }
 
       executor.start_plan(plan_context)
       result = pal.run_plan(plan, params, executor, inventory, plugins.puppetdb_client)
       executor.finish_plan(result)
 
       result
+    rescue Bolt::Error => e
+      Bolt::PlanResult.new(e, 'failure')
     end
 
     # Show plan information.
