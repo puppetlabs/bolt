@@ -1,5 +1,57 @@
 # Changelog
 
+## Bolt 3.24.0 (2022-06-29)
+
+### New features
+
+* **Support extended globs for target matching from CLI**
+  ([#3105](https://github.com/puppetlabs/bolt/pull/3105))
+
+  Bolt now supports extended globs for target matching in CLI
+  `--targets` option.
+
+  _Contributed by [Yury Bushmelev](https://github.com/jay7x)_
+
+* **Support interpreters in LXD transport configuration**
+  ([#3013](https://github.com/puppetlabs/bolt/issues/3013))
+
+  Bolt now also supports setting the `interpreters` configuration option
+  for the LXD transport.
+
+  _Contributed by [jonasdemoor](https://github.com/jonasdemoor)_
+
+* **Update `puppetlabs-reboot` to 4.2.0**
+  ([#3124](https://github.com/puppetlabs/bolt/pull/3124))
+
+  The bundled module `puppetlabs-reboot` has been updated to version
+  [4.2.0](https://forge.puppet.com/puppetlabs/reboot/4.2.0/changelog).
+
+### Bug fixes
+
+* **Execute commands over `winrm` in separate shell instances**
+  ([#3111](https://github.com/puppetlabs/bolt/pull/3111))
+
+  Bolt now opens a new shell instance each time it runs a command over
+  `winrm`. Previously, Bolt used a single shell instance to run all
+  commands, preventing Bolt from properly cleaning up temporary files in
+  some instances.
+
+* **Correctly print secret key paths when using rainbow format**
+  ([#3120](https://github.com/puppetlabs/bolt/pull/3120))
+
+  Bolt no longer errors when running `bolt secret createkeys --format
+  rainbow` or `New-BoltSecretKey -Format rainbow`.
+
+* **Don't store sensitive parameter values when running plans over PCP**
+  ([#3117](https://github.com/puppetlabs/bolt/pull/3117))
+
+  Bolt no longer submits sensitive parameter values to the PE
+  Orchestrator service when running plans over the PCP transport.
+
+### Removals
+
+* **Remove support for Fedora 32, Ubuntu 16.04**
+
 ## Bolt 3.23.1 (2022-06-15)
 
 ### Bug fixes
