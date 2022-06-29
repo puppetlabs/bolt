@@ -2,6 +2,7 @@
 
 require_relative '../../bolt/container_result'
 require_relative '../../bolt/pal'
+require_relative '../../bolt/util/format'
 
 module Bolt
   class Outputter
@@ -890,7 +891,7 @@ module Bolt
       end
 
       def print_message(message)
-        @stream.puts(message)
+        @stream.puts(Bolt::Util::Format.stringify(message))
       end
 
       def print_error(message)

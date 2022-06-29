@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../../bolt/util/format'
+
 module Bolt
   class Outputter
     class JSON < Bolt::Outputter
@@ -190,7 +192,7 @@ module Bolt
       end
 
       def print_message(message)
-        $stderr.puts(message)
+        $stderr.puts(Bolt::Util::Format.stringify(message))
       end
       alias print_error print_message
 
