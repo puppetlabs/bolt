@@ -9,6 +9,7 @@ module Bolt
       class LXD < Base
         OPTIONS = %w[
           cleanup
+          interpreters
           remote
           tmpdir
         ].concat(RUN_AS_OPTIONS).sort.freeze
@@ -17,6 +18,14 @@ module Bolt
           'cleanup' => true,
           'remote'  => 'local'
         }.freeze
+
+        private def validate
+          super
+
+          if @config['interpreters']
+            @config['interpreters'] = normalize_interpreters(@config['interpreters'])
+          end
+        end
       end
     end
   end
