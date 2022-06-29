@@ -254,10 +254,8 @@ describe Bolt::Application do
     it 'errors if targets are specified twice' do
       params = { 'targets' => targets }
 
-      expect { application.run_plan(plan, targets, params: params) }.to raise_error(
-        Bolt::CLIError,
-        /A plan's 'targets' parameter can be specified using the --targets option/
-      )
+      result = application.run_plan(plan, targets, params: params)
+      expect(result.value.msg).to match(/A plan's 'targets' parameter can be specified using the --targets option/)
     end
   end
 

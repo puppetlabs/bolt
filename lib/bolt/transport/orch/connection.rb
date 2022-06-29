@@ -6,7 +6,7 @@ module Bolt
       class Connection
         attr_reader :logger, :key
 
-        CONTEXT_KEYS = Set.new(%i[plan_name description params]).freeze
+        CONTEXT_KEYS = Set.new(%i[plan_name description params sensitive]).freeze
 
         def self.get_key(opts)
           [
@@ -46,6 +46,7 @@ module Bolt
           if plan_context
             begin
               opts = plan_context.select { |k, _| CONTEXT_KEYS.include? k }
+              opts[:params] = opts[:params].reject { |k, _| plan_context[:sensitive].include?(k) }
               @client.command.plan_start(opts)['name']
             rescue OrchestratorClient::ApiError => e
               if e.code == '404'
