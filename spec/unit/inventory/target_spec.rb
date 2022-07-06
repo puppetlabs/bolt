@@ -54,4 +54,12 @@ describe Bolt::Inventory::Target do
       )
     end
   end
+
+  context 'validating target name' do
+    ['foo bar', 'foo,bar'].each do |name|
+      it "rejects #{name}" do
+        expect { described_class.new({ 'name' => name }, inventory) }.to raise_error(/Illegal character/)
+      end
+    end
+  end
 end
