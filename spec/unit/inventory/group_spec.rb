@@ -579,19 +579,6 @@ describe Bolt::Inventory::Group do
       it { expect { group }.to raise_error(/Alias entry on target1 must be a String or Array/) }
     end
 
-    context 'invalid alias name' do
-      let(:data) do
-        {
-          'name' => 'root',
-          'targets' => [
-            { 'name' => 'target1', 'alias' => 'not a valid alias' }
-          ]
-        }
-      end
-
-      it { expect { group }.to raise_error(/Invalid alias not a valid alias/) }
-    end
-
     context 'validating alias names' do
       let(:data) do
         {
@@ -602,17 +589,17 @@ describe Bolt::Inventory::Group do
         }
       end
 
-      %w[alias1 _alias1 1alias 1_alias_ alias-1 a 1].each do |alias_name|
+      %w[alias1 _alias1 1alias 1_alias_ alias-1 a 1 alias.1].each do |alias_name|
         it "accepts '#{alias_name}'" do
           @alias = alias_name
           expect(group.target_aliases).to eq(alias_name => 'target1')
         end
       end
 
-      %w[-alias1 alias/1 alias.1 - Alias1 ALIAS_1].each do |alias_name|
+      ['foo bar', 'foo,bar'].each do |alias_name|
         it "rejects '#{alias_name}'" do
           @alias = alias_name
-          expect { group }.to raise_error(/Invalid alias/)
+          expect { group }.to raise_error(/Illegal character/)
         end
       end
     end

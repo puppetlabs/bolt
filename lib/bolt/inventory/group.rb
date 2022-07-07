@@ -10,8 +10,10 @@ module Bolt
     class Group
       attr_accessor :name, :groups
 
-      # Regex used to validate group names and target aliases.
-      NAME_REGEX = /\A[a-z0-9_][a-z0-9_-]*\Z/.freeze
+      # Illegal characters that are not permitted in group names or aliases.
+      # These characters are delimiters for target and group names and allowing
+      # them would cause unexpected behavior.
+      ILLEGAL_CHARS = /[\s,]/.freeze
 
       # NOTE: All keys should have a corresponding schema property in schemas/bolt-inventory.schema.json
       DATA_KEYS = %w[config facts vars features plugin_hooks].freeze
@@ -41,7 +43,10 @@ module Bolt
         @name = @plugins.resolve_references(input['name'])
 
         raise ValidationError.new("Group name must be a String, not #{@name.inspect}", nil) unless @name.is_a?(String)
-        raise ValidationError.new("Invalid group name #{@name}", @name) unless @name =~ NAME_REGEX
+
+        if (illegal_char = @name.match(ILLEGAL_CHARS))
+          raise ValidationError.new("Illegal character '#{illegal_char}' in group name '#{@name}'", @name)
+        end
 
         validate_group_input(input)
 
@@ -167,7 +172,9 @@ module Bolt
 
       def insert_alia(target_name, aliases)
         aliases.each do |alia|
-          raise ValidationError.new("Invalid alias #{alia}", @name) unless alia =~ NAME_REGEX
+          if (illegal_char = alia.match(ILLEGAL_CHARS))
+            raise ValidationError.new("Illegal character '#{illegal_char}' in alias '#{alia}'", @name)
+          end
 
           if (found = @aliases[alia])
             raise ValidationError.new(alias_conflict(alia, found, target_name), @name)

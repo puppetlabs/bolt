@@ -8,6 +8,11 @@ module Bolt
     class Target
       attr_reader :name, :uri, :safe_name, :target_alias, :resources
 
+      # Illegal characters that are not permitted in target names.
+      # These characters are delimiters for target and group names and allowing
+      # them would cause unexpected behavior.
+      ILLEGAL_CHARS = /[\s,]/.freeze
+
       def initialize(target_data, inventory)
         unless target_data['name'] || target_data['uri']
           raise Bolt::Inventory::ValidationError.new("Target must have either a name or uri", nil)
@@ -148,6 +153,10 @@ module Bolt
       def validate
         unless name.ascii_only?
           raise Bolt::Inventory::ValidationError.new("Target name must be ASCII characters: #{@name}", nil)
+        end
+
+        if (illegal_char = @name.match(ILLEGAL_CHARS))
+          raise ValidationError.new("Illegal character '#{illegal_char}' in target name '#{@name}'", nil)
         end
 
         unless transport.nil? || Bolt::TRANSPORTS.include?(transport.to_sym)
