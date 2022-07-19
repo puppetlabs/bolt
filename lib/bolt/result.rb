@@ -200,16 +200,18 @@ module Bolt
 
     def to_data
       serialized_value = safe_value
+
       if serialized_value.key?('_sensitive') &&
          serialized_value['_sensitive'].is_a?(Puppet::Pops::Types::PSensitiveType::Sensitive)
         serialized_value['_sensitive'] = serialized_value['_sensitive'].to_s
       end
+
       {
         "target" => @target.name,
         "action" => action,
         "object" => object,
         "status" => status,
-        "value" => serialized_value
+        "value"  => serialized_value
       }
     end
 

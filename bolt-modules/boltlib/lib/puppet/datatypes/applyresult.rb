@@ -12,11 +12,20 @@
 #   keys](applying_manifest_blocks.md#result-keys).
 # @param target
 #   The target the result is from.
+# @param error
+#   An Error object constructed from the `_error` field of the result's value.
+# @param catalog
+#   The Puppet catalog used to configure the target. The catalog describes the
+#   desired state of the target. The catalog is masked with the `Sensitive` data
+#   type to protect any sensitive information in the catalog from being printed
+#   to the console or logs. Using this function automatically unwraps the
+#   catalog. For more information about catalogs and the catalog compilation
+#   process, see [Catalog
+#   compilation](https://puppet.com/docs/puppet/latest/subsystem_catalog_compilation.html).
+
 #
 # @!method action
 #   The action performed. `ApplyResult.action` always returns the string `apply`.
-# @!method error
-#   Returns an Error object constructed from the `_error` field of the result's value.
 # @!method message
 #   The `_output` field of the result's value.
 # @!method ok
@@ -30,10 +39,11 @@ Puppet::DataTypes.create_type('ApplyResult') do
   interface <<-PUPPET
     attributes => {
       'report' => Hash[String[1], Data],
-      'target' => Target
+      'target' => Target,
+      'error' => Optional[Error],
+      'catalog' => Optional[Hash]
     },
     functions => {
-      error => Callable[[], Optional[Error]],
       ok => Callable[[], Boolean],
       message => Callable[[], Optional[String]],
       action => Callable[[], String],

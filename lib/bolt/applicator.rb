@@ -280,7 +280,6 @@ module Bolt
                   result
                 end
               else
-
                 arguments = {
                   'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                   'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
@@ -291,7 +290,7 @@ module Bolt
 
                 callback = proc do |event|
                   if event[:type] == :node_result
-                    event = event.merge(result: ApplyResult.from_task_result(event[:result]))
+                    event = event.merge(result: ApplyResult.from_task_result(event[:result], catalog))
                   end
                   @executor.publish_event(event)
                 end
@@ -299,7 +298,7 @@ module Bolt
                 options[:run_as] = @executor.run_as if @executor.run_as && !options.key?(:run_as)
 
                 results = transport.batch_task(batch, catalog_apply_task, arguments, options, &callback)
-                Array(results).map { |result| ApplyResult.from_task_result(result) }
+                Array(results).map { |result| ApplyResult.from_task_result(result, catalog) }
               end
             end
           end

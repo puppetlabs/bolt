@@ -65,23 +65,30 @@ module Bolt
       end
     end
 
-    def self.from_task_result(result)
+    def self.from_task_result(result, catalog = nil)
       if (puppet_missing = puppet_missing_error(result))
         new(result.target,
             error: puppet_missing,
-            report: result.value.reject { |k| k == '_error' })
+            report: result.value.reject { |k| k == '_error' },
+            catalog: catalog)
       elsif !result.ok?
-        new(result.target, error: result.error_hash)
+        new(result.target,
+            error: result.error_hash,
+            catalog: catalog)
       elsif (invalid_report = invalid_report_error(result))
         new(result.target,
             error: invalid_report,
-            report: result.value.reject { |k| %w[_error _output].include?(k) })
+            report: result.value.reject { |k| %w[_error _output].include?(k) },
+            catalog: catalog)
       elsif (resource_error = resource_error(result))
         new(result.target,
             error: resource_error,
-            report: result.value.reject { |k| k == '_error' })
+            report: result.value.reject { |k| k == '_error' },
+            catalog: catalog)
       else
-        new(result.target, report: result.value)
+        new(result.target,
+            report: result.value,
+            catalog: catalog)
       end
     end
 
@@ -89,16 +96,21 @@ module Bolt
     def _pcore_init_hash
       { 'target' => @target,
         'error' => value['_error'],
-        'report' => value['report'] }
+        'report' => value['report'],
+        'catalog' => catalog }
     end
 
-    def initialize(target, error: nil, report: nil)
+    def initialize(target, error: nil, report: nil, catalog: nil)
       @target = target
       @value = {}
       @action = 'apply'
       @value['report'] = report if report
       @value['_error'] = error if error
       @value['_output'] = metrics_message if metrics_message
+
+      if catalog
+        @value['_sensitive'] = Puppet::Pops::Types::PSensitiveType::Sensitive.new({ 'catalog' => catalog })
+      end
     end
 
     def event_metrics
@@ -129,6 +141,10 @@ module Bolt
 
     def report
       @value['report']
+    end
+
+    def catalog
+      sensitive.unwrap['catalog'] if sensitive
     end
 
     def generic_value
