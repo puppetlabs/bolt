@@ -3,18 +3,11 @@ name: Release Notes
 on:
   pull_request:
     types: [opened, reopened, edited, synchronize]
-    paths-ignore: 
-      - '*.md'
-      - '**.md'
-      - '**.erb'
-      - 'lib/bolt_server/**'
-      - 'spec/**'
-      - 'acceptance/**'
-      - 'bolt_spec_spec/**'
-      - 'config/**'
-      - '.github/**'
-      - 'rakelib/**'
-      - 'Dockerfile.bolt-server'
+    paths:
+      - Puppetfile
+      - bolt-modules/**
+      - lib/bolt/**
+      - modules/**
 
 jobs:
 

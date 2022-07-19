@@ -1,12 +1,19 @@
 name: Docs
 
 on:
-  push:
-    branches: [main]
-    paths-ignore: ['schemas/*']
   pull_request:
     types: [opened, reopened, edited, synchronize]
-    paths-ignore: ['schemas/*']
+    paths:
+      - .github/workflows/docs.yaml
+      - bolt.gemspec
+      - Gemfile
+      - Puppetfile
+      - bolt-modules/**
+      - documentation/**
+      - lib/bolt/**
+      - modules/**
+      - pwsh_module/**
+      - rakelib/docs.rake
 
 jobs:
 
