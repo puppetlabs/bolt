@@ -307,6 +307,11 @@ describe Bolt::Inventory::Inventory do
                                                     target9])
         end
 
+        it 'globs against group names' do
+          targets = inventory.get_targets('group*')
+          expect(targets.map(&:name).sort).to eq(%w[ssh://target8 target4 target5 target6 target7 target9])
+        end
+
         it 'should fail if wildcard selector matches nothing' do
           expect {
             inventory.get_targets('*target')

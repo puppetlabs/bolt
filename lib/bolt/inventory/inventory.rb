@@ -125,16 +125,25 @@ module Bolt
       end
 
       # If target is a group name, expand it to the members of that group.
-      # Else match against targets in inventory by name or alias.
+      # Else match against groups and targets in inventory by name or alias.
       # If a wildcard string, error if no matches are found.
       # Else fall back to [target] if no matches are found.
       def resolve_name(target, ext_glob: false)
         if (group = group_lookup[target])
-          group.all_targets
+          group.all_targets.to_a
         else
-          # Try to wildcard match targets in inventory
-          # Ignore case because hostnames are generally case-insensitive
-          targets = groups.all_targets.select { |targ| match_wildcard?(target, targ, ext_glob: ext_glob) }
+          targets = []
+
+          # Find groups that match the glob
+          group_lookup.each do |name, grp|
+            next unless match_wildcard?(target, name, ext_glob: ext_glob)
+            targets += grp.all_targets.to_a
+          end
+
+          # Find target names that match the glob
+          targets += groups.all_targets.select { |targ| match_wildcard?(target, targ, ext_glob: ext_glob) }
+
+          # Find target aliases that match the glob
           targets += groups.target_aliases
                            .select { |tgt_alias, _| match_wildcard?(target, tgt_alias, ext_glob: ext_glob) }
                            .values
@@ -143,7 +152,7 @@ module Bolt
             raise(WildcardError, target) if target.include?('*')
             [target]
           else
-            targets
+            targets.uniq
           end
         end
       end
