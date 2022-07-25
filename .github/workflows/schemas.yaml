@@ -1,20 +1,14 @@
 name: Schemas
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - 'rakelib/schemas.rake'
-      - 'schemas/*.json'
-      - 'lib/bolt/config/options.rb'
-      - 'lib/bolt/config/transport/*'
   pull_request:
     types: [opened, reopened, edited, synchronize]
     paths:
-      - 'rakelib/schemas.rake'
-      - 'schemas/*.json'
-      - 'lib/bolt/config/options.rb'
-      - 'lib/bolt/config/transport/options.rb'
+      - lib/bolt/config/options.rb
+      - lib/bolt/config/transport/**
+      - lib/bolt/inventory/options.rb
+      - rakelib/schemas.rake
+      - schemas/*.json
 
 jobs:
 

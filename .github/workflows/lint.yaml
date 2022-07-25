@@ -1,12 +1,11 @@
 name: Linting
 
 on:
-  push:
-    branches: [main]
-    paths-ignore: ['**.md', '**.erb', 'schemas/*']
   pull_request:
     types: [opened, reopened, edited, synchronize]
-    paths-ignore: ['**.md', '**.erb', 'schemas/*']
+    paths:
+      - .github/workflows/lint.yaml
+      - '**.rb'
 
 jobs:
 

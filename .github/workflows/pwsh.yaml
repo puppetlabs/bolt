@@ -1,12 +1,13 @@
 name: pwsh
 
 on:
-  push:
-    branches: [master]
-    paths: ['pwsh_module/*']
   pull_request:
     types: [opened, reopened, edited, synchronize]
-    paths: ['pwsh_module/*', 'lib/bolt/bolt_option_parser.rb', 'rakelib/pwsh.rake']
+    paths:
+      - .github/workflows/pwsh.yaml
+      - pwsh_module/*
+      - lib/bolt/bolt_option_parser.rb
+      - rakelib/pwsh.rake
 
 jobs:
 

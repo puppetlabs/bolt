@@ -1,12 +1,18 @@
 name: WinRM Transport
 
 on:
-  push:
-    branches: [main]
-    paths-ignore: ['**.md', '**.erb', 'schemas/*']
   pull_request:
     types: [opened, reopened, edited, synchronize]
-    paths-ignore: ['**.md', '**.erb', 'schemas/*']
+    paths-ignore:
+      - .github/workflows/winrm_transport.yaml
+      - bolt.gemspec
+      - Gemfile
+      - Puppetfile
+      - bolt-modules/**
+      - lib/bolt/**
+      - libexec/**
+      - rakelib/tests.rake
+      - spec/**
 
 env:
   BOLT_WINRM_USER: roddypiper
