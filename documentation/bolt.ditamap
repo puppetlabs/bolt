@@ -94,6 +94,7 @@
                 <shortdesc>Bolt tasks are similar to scripts, but they are kept in modules and can have metadata. This allows you to reuse and share them.</shortdesc>
             </topicmeta>
         </topicref>
+        <topicref href="task_helpers.md" format="markdown"/>
     </topicref>
     <topichead navtitle="Modules">
         <topicref href="modules.md" format="markdown"/>
