@@ -1,5 +1,64 @@
 # Changelog
 
+## Bolt 3.25.0 (2022-07-27)
+
+### New features
+
+* **Include catalog in `ApplyResult` objects**
+  ([#2618](https://github.com/puppetlabs/bolt/issues/2618))
+
+  The `ApplyResult` object now includes a `catalog` attribute that
+  includes the catalog used during an apply. The catalog is masked using
+  the `Sensitive` data type to prevent sensitive information in the
+  catalog from being printed to the console or Bolt logs.
+
+* **Allow larger set of characters in group and alias names**
+  ([#3122](https://github.com/puppetlabs/bolt/issues/3122))
+
+  Group and alias names can now include any character other than
+  whitespace characters and commas.
+
+* **Support installing any git-based module**
+  ([#3109](https://github.com/puppetlabs/bolt/issues/3109))
+
+  Bolt now supports installing any git-based module. Previously, Bolt
+  only supported installing and resolving dependencies for modules
+  hosted in a public GitHub repository. Now, Bolt will check both GitHub
+  and GitLab before falling back to cloning a module's metadata using
+  the `git` executable. This allows users to install modules from
+  private repositories, or from locations other than GitHub.
+
+* **Add `bash_task_helper` to bundled modules**
+  ([#2994](https://github.com/puppetlabs/bolt/issues/2994))
+
+  Bolt now ships with the `bolt_task_helper` module which includes a
+  library for helping write Bash tasks.
+
+* **Update bundled modules to latest version**
+  ([#3134](https://github.com/puppetlabs/bolt/pull/3134))
+
+  The following bundled modules have been updated to their latest versions:
+
+  - [puppet_agent 4.12.1](https://forge.puppet.com/modules/puppetlabs/puppet_agent/4.12.1/changelog)
+  - [stdlib 8.4.0](https://forge.puppet.com/modules/puppetlabs/stdlib/8.4.0/changelog)
+
+### Bug fixes
+
+* **Restrict whitespace characters and commas in target names**
+  ([#3122](https://github.com/puppetlabs/bolt/issues/3122))
+
+  Bolt now raises a validation error when a target name includes a
+  whitespace character or comma. Previously, these characters were
+  allowed, but Bolt would not be able to retrieve the target from the
+  inventory by name.
+
+* **Configure proxy when retrieving metadata for git-based modules**
+  ([#3115](https://github.com/puppetlabs/bolt/pull/3115))
+
+  Bolt now configures a proxy when `module-install.proxy` is set and it
+  retrieves metadata for git-based modules. Previously, Bolt was only
+  configuring a proxy when it resolved and installed modules.
+
 ## Bolt 3.24.0 (2022-06-29)
 
 ### New features
