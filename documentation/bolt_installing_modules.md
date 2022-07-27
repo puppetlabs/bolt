@@ -10,9 +10,9 @@ You can use the command line to:
   downloaded a project from source control and want to install its dependencies.
 - Update your project's modules.
 
-If you need to install a module from a GitHub repository or an alternate Forge,
-or you need to use a Forge proxy, you can manually configure your Bolt modules
-in your Bolt project configuration file (`bolt-project.yaml`).
+If you need to install a module from a git repository or an alternate Forge, or
+you need to use a Forge proxy, you can manually configure your Bolt modules in
+your Bolt project configuration file (`bolt-project.yaml`).
 
 ## Create a Bolt project with pre-installed modules
 
@@ -216,7 +216,7 @@ To specify a git module, use the following keys in the specification:
 
 | Key | Description | Required |
 | --- | --- | :-: |
-| `git` | The URI to the GitHub repository. URI must begin with either `https://github.com`or `git@github.com`. | ✓ |
+| `git` | The URI to the git repository. URI must begin with either `git@`, `http://`, or `https://`. | ✓ |
 | `name` | The name of the module. Bolt uses this name for the module in the Puppetfile, the directory that the module's contents are downloaded to, and as a namespace for the module's content. To avoid errors, make sure this name matches the name specified in the module's `metadata.json`. **Required if `resolve` is `false`.** | |
 | `ref` | The git reference to checkout. Can be either a branch, commit, or tag. | ✓ |
 | `resolve` | Boolean. Whether to resolve the module's dependencies when installing modules. | |
@@ -232,8 +232,6 @@ modules:
   - git: https://github.com/puppetlabs/puppetlabs-puppetdb
     ref: '7.0.0'
 ```
-
-Bolt only supports installing git modules from GitHub.
 
 ## Pin a module version
 
@@ -364,8 +362,6 @@ resolve dependencies for.
 You might want to skip dependency resolution for a module if:
 
 - The module has outdated or incorrect metadata.
-- The module is a git module hosted in a repository other than a public GitHub
-  repository. For example, a private GitHub repository.
 - Bolt can't cleanly resolve the module's dependencies.
 
 You can configure Bolt to skip dependency resolution for a module by setting the
@@ -378,8 +374,8 @@ dependencies, Bolt generates a Puppetfile with the resolved modules and
 dependencies, as well as the modules it did not resolve dependencies for.
 
 For example, if your project includes the `puppetlabs/ntp` Forge module and a
-git module named `private_module` hosted in a private GitHub repository, you can
-configure Bolt to skip dependency resolution for `private_module`:
+git module named `private_module` that has incorrect metadata, you can configure
+Bolt to skip dependency resolution for `private_module`:
 
 ```yaml
 # bolt-project.yaml
@@ -453,11 +449,6 @@ without resolving dependencies. The process for manually managing your modules
 uses the new `module` subcommand, and replaces the now deprecated `puppetfile`
 subcommand.
 
-The most common scenario where Bolt can't resolve module dependencies is when
-a project includes git modules that are in a repository other than a public
-GitHub repository. If your project includes this type of module, you must
-manually manage your project's Puppetfile.
-
 To manually manage a project's Puppetfile and install modules without resolving
 dependencies, follow these steps:
 
@@ -466,10 +457,9 @@ dependencies, follow these steps:
    the Puppetfile. For example:
 
    ```ruby
-   # Modules from a private git repository
-   mod 'private-module', git: 'https://github.com/bolt-user/private-module.git', ref: 'main'
-
-   # Modules from an alternate Forge
+   mod 'private-module',
+    git: 'https://github.com/bolt-user/private-module.git',
+    ref: 'main'
    mod 'puppetlabs/apache', '5.7.0'
    mod 'puppetlabs/stdlib', '6.5.0'
    mod 'puppetlabs/concat', '6.3.0'
@@ -505,9 +495,7 @@ project](projects.md#migrate-a-bolt-project).
 In some cases, Bolt is unable to resolve module dependencies and manage your
 project's modules for you. If Bolt can't resolve your module dependencies, you
 can manage your project's Puppetfile manually and use Bolt to install the
-modules listed in the Puppetfile without resolving dependencies. The most common
-scenario where Bolt can't resolve module dependencies is when a project includes
-git modules that are in a repository other than a public GitHub repository.
+modules listed in the Puppetfile without resolving dependencies.
 
 The module management feature makes changes to configuration files and changes
 the directory where modules are installed. To migrate your project, do the

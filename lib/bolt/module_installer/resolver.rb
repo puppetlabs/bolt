@@ -49,7 +49,7 @@ module Bolt
             spec_searcher_configuration: spec_searcher_config(config)
           )
         rescue StandardError => e
-          raise Bolt::Error.new(e.message, 'bolt/module-resolver-error')
+          raise Bolt::Error.new("Unable to resolve modules: #{e.message}", 'bolt/module-resolver-error')
         end
 
         # Create the Puppetfile object.
