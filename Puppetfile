@@ -6,7 +6,7 @@ moduledir File.join(File.dirname(__FILE__), 'modules')
 
 # Core modules used by 'apply'
 mod 'puppetlabs-service', '2.2.0'
-mod 'puppetlabs-puppet_agent', '4.11.0'
+mod 'puppetlabs-puppet_agent', '4.12.1'
 mod 'puppetlabs-facts', '1.4.0'
 
 # Core types and providers for Puppet 6
@@ -25,7 +25,7 @@ mod 'puppetlabs-zone_core', '1.0.3'
 mod 'puppetlabs-package', '2.2.0'
 mod 'puppetlabs-puppet_conf', '1.3.0'
 mod 'puppetlabs-reboot', '4.2.0'
-mod 'puppetlabs-stdlib', '8.2.0'
+mod 'puppetlabs-stdlib', '8.4.0'
 
 # Task helpers
 mod 'puppetlabs-powershell_task_helper', '0.1.0'
