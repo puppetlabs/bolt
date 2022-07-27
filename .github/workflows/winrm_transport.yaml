@@ -3,7 +3,7 @@ name: WinRM Transport
 on:
   pull_request:
     types: [opened, reopened, edited, synchronize]
-    paths-ignore:
+    paths:
       - .github/workflows/winrm_transport.yaml
       - bolt.gemspec
       - Gemfile
