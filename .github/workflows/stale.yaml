@@ -1,0 +1,26 @@
+name: 'Close stale issues and PRs'
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v5
+        with:
+          exempt-issue-labels: Ready for Engineering
+          exempt-pr-labels: Blocked,Do Not Merge
+          stale-issue-message: |
+            This issue has not had activity for 60 days and will be marked as stale.
+            If this issue continues to have no activity for 7 days, it will be closed.
+          close-issue-message: |
+            This issue is stale and has been closed. If you believe this is in error,
+            or would like the Bolt team to reconsider it, please reopen the issue.
+          stale-pr-message: |
+            This PR has not had activity for 60 days and will be marked as stale.
+            If this PR continues to have no activity for 7 days, it will be closed.
+          close-pr-message: |
+            This PR is stale and has been closed. If you believe this is in error,
+            or would like the Bolt team to reconsider it, please reopen the PR.
