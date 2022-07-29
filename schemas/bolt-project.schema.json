@@ -73,6 +73,9 @@
     "save-rerun": {
       "$ref": "#/definitions/save-rerun"
     },
+    "scripts": {
+      "$ref": "#/definitions/scripts"
+    },
     "spinner": {
       "$ref": "#/definitions/spinner"
     },
@@ -597,6 +600,13 @@
     "save-rerun": {
       "description": "Whether to update `.rerun.json` in the Bolt project directory. If your target names include passwords, set this value to `false` to avoid writing passwords to disk.",
       "type": "boolean"
+    },
+    "scripts": {
+      "description": "A list of scripts and glob patterns to filter the project's scripts by. This option is used to limit the visibility of scripts for users of the project. For example, project authors might want to limit the visibility of scripts that should only be run as part of a larger workflow. When this option is not configured, all scripts are visible. This option does not prevent users from running scripts that are not part of this list.",
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
     },
     "spinner": {
       "description": "Whether to print a spinner to the console for long-running Bolt operations.",

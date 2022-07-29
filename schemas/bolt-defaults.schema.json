@@ -635,6 +635,16 @@
                 }
               ]
             },
+            "extensions": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/extensions"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "interpreters": {
               "oneOf": [
                 {
@@ -712,6 +722,16 @@
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/cleanup"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "interpreters": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/interpreters"
                 },
                 {
                   "$ref": "#/definitions/_plugin"

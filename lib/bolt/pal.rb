@@ -478,14 +478,16 @@ module Bolt
 
     # List the scripts available to a project. This includes any scripts in a
     # project's or module's 'files/scripts/' and 'scripts/' directories.
-    def list_scripts
+    def list_scripts(filter_content: false)
       in_bolt_compiler do
-        Puppet.lookup(:current_environment).modules.collect do |mod|
+        scripts = Puppet.lookup(:current_environment).modules.collect do |mod|
           files_dir   = Pathname.new(mod.files) + 'scripts'
           scripts_dir = Pathname.new(mod.scripts)
-          scripts     = Bolt::Util.collect_files(files_dir) + Bolt::Util.collect_files(scripts_dir)
-          scripts.map { |path| File.join(mod.name, path.relative_path_from(mod.path)) }
+          paths       = Bolt::Util.collect_files(files_dir) + Bolt::Util.collect_files(scripts_dir)
+          paths.map { |path| File.join(mod.name, path.relative_path_from(mod.path)) }
         end.flatten.sort
+
+        filter_content ? filter_content(scripts, @project&.scripts) : scripts
       end
     end
 

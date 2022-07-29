@@ -368,6 +368,18 @@ describe 'commands' do
       result = run_cli_json(%w[script show --filter nested], project: project)
       expect(result['scripts']).to eq(["sample/scripts/nested/script.sh"])
     end
+
+    context 'with an allowlist' do
+      let(:config) { base_config.merge('scripts' => ['with_both*']) }
+
+      it 'filters scripts' do
+        result = run_cli_json(%w[script show], project: project)
+        expect(result['scripts']).to eq([
+                                          "with_both/files/scripts/filepath.rb",
+                                          "with_both/scripts/filepath.rb"
+                                        ])
+      end
+    end
   end
 
   describe 'task show' do

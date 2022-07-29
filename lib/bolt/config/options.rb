@@ -491,6 +491,19 @@ module Bolt
           _example: false,
           _default: true
         },
+        "scripts" => {
+          description: "A list of scripts and glob patterns to filter the project's scripts by. This option is used "\
+                       "to limit the visibility of scripts for users of the project. For example, project authors "\
+                       "might want to limit the visibility of scripts that should only be run as part of a larger "\
+                       "workflow. When this option is not configured, all scripts are visible. This option does "\
+                       "not prevent users from running scripts that are not part of this list.",
+          type: Array,
+          items: {
+            type: String
+          },
+          _plugin: false,
+          _example: ["myproject/scripts/*", "myproject/files/scripts/myscript.py"]
+        },
         "spinner" => {
           description: "Whether to print a spinner to the console for long-running Bolt operations.",
           type: [TrueClass, FalseClass],
@@ -655,6 +668,7 @@ module Bolt
         puppetdb-instances
         rerunfile
         save-rerun
+        scripts
         spinner
         stream
         tasks

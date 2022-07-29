@@ -638,7 +638,7 @@ module Bolt
     #
     def list_scripts(filter: nil)
       {
-        scripts:    filter_content(pal.list_scripts, filter),
+        scripts:    filter_content(pal.list_scripts(filter_content: true), filter),
         modulepath: pal.user_modulepath
       }
     end

@@ -164,6 +164,10 @@ module Bolt
       @data['name']
     end
 
+    def scripts
+      @data['scripts']
+    end
+
     def tasks
       @data['tasks']
     end
