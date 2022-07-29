@@ -34,7 +34,7 @@ Describe "test bolt module" {
 
     it "has the correct number of exported functions" {
       # should count of pwsh functions
-      @($commands).Count | Should -Be 28
+      @($commands).Count | Should -Be 29
     }
   }
 }
@@ -279,6 +279,16 @@ Describe "test all bolt command examples" {
     It "bolt script run myscript.sh foo bar --targets target1,target2" {
       $result = Invoke-BoltScript -script 'myscript.sh' -arguments 'foo','bar' -targets 'target1,target2'
       $result | Should -Be "bolt script run myscript.sh foo bar --targets target1,target2"
+    }
+
+    It "bolt script show" {
+      $result = Get-BoltScript
+      $result | Should -Be "bolt script show"
+    }
+
+    It "bolt script show script" {
+      $result = Get-BoltScript -Script "script"
+      $result | Should -Be "bolt script show script"
     }
   }
 

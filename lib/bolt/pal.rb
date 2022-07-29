@@ -476,6 +476,19 @@ module Bolt
       end
     end
 
+    # List the scripts available to a project. This includes any scripts in a
+    # project's or module's 'files/scripts/' and 'scripts/' directories.
+    def list_scripts
+      in_bolt_compiler do
+        Puppet.lookup(:current_environment).modules.collect do |mod|
+          files_dir   = Pathname.new(mod.files) + 'scripts'
+          scripts_dir = Pathname.new(mod.scripts)
+          scripts     = Bolt::Util.collect_files(files_dir) + Bolt::Util.collect_files(scripts_dir)
+          scripts.map { |path| File.join(mod.name, path.relative_path_from(mod.path)) }
+        end.flatten.sort
+      end
+    end
+
     def get_plan_info(plan_name, with_mtime: false)
       plan_sig = in_bolt_compiler do |compiler|
         compiler.plan_signature(plan_name)

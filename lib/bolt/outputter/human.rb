@@ -707,6 +707,52 @@ module Bolt
         @stream.puts info.chomp
       end
 
+      # Prints a script.
+      #
+      # @param filepath [String] The path to the script.
+      # @param name [String] The script's name.
+      # @param script [String] The script content.
+      #
+      def print_script_info(filepath:, name:, script:)
+        command = if Bolt::Util.powershell?
+                    'Invoke-BoltScript -Name <SCRIPT NAME> -Targets <TARGETS> [ARGS]'
+                  else
+                    'bolt script run <SCRIPT NAME> --targets <TARGETS> [ARGS]'
+                  end
+
+        @stream.puts colorize(:cyan, name)
+        @stream.puts indent(2, script)
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Usage')
+        @stream.puts indent(2, command)
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Path')
+        @stream.puts indent(2, filepath)
+      end
+
+      # Prints scripts available to the project.
+      #
+      # @param modulepath [Array] The project's modulepath.
+      # @param scripts [Array] The available scripts.
+      #
+      def print_scripts(modulepath:, scripts:)
+        command = Bolt::Util.powershell? ? 'Get-BoltScript -Name <SCRIPT NAME>' : 'bolt script show <SCRIPT NAME>'
+        scripts = scripts.map { |script| indent(2, script) }
+
+        @stream.puts colorize(:cyan, 'Scripts')
+        @stream.puts scripts.any? ? scripts : indent(2, 'No available scripts')
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Modulepath')
+        @stream.puts indent(2, modulepath.join(File::PATH_SEPARATOR))
+        @stream.puts
+
+        @stream.puts colorize(:cyan, 'Additional information')
+        @stream.puts indent(2, "Use '#{command}' to view a script.")
+      end
+
       # Print target names and where they came from.
       #
       # @param adhoc [Hash] Adhoc targets provided on the command line.

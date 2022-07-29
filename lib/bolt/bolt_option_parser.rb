@@ -146,6 +146,9 @@ module Bolt
         when 'run'
           { flags: ACTION_OPTS + %w[tmpdir env-var],
             banner: SCRIPT_RUN_HELP }
+        when 'show'
+          { flags: OPTIONS[:global] + OPTIONS[:global_config_setters] + %w[filter format],
+            banner: SCRIPT_SHOW_HELP }
         else
           { flags: OPTIONS[:global],
             banner: SCRIPT_HELP }
@@ -219,7 +222,7 @@ module Bolt
           plugin            Show available plugins
           policy            Apply, create, and show policies
           project           Create and migrate Bolt projects
-          script            Upload a local script and run it remotely
+          script            Show and run scripts
           secret            Create encryption keys and encrypt and decrypt values
           task              Show and run Bolt tasks
 
@@ -783,13 +786,14 @@ module Bolt
           bolt script <action> [options]
 
       #{colorize(:cyan, 'Description')}
-          Run a script on the specified targets.
+          Show and run scripts.
 
       #{colorize(:cyan, 'Documentation')}
           Learn more about running scripts at https://pup.pt/bolt-commands.
 
       #{colorize(:cyan, 'Actions')}
-          run         Run a script on the specified targets.
+          run         Run a script on the specified targets
+          show        Show available scripts
     HELP
 
     SCRIPT_RUN_HELP = <<~HELP
@@ -812,6 +816,33 @@ module Bolt
 
       #{colorize(:cyan, 'Examples')}
           bolt script run myscript.sh 'echo hello' --targets target1,target2
+    HELP
+
+    SCRIPT_SHOW_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+          script show
+
+      #{colorize(:cyan, 'Usage')}
+          bolt script show [script] [options]
+            [options]
+
+      #{colorize(:cyan, 'Description')}
+          Show available scripts.
+
+          This command only shows scripts that are saved to a module or project's
+          'scripts/' and 'files/scripts/' directories. If you have scripts saved to
+          a module or project's 'files/' directory, they will not appear in the
+          output for this command.
+
+          Script names follow the convention 'MODULE/scripts/SCRIPT'
+          and 'MODULE/files/scripts/SCRIPT'.
+
+          When showing a specific script, Bolt will print the script's contents
+          to the console.
+
+      #{colorize(:cyan, 'Examples')}
+          bolt script show
+          bolt script show my_module/scripts/my_script.py
     HELP
 
     SECRET_HELP = <<~HELP

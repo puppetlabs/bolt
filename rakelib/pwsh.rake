@@ -166,28 +166,31 @@ namespace :pwsh do
           }
         when 'script'
           # bolt command run <script> [options]
+          script_param_mandatory = (@pwsh_command[:verb] != 'Get')
           @pwsh_command[:options] << {
             name:                       'Script',
             ruby_short:                 's',
-            help_msg:                   'The script to execute',
+            help_msg:                   "The script to #{action}",
             type:                       'string',
             switch:                     false,
-            mandatory:                  true,
+            mandatory:                  script_param_mandatory,
             position:                   0,
             ruby_arg:                   'bare',
             validate_not_null_or_empty: true
           }
-          @pwsh_command[:options] << {
-            name:                           'Arguments',
-            ruby_short:                     'a',
-            help_msg:                       'The arguments to the script',
-            type:                           'string[]',
-            switch:                         false,
-            mandatory:                      false,
-            position:                       1,
-            ruby_arg:                       'bare',
-            value_from_remaining_arguments: true
-          }
+          unless @pwsh_command[:verb] == 'Get'
+            @pwsh_command[:options] << {
+              name:                           'Arguments',
+              ruby_short:                     'a',
+              help_msg:                       'The arguments to the script',
+              type:                           'string[]',
+              switch:                         false,
+              mandatory:                      false,
+              position:                       1,
+              ruby_arg:                       'bare',
+              value_from_remaining_arguments: true
+            }
+          end
         when 'task'
           # bolt task show|run <task> [parameters] [options]
           task_param_mandatory = (@pwsh_command[:verb] != 'Get')

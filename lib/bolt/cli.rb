@@ -46,7 +46,7 @@ module Bolt
       'plugin'    => %w[show],
       'policy'    => %w[apply new show],
       'project'   => %w[init migrate],
-      'script'    => %w[run],
+      'script'    => %w[run show],
       'secret'    => %w[encrypt decrypt createkeys],
       'task'      => %w[show run]
     }.freeze
@@ -685,13 +685,23 @@ module Bolt
         end
 
       when 'script'
-        outputter.print_head
-        opts = options.slice(:env_vars).merge(arguments: options[:leftovers])
-        results = app.run_script(options[:object], options[:targets], **opts)
-        rerun.update(results)
-        app.shutdown
-        outputter.print_summary(results, results.elapsed_time)
-        results.ok? ? SUCCESS : FAILURE
+        case action
+        when 'run'
+          outputter.print_head
+          opts = options.slice(:env_vars).merge(arguments: options[:leftovers])
+          results = app.run_script(options[:object], options[:targets], **opts)
+          rerun.update(results)
+          app.shutdown
+          outputter.print_summary(results, results.elapsed_time)
+          results.ok? ? SUCCESS : FAILURE
+        when 'show'
+          if options[:object]
+            outputter.print_script_info(**app.show_script(options[:object]))
+          else
+            outputter.print_scripts(**app.list_scripts(**options.slice(:filter)))
+          end
+          SUCCESS
+        end
 
       when 'secret'
         case action

@@ -449,6 +449,23 @@ module Bolt
           end
         end
       end
+
+      # Recursively collects paths to all files in a directory.
+      #
+      # @param path [PathName]
+      #
+      def collect_files(path)
+        return [] unless path.directory?
+
+        path.children.collect do |child|
+          if child.file?
+            child
+          else
+            child.directory?
+            collect_files(child)
+          end
+        end.flatten
+      end
     end
   end
 end

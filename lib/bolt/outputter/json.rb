@@ -105,6 +105,14 @@ module Bolt
         print_table(**kwargs)
       end
 
+      def print_scripts(**kwargs)
+        print_table(**kwargs)
+      end
+
+      def print_script_info(**kwargs)
+        print_table(**kwargs)
+      end
+
       def print_apply_result(apply_result)
         @stream.puts apply_result.to_json
       end

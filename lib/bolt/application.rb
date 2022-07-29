@@ -631,6 +631,42 @@ module Bolt
       end
     end
 
+    # Show scripts available to the project.
+    #
+    # @param filter [String] A substring to filter scripts by.
+    # @return [Hash]
+    #
+    def list_scripts(filter: nil)
+      {
+        scripts:    filter_content(pal.list_scripts, filter),
+        modulepath: pal.user_modulepath
+      }
+    end
+
+    # Show a script.
+    #
+    # @param script [String] The name of the script.
+    # @return [Hash]
+    #
+    def show_script(script)
+      path = find_file(script)
+
+      unless File.readable?(path)
+        raise Bolt::Error.new(
+          "The script #{script} does not exist or is not readable.",
+          'bolt/unknown-script-error'
+        )
+      end
+
+      content = File.read(path)
+
+      {
+        filepath: path,
+        name:     script,
+        script:   content
+      }
+    end
+
     # Generate a keypair using the configured secret plugin.
     #
     # @param force [Boolean] Forcibly create a keypair.

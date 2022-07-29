@@ -331,6 +331,45 @@ describe 'commands' do
     end
   end
 
+  describe 'script show' do
+    it 'shows available scripts' do
+      result = run_cli_json(%w[script show], project: project)
+      expect(result['scripts']).to include(
+        "sample/scripts/nested/script.sh",
+        "sample/scripts/script.py",
+        "sample/scripts/script.rb",
+        "with_both/scripts/filepath.rb",
+        "with_scripts/scripts/filepath.rb",
+        "with_both/files/scripts/filepath.rb"
+      )
+    end
+
+    it 'shows the modulepath' do
+      result = run_cli_json(%w[script show], project: project)
+      expect(result['modulepath']).to include(modulepath)
+    end
+
+    it 'shows individual script data' do
+      result = run_cli_json(%w[script show sample/scripts/script.py], project: project)
+      expect(result).to include(
+        'name'     => 'sample/scripts/script.py',
+        'script'   => "print('Hello, world!')\n",
+        'filepath' => fixtures_path('modules', 'sample', 'scripts', 'script.py')
+      )
+    end
+
+    it 'errors with an unknown script' do
+      expect { run_cli_json(%w[script show foo/bar/baz.sh], project: project) }.to raise_error(
+        %r{The script foo/bar/baz.sh does not exist or is not readable}
+      )
+    end
+
+    it 'filters scripts with a substring' do
+      result = run_cli_json(%w[script show --filter nested], project: project)
+      expect(result['scripts']).to eq(["sample/scripts/nested/script.sh"])
+    end
+  end
+
   describe 'task show' do
     it 'shows available tasks with descriptions' do
       result = run_cli_json(%w[task show], project: project)
