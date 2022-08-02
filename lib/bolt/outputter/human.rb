@@ -363,7 +363,7 @@ module Bolt
                  end
         usage << (Bolt::Util.powershell? ? ' [-Noop]' : ' [--noop]') if task.supports_noop
         params.each do |name, data|
-          usage << if data['type']&.start_with?('Optional')
+          usage << if data['type']&.start_with?('Optional') || data.key?('default')
                      " [#{name}=<value>]"
                    else
                      " #{name}=<value>"
