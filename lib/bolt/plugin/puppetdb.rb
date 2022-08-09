@@ -79,8 +79,9 @@ module Bolt
 
         Bolt::Util.walk_vals(template) do |value|
           # This is done in parts instead of in place so that we only need to
-          # make one puppetDB query
-          if value.is_a?(String)
+          # make one puppetDB query. Don't gather certname since we already
+          # have that and it's not a fact.
+          if value.is_a?(String) && value != 'certname'
             facts << fact_path(value)
           end
           value
