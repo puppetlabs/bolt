@@ -110,11 +110,11 @@ module Bolt
         return {} if certnames.empty? || facts.empty?
 
         certnames.uniq!
-        name_query = certnames.map { |c| ["=", "certname", c] }
-        name_query.insert(0, "or")
+        name_query = certnames.each_slice(100).map { |slice| ["in", "certname", ["array", slice]] }
+        name_query.unshift("or")
 
         facts_query = facts.map { |f| ["=", "path", f] }
-        facts_query.insert(0, "or")
+        facts_query.unshift("or")
 
         query = ['and', name_query, facts_query]
 
