@@ -194,7 +194,7 @@ module Bolt
               end
             end
           when 'lookup'
-            @stream.puts(indent(2, result['value']))
+            @stream.puts(indent(2, Bolt::Util::Format.stringify(result['value'])))
           else
             if result.generic_value.any?
               @stream.puts(indent(2, ::JSON.pretty_generate(result.generic_value)))
