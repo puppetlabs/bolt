@@ -1,5 +1,31 @@
 # Changelog
 
+## Bolt 3.26.0 (2022-08-15)
+
+### New features
+
+* **Support globbing group names**
+  ([#2818](https://github.com/puppetlabs/bolt/issues/2818))
+
+  Bolt now supports selecting group names with glob patterns when
+  selecting targets.
+
+### Bug fixes
+
+* **Improve performance when using the 'puppetdb' plugin with many nodes**
+  ([#3106](https://github.com/puppetlabs/bolt/issues/3106))
+
+  Using the 'puppetdb' plugin with many thousands of nodes resulted in
+  degenerate performance, sometimes taking minutes to resolve simple
+  queries. This is now resolved and these queries should execute
+  quickly.
+
+* **Properly print hiera data with bolt lookup**
+  ([#3144](https://github.com/puppetlabs/bolt/issues/3144))
+
+  The human outputter can now properly print hiera data including
+  values that are hashes.
+
 ## Bolt 3.25.0 (2022-07-27)
 
 ### New features
