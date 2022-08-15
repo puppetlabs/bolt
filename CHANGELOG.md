@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt 3.26.0 (2022-08-15)
+## Bolt 3.26.1 (2022-08-15)
 
 ### New features
 
