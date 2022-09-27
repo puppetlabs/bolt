@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require_relative '../../../shared/sleep_signal'
 # Repeat the block until it returns a truthy value. Returns the value.
 Puppet::Functions.create_function(:'ctrl::do_until') do
   # @param options A hash of additional options.
@@ -35,7 +36,7 @@ Puppet::Functions.create_function(:'ctrl::do_until') do
     until (x = yield)
       i += 1
       break if limit != 0 && i >= limit
-      Kernel.sleep(interval) if interval
+      SleepSignal.sleep_with_signal_handler(interval) if interval
     end
     x
   end

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative '../../../shared/sleep_signal'
+
 # Sleeps for specified number of seconds.
 Puppet::Functions.create_function(:'ctrl::sleep') do
   # @param period Time to sleep (in seconds)
@@ -13,8 +15,7 @@ Puppet::Functions.create_function(:'ctrl::sleep') do
   def sleeper(period)
     # Send Analytics Report
     Puppet.lookup(:bolt_executor) {}&.report_function_call(self.class.name)
-
-    sleep(period)
+    SleepSignal.sleep_with_signal_handler(period)
     nil
   end
 end
