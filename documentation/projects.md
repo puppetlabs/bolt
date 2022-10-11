@@ -20,9 +20,10 @@ To create a Bolt project:
    project name in the next step, follow project naming conventions. Project
    names can contain only lowercase letters, numbers, and underscores, and begin
    with a lowercase letter. 
-2. Run `bolt project init`. Bolt creates a `bolt-project.yaml` file in your
-   project directory. At this point, the `bolt-project.yaml` only contains a
-   `name` key with the name of your project.
+2. Run `bolt project init` (or `New-BoltProject` for PowerShell cmdlet).
+   Bolt creates a `bolt-project.yaml` file in your project directory.
+   At this point, the `bolt-project.yaml` only contains a `name` key with the
+   name of your project.
 
 Congratulations, you've created a Bolt project! 🎉 Develop your Bolt plans and
 tasks in `plans` and `tasks` directories in the root of the project directory,
