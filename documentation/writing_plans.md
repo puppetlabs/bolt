@@ -399,7 +399,7 @@ check fails:
 ```
 $r = run_task('sometask', ..., '_catch_errors' => true)
 unless $r.ok {
-  fail("Running sometask failed on the targets ${r.error_set.names}")
+  fail_plan("Running sometask failed on the targets ${r.error_set.names}")
 }
 ```
 
