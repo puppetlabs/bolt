@@ -18,7 +18,7 @@ test_name "C100553: \
     on(bolt, "mkdir -p #{dir}/modules/test/{tasks,plans}")
     create_remote_file(bolt, "#{dir}/modules/test/tasks/hostname_nix.sh", <<-FILE)
 #!/bin/bash
-if [ ! -f /tmp/retry.txt ] && [ "$HOSTNAME" = '#{first_node}' ]; then
+if [ ! -f /tmp/retry.txt ] && [ "$(hostname -s)" = '#{first_node}' ]; then
   touch /tmp/retry.txt;
   exit 1
 elif [ -f /tmp/retry.txt ]; then
