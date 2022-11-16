@@ -21,6 +21,8 @@ PS
       # public_suffix for win requires Ruby version >= 2.6
       # current Ruby 2.5.0 works with public_suffix version 4.0.7
       on(bolt, powershell('gem install public_suffix -v 4.0.7'))
+      # current Ruby 2.5.0 works with puppet-strings 2.9.0
+      on(bolt, powershell('gem install puppet-strings -v 2.9.0'))
     when /debian|ubuntu/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -46,6 +48,8 @@ PS
     when /osx/
       # System ruby for osx is 2.3. winrm-fs and its dependencies require > 2.3.
       on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
+      # System ruby for osx12 is 2.6, which can only manage puppet-strings 2.9.0
+      on(bolt, 'gem install puppet-strings -v 2.9.0 --no-document')
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
