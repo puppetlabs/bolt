@@ -1,5 +1,17 @@
 # Changelog
 
+## Bolt 3.26.2 (2022-11-16)
+
+### New features
+
+* **Support for new platforms**
+
+  Bolt packages are now available for Fedora 36 and Ubuntu 22.04.
+
+### Removals
+
+* **Removed support for Fedora 34, Debian 9**
+
 ## Bolt 3.26.1 (2022-08-15)
 
 ### New features
