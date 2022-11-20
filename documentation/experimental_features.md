@@ -191,6 +191,30 @@ targets:
         tmpdir: /root/tmp
 ```
 
+## FreeBSD jails support
+
+Bolt now has experimental support for [FreeBSD
+jails](https://docs.freebsd.org/en/books/handbook/jails/), a lightweight virtualization solution
+that allow for the creation of isolated environments within a single FreeBSD system.
+The jail transport supports connecting to jails running on the local system.
+The jail transport accepts many of the same configuration options as the Docker transport. You can
+see the full list of supported configuration options [on the transport reference
+page](bolt_transports_reference.md). The jail transport doesn't support the `service-url`
+configuration options as the transport doesn't support remote connections. If this is a feature
+you're interested in, let us know [in Slack](https://slack.puppet.com) or submit a [Github
+issue](https://github.com/puppetlabs/bolt/issues).
+
+The example inventory file below demonstrates connecting to a jail container target named
+`postgres_db`.
+
+```
+targets:
+  - uri: jail://postgres_db
+    config:
+      jail:
+        user: postgres
+```
+
 ## Streaming output
 
 This feature was introduced in [Bolt 3.2.0](https://github.com/puppetlabs/bolt/blob/main/CHANGELOG.md#bolt-320-2021-3-08).

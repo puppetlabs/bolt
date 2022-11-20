@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative '../../bolt/config/transport/docker'
+require_relative '../../bolt/config/transport/jail'
 require_relative '../../bolt/config/transport/local'
 require_relative '../../bolt/config/transport/lxd'
 require_relative '../../bolt/config/transport/orch'
@@ -16,6 +17,7 @@ module Bolt
       # gets passed along to the inventory.
       TRANSPORT_CONFIG = {
         'docker' => Bolt::Config::Transport::Docker,
+        'jail'   => Bolt::Config::Transport::Jail,
         'local'  => Bolt::Config::Transport::Local,
         'lxd'    => Bolt::Config::Transport::LXD,
         'pcp'    => Bolt::Config::Transport::Orch,
@@ -549,6 +551,12 @@ module Bolt
           type: Hash,
           _plugin: true,
           _example: { "cleanup" => false, "service-url" => "https://docker.example.com" }
+        },
+        "jail" => {
+          description: "A map of configuration options for the jail transport.",
+          type: Hash,
+          _plugin: true,
+          _example: { cleanup: false }
         },
         "local" => {
           description: "A map of configuration options for the local transport. The set of available options is "\
