@@ -29,8 +29,11 @@ module BoltSpec
         default_host     = 'ubuntu_node'
       when 'lxd'
         default_host     = 'testlxd'
+      when 'jail'
+        default_user     = 'root'
+        default_host     = 'bolt'
       else
-        raise Error, "The transport must be either 'ssh', 'winrm', 'docker', 'podman', or 'lxd'."
+        raise Error, "The transport must be either 'ssh', 'winrm', 'docker', 'podman', 'lxd' or 'jail'."
       end
 
       additional_config.merge(

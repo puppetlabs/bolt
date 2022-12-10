@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 if [ ! -z "$PT_fail" ]; then
   exit 1

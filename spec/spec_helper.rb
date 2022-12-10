@@ -48,6 +48,7 @@ RSpec.configure do |config|
   end
 
   config.filter_run_excluding windows: true unless Bolt::Util.windows?
+  config.filter_run_excluding jail: true unless RUBY_PLATFORM =~ /-freebsd\d+\z/
 
   # rspec-mocks config
   config.mock_with :rspec do |mocks|

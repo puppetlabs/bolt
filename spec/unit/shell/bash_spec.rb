@@ -131,7 +131,7 @@ describe Bolt::Shell::Bash do
     end
 
     it "sets environment variables if requested" do
-      expect(connection).to receive(:execute).with('FOO=bar sh -c echo\\ \\$FOO')
+      expect(connection).to receive(:execute).with('/usr/bin/env FOO=bar sh -c echo\\ \\$FOO')
 
       shell.run_command('echo $FOO', env_vars: { 'FOO' => 'bar' })
     end
