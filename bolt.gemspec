@@ -55,7 +55,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "net-scp", "~> 1.2"
   spec.add_dependency "net-ssh", ">= 4.0", "< 7.0"
   spec.add_dependency "net-ssh-krb", "~> 0.5"
-  spec.add_dependency "orchestrator_client", "~> 0.5"
+  spec.add_dependency "orchestrator_client", "~> 0.6"
   spec.add_dependency "puppet", ">= 6.18.0"
   spec.add_dependency "puppetfile-resolver", ">= 0.6.2", "< 1.0"
   spec.add_dependency "puppet-resource_api", ">= 1.8.1"
