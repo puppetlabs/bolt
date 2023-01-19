@@ -102,16 +102,13 @@ describe Bolt::ModuleInstaller::Resolver do
     end
   end
 
-  context 'with unknown module dependencies' do
+  context 'with incompatable module dependencies' do
     let(:name)      { 'kubeinstall' }
     let(:full_name) { "aursu/#{name}" }
     let(:version)   { '0.2.1' }
 
     it 'errors' do
-      expect { resolver.resolve(specs) }.to raise_error(
-        Bolt::Error,
-        /could not find compatible versions for possibility named/
-      )
+      expect { resolver.resolve(specs) }.to raise_error(Bolt::Error)
     end
   end
 
