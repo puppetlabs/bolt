@@ -23,6 +23,8 @@ PS
       on(bolt, powershell('gem install public_suffix -v 4.0.7'))
       # current Ruby 2.5.0 works with puppet-strings 2.9.0
       on(bolt, powershell('gem install puppet-strings -v 2.9.0'))
+      # net-ssh 7.x no longer supports ruby 2.5
+      on(bolt, powershell('gem install net-ssh -v 6.1.0'))
     when /debian|ubuntu/
       # install system ruby packages
       install_package(bolt, 'ruby')
