@@ -9,7 +9,6 @@ require 'bolt/project'
 require 'bolt/target'
 require 'bolt_server/file_cache'
 require 'bolt_server/plugin'
-require 'bolt_server/plugin/puppet_connect_data'
 require 'bolt_server/request_error'
 require 'bolt/task/puppet_server'
 require 'json'
@@ -42,7 +41,6 @@ module BoltServer
       action-upload_file
       transport-ssh
       transport-winrm
-      connect-data
       action-apply_prep
       action-apply
     ].freeze
@@ -823,53 +821,6 @@ module BoltServer
       [200, metadatas.to_json]
     rescue ArgumentError => e
       [500, e.message]
-    end
-
-    # Returns a list of targets parsed from a Project inventory
-    #
-    # @param versioned_project [String] the versioned_project to compute the inventory from
-    post '/project_inventory_targets' do
-      content_type :json
-      body = JSON.parse(request.body.read)
-      validate_schema(@schemas["connect-data"], body)
-      in_bolt_project(body['versioned_project']) do |context|
-        if context[:config].inventoryfile &&
-           context[:config].project.inventory_file.to_s !=
-           context[:config].inventoryfile
-          raise Bolt::ValidationError, "Project inventory must be defined in the " \
-            "inventory.yaml file at the root of the project directory"
-        end
-
-        Bolt::Util.validate_file('inventory file', context[:config].project.inventory_file)
-
-        begin
-          # Set the default puppet_library plugin hook if it has not already been
-          # set
-          context[:config].data['plugin-hooks']['puppet_library'] ||= {
-            'plugin'     => 'task',
-            'task'       => 'puppet_agent::install',
-            'parameters' => {
-              'stop_service' => true
-            }
-          }
-
-          connect_plugin = BoltServer::Plugin::PuppetConnectData.new(body['puppet_connect_data'])
-          plugins = Bolt::Plugin.new(context[:config], context[:pal], load_plugins: false)
-          plugins.add_plugin(connect_plugin)
-          %w[aws_inventory azure_inventory gcloud_inventory].each do |plugin_name|
-            plugins.add_module_plugin(plugin_name) if plugins.known_plugin?(plugin_name)
-          end
-          inventory = Bolt::Inventory.from_config(context[:config], plugins)
-          target_list = inventory.get_targets('all').map do |targ|
-            targ.to_h.merge({ 'transport' => targ.transport, 'plugin_hooks' => targ.plugin_hooks })
-          end
-        rescue Bolt::Plugin::PluginError::LoadingDisabled => e
-          msg = "Cannot load plugin #{e.details['plugin_name']}: plugin not supported"
-          raise BoltServer::Plugin::PluginNotSupported.new(msg, e.details['plugin_name'])
-        end
-
-        [200, target_list.to_json]
-      end
     end
 
     # Returns the base64 encoded tar archive of plugin code that is needed to calculate
