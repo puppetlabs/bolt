@@ -1,0 +1,38 @@
+name: Security
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+jobs:
+  scan:
+    name: Mend Scanning
+    runs-on: ubuntu-latest
+    steps:
+    - name: checkout repo content
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 1
+    - name: setup ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 2.7
+    # setup a package lock if one doesn't exist, otherwise do nothing
+    - name: check lock
+      run: '[ -f "Gemfile.lock" ] && echo "package lock file exists, skipping" || bundle lock'
+    # install java
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin' # See 'Supported distributions' for available options
+        java-version: '17'
+    # download mend
+    - name: download_mend
+      run: curl -o wss-unified-agent.jar https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
+    - name: run mend
+      run: java -jar wss-unified-agent.jar
+      env:
+        WS_APIKEY: ${{ secrets.MEND_API_KEY }}
+        WS_WSS_URL: https://saas-eu.whitesourcesoftware.com/agent
+        WS_USERKEY: ${{ secrets.MEND_TOKEN }}
+        WS_PRODUCTNAME: RE
+        WS_PROJECTNAME: ${{ github.event.repository.name }}
