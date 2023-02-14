@@ -809,6 +809,7 @@ describe "BoltServer::TransportApp" do
                     },
                     files: [{ filename: "echo.sh", sha256: "foo",
                               uri: { path: 'foo', params: { environment: 'foo' } } }] },
+            timeout: 0,
             parameters: { message: "Hello!" }
           }
         }
@@ -905,6 +906,54 @@ describe "BoltServer::TransportApp" do
           result = JSON.parse(last_response.body)
           expect(result).to include('status' => 'success')
           expect(result['value']).to eql('user' => 'someone')
+        end
+      end
+
+      describe 'with a task timeout over ssh', :ssh do
+        let(:ssh_timeout_task) {
+          {
+            task: { name: 'sample:sleep',
+                    metadata: {
+                      description: 'Echo a message',
+                      parameters: {}
+                    },
+                    files: [{ filename: "sleep.sh", sha256: "foo",
+                              uri: { path: 'foo', params: { environment: 'foo' } } }] },
+            parameters: {},
+            timeout: 2
+          }
+        }
+
+        it 'runs a simple echo task', :ssh do
+          post_over_transport('ssh', 'run_task', ssh_timeout_task)
+          expect(last_response).not_to be_ok
+          expect(last_response.status).to eq(500)
+          result = JSON.parse(last_response.body)
+          expect(result['kind']).to eq("boltserver/task-timeout")
+        end
+      end
+
+      describe 'with a task timeout over WinRM', :winrm do
+        let(:winrm_timeout_task) {
+          {
+            task: { name: 'sample:sleep',
+                    metadata: {
+                      description: 'Echo a message',
+                      parameters: {}
+                    },
+                    files: [{ filename: "sleep.ps1", sha256: "foo",
+                              uri: { path: 'foo', params: { environment: 'foo' } } }] },
+            parameters: {},
+            timeout: 2
+          }
+        }
+
+        it 'runs a simple echo task', :ssh do
+          post_over_transport('ssh', 'run_task', winrm_timeout_task)
+          expect(last_response).not_to be_ok
+          expect(last_response.status).to eq(500)
+          result = JSON.parse(last_response.body)
+          expect(result['kind']).to eq("boltserver/task-timeout")
         end
       end
     end

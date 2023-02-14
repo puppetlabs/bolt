@@ -124,7 +124,17 @@ module BoltServer
       end
     end
 
-    def task_helper(target, task, parameters)
+    def unwrap_sensitive_results(result_set)
+      # Take a ResultSet and unwrap sensitive values
+      result_set.each do |result|
+        value = result.value
+        next unless value.is_a?(Hash)
+        next unless value.key?('_sensitive')
+        value['_sensitive'] = value['_sensitive'].unwrap
+      end
+    end
+
+    def task_helper(target, task, parameters, timeout = nil)
       # Wrap parameters marked with '"sensitive": true' in the task metadata with a
       # Sensitive wrapper type. This way it's not shown in logs.
       if (param_spec = task.parameters)
@@ -135,11 +145,20 @@ module BoltServer
         end
       end
 
-      @executor.run_task(target, task, parameters).each do |result|
-        value = result.value
-        next unless value.is_a?(Hash)
-        next unless value.key?('_sensitive')
-        value['_sensitive'] = value['_sensitive'].unwrap
+      if timeout && timeout > 0
+        task_thread = Thread.new do
+          unwrap_sensitive_results(@executor.run_task(target, task, parameters))
+        end
+        # Wait for the timeout for the task to execute in the thread. If `join` times out, result will be nil.
+        if task_thread.join(timeout).nil?
+          task_thread.kill
+          raise Bolt::Error.new("Task execution on #{target.first.safe_name} timed out after #{timeout} seconds",
+                                'boltserver/task-timeout')
+        else
+          task_thread.value
+        end
+      else
+        unwrap_sensitive_results(@executor.run_task(target, task, parameters))
       end
     end
 
@@ -148,7 +167,7 @@ module BoltServer
 
       task_data = body['task']
       task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
-      task_helper(target, task, body['parameters'] || {})
+      task_helper(target, task, body['parameters'] || {}, body['timeout'])
     end
 
     def extract_install_task(target)

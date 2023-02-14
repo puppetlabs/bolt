@@ -9,7 +9,11 @@
       "type": "object",
       "description": "JSON formatted parameters to be provided to task"
     },
-    "target": { "$ref": "partial:target-any" }
+    "target": { "$ref": "partial:target-any" },
+    "timeout": {
+      "type": "integer",
+      "description": "Number of seconds to wait before abandoning the task execution on the tartet."
+    }
   },
   "required": ["target", "task"],
   "additionalProperties": false
