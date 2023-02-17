@@ -42,8 +42,8 @@ language](./writing_plans.md#targetspec).
 In order for Bolt to find a plan, the plan must be in a module on the modulepath
 or in a `plans/` directory in your Bolt project. If you are developing a new
 plan, you can [create a Bolt project](projects.md#create-a-bolt-project),
-develop your task in `<PROJECT DIRECTORY>/plans/`, and run Bolt from the root of
-your Bolt project directory to test the task.
+develop your plan in `<PROJECT DIRECTORY>/plans/`, and run Bolt from the root of
+your Bolt project directory to test the plan.
 
 ## Passing structured data into a plan
 
