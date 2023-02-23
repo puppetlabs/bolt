@@ -130,7 +130,7 @@ Ran on 1 target in 0.12 seconds
 The following task uses the PowerShell task helper to create a simple task that
 outputs a greeting.
 
-To use the Python task helper, include the
+To use the PowerShell task helper, include the
 `powershell_task_helper/files/BoltPwshHelper` file in the task metadata.
 
 > **Note**: If you're using a version of PowerShell more recent than 3.0, you
@@ -215,10 +215,10 @@ Ran on 1 target in 0.12 seconds
 
 ### Bash task helper
 
-The following task uses the PowerShell task helper to create a simple task that
+The following task uses the Bash task helper to create a simple task that
 outputs a greeting.
 
-To use the Python task helper, include the
+To use the Bash task helper, include the
 `bash_task_helper/files/task_helper.sh` file in the task metadata.
 
 **Metadata**
