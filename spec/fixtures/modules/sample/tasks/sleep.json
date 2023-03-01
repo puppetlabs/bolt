@@ -1,0 +1,13 @@
+{
+  "description": "A sleep task",
+  "implementations": [
+    {
+      "name": "sleep.sh",
+      "requirements": ["shell"]
+    },
+    {
+      "name": "sleep.ps1",
+      "requirements": ["powershell"]
+    }
+  ]
+}
