@@ -23,6 +23,8 @@ end
 # Optional paint gem for rainbow outputter
 gem "paint", "~> 2.2"
 
+gem "orchestrator_client", :git => "https://github.com/donoghuc/orchestrator_client-ruby.git", :branch => "ruby-3.2"
+
 group(:test) do
   gem "beaker-hostgenerator"
   gem "mocha", '~> 1.4.0'
