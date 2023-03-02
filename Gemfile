@@ -25,6 +25,7 @@ gem "paint", "~> 2.2"
 
 gem "orchestrator_client", git: "https://github.com/donoghuc/orchestrator_client-ruby.git", branch: "ruby-3.2"
 gem "rubyntlm", git: "https://github.com/larskanis/rubyntlm.git", branch: "openssl-3-legacy"
+gem "puppet", git: "https://github.com/puppetlabs/puppet.git", branch: 'main'
 
 group(:test) do
   gem "beaker-hostgenerator"
