@@ -42,6 +42,7 @@
                   "type": "string",
                   "enum": [
                     "docker",
+                    "jail",
                     "local",
                     "lxd",
                     "pcp",
@@ -210,6 +211,148 @@
                 }
               ]
             },
+            "jail": {
+              "description": "A map of configuration options for the jail transport.",
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "cleanup": {
+                      "description": "Whether to clean up temporary files created on targets. When running commands on a target, Bolt might create temporary files. After completing the command, these files are automatically deleted. This value can be set to 'false' if you wish to leave these temporary files on the target.",
+                      "oneOf": [
+                        {
+                          "type": "boolean"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "host": {
+                      "description": "The target's hostname.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "interpreters": {
+                      "description": "A map of an extension name to the absolute path of an executable,  enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. When a target's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default.",
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": [
+                              "string",
+                              "array"
+                            ]
+                          },
+                          "propertyNames": {
+                            "pattern": "^.?[a-zA-Z0-9]+$"
+                          }
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "run-as": {
+                      "description": "The user to run commands as after login. The run-as user must be different than the login user.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "run-as-command": {
+                      "description": "The command to elevate permissions. Bolt appends the user and command strings to the configured `run-as-command` before running it on the target. This command must not require  aninteractive password prompt, and the `sudo-password` option is ignored when `run-as-command` is specified. The `run-as-command` must be specified as an array.",
+                      "oneOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
+                          }
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "shell-command": {
+                      "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-executable": {
+                      "description": "The executable to use when escalating to the configured `run-as` user. This is useful when you want to escalate using the configured `sudo-password`, since `run-as-command` does not use `sudo-password` or support prompting. The command executed on the target is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is experimental.**",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "sudo-password": {
+                      "description": "The password to use when changing users via `run-as`.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "tmpdir": {
+                      "description": "The directory to upload and execute temporary files on the target.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "user": {
+                      "description": "The user name to login as.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    }
+                  }
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "local": {
               "description": "A map of configuration options for the local transport. The set of available options is platform dependent.",
               "oneOf": [
@@ -225,6 +368,28 @@
                       "oneOf": [
                         {
                           "type": "boolean"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "extensions": {
+                      "description": "A list of file extensions that are accepted for scripts or tasks on Windows. Scripts with these file extensions rely on the target's file type association to run. For example, if Python is installed on the system, a `.py` script runs with `python.exe`. The extensions `.ps1`, `.rb`, and `.pp` are always allowed and run via hard-coded executables.",
+                      "oneOf": [
+                        {
+                          "type": "array",
+                          "uniqueItems": true,
+                          "items": {
+                            "oneOf": [
+                              {
+                                "type": "string"
+                              },
+                              {
+                                "$ref": "#/definitions/_plugin"
+                              }
+                            ]
+                          }
                         },
                         {
                           "$ref": "#/definitions/_plugin"
@@ -334,6 +499,26 @@
                       "oneOf": [
                         {
                           "type": "boolean"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "interpreters": {
+                      "description": "A map of an extension name to the absolute path of an executable,  enabling you to override the shebang defined in a task executable. The extension can optionally be specified with the `.` character (`.py` and `py` both map to a task executable `task.py`) and the extension is case sensitive. When a target's name is `localhost`, Ruby tasks run with the Bolt Ruby interpreter by default.",
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "additionalProperties": {
+                            "type": [
+                              "string",
+                              "array"
+                            ]
+                          },
+                          "propertyNames": {
+                            "pattern": "^.?[a-zA-Z0-9]+$"
+                          }
                         },
                         {
                           "$ref": "#/definitions/_plugin"

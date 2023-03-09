@@ -356,7 +356,7 @@ module Bolt
           if defined? conn.add_env_vars
             conn.add_env_vars(options[:environment])
           else
-            env_decl = options[:environment].map do |env, val|
+            env_decl = '/usr/bin/env ' + options[:environment].map do |env, val|
               "#{env}=#{Shellwords.shellescape(val)}"
             end.join(' ')
           end

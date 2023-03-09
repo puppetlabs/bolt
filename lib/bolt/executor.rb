@@ -14,6 +14,7 @@ require_relative '../bolt/result'
 require_relative '../bolt/result_set'
 # Load transports
 require_relative '../bolt/transport/docker'
+require_relative '../bolt/transport/jail'
 require_relative '../bolt/transport/local'
 require_relative '../bolt/transport/lxd'
 require_relative '../bolt/transport/orch'
@@ -25,6 +26,7 @@ require_relative '../bolt/transport/winrm'
 module Bolt
   TRANSPORTS = {
     docker: Bolt::Transport::Docker,
+    jail: Bolt::Transport::Jail,
     local: Bolt::Transport::Local,
     lxd: Bolt::Transport::LXD,
     pcp: Bolt::Transport::Orch,
