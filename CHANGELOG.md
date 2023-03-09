@@ -1,5 +1,25 @@
 # Changelog
 
+## Bolt 3.27.0 (2023-03-09)
+
+### New features
+
+* **Support for running bolt with net-ssh 7.x**
+  ([#3178](#3178))
+
+  Bolt now supports running with net-ssh 7. The 7 series of net-ssh contains
+  breaking changes (removal of some supported algoriths for example) and
+  bolt 3 packages will continue to ship with the 6 series.
+
+* **Add transport for FreeBSD jails** ([#3160](https://github.com/puppetlabs/bolt/pull/3170))
+
+FreeBSD has support for jails since FreeBSD 4.0 (released in 2000).
+
+Add a new 'jail' transport to Bolt to allow management of jails on
+FreeBSD.  This feature is currently considered experimental.
+
+  _Contributed by [Romain Tartière](https://github.com/smortex)_
+
 ## Bolt 3.26.2 (2022-11-16)
 
 ### New features
