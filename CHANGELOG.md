@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt 3.27.0 (2023-03-09)
+## Bolt 3.27.1 (2023-03-13)
 
 ### New features
 
@@ -19,6 +19,10 @@ Add a new 'jail' transport to Bolt to allow management of jails on
 FreeBSD.  This feature is currently considered experimental.
 
   _Contributed by [Romain Tartière](https://github.com/smortex)_
+
+## Bolt 2.27.0
+
+_This version of Bolt was not released._
 
 ## Bolt 3.26.2 (2022-11-16)
 
