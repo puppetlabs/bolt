@@ -31,7 +31,8 @@ PowerShell module.
 
 1. Build and stage packages with the 
    [init_bolt-release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_bolt-vanagon_bolt-release-init_bolt-release/).
-   Click on _Build with Parameters_ and set `NEW_TAG` to the next tagged version of Bolt. Click _Build_.
+   Click on _Build with Parameters_ and set `NEW_TAG` to the next tagged version of Bolt. Click _Build_. **NOTE** Ensure the `PUBLIC` field is not selected
+   as we DO NOT want this job to publish the bolt gem to rubygems, that happens later in the shipping pipeline and if it ships early that pipeline will fail.
 
 1. Once packages are staged and you are ready to push them to public repositories, run the
    [release job](https://jenkins-master-prod-1.delivery.puppetlabs.net/view/bolt/job/platform_ship-bolt_stage-foss-artifacts-all-repos/).
