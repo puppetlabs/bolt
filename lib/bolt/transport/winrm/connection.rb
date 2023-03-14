@@ -91,7 +91,7 @@ module Bolt
           )
         rescue StandardError => e
           raise Bolt::Node::ConnectError.new(
-            "Failed to connect to #{endpoint}: #{e.message}",
+            "Failed to connect to #{endpoint}: #{e.message} #{e.backtrace}",
             'CONNECT_ERROR'
           )
         end
