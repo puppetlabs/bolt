@@ -59,7 +59,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "puppet", ">= 6.18.0"
   spec.add_dependency "puppetfile-resolver", ">= 0.6.2", "< 1.0"
   spec.add_dependency "puppet-resource_api", ">= 1.8.1"
-  spec.add_dependency "puppet-strings", ">= 2.3.0", "< 4.0"
+  spec.add_dependency "puppet-strings", ">= 2.3.0", "< 5.0"
   spec.add_dependency "r10k", "~> 3.10"
   spec.add_dependency "ruby_smb", "~> 1.0"
   spec.add_dependency "terminal-table", "~> 3.0"
