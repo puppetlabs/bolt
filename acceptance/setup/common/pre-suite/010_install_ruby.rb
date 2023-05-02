@@ -27,6 +27,7 @@ PS
       on(bolt, powershell('gem install net-ssh -v 6.1.0'))
       # semantic puppet no longer supports ruby < 2.7
       on(bolt, powershell('gem install semantic_puppet -v 1.0.4'))
+      on(bolt, powershell('gem install puppet -v 7.24.0'))
     when /debian|ubuntu/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -48,6 +49,7 @@ PS
       on(bolt, "dnf group install -y 'C Development Tools and Libraries'")
       # semantic puppet no longer supports ruby < 2.7
       on(bolt, 'gem install semantic_puppet -v 1.0.4')
+      on(bolt, 'gem install puppet -v 7.24.0')
       install_package(bolt, 'rubygem-json')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
@@ -58,6 +60,7 @@ PS
       on(bolt, 'gem install puppet-strings -v 2.9.0 --no-document')
       # semantic puppet no longer supports ruby < 2.7
       on(bolt, 'gem install semantic_puppet -v 1.0.4')
+      on(bolt, 'gem install puppet -v 7.24.0')
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
