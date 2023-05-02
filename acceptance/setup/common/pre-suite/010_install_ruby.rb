@@ -32,6 +32,9 @@ PS
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-ffi')
+      # semantic puppet no longer supports ruby < 2.7
+      on(bolt, 'gem install semantic_puppet -v 1.0.4')
+      on(bolt, 'gem install puppet -v 7.24.0')
     when /el-|centos/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -47,9 +50,6 @@ PS
       install_package(bolt, 'libffi-devel')
       install_package(bolt, 'redhat-rpm-config')
       on(bolt, "dnf group install -y 'C Development Tools and Libraries'")
-      # semantic puppet no longer supports ruby < 2.7
-      on(bolt, 'gem install semantic_puppet -v 1.0.4')
-      on(bolt, 'gem install puppet -v 7.24.0')
       install_package(bolt, 'rubygem-json')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
