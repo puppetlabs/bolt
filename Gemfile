@@ -40,5 +40,5 @@ if File.exist? local_gemfile
   eval_gemfile local_gemfile
 end
 
-# TODO: remove this pin once we solve PE-35920
-gem "puppet", '~> 7.24'
+# # TODO: remove this pin once https://github.com/puppetlabs/puppet/pull/9063 is released
+gem "puppet", git: 'https://github.com/donoghuc/puppet.git', branch: 'PE-35920'
