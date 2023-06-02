@@ -170,7 +170,8 @@ module Bolt
       r = Puppet::Pal.in_tmp_environment('bolt', modulepath: full_modulepath, facts: {}) do |pal|
         # Only load the project if it a) exists, b) has a name it can be loaded with
         Puppet.override(bolt_project: @project,
-                        yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader) do
+                        yaml_plan_instantiator: Bolt::PAL::YamlPlan::Loader,
+                        avoid_hiera_interpolation_errors: false) do
           # Because this has the side effect of loading and caching the list
           # of modules, it must happen *after* we have overridden
           # bolt_project or the project will be ignored
