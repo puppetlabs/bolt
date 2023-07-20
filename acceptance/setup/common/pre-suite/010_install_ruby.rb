@@ -13,11 +13,17 @@ PS
       # HACK: to add chocolatey path to cygwin: this path should at least be
       # instrospected from the STDOUT of the installer.
       bolt.add_env_var('PATH', '/cygdrive/c/ProgramData/chocolatey/bin:PATH')
-      on(bolt, powershell('choco install ruby -y --version 2.5.3.101'))
-      on(bolt, powershell('choco list --lo ruby')) do |output|
-        version = /ruby (2\.[0-9])/.match(output.stdout)[1].delete('.')
+      on(bolt, powershell('choco install ruby -y'))
+      on(bolt, powershell('choco list ruby')) do |output|
+        version = /ruby ([2-3]\.[0-9])/.match(output.stdout)[1].delete('.')
         bolt.add_env_var('PATH', "/cygdrive/c/tools/ruby#{version}/bin:PATH")
       end
+      # The ruby devkit (required to build gems with C extensions) has changed,
+      # and we now need to install msys2 ourselves. https://community.chocolatey.org/packages/msys2
+      on(bolt, powershell('choco install msys2 -y --params "/NoUpdate"'))
+      on(bolt, powershell('ridk install 2 3'))
+      # Add the msys bins to PATH
+      bolt.add_env_var('PATH', "/cygdrive/c/tools/msys64:PATH")
       # public_suffix for win requires Ruby version >= 2.6
       # current Ruby 2.5.0 works with public_suffix version 4.0.7
       on(bolt, powershell('gem install public_suffix -v 4.0.7'))
