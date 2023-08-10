@@ -256,7 +256,7 @@ module Bolt
         futures = targets.map do |target|
           Concurrent::Future.execute(executor: @pool) do
             Thread.current[:name] ||= Thread.current.name
-            @executor.with_node_logging("Compiling manifest block", [target]) do
+            @executor.with_node_logging("Compiling manifest block", [target], :trace) do
               compile(target, scope)
             end
           end
