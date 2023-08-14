@@ -1,5 +1,18 @@
 # Changelog
 
+## Bolt 3.27.2 (2023-08-14)
+
+### Bug fixes
+
+* **Only log compiled catalogs at trace level**
+  ([#3217](#3217))
+
+  Previously compiled catalogs would be logged per target at INFO level. This clogs up
+  logs and can expose Sensitive data in catalogs. This commit moves logging of
+  compiled catalogs to the TRACE log level only.
+
+  _Contributed by [donoghuc](https://github.com/donoghuc)_
+
 ## Bolt 3.27.1 (2023-03-13)
 
 ### New features
