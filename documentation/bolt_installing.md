@@ -403,6 +403,15 @@ have installed:
   sudo apt-get install puppet-bolt
   ```
 
+- _Ubuntu 22.04_
+
+  ```shell
+  wget https://apt.puppet.com/puppet-tools-release-focal.deb
+  sudo dpkg -i puppet-tools-release-focal.deb
+  sudo apt-get update 
+  sudo apt-get install puppet-bolt
+  ```
+
 **Upgrade Bolt**
 
 To upgrade Bolt to the latest version, run the following command:
