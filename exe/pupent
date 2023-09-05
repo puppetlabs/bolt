@@ -1,0 +1,16 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require 'pupent/cli'
+require 'bolt/logger'
+require 'bolt/error'
+
+begin
+  cli = PupEnt::CLI.new(ARGV)
+  exitcode = cli.execute
+  exit exitcode
+rescue PupEnt::CLIExit
+  exit
+rescue Bolt::Error => e
+  exit e.error_code
+end
