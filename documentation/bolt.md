@@ -1,4 +1,4 @@
-# Welcome to Bolt
+# Welcome to Puppet Bolt®
 
 Bolt is an open source orchestration tool that automates the manual work it
 takes to maintain your infrastructure. Use Bolt to automate tasks that you
@@ -42,7 +42,7 @@ you are not required to install any agent software.
     <p>Create your own tasks and plans
         <ul>
             <li><a class="xref" href="writing_tasks.md">Writing tasks</a></li>
-            <li><a class="xref" href="writing_plans.md">Writing plans in Puppet language</a></li>
+            <li><a class="xref" href="writing_plans.md">Writing plans in Puppet® language</a></li>
             <li><a class="xref" href="writing_yaml_plans.md">Writing plans in YAML</a></li>
             <li><a class="xref" href="writing_plans.md">Example plans</a></li>
             <li><a class="xref" href="applying_manifest_blocks.md">Applying manifest blocks</a></li>
@@ -65,7 +65,7 @@ you are not required to install any agent software.
     <p>Docs for related Puppet products
         <ul>
             <li><a class="xref" target="_blank" href="https://puppet.com/docs/puppet/latest/index.html">Open source Puppet</a></li>
-            <li><a class="xref" target="_blank" href="https://puppet.com/docs/pe/latest/pe_user_guide.html">Puppet Enterprise</a></li>
+            <li><a class="xref" target="_blank" href="https://puppet.com/docs/pe/latest/pe_user_guide.html">Puppet Enterprise®</a></li>
             <li><a class="xref" target="_blank" href="https://puppet.com/docs/pdk/latest/pdk.html">Puppet Development Kit</a></li>
         </ul>
     </p>
