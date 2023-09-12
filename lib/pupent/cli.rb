@@ -57,6 +57,11 @@ module PupEnt
             @parsed_options[:token_file]
           ).login(new_client, @parsed_options[:lifetime])
           0
+        when 'list'
+          $stdout.puts Access.new(
+            @parsed_options[:token_file]
+          ).list(new_client)
+          0
         when 'show'
           $stdout.puts Access.new(@parsed_options[:token_file]).show
           0

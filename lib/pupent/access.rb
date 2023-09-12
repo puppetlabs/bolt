@@ -42,6 +42,11 @@ module PupEnt
       raise Bolt::Error.new(msg, 'bolt/no-token')
     end
 
+    def list(client)
+      response, = client.pe_get("/v1/users/current", headers: { 'X-Authentication' => show })
+      JSON.pretty_generate(client.pe_get("/v1/users/#{response['id']}/tokens", headers: { 'X-Authentication' => show }).first)
+    end
+
     def delete_token
       @logger.info("Deleting token...")
       File.delete(token_location)

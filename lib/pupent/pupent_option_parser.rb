@@ -50,6 +50,7 @@ module PupEnt
 
       #{colorize(:cyan, 'Actions')}
         deploy          Runs remote code deployments
+        deploy-status   View status of code deployments
         help            Help about any command
         print-config    Prints out the resolved pupent configuration
         status          Checks Code Manager status
@@ -126,6 +127,19 @@ module PupEnt
 
       #{colorize(:cyan, 'Description')}
         login to Puppet Enterprise and generate an RBAC token usable for further authentication
+
+      #{colorize(:cyan, 'Options')}
+    HELP
+
+    ACCESS_LIST_HELP = <<~HELP
+      #{colorize(:cyan, 'Name')}
+        access list
+
+      #{colorize(:cyan, 'Usage')}
+        pupent access list [options]
+
+      #{colorize(:cyan, 'Description')}
+        Print the list of tokens in Puppet Enterprise for the user logged in with the local token
 
       #{colorize(:cyan, 'Options')}
     HELP
@@ -233,13 +247,16 @@ module PupEnt
         parser.banner = ACCESS_HELP
         access_globals(parser)
         case action
-        when "login"
+        when 'login'
           parser.banner = ACCESS_LOGIN_HELP
           access_login(parser)
-        when "show"
+        when 'list'
+          parser.banner = ACCESS_LIST_HELP
+          # No options to add
+        when 'show'
           parser.banner = ACCESS_SHOW_HELP
           # No options to add
-        when "delete-token-file"
+        when 'delete-token-file'
           parser.banner = ACCESS_DELETE_HELP
           # No options to add
         else
