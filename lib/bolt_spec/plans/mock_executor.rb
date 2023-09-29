@@ -49,7 +49,11 @@ module BoltSpec
         path = Pathname.new(file)
         relative = path.relative_path_from(Pathname.new(modpath.first))
         segments = relative.to_path.split('/')
-        ([segments[0]] + segments[2..-1]).join('/')
+        if segments[1] == 'files'
+          ([segments[0]] + segments[2..-1]).join('/')
+        else
+          segments.join('/')
+        end
       end
 
       def run_command(targets, command, options = {}, _position = [])
