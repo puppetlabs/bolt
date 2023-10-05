@@ -8,8 +8,6 @@ ENV['BOLT_DISABLE_ANALYTICS'] = 'true'
 # Disable warning that Bolt may be installed as a gem
 ENV['BOLT_GEM'] = 'true'
 
-ruby '>= 2.7.7', bundler: ">= 2.3.4"
-
 gemspec
 
 group(:bolt_server) do
