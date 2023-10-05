@@ -73,7 +73,9 @@ module Bolt
           # Only do this if bundled-ruby is set to false, not nil
           ruby_env_vars = if target.transport_config['bundled-ruby'] == false
                             RUBY_ENV_VARS.each_with_object({}) do |e, acc|
-                              acc[e] = ENV["BOLT_ORIG_#{e}"] if ENV["BOLT_ORIG_#{e}"]
+                              if ENV["BOLT_ORIG_#{e}"] && !ENV["BOLT_ORIG_#{e}"].empty?
+                                acc[e] = ENV["BOLT_ORIG_#{e}"]
+                              end
                             end
                           end
 
