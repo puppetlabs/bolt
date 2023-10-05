@@ -1,5 +1,16 @@
 # Changelog
 
+## Bolt 3.27.4 (2023-10-05)
+
+### Bug fixes
+
+* **Stop restricting ruby version in Gemfile**
+
+  The source of truth for minimum ruby version is in the gemspec. Stop duplicating
+  that and risking conflicts in the Gemfile.
+
+  _Contributed by [donoghuc](https://github.com/donoghuc)_
+
 ## Bolt 3.27.3 (2023-10-05)
 
 ### Bug fixes
