@@ -1,5 +1,20 @@
 # Changelog
 
+## Bolt 3.27.3 (2023-10-05)
+
+### Bug fixes
+
+* **Only set ruby env vars for local transport when non empty strings**
+  ([#3236](#3236))
+
+  Previously when using bundled-ruby=false for the local transport and
+  not expliclty setting ruby environment variables internal apply tasks
+  did not work due to ruby code not being able to be loaded. Now the local
+  transport only preserves ruby environment variables when they are set
+  to something other than an empty string.
+
+  _Contributed by [donoghuc](https://github.com/donoghuc)_
+
 ## Bolt 3.27.2 (2023-08-14)
 
 ### Bug fixes
