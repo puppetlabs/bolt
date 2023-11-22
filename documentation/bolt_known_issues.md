@@ -73,37 +73,6 @@ command line with the `--password` option.
 - [#1986 - Commands fail if in a remote session to
   Windows](https://github.com/puppetlabs/bolt/issues/1986)
 
-## Unable to authenticate with ed25519 keys over SSH transport on Windows
-
-By default, Bolt uses the `net-ssh` Ruby libary to connect to targets over SSH.
-The `net-ssh` library requires the `ed25519` and `bcrypt_pbkdf` gems as
-dependencies, which are not supported in Bolt's packaging process due to issues
-with compiling native extensions.
-
-Attempting to authenticate with ed25519 keys over SSH on Windows will result
-in an error message similar to this:
-
-```
-unsupported key type `ssh-ed25519'
- net-ssh requires the following gems for ed25519 support:
-  * ed25519 (>= 1.2, < 2.0)
-  * bcrypt_pbkdf (>= 1.0, < 2.0)
-```
-
-A workaround is to use native SSH when you need to authenticate with ed25519
-keys. When native SSH is enabled, Bolt will use a specified SSH client to
-connect to targets instead of the `net-ssh` Ruby library. To learn more about
-native SSH, see [native SSH
-transport](experimental_features.md#native-ssh-transport). 
-
-🧪 Native SSH is
-experimental and might change in future minor (y) releases.
-
-📖 **Related issues**
-
-- [#1987 - Unable to authenticate with ed25519 keys over SSH transport
-  on Windows](https://github.com/puppetlabs/bolt/issues/1987)
-
 ## 🧪 Limited Kerberos support over WinRM
 
 🧪 Authenticating with Kerberos over WinRM is considered experimental and is
