@@ -68,7 +68,7 @@ Gem::Specification.new do |spec|
 
   spec.add_development_dependency "bundler", ">= 1.14"
   spec.add_development_dependency "octokit", ">= 4.0", '< 9'
-  spec.add_development_dependency "puppetlabs_spec_helper", "~> 5.0"
+  spec.add_development_dependency "puppetlabs_spec_helper", "~> 7.0", '>= 7.0.1'
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "rspec", "~> 3.0"
 end
