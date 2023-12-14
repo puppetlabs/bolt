@@ -264,7 +264,8 @@ module Bolt
 
         result_promises = targets.zip(futures).flat_map do |target, future|
           @executor.queue_execute([target]) do |transport, batch|
-            @executor.with_node_logging("Applying manifest block", batch) do
+            message = format("Applying manifest block%s", (" (with agent confdir)" if options[:agent]))
+            @executor.with_node_logging(message, batch) do
               catalog = future.value
               if future.rejected?
                 batch.map do |batch_target|
@@ -285,7 +286,8 @@ module Bolt
                   'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
                   'apply_settings' => @apply_settings,
                   '_task' => catalog_apply_task.name,
-                  '_noop' => options[:noop]
+                  '_noop' => options[:noop],
+                  '_agent' => options[:agent]
                 }
 
                 callback = proc do |event|

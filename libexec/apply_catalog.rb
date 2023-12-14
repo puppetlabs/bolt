@@ -17,7 +17,10 @@ args = JSON.parse(ARGV[0] ? File.read(ARGV[0]) : $stdin.read)
 puppet_root = Dir.mktmpdir
 moduledir = File.join(puppet_root, 'modules')
 Dir.mkdir(moduledir)
-cli = (Puppet::Settings::REQUIRED_APP_SETTINGS + [:rundir]).flat_map do |setting|
+settings = (Puppet::Settings::REQUIRED_APP_SETTINGS + [:rundir]).reject do |setting|
+  setting == :confdir && args['_agent']
+end
+cli = settings.flat_map do |setting|
   ["--#{setting}", File.join(puppet_root, setting.to_s.chomp('dir'))]
 end
 cli << '--modulepath' << moduledir

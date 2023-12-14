@@ -184,6 +184,11 @@ The `apply` function supports the following options:
   option is for transports that allow a user to run commands under a different
   username.)
 
+- `_agent => true` applies the manifest block with the targets default Puppet
+  confdir. Without this option, Bolt will use a temporary directory to prevent
+  Puppet from automatically reading any files from the targets local
+  configuration.
+
 ```puppet
 # Preview installing docker as root on $targets.
 apply($targets, _catch_errors => true, _noop => true, _run_as => root) {
