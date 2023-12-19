@@ -16,7 +16,7 @@ and Microsoft Windows.
 | Microsoft Windows Server* | 2012R2, 2019        |
 | RHEL                      | 6, 7, 8, 9          |
 | SLES                      | 12, 15              |
-| Ubuntu                    | 18.04, 20.04 , 22,04|
+| Ubuntu                    | 18.04, 20.04 , 22.04|
 
 > **Note:** Windows packages are automatically tested on the versions listed
 > above, but might be installable on other versions.
