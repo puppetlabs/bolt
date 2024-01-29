@@ -57,12 +57,24 @@ module Bolt
         end
 
         def execute(command)
-          lxc_command = %w[lxc exec]
+          lxc_command = %W[lxc exec #{container_id}]
+          lxc_command += ['--mode', target.options['tty'].to_s.empty? ? 'non-interactive' : 'interactive']
           lxc_command += @env_vars if @env_vars
-          lxc_command += %W[#{container_id} -- sh -c #{Shellwords.shellescape(command)}]
+          lxc_command << '--'
+
+          if target.options['shell-command'].to_s.empty?
+            lxc_command += Shellwords.split(command)
+          else
+            lxc_command += Shellwords.split(target.options['shell-command'])
+            lxc_command << command
+          end
 
           @logger.trace { "Executing: #{lxc_command.join(' ')}" }
-          Open3.popen3(lxc_command.join(' '))
+
+          Open3.popen3(*lxc_command)
+        rescue StandardError
+          @logger.trace { "Command aborted" }
+          raise
         end
 
         private def execute_local_command(command)
