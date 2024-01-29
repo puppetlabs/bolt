@@ -332,7 +332,7 @@ module Bolt
           },
           "shell-command" => {
             type: String,
-            description: "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+            description: "A shell command to wrap any exec commands in, such as `bash -lc`.",
             _plugin: true,
             _example: "bash -lc"
           },
