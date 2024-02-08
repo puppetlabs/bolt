@@ -1,5 +1,14 @@
 # Changelog
 
+## Bolt 3.28.0 (2024-02-08)
+
+### New features
+
+* **Allow running with concurrent-ruby 2.x**
+
+  Previously bolt's gemspec prevented the 2.x series of concurrent ruby,
+  bolt is now compatable with both major versions of concurrent-ruby.
+
 ## Bolt 3.27.4 (2023-10-05)
 
 ### Bug fixes
