@@ -34,6 +34,7 @@ PS
       # semantic puppet no longer supports ruby < 2.7
       on(bolt, powershell('gem install semantic_puppet -v 1.0.4'))
       on(bolt, powershell('gem install puppet -v 7.24.0'))
+      on(bolt, powershell('gem install highline -v 2.1.0'))
     when /debian|ubuntu/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -41,6 +42,7 @@ PS
       # semantic puppet no longer supports ruby < 2.7
       on(bolt, 'gem install semantic_puppet -v 1.0.4')
       on(bolt, 'gem install puppet -v 7.24.0')
+      on(bolt, 'gem install highline -v 2.1.0')
     when /el-|centos/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -48,6 +50,7 @@ PS
       install_package(bolt, 'rubygem-ffi')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
+      on(bolt, 'gem install highline -v 2.1.0')
     when /fedora/
       # install system ruby packages
       install_package(bolt, 'ruby')
@@ -59,6 +62,7 @@ PS
       install_package(bolt, 'rubygem-json')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
+      on(bolt, 'gem install highline -v 2.1.0')
     when /osx/
       # System ruby for osx is 2.3. winrm-fs and its dependencies require > 2.3.
       on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
@@ -67,6 +71,7 @@ PS
       # semantic puppet no longer supports ruby < 2.7
       on(bolt, 'gem install semantic_puppet -v 1.0.4')
       on(bolt, 'gem install puppet -v 7.24.0')
+      on(bolt, 'gem install highline -v 2.1.0')
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
