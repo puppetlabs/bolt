@@ -9,14 +9,14 @@ and Microsoft Windows.
 
 | Operating system          | Versions            |
 | ------------------------- | ------------------- |
-| Debian                    | 9, 10, 11           |
-| Fedora                    | 34                  |
+| Debian                    | 10, 11              |
+| Fedora                    | 36                  |
 | macOS                     | 11, 12              |
 | Microsoft Windows*        | 10 Enterprise       |
 | Microsoft Windows Server* | 2012R2, 2019        |
 | RHEL                      | 6, 7, 8, 9          |
 | SLES                      | 12, 15              |
-| Ubuntu                    | 18.04, 20.04 , 22.04|
+| Ubuntu                    | 18.04, 20.04, 22.04 |
 
 > **Note:** Windows packages are automatically tested on the versions listed
 > above, but might be installable on other versions.
@@ -27,15 +27,6 @@ and Microsoft Windows.
 
 To install Bolt, run the appropriate command for the version of Debian you
 have installed:
-
-- _Debian 9_
-
-  ```shell
-  wget https://apt.puppet.com/puppet-tools-release-stretch.deb
-  sudo dpkg -i puppet-tools-release-stretch.deb
-  sudo apt-get update
-  sudo apt-get install puppet-bolt
-  ```
 
 - _Debian 10_
 
@@ -79,10 +70,10 @@ sudo apt remove puppet-bolt
 To install Bolt, run the appropriate command for the version of Fedora you
 have installed:
 
-- _Fedora 34_
+- _Fedora 36_
 
   ```shell
-  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-34.noarch.rpm
+  sudo rpm -Uvh https://yum.puppet.com/puppet-tools-release-fedora-36.noarch.rpm
   sudo dnf install puppet-bolt
   ```
 
