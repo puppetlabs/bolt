@@ -45,7 +45,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "addressable", '~> 2.5'
   spec.add_dependency "aws-sdk-ec2", '~> 1'
-  spec.add_dependency "CFPropertyList", ">= 2.2"
+  spec.add_dependency "CFPropertyList", ">= 2.2", "< 3.0.7"
   spec.add_dependency "concurrent-ruby", "~> 1.0"
   spec.add_dependency "ffi", ">= 1.9.25", "< 2.0.0"
   spec.add_dependency "hiera-eyaml", "~> 3"
