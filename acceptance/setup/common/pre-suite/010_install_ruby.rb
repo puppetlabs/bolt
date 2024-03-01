@@ -67,8 +67,8 @@ PS
       on(bolt, 'gem install highline -v 2.1.0')
     when /osx/
       # System ruby for osx is 2.3. winrm-fs and its dependencies require > 2.3.
-      on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
       on(bolt, 'gem install nori -v 2.6.0 --no-document')
+      on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
       on(bolt, 'gem install CFPropertyList -v 3.0.6 --no-document')
       # System ruby for osx12 is 2.6, which can only manage puppet-strings 2.9.0
       on(bolt, 'gem install puppet-strings -v 2.9.0 --no-document')
