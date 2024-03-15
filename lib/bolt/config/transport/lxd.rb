@@ -11,7 +11,9 @@ module Bolt
           cleanup
           interpreters
           remote
+          shell-command
           tmpdir
+          tty
         ].concat(RUN_AS_OPTIONS).sort.freeze
 
         DEFAULTS = {

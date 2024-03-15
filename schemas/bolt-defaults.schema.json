@@ -885,6 +885,16 @@
                 }
               ]
             },
+            "shell-command": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/shell-command"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
             "sudo-executable": {
               "oneOf": [
                 {
@@ -909,6 +919,16 @@
               "oneOf": [
                 {
                   "$ref": "#/transport_definitions/tmpdir"
+                },
+                {
+                  "$ref": "#/definitions/_plugin"
+                }
+              ]
+            },
+            "tty": {
+              "oneOf": [
+                {
+                  "$ref": "#/transport_definitions/tty"
                 },
                 {
                   "$ref": "#/definitions/_plugin"
@@ -2118,7 +2138,7 @@
       ]
     },
     "shell-command": {
-      "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+      "description": "A shell command to wrap any exec commands in, such as `bash -lc`.",
       "oneOf": [
         {
           "type": "string"
