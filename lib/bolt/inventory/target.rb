@@ -98,7 +98,7 @@ module Bolt
 
       def add_facts(new_facts = {})
         validate_fact_names(new_facts)
-        @facts = Bolt::Util.deep_merge(@facts, new_facts)
+        Bolt::Util.deep_merge!(@facts, new_facts)
       end
 
       def features

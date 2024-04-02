@@ -212,6 +212,17 @@ module Bolt
         hash1.merge(hash2, &recursive_merge)
       end
 
+      def deep_merge!(hash1, hash2)
+        recursive_merge = proc do |_key, h1, h2|
+          if h1.is_a?(Hash) && h2.is_a?(Hash)
+            h1.merge!(h2, &recursive_merge)
+          else
+            h2
+          end
+        end
+        hash1.merge!(hash2, &recursive_merge)
+      end
+
       # Accepts a Data object and returns a copy with all hash keys
       # modified by block. use &:to_s to stringify keys or &:to_sym to symbolize them
       def walk_keys(data, &block)
