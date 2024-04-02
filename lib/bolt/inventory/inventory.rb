@@ -119,8 +119,7 @@ module Bolt
         if ext_glob
           File.fnmatch(wildcard, target_name, File::FNM_CASEFOLD | File::FNM_EXTGLOB)
         else
-          regexp = Regexp.new("^#{Regexp.escape(wildcard).gsub('\*', '.*?')}$", Regexp::IGNORECASE)
-          target_name =~ regexp
+          File.fnmatch(wildcard, target_name, File::FNM_CASEFOLD)
         end
       end
 
