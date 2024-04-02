@@ -377,8 +377,8 @@ describe Bolt::Config do
     end
 
     context 'analytics' do
-      it 'defaults to enabled' do
-        expect(config.analytics).to eq(true)
+      it 'defaults to disabled' do
+        expect(config.analytics).to eq(false)
       end
 
       it 'overrides a true value with false' do

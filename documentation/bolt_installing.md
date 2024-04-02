@@ -1,9 +1,5 @@
 # Installing Bolt
 
-> Bolt automatically collects data about how you use it. If you want to opt
-> out of providing this data, you can do so. For more information, see
-> [Opt out of data collection](analytics.md#opt-out-of-data-collection).
-
 Packaged versions of Bolt are available for several Linux distributions, macOS,
 and Microsoft Windows.
 

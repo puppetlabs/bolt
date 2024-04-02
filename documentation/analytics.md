@@ -1,7 +1,8 @@
 # Analytics
 
 Bolt collects data about how you use it to help the Bolt team make decisions
-about how to improve it. You can opt out of providing this data.
+about how to improve it. You can opt out of providing this data. Analytics is
+disabled by default.
 
 ## Opt out of data collection
 
@@ -12,7 +13,7 @@ or by setting an environment variable.
 
 To disable data collection, set `analytics: false` in your [configuration
 file](configuring_bolt.md). This option is supported in the system-wide,
-user-level, and project configuration files.
+user-level, and project configuration files. `false` is the default value.
 
 ```yaml
 # bolt-defaults.yaml
