@@ -14,6 +14,10 @@ module Bolt
       EXTENDED_TARGET_REGEX = /[[:space:],]+(?=[^\]}]*(?:[\[{]|$))/.freeze
       TARGET_REGEX          = /[[:space:],]+/.freeze
 
+      # Pattern which looks for indicators that glob-based target name matching
+      # should be used.
+      GLOB_MATCH_REGEX      = /[*?\[\]{}]/.freeze
+
       class WildcardError < Bolt::Error
         def initialize(target)
           super("Found 0 targets matching wildcard pattern #{target}", 'bolt.inventory/wildcard-error')
@@ -125,12 +129,30 @@ module Bolt
 
       # If target is a group name, expand it to the members of that group.
       # Else match against groups and targets in inventory by name or alias.
-      # If a wildcard string, error if no matches are found.
+      # Attempt exact matches for groups, targets, and aliases first for speed.
+      # If no exact match and the string contains wildcard characters, then check
+      # and see if the target string might be a URI, if it parses as a URI with
+      # a scheme then return as-is, otherwise look for a wildcard match and
+      # error if no matches are found.
       # Else fall back to [target] if no matches are found.
       def resolve_name(target, ext_glob: false)
         if (group = group_lookup[target])
           group.all_targets.to_a
-        else
+        elsif @targets.key?(target)
+          [target]
+        elsif (real_target = groups.target_aliases[target])
+          [real_target]
+        elsif GLOB_MATCH_REGEX.match?(target)
+          # URIs and glob wildcards have some overlapping characters. If the target
+          # being resolved parses as a valid target URI and has a scheme defined then
+          # return it as-is and do not try to do further wildcard matching:
+          uri = begin
+            Bolt::Inventory::Target.parse_uri(target)
+          rescue Bolt::ParseError
+            nil
+          end
+          return [target] if uri&.scheme
+
           targets = []
 
           # Find groups that match the glob
@@ -147,12 +169,11 @@ module Bolt
                            .select { |tgt_alias, _| match_wildcard?(target, tgt_alias, ext_glob: ext_glob) }
                            .values
 
-          if targets.empty?
-            raise(WildcardError, target) if target.include?('*')
-            [target]
-          else
-            targets.uniq
-          end
+          raise(WildcardError, target) if targets.empty?
+
+          targets.uniq
+        else # rubocop:disable Lint/DuplicateBranch
+          [target]
         end
       end
       private :resolve_name
