@@ -16,6 +16,19 @@ module Bolt
         @logger      = Bolt::Logger.logger(self)
       end
 
+      def post_puppetdb(url, body)
+        response = http_client.post(url, body: body, header: headers(@config.token))
+        if response.status == 401 && @token_and_cert
+          @logger.debug("Invalid token: #{response.body}, retrying with cert based auth")
+          response = http_client.post(url, body: body, header: headers)
+          if response.ok?
+            @logger.debug("Puppetdb token is invalid, but certs are not. No longer including token.")
+            @bad_token = true
+          end
+        end
+        response
+      end
+
       def make_query(query, path = nil)
         body = JSON.generate(query: query)
         url = "#{uri}/pdb/query/v4"
@@ -23,7 +36,7 @@ module Bolt
 
         begin
           @logger.debug("Sending PuppetDB query to #{url}")
-          response = http_client.post(url, body: body, header: headers)
+          response = post_puppetdb(url, body)
         rescue StandardError => e
           raise Bolt::PuppetDBFailoverError, "Failed to query PuppetDB: #{e}"
         end
@@ -81,7 +94,7 @@ module Bolt
         # Send the command to PDB
         begin
           @logger.debug("Sending PuppetDB command '#{command}' to #{url}")
-          response = http_client.post(url.to_s, body: body, header: headers)
+          response = post_puppetdb(url.to_s, body)
         rescue StandardError => e
           raise Bolt::PuppetDBFailoverError, "Failed to invoke PuppetDB command: #{e}"
         end
@@ -109,11 +122,15 @@ module Bolt
         require 'httpclient'
         @logger.trace("Creating HTTP Client")
         @http = HTTPClient.new
-        @http.ssl_config.set_client_cert_file(@config.cert, @config.key) if @config.cert
         @http.ssl_config.add_trust_ca(@config.cacert)
         @http.connect_timeout = @config.connect_timeout if @config.connect_timeout
         @http.receive_timeout = @config.read_timeout if @config.read_timeout
-
+        # Determine if there are both token and cert auth methods defined
+        @token_and_cert = false
+        if @config.cert
+          @http.ssl_config.set_client_cert_file(@config.cert, @config.key)
+          @token_and_cert = !@config.token.nil?
+        end
         @http
       end
 
@@ -136,9 +153,9 @@ module Bolt
         uri
       end
 
-      def headers
+      def headers(token = nil)
         headers = { 'Content-Type' => 'application/json' }
-        headers['X-Authentication'] = @config.token if @config.token
+        headers['X-Authentication'] = token if token && !@bad_token
         headers
       end
     end
