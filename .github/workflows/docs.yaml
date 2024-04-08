@@ -35,4 +35,5 @@ jobs:
       - name: Run DITA
         uses: dita-ot/dita-ot-action@master
         with:
+          dita-ot-version: 4.1.2
           build: dita -i documentation/bolt.ditamap -o out -f html5 --processing-mode=strict

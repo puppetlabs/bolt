@@ -169,7 +169,7 @@ module Bolt
       @config_files = []
 
       default_data = {
-        'analytics'           => true,
+        'analytics'           => false,
         'apply-settings'      => {},
         'color'               => true,
         'compile-concurrency' => Etc.nprocessors,

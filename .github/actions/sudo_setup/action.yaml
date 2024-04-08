@@ -6,6 +6,7 @@ runs:
     - name: Bring up containers
       shell: bash
       run: |
+        sudo apt install docker-compose
         docker-compose -f spec/docker-compose.yml build --parallel
         docker-compose -f spec/docker-compose.yml up -d
     - name: Create non-sudo user
