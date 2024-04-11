@@ -60,7 +60,7 @@ module Bolt
       end
 
       def token
-        return @token if @token
+        return @token if @token_computed
         # Allow nil in config to skip loading a token
         if @settings.include?('token')
           if @settings['token']
@@ -69,6 +69,12 @@ module Bolt
         elsif File.exist?(DEFAULT_TOKEN)
           @token = File.read(DEFAULT_TOKEN)
         end
+        # Only use cert based auth in the case token and cert are both configured
+        if @token && cert
+          Bolt::Logger.logger(self).debug("Both cert and token based auth configured, using cert only")
+          @token = nil
+        end
+        @token_computed = true
         @token = @token.strip if @token
       end
 

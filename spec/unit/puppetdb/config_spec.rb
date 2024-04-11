@@ -72,6 +72,8 @@ describe Bolt::PuppetDB::Config do
     context "token" do
       context "token is valid" do
         before :each do
+          options.delete('cert')
+          options.delete('key')
           allow(File).to receive(:read).with(token).and_return 'footoken'
           allow(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return 'bartoken'
         end
@@ -97,6 +99,8 @@ describe Bolt::PuppetDB::Config do
 
       context "token is invalid" do
         before :each do
+          options.delete('cert')
+          options.delete('key')
           allow(File).to receive(:read).with(token).and_return "footoken\n"
           allow(File).to receive(:read).with(Bolt::PuppetDB::Config::DEFAULT_TOKEN).and_return "bartoken\n"
         end
@@ -110,6 +114,14 @@ describe Bolt::PuppetDB::Config do
           options.delete('token')
 
           expect(config.token).to eq('bartoken')
+        end
+      end
+
+      context "both token and cert" do
+        it "returns nil for token when cert is configured" do
+          allow(config).to receive(:validate_file_exists).with('cert').and_return true
+          allow(File).to receive(:read).with(token).and_return 'footoken'
+          expect(config.token).to be_nil
         end
       end
     end
