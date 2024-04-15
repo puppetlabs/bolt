@@ -9,8 +9,8 @@ require 'bolt_spec/puppet_agent'
 require 'bolt_spec/run'
 
 TEST_VERSIONS = [
-  [6, 'puppet6'],
-  [7, 'puppet']
+  [7, 'puppet7'],
+  [8, 'puppet8']
 ].freeze
 
 describe 'apply', apply: true do
