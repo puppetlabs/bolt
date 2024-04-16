@@ -1,5 +1,39 @@
 # Changelog
 
+## Bolt 3.29.0 (2024-04-16)
+
+### New features
+
+* **Add `file::delete()` function**
+  Delete a file on localhost using ruby's `File.delete`. This will only
+  delete files on the machine you run Bolt on.
+
+  _Contributed by [Yury Bushmelev](https://github.com/jay7x)_
+
+* **Minor add_facts optimization**
+
+  Deep merge new facts into existing target fact hash, instead
+  of creating and copying a new hash each time.
+
+  _Contributed by [Sean Millichamp](https://github.com/seanmil)_
+
+* **Update puppet modules shipped with bolt packages**
+
+  Modules shipped with bolt packages have been updated to latest.
+
+### Bug fixes
+
+* **Prefer cert based auth over token for puppetdb** ([#3296](#3296))
+
+  When both a token and cert are computed for puppetdb config, only use
+  cert auth. This matches behavior of other puppetdb CLI tools.
+
+### Removals
+
+* **Stop collecting bolt analytics** ([#3293](#3293))
+
+  Bolt no longer collects analytics by default.
+
 ## Bolt 3.28.0 (2024-02-08)
 
 ### New features
