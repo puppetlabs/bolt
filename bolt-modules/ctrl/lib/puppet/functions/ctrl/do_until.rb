@@ -6,7 +6,7 @@ Puppet::Functions.create_function(:'ctrl::do_until') do
   # @param block The code block to repeat.
   # @option options [Numeric] limit The number of times to repeat the block.
   # @option options [Numeric] interval The number of seconds to wait before repeating the block.
-  # @return [nil]
+  # @return The value of the code block's last iteration
   # @example Run a task until it succeeds
   #   ctrl::do_until() || {
   #     run_task('test', $target, '_catch_errors' => true).ok()
