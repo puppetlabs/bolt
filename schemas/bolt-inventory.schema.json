@@ -150,7 +150,7 @@
                       ]
                     },
                     "shell-command": {
-                      "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+                      "description": "A shell command to wrap any exec commands in, such as `bash -lc`.",
                       "oneOf": [
                         {
                           "type": "string"
@@ -292,7 +292,7 @@
                       ]
                     },
                     "shell-command": {
-                      "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+                      "description": "A shell command to wrap any exec commands in, such as `bash -lc`.",
                       "oneOf": [
                         {
                           "type": "string"
@@ -561,6 +561,17 @@
                         }
                       ]
                     },
+                    "shell-command": {
+                      "description": "A shell command to wrap any exec commands in, such as `bash -lc`.",
+                      "oneOf": [
+                        {
+                          "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
                     "sudo-executable": {
                       "description": "The executable to use when escalating to the configured `run-as` user. This is useful when you want to escalate using the configured `sudo-password`, since `run-as-command` does not use `sudo-password` or support prompting. The command executed on the target is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is experimental.**",
                       "oneOf": [
@@ -588,6 +599,17 @@
                       "oneOf": [
                         {
                           "type": "string"
+                        },
+                        {
+                          "$ref": "#/definitions/_plugin"
+                        }
+                      ]
+                    },
+                    "tty": {
+                      "description": "Whether to enable tty on exec commands.",
+                      "oneOf": [
+                        {
+                          "type": "boolean"
                         },
                         {
                           "$ref": "#/definitions/_plugin"
@@ -787,7 +809,7 @@
                       ]
                     },
                     "shell-command": {
-                      "description": "A shell command to wrap any Docker exec commands in, such as `bash -lc`.",
+                      "description": "A shell command to wrap any exec commands in, such as `bash -lc`.",
                       "oneOf": [
                         {
                           "type": "string"
