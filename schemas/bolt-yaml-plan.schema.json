@@ -337,7 +337,7 @@
           "$ref": "#/definitions/name"
         }
       }
-    },
+    }
   },
   "definitions": {
     "catch_errors": {
