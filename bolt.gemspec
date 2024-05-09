@@ -60,15 +60,15 @@ Gem::Specification.new do |spec|
   spec.add_dependency "puppetfile-resolver", ">= 0.6.2", "< 1.0"
   spec.add_dependency "puppet-resource_api", ">= 1.8.1"
   spec.add_dependency "puppet-strings", ">= 2.3.0", "< 5.0"
-  spec.add_dependency "r10k", "~> 3.10"
+  spec.add_dependency "r10k", "~> 4.0"
   spec.add_dependency "ruby_smb", "~> 1.0"
   spec.add_dependency "terminal-table", "~> 3.0"
   spec.add_dependency "winrm", "~> 2.0"
   spec.add_dependency "winrm-fs", "~> 1.3"
 
   spec.add_development_dependency "bundler", ">= 1.14"
-  spec.add_development_dependency "octokit", "~> 4.0"
-  spec.add_development_dependency "puppetlabs_spec_helper", "~> 5.0"
+  spec.add_development_dependency "octokit", ">= 4.0", '< 9'
+  spec.add_development_dependency "puppetlabs_spec_helper", "~> 7.0", '>= 7.0.1'
   spec.add_development_dependency "rake", "~> 12.0"
   spec.add_development_dependency "rspec", "~> 3.0"
 end
