@@ -94,6 +94,16 @@ describe Bolt::Transport::Local do
       end
     end
 
+    context 'without with_connection' do
+      let(:data) { { 'targets' => [] } }
+      it 'applies bundled-ruby config' do
+        target = get_target(inventory, 'local://foo')
+        expect(target.transport).to eq('local')
+        expect(target.options['interpreters']).to include('.rb' => RbConfig.ruby)
+        expect(target.features).to include('puppet-agent')
+      end
+    end
+
     context 'with group-level config' do
       let(:data) {
         { 'targets' => [uri],

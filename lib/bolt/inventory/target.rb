@@ -34,7 +34,7 @@ module Bolt
           @name = @uri
           @safe_name = @uri_obj.omit(:password).to_str.sub(%r{^//}, '')
         end
-
+        # handle special localhost target
         if @name == 'localhost'
           default = { 'config' => { 'transport' => 'local' } }
           target_data = Bolt::Util.deep_merge(default, target_data)
@@ -53,6 +53,8 @@ module Bolt
         @inventory = inventory
 
         validate
+        # after setting config, apply local defaults when using bundled ruby
+        set_local_defaults if transport_config['bundled-ruby']
       end
 
       def set_local_defaults

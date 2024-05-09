@@ -11,10 +11,6 @@ module Bolt
       end
 
       def with_connection(target)
-        if target.transport_config['bundled-ruby']
-          target.set_local_defaults
-        end
-
         yield Connection.new(target)
       end
     end
