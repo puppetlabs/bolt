@@ -52,6 +52,19 @@ begin
     $LOAD_PATH << dir unless $LOAD_PATH.include?(dir)
   end
 
+  # In the case we are applying on a bolt runner and using bundled-ruby over local transport
+  # we will want to load code shipped with bolt. This is last on the load path and therefore
+  # explicitly packaged plugins should take precedence
+  args['bolt_builtin_content'].each do |builtin_dir|
+    next unless Dir.exist?(builtin_dir)
+    Dir.foreach(builtin_dir) do |dir|
+      unless ['.', '..'].include? dir
+        full_path = File.join(builtin_dir, dir, 'lib')
+        $LOAD_PATH << full_path unless $LOAD_PATH.include?(full_path)
+      end
+    end
+  end
+
   if (conn_info = args['_target'])
     unless (type = conn_info['remote-transport'])
       puts "Cannot execute a catalog for a remote target without knowing it's the remote-transport type."
