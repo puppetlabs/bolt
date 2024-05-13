@@ -4,5 +4,6 @@
 require 'logging_extensions/logging'
 
 module Bolt
+  # Trigger PR tests REVERT ME
   require_relative 'bolt/executor'
 end

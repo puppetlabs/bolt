@@ -47,7 +47,7 @@ module Bolt
     end
 
     def self.unknown_plan(plan)
-      command = Bolt::Util.powershell? ? "Get-BoltPlan" : "bolt plan show"
+      command = Bolt::Util.powershell? ? "Get-BoltPlan" : "bolt plan show "
       new(
         "Could not find a plan named '#{plan}'. For a list of available plans, run '#{command}'.",
         'bolt/unknown-plan'
