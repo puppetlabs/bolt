@@ -80,10 +80,6 @@ module Bolt
       inventory_target.resources
     end
 
-    def set_local_defaults
-      inventory_target.set_local_defaults
-    end
-
     # rubocop:disable Naming/AccessorMethodName
     def set_resource(resource)
       inventory_target.set_resource(resource)
