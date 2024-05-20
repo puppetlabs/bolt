@@ -113,7 +113,7 @@ describe 'plans' do
 
       it "prints the spinner when running executor functions", ssh: true do
         expect_any_instance_of(Bolt::Outputter::Human).to receive(:start_spin).at_least(:once)
-        run_cli(%w[plan run sample::noop --targets #{target}] + config_flags, **opts)
+        run_cli(%W[plan run sample::noop --targets #{target}] + config_flags, **opts)
       end
 
       it "doesn't print the spinner when running non-executor functions", ssh: true do
