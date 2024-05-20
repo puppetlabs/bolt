@@ -284,6 +284,9 @@ module Bolt
                   'catalog' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(catalog),
                   'plugins' => Puppet::Pops::Types::PSensitiveType::Sensitive.new(plugins),
                   'apply_settings' => @apply_settings,
+                  # This should just be boltlib and modules dirs shipped with bolt packages
+                  # The apply_catalog task uses them to load core types if they exist
+                  'bolt_builtin_content' => @modulepath - @plugin_dirs,
                   '_task' => catalog_apply_task.name,
                   '_noop' => options[:noop]
                 }
