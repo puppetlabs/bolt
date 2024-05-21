@@ -39,6 +39,7 @@ PS
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-ffi')
+      on(bolt, 'gem install fast_gettext -v 2.4.0')
       # semantic puppet no longer supports ruby < 2.7
       on(bolt, 'gem install semantic_puppet -v 1.0.4')
       on(bolt, 'gem install puppet -v 7.24.0')
@@ -70,6 +71,7 @@ PS
       on(bolt, 'gem install nori -v 2.6.0 --no-document')
       on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
       on(bolt, 'gem install CFPropertyList -v 3.0.6 --no-document')
+      on(bolt, 'gem install fast_gettext -v 2.4.0')
       # System ruby for osx12 is 2.6, which can only manage puppet-strings 2.9.0
       on(bolt, 'gem install puppet-strings -v 2.9.0 --no-document')
       # semantic puppet no longer supports ruby < 2.7
