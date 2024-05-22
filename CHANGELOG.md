@@ -1,5 +1,50 @@
 # Changelog
 
+## Bolt 3.30.0 (2024-05-22)
+
+### New features
+
+* **add shell-command and tty support to the LXD transport** ([#3262](https://github.com/puppetlabs/bolt/pull/3262))
+
+Previously the LXD transport would always execute commands on the
+target with `sh -c`. The shell-command and tty options are added
+to provide a more consistent experience between the docker, podman
+and lxd transports.
+
+* **Enable basic glob matching of target strings**
+
+  Previously, only the '*' wildcard character would match
+  when targets were resolved from areas other than the CLI
+  (such as from within a Plan).  With this change wildcard
+  matching is switched to use Ruby's fnmatch with basic
+  glob matching enabled.  In addition to providing more
+  wildcard matching options, it also provides a significant
+  performance improvement over the prior implementation.
+
+  _Contributed by [Sean Millichamp](https://github.com/seanmil)_
+
+* **Optimize get_targets performance for exact-match cases**
+
+  Attempt exact target name matches for strings passed to
+  get_targets and only attempt the slower wildcard match if
+  the string contains a valid glob wildcard character.
+
+  _Contributed by [Sean Millichamp](https://github.com/seanmil)_
+
+### Bug fixes
+
+* **Apply bundled-ruby defaults at target creation** ([#3309](3309))
+
+  Ensure defaults associated with `bundled-ruby` transport config are
+  applied at target initialization.
+
+* **Ensure core types are available for apply over local transport** [#GH-3310](GH-3310)
+
+  Previously when using `bundled-ruby: true` config on the local transport
+  core types were not available during catalog application. This commit
+  makes the core types available by loading the bundled bolt module content
+  shipped with bolt packages if it is present on the target.
+
 ## Bolt 3.29.0 (2024-04-16)
 
 ### New features
