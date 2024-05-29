@@ -11,7 +11,7 @@
 #
 # @!method []
 #   Accesses the `value` hash directly and returns the value for the key. This
-#   function does not use dot nation. Call the function directly on the `Result`.
+#   function does not use dot notation. Call the function directly on the `Result`.
 #   For example, `$result['key']`.
 # @!method action
 #   The type of result. For example, `task` or `command`.
