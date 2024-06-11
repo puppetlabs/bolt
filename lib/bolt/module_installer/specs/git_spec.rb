@@ -45,7 +45,7 @@ module Bolt
 
           unless valid_url?(@git)
             raise Bolt::ValidationError,
-                  "Invalid URI #{@git}. Valid URIs must begin with 'git@', 'http://', or 'https://'."
+                  "Invalid URI #{@git}. Valid URIs must begin with 'git@', 'http://', 'https://' or 'ssh://'."
           end
         end
 
@@ -140,7 +140,7 @@ module Bolt
           return true if url.start_with?('git@')
 
           uri = URI.parse(url)
-          uri.is_a?(URI::HTTP) && uri.host
+          (uri.is_a?(URI::HTTP) || uri.scheme == "ssh") && uri.host
         rescue URI::InvalidURIError
           false
         end

@@ -61,6 +61,11 @@ describe Bolt::ModuleInstaller::Specs::GitSpec do
         /Option 'resolve'.*must be a Boolean/
       )
     end
+
+    it 'allow ssh URI' do
+      init_hash['git'] = 'ssh://myuser@github.com:12345/puppetlabs/puppetlabs-yaml'
+      expect { spec }.not_to raise_error
+    end
   end
 
   context '#to_hash' do
