@@ -470,7 +470,10 @@ module Bolt
             result_output.merged_output << to_print
           }
         rescue Errno::EAGAIN, EOFError
+        ensure
+          stream.close
         end
+        inp.close
         result_output.stdout << read_streams[out]
         result_output.stderr << read_streams[err]
         result_output.exit_code = t.value.respond_to?(:exitstatus) ? t.value.exitstatus : t.value
@@ -490,7 +493,7 @@ module Bolt
         result_output
       rescue StandardError
         # Ensure we close stdin and kill the child process
-        inp&.close
+        inp.close unless inp.nil? || inp.closed?
         t&.terminate if t&.alive?
         @logger.trace { "Command aborted" }
         raise
