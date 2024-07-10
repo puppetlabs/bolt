@@ -571,7 +571,7 @@ describe "Bolt::Executor" do
       expect(ssh)
         .to receive(:with_connection)
         .and_raise(
-          NotImplementedError.new('ed25519 is not supported')
+          NotImplementedError.new('something is not supported')
         )
     end
 
@@ -580,7 +580,7 @@ describe "Bolt::Executor" do
 
     results.each do |result|
       expect(result.error_hash['kind']).to eq('puppetlabs.tasks/exception-error')
-      expect(result.error_hash['msg']).to eq('ed25519 is not supported')
+      expect(result.error_hash['msg']).to eq('something is not supported')
     end
 
     expect(collector.events.count).to eq(10)
