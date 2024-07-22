@@ -25,6 +25,23 @@ Puppet::Functions.create_function(:run_command) do
     return_type 'ResultSet'
   end
 
+  # Run multiple commands.
+  # @param commands Commands to run on target.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param options A hash of additional options.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
+  # @option options [Hash[String, Any]] _env_vars Map of environment variables to set
+  # @return A list of results, one entry per target.
+  # @example Run commands on targets
+  #   run_command(['hostname', 'whoami'], $targets, '_catch_errors' => true)
+  dispatch :run_commands do
+    param 'Array', :commands
+    param 'Boltlib::TargetSpec', :targets
+    optional_param 'Hash[String[1], Any]', :options
+    return_type 'ResultSet'
+  end
+
   # Run a command, logging the provided description.
   # @param command A command to run on target.
   # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
@@ -46,6 +63,10 @@ Puppet::Functions.create_function(:run_command) do
 
   def run_command(command, targets, options = {})
     run_command_with_description(command, targets, nil, options)
+  end
+
+  def run_commands(commands, targets, options = {})
+    run_command_with_description(commands.join(' && '), targets, nil, options)
   end
 
   def run_command_with_description(command, targets, description = nil, options = {})
