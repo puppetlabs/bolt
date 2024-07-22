@@ -37,16 +37,21 @@ Puppet::Functions.create_function(:puppetdb_query) do
   # The query type could be more specific ASTQuery = Array[Variant[String, ASTQuery]]
 
   def make_query(query)
-    make_query_with_instance(query, nil)
+    puppetdb_client.make_query(query)
   end
 
   def make_query_with_instance(query, instance)
+    puppetdb_client.make_query(query, nil, instance)
+  end
+
+  private
+
+  def puppetdb_client
     puppetdb_client = Puppet.lookup(:bolt_pdb_client)
     # Bolt executor not expected when invoked from apply block
     executor = Puppet.lookup(:bolt_executor) { nil }
     # Send Analytics Report
     executor&.report_function_call(self.class.name)
-
-    puppetdb_client.make_query(query, nil, instance)
+    puppetdb_client
   end
 end
