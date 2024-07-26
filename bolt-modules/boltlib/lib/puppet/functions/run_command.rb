@@ -2,6 +2,7 @@
 
 require 'bolt/error'
 require 'json'
+require 'shellwords'
 
 # Runs a command on the given set of targets and returns the result from each command execution.
 # This function does nothing if the list of targets is empty.
@@ -20,6 +21,23 @@ Puppet::Functions.create_function(:run_command) do
   #   run_command('hostname', $targets, '_catch_errors' => true)
   dispatch :run_command do
     param 'String[1]', :command
+    param 'Boltlib::TargetSpec', :targets
+    optional_param 'Hash[String[1], Any]', :options
+    return_type 'ResultSet'
+  end
+
+  # Run multiple commands.
+  # @param commands Commands to run on target.
+  # @param targets A pattern identifying zero or more targets. See {get_targets} for accepted patterns.
+  # @param options A hash of additional options.
+  # @option options [Boolean] _catch_errors Whether to catch raised errors.
+  # @option options [String] _run_as User to run as using privilege escalation.
+  # @option options [Hash[String, Any]] _env_vars Map of environment variables to set
+  # @return A list of results, one entry per target.
+  # @example Run commands on targets
+  #   run_command(['hostname', 'whoami'], $targets, '_catch_errors' => true)
+  dispatch :run_commands do
+    param 'Array', :commands
     param 'Boltlib::TargetSpec', :targets
     optional_param 'Hash[String[1], Any]', :options
     return_type 'ResultSet'
@@ -46,6 +64,10 @@ Puppet::Functions.create_function(:run_command) do
 
   def run_command(command, targets, options = {})
     run_command_with_description(command, targets, nil, options)
+  end
+
+  def run_commands(commands, targets, options = {})
+    run_command_with_description(commands, targets, nil, options)
   end
 
   def run_command_with_description(command, targets, description = nil, options = {})
@@ -83,24 +105,60 @@ Puppet::Functions.create_function(:run_command) do
     # Ensure that given targets are all Target instances
     targets = inventory.get_targets(targets)
 
-    if targets.empty?
-      call_function('debug', "Simulating run_command('#{command}') - no targets given - no action taken")
-      Bolt::ResultSet.new([])
-    else
-      file_line = Puppet::Pops::PuppetStack.top_of_stack
-      r = if executor.in_parallel?
-            executor.run_in_thread do
-              executor.run_command(targets, command, options, file_line)
-            end
-          else
-            executor.run_command(targets, command, options, file_line)
+    # if command is an array, run each command in sequence
+    if command.is_a?(Array)
+      results = []
+      command.each do |cmd|
+        # Split the command into an array of arguments
+        split_cmd = Shellwords.split(cmd)
+
+        # Escape each argument
+        escaped_cmd = split_cmd.map { |arg| Shellwords.escape(arg) }.join(' ')
+
+        if targets.empty?
+          call_function('debug', "Simulating run_command('#{escaped_cmd}') - no targets given - no action taken")
+          Bolt::ResultSet.new([])
+        else
+          file_line = Puppet::Pops::PuppetStack.top_of_stack
+          result = if executor.in_parallel?
+                     executor.run_in_thread do
+                       executor.run_command(targets, escaped_cmd, options, file_line)
+                     end
+                   else
+                     executor.run_command(targets, escaped_cmd, options, file_line)
+                   end
+
+          if !result.ok && !options[:catch_errors]
+            raise Bolt::RunFailure.new(result, 'run_command', escaped_cmd)
           end
-
-      if !r.ok && !options[:catch_errors]
-        raise Bolt::RunFailure.new(r, 'run_command', command)
+          results.concat(result.results)
+        end
       end
+      Bolt::ResultSet.new(results)
+    else
+      # Split the command into an array of arguments
+      split_cmd = Shellwords.split(command)
 
-      r
+      escaped_cmd = split_cmd.map { |arg| Shellwords.escape(arg) }.join(' ')
+
+      if targets.empty?
+        call_function('debug', "Simulating run_command('#{escaped_cmd}') - no targets given - no action taken")
+        Bolt::Result.new([])
+      else
+        file_line = Puppet::Pops::PuppetStack.top_of_stack
+        result = if executor.in_parallel?
+                   executor.run_in_thread do
+                     executor.run_command(targets, escaped_cmd, options, file_line)
+                   end
+                 else
+                   executor.run_command(targets, escaped_cmd, options, file_line)
+                 end
+
+        if !result.ok && !options[:catch_errors]
+          raise Bolt::RunFailure.new(result, 'run_command', escaped_cmd)
+        end
+        result
+      end
     end
   end
 end
