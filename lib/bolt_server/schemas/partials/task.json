@@ -63,24 +63,9 @@
                   "environment": {
                     "description": "Environment the task is in",
                     "type": "string"
-                  },
-                  "versioned_project": {
-                    "description": "Project the task is in",
-                    "type": "string"
                   }
                 },
-                "oneOf": [
-                  {
-                    "required": [
-                      "environment"
-                    ]
-                  },
-                  {
-                    "required": [
-                      "versioned_project"
-                    ]
-                  }
-                ],              
+                "required": ["environment"],             
                 "additionalProperties": true
               }
             },

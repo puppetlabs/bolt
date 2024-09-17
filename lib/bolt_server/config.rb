@@ -8,7 +8,7 @@ module BoltServer
   class Config < BoltServer::BaseConfig
     def config_keys
       super + %w[concurrency cache-dir file-server-conn-timeout
-                 file-server-uri projects-dir environments-codedir
+                 file-server-uri environments-codedir
                  environmentpath basemodulepath builtin-content-dir]
     end
 
@@ -30,7 +30,7 @@ module BoltServer
     end
 
     def required_keys
-      super + %w[file-server-uri projects-dir]
+      super + %w[file-server-uri]
     end
 
     def service_name
