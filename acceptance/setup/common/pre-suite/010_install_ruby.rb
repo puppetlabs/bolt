@@ -27,6 +27,7 @@ PS
       # public_suffix for win requires Ruby version >= 2.6
       # current Ruby 2.5.0 works with public_suffix version 4.0.7
       on(bolt, powershell('gem install public_suffix -v 4.0.7'))
+      on(bolt, powershell('gem install yard -v 0.9.36'))
       # current Ruby 2.5.0 works with puppet-strings 2.9.0
       on(bolt, powershell('gem install puppet-strings -v 2.9.0'))
       # net-ssh 7.x no longer supports ruby 2.5
@@ -76,6 +77,7 @@ PS
       on(bolt, 'gem install public_suffix -v 5.1.1 --no-document')
       on(bolt, 'gem install CFPropertyList -v 3.0.6 --no-document')
       on(bolt, 'gem install fast_gettext -v 2.4.0')
+      on(bolt, 'gem install puppet-strings -v 0.9.36 --no-document')
       # System ruby for osx12 is 2.6, which can only manage puppet-strings 2.9.0
       on(bolt, 'gem install puppet-strings -v 2.9.0 --no-document')
       # semantic puppet no longer supports ruby < 2.7
