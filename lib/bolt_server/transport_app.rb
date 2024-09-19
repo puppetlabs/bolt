@@ -5,10 +5,8 @@ require 'addressable/uri'
 require 'bolt'
 require 'bolt/error'
 require 'bolt/inventory'
-require 'bolt/project'
 require 'bolt/target'
 require 'bolt_server/file_cache'
-require 'bolt_server/plugin'
 require 'bolt_server/request_error'
 require 'bolt/task/puppet_server'
 require 'json'
@@ -16,13 +14,6 @@ require 'json-schema'
 
 # These are only needed for the `/plans` endpoint.
 require 'puppet'
-
-# Needed by the `/project_file_metadatas` endpoint
-require 'puppet/file_serving/fileset'
-
-# Needed by the 'project_facts_plugin_tarball' endpoint
-require 'minitar'
-require 'zlib'
 
 module BoltServer
   class TransportApp < Sinatra::Base
@@ -41,8 +32,6 @@ module BoltServer
       action-upload_file
       transport-ssh
       transport-winrm
-      action-apply_prep
-      action-apply
     ].freeze
 
     # PE_BOLTLIB_PATH is intended to function exactly like the BOLTLIB_PATH used
@@ -67,19 +56,11 @@ module BoltServer
         shared_schema = JSON::Schema.new(schema_content, Addressable::URI.parse("partial:#{basename}"))
         JSON::Validator.add_schema(shared_schema)
       end
-
-      @executor = Bolt::Executor.new(0)
-
       @file_cache = BoltServer::FileCache.new(@config).setup
+      @executor = Bolt::Executor.new(0)
 
       # This is needed until the PAL is threadsafe.
       @pal_mutex = Mutex.new
-
-      # Avoid redundant plugin tarbal construction
-      @plugin_mutex = Mutex.new
-
-      # Avoid redundant project_task metadata construction
-      @task_metadata_mutex = Mutex.new
 
       @logger = Bolt::Logger.logger(self)
 
@@ -168,94 +149,6 @@ module BoltServer
       task_data = body['task']
       task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
       task_helper(target, task, body['parameters'] || {}, body['timeout'])
-    end
-
-    def extract_install_task(target)
-      unless target.plugin_hooks['puppet_library']['task']
-        raise BoltServer::RequestError,
-              "Target must have 'task' plugin hook"
-      end
-      install_task = target.plugin_hooks['puppet_library']['task'].split('::', 2)
-      install_task << 'init' if install_task.count == 1
-      install_task
-    end
-
-    # This helper is responsible for computing or retrieving from the cache a plugin tarball. There are
-    # two supported plugin types 'fact_plugins', and 'all_plugins'. Note that this is cached based on
-    # versioned_project as there are no plugins in the "builtin content" directory
-    def plugin_tarball(versioned_project, tarball_type)
-      tarball_types = %w[fact_plugins all_plugins]
-      unless tarball_types.include?(tarball_type)
-        raise ArgumentError,
-              "tarball_type must be one of: #{tarball_types.join(', ')}"
-      end
-      # lock this so that in the case an apply/apply_prep with multiple targets hits this endpoint
-      # the tarball computation only happens once (all the other targets will just need to read the cached data)
-      @plugin_mutex.synchronize do
-        if (tarball = @file_cache.get_cached_project_file(versioned_project, tarball_type))
-          tarball
-        else
-          new_tarball = build_project_plugins_tarball(versioned_project) do |mod|
-            search_dirs = []
-            search_dirs << mod.plugins if mod.plugins?
-            search_dirs << mod.pluginfacts if mod.pluginfacts?
-            if tarball_type == 'all_plugins'
-              search_dirs << mod.files if mod.files?
-              search_dirs << mod.scripts if mod.scripts?
-              type_files = "#{mod.path}/types"
-              search_dirs << type_files if File.exist?(type_files)
-            end
-            search_dirs
-          end
-          @file_cache.cache_project_file(versioned_project, tarball_type, new_tarball)
-          new_tarball
-        end
-      end
-    end
-
-    # This helper is responsible for computing or retrieving task metadata for a project.
-    # It expects task name in segments and uses the combination of task name and versioned_project
-    # as a unique identifier for caching in addition to the job_id. The job id is added to protect against
-    # a case where the buildtin content is update (where the apply_helpers would be managed)
-    def project_task_metadata(versioned_project, task_name_segments, job_id)
-      cached_file_name = "#{task_name_segments.join('_')}_#{job_id}"
-      # lock this so that in the case an apply/apply_prep with multiple targets hits this endpoint the
-      # metadata computation will only be computed once, then the cache will be read.
-      @task_metadata_mutex.synchronize do
-        if (metadata = @file_cache.get_cached_project_file(versioned_project, cached_file_name))
-          JSON.parse(metadata)
-        else
-          new_metadata = in_bolt_project(versioned_project) do |context|
-            ps_parameters = {
-              'versioned_project' => versioned_project
-            }
-            pe_task_info(context[:pal], *task_name_segments, ps_parameters)
-          end
-          @file_cache.cache_project_file(versioned_project, cached_file_name, new_metadata.to_json)
-          new_metadata
-        end
-      end
-    end
-
-    def apply_prep(target, body)
-      validate_schema(@schemas["action-apply_prep"], body)
-      plugins_tarball = plugin_tarball(body['versioned_project'], 'fact_plugins')
-      install_task_segments = extract_install_task(target.first)
-      task_data = project_task_metadata(body['versioned_project'], install_task_segments, body["job_id"])
-      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
-      install_task_result = task_helper(target, task, target.first.plugin_hooks['puppet_library']['parameters'] || {})
-      return install_task_result unless install_task_result.ok
-      task_data = project_task_metadata(body['versioned_project'], %w[apply_helpers custom_facts], body["job_id"])
-      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
-      task_helper(target, task, { 'plugins' => plugins_tarball })
-    end
-
-    def apply(target, body)
-      validate_schema(@schemas["action-apply"], body)
-      plugins_tarball = plugin_tarball(body['versioned_project'], 'all_plugins')
-      task_data = project_task_metadata(body['versioned_project'], %w[apply_helpers apply_catalog], body["job_id"])
-      task = Bolt::Task::PuppetServer.new(task_data['name'], task_data['metadata'], task_data['files'], @file_cache)
-      task_helper(target, task, body['parameters'].merge({ 'plugins' => plugins_tarball }))
     end
 
     def run_command(target, body)
@@ -375,37 +268,6 @@ module BoltServer
       end
     end
 
-    def config_from_project(versioned_project)
-      project_dir = File.join(@config['projects-dir'], versioned_project)
-      unless Dir.exist?(project_dir)
-        raise BoltServer::RequestError,
-              "versioned_project: '#{project_dir}' does not exist"
-      end
-      project = Bolt::Project.create_project(project_dir)
-      Bolt::Config.from_project(project, { log: { 'bolt-debug.log' => 'disable' } })
-    end
-
-    def pal_from_project_bolt_config(bolt_config)
-      modulepath_object = Bolt::Config::Modulepath.new(
-        bolt_config.modulepath,
-        boltlib_path: [PE_BOLTLIB_PATH, Bolt::Config::Modulepath::BOLTLIB_PATH],
-        builtin_content_path: @config['builtin-content-dir']
-      )
-      Bolt::PAL.new(modulepath_object, nil, nil, nil, nil, nil, bolt_config.project)
-    end
-
-    def in_bolt_project(versioned_project)
-      @pal_mutex.synchronize do
-        bolt_config = config_from_project(versioned_project)
-        pal = pal_from_project_bolt_config(bolt_config)
-        context = {
-          pal: pal,
-          config: bolt_config
-        }
-        yield context
-      end
-    end
-
     def pe_plan_info(pal, module_name, plan_name)
       # Handle case where plan name is simply module name with special `init.pp` plan
       plan_name = if plan_name == 'init' || plan_name.nil?
@@ -482,107 +344,6 @@ module BoltServer
       plans.map { |plan_name| { 'name' => plan_name } }
     end
 
-    def file_metadatas(versioned_project, module_name, file)
-      result = @pal_mutex.synchronize do
-        bolt_config = config_from_project(versioned_project)
-        pal = pal_from_project_bolt_config(bolt_config)
-        pal.in_bolt_compiler do
-          mod = Puppet.lookup(:current_environment).module(module_name)
-          raise BoltServer::RequestError, "module_name: '#{module_name}' does not exist" unless mod
-          # First, look in the 'old' location <module>/files/<path>.
-          # If not found, and the path starts with `files` or `scripts`, munge
-          # the path and look inside that directory.
-          if (abs_path = mod.file(file))
-            { abs_file_path: abs_path, puppetserver_root: "modules/#{module_name}/#{file}" }
-          else
-            subdir, relative_path = file.split(File::SEPARATOR, 2)
-            abs_path, mount = case subdir
-                              when 'files'
-                                [mod.file(relative_path), 'modules']
-                              when 'scripts'
-                                [mod.script(relative_path), 'scripts']
-                              end
-            next nil unless abs_path
-            { abs_file_path: abs_path, puppetserver_root: "#{mount}/#{module_name}/#{relative_path}" }
-          end
-        end
-      end
-
-      unless result
-        raise BoltServer::RequestError,
-              "file: '#{file}' does not exist inside #{module_name} 'files' or 'scripts' directories"
-      end
-
-      abs_file_path = result[:abs_file_path]
-      puppetserver_root = result[:puppetserver_root]
-
-      fileset = Puppet::FileServing::Fileset.new(abs_file_path, 'recurse' => 'yes')
-      Puppet::FileServing::Fileset.merge(fileset).collect do |relative_file_path, base_path|
-        metadata = Puppet::FileServing::Metadata.new(base_path, relative_path: relative_file_path)
-        metadata.checksum_type = 'sha256'
-        metadata.links = 'follow'
-        metadata.collect
-        metadata.to_data_hash.merge(puppetserver_root: puppetserver_root)
-      end
-    end
-
-    # The provided block takes a module object and returns the list
-    # of directories to search through. This is similar to
-    # Bolt::Applicator.build_plugin_tarball.
-    def build_project_plugins_tarball(versioned_project, &block)
-      start_time = Time.now
-
-      # Fetch the plugin files
-      plugin_files = in_bolt_project(versioned_project) do |context|
-        files = {}
-
-        # Bolt also sets plugin_modulepath to user modulepath so do it here too for
-        # consistency
-        plugin_modulepath = context[:pal].user_modulepath
-        Puppet.lookup(:current_environment).override_with(modulepath: plugin_modulepath).modules.each do |mod|
-          search_dirs = block.call(mod)
-
-          files[mod] ||= []
-          Find.find(*search_dirs).each do |file|
-            files[mod] << file if File.file?(file)
-          end
-        end
-
-        files
-      end
-
-      # Pack the plugin files
-      sio = StringIO.new
-      begin
-        output = Minitar::Output.new(Zlib::GzipWriter.new(sio))
-
-        plugin_files.each do |mod, files|
-          tar_dir = Pathname.new(mod.name)
-          mod_dir = Pathname.new(mod.path)
-
-          files.each do |file|
-            tar_path = tar_dir + Pathname.new(file).relative_path_from(mod_dir)
-            stat = File.stat(file)
-            content = File.binread(file)
-            output.tar.add_file_simple(
-              tar_path.to_s,
-              data: content,
-              size: content.size,
-              mode: stat.mode & 0o777,
-              mtime: stat.mtime
-            )
-          end
-        end
-
-        duration = Time.now - start_time
-        @logger.trace("Packed plugins in #{duration * 1000} ms")
-      ensure
-        output.close
-      end
-
-      Base64.encode64(sio.string)
-    end
-
     get '/' do
       200
     end
@@ -638,8 +399,7 @@ module BoltServer
         'config' => {
           'transport' => 'ssh',
           'ssh' => opts.slice(*Bolt::Config::Transport::SSH.options)
-        },
-        'plugin_hooks' => target_hash['plugin_hooks']
+        }
       }
 
       inventory = Bolt::Inventory.empty
@@ -677,8 +437,7 @@ module BoltServer
         'config' => {
           'transport' => 'winrm',
           'winrm' => opts.slice(*Bolt::Config::Transport::WinRM.options)
-        },
-        'plugin_hooks' => target_hash['plugin_hooks']
+        }
       }
 
       inventory = Bolt::Inventory.empty
@@ -713,18 +472,6 @@ module BoltServer
       end
     end
 
-    # Fetches the metadata for a single plan
-    #
-    # @param versioned_project [String] the project to fetch the plan from
-    get '/project_plans/:module_name/:plan_name' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
-      in_bolt_project(params['versioned_project']) do |context|
-        plan_info = pe_plan_info(context[:pal], params[:module_name], params[:plan_name])
-        plan_info = allowed_helper(context[:pal], plan_info, context[:config].project.plans)
-        [200, plan_info.to_json]
-      end
-    end
-
     # Fetches the metadata for a single task
     #
     # @param environment [String] the environment to fetch the task from
@@ -734,21 +481,6 @@ module BoltServer
           'environment' => params['environment']
         }
         task_info = pe_task_info(pal, params[:module_name], params[:task_name], ps_parameters)
-        [200, task_info.to_json]
-      end
-    end
-
-    # Fetches the metadata for a single task
-    #
-    # @param bolt_versioned_project [String] the reference to the bolt-project directory to load task metadata from
-    get '/project_tasks/:module_name/:task_name' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
-      in_bolt_project(params['versioned_project']) do |context|
-        ps_parameters = {
-          'versioned_project' => params['versioned_project']
-        }
-        task_info = pe_task_info(context[:pal], params[:module_name], params[:task_name], ps_parameters)
-        task_info = allowed_helper(context[:pal], task_info, context[:config].project.tasks)
         [200, task_info.to_json]
       end
     end
@@ -777,25 +509,6 @@ module BoltServer
       end
     end
 
-    # Fetches the list of plans for a project
-    #
-    # @param versioned_project [String] the project to fetch the list of plans from
-    get '/project_plans' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
-      in_bolt_project(params['versioned_project']) do |context|
-        plans_response = plan_list(context[:pal])
-
-        # Dig in context for the allowlist of plans from project object
-        plans_response.map! { |metadata| allowed_helper(context[:pal], metadata, context[:config].project.plans) }
-
-        # We structure this array of plans to be an array of hashes so that it matches the structure
-        # returned by the puppetserver API that serves data like this. Structuring the output this way
-        # makes switching between puppetserver and bolt-server easier, which makes changes to switch
-        # to bolt-server smaller/simpler.
-        [200, plans_response.to_json]
-      end
-    end
-
     # Fetches the list of tasks for an environment
     #
     # @param environment [String] the environment to fetch the list of tasks from
@@ -809,62 +522,6 @@ module BoltServer
         # to bolt-server smaller/simpler.
         [200, tasks_response]
       end
-    end
-
-    # Fetches the list of tasks for a bolt-project
-    #
-    # @param versioned_project [String] the project to fetch the list of tasks from
-    get '/project_tasks' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
-      in_bolt_project(params['versioned_project']) do |context|
-        tasks_response = task_list(context[:pal])
-
-        # Dig in context for the allowlist of tasks from project object
-        tasks_response.map! { |metadata| allowed_helper(context[:pal], metadata, context[:config].project.tasks) }
-
-        # We structure this array of tasks to be an array of hashes so that it matches the structure
-        # returned by the puppetserver API that serves data like this. Structuring the output this way
-        # makes switching between puppetserver and bolt-server easier, which makes changes to switch
-        # to bolt-server smaller/simpler.
-        [200, tasks_response.to_json]
-      end
-    end
-
-    # Implements puppetserver's file_metadatas endpoint for projects.
-    #
-    # @param versioned_project [String] the versioned_project to fetch the file metadatas from
-    get '/project_file_metadatas/:module_name/*' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
-      file = params[:splat].first
-      metadatas = file_metadatas(params['versioned_project'], params[:module_name], file)
-      [200, metadatas.to_json]
-    rescue ArgumentError => e
-      [500, e.message]
-    end
-
-    # Returns the base64 encoded tar archive of plugin code that is needed to calculate
-    # custom facts
-    #
-    # @param versioned_project [String] the versioned_project to build the plugin tarball from
-    get '/project_facts_plugin_tarball' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
-      content_type :json
-
-      plugins_tarball = plugin_tarball(params['versioned_project'], 'fact_plugins')
-
-      [200, plugins_tarball.to_json]
-    end
-
-    # Returns the base64 encoded tar archive of _all_ plugin code for a project
-    #
-    # @param versioned_project [String] the versioned_project to build the plugin tarball from
-    get '/project_plugin_tarball' do
-      raise BoltServer::RequestError, "'versioned_project' is a required argument" if params['versioned_project'].nil?
-      content_type :json
-
-      plugins_tarball = plugin_tarball(params['versioned_project'], 'all_plugins')
-
-      [200, plugins_tarball.to_json]
     end
 
     error 404 do

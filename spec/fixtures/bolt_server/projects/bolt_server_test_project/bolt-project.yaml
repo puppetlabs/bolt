@@ -1,7 +1,0 @@
-name: 'bolt_server_test_project'
-plans:
-  - 'bolt_server_test_project'
-  - '*allowlist*'
-tasks:
-  - 'bolt_server_test_project'
-  - '*allowlist*'
