@@ -77,7 +77,7 @@ PS
       on(bolt, 'gem install public_suffix -v 5.1.1 --no-document')
       on(bolt, 'gem install CFPropertyList -v 3.0.6 --no-document')
       on(bolt, 'gem install fast_gettext -v 2.4.0')
-      on(bolt, 'gem install puppet-strings -v 0.9.36 --no-document')
+      on(bolt, 'gem install yard -v 0.9.36 --no-document')
       # System ruby for osx12 is 2.6, which can only manage puppet-strings 2.9.0
       on(bolt, 'gem install puppet-strings -v 2.9.0 --no-document')
       # semantic puppet no longer supports ruby < 2.7
