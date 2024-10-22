@@ -39,6 +39,3 @@ local_gemfile = File.join(__dir__, 'Gemfile.local')
 if File.exist? local_gemfile
   eval_gemfile local_gemfile
 end
-
-# TODO: remove this pin once we solve PE-35920
-gem "puppet", '~> 7.24'
