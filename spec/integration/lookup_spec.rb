@@ -94,9 +94,13 @@ describe 'lookup' do
 
     context 'with interpolations' do
       let(:hiera_config) { File.join(project, 'hiera_interpolations.yaml') }
-      it 'returns a value' do
+
+      it 'returns an error' do
         result = run_cli_json(cli_command + %w[key=test::interpolations])
-        expect(result).to eq('test::interpolations data/common.yaml')
+        expect(result).to include(
+          'kind' => 'bolt/pal-error',
+          'msg'  => /Interpolations are not supported in lookups/
+        )
       end
     end
 
