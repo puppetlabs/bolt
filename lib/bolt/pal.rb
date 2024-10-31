@@ -498,7 +498,12 @@ module Bolt
         require 'puppet-strings'
         require 'puppet-strings/yard'
         PuppetStrings::Yard.setup!
-        YARD::Logger.instance.level = :error
+        YARD::Logger.instance.level = if YARD::Logger.const_defined?(:Severity)
+                                        YARD::Logger::Severity::ERROR
+                                      else
+                                        # Backward compatility for YARD < 0.9.37
+                                        YARD::Logger.instance.level = :error
+                                      end
         YARD.parse(pp_path)
 
         plan = YARD::Registry.at("puppet_plans::#{plan_name}")
