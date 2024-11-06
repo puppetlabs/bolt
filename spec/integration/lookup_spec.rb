@@ -92,15 +92,12 @@ describe 'lookup' do
       end
     end
 
-    context 'with interpolations' do
+    context 'when context is not available' do
       let(:hiera_config) { File.join(project, 'hiera_interpolations.yaml') }
 
-      it 'returns an error' do
+      it 'returns the default value' do
         result = run_cli_json(cli_command + %w[key=test::interpolations])
-        expect(result).to include(
-          'kind' => 'bolt/pal-error',
-          'msg'  => /Interpolations are not supported in lookups/
-        )
+        expect(result).to eq('test::interpolations data/common.yaml')
       end
     end
 
@@ -159,11 +156,11 @@ describe 'lookup' do
       let(:plan)         { 'test::plan_lookup' }
       let(:uri)          { 'localhost' }
 
-      it 'raises a validation error' do
+      it 'errors with a missing key' do
         result = run_cli_json(cli_command + %W[-t #{uri}])
         expect(result).to include(
           'kind' => 'bolt/pal-error',
-          'msg'  => /Interpolations are not supported in lookups/
+          'msg'  => "Function lookup() did not find a value for the name 'pop'"
         )
       end
     end
@@ -307,9 +304,9 @@ describe 'lookup' do
       context 'with invalid plan_hierarchy' do
         let(:hiera_config) { File.join(project, 'plan_hiera_facts.yaml') }
 
-        it 'raises a validation error' do
-          expect { run_cli_json(%w[lookup environment] + opts) }
-            .to raise_error(Bolt::PAL::PALError, /Interpolations are not supported in lookups/)
+        it 'returns the default value' do
+          result = run_cli_json(%w[lookup environment] + opts)
+          expect(result).to eq("environment data/common.yaml")
         end
       end
 
