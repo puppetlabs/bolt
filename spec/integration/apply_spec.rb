@@ -9,7 +9,6 @@ require 'bolt_spec/puppet_agent'
 require 'bolt_spec/run'
 
 TEST_VERSIONS = [
-  [7, 'puppet7'],
   [8, 'puppet8']
 ].freeze
 
