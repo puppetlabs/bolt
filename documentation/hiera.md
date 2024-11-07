@@ -162,13 +162,10 @@ Running the plan results in an error like this:
 ```shell
 $ bolt plan run my_project::request --targets server
 Starting: plan my_project::request
-Finished: plan my_project::example in 0.01 sec
-{
-  "kind": "bolt/pal-error",
-  "msg": "Interpolations are not supported in lookups outside of an apply block: Undefined variable 'trusted' (file: /Users/bolt/.puppetlabs/bolt/hiera.yaml)",
-  "details": {
-  }
-}
+Interpolation failed with 'application', but compilation continuing; 
+   (file & line not available)
+Finished: plan my_project::request in 0.01 sec
+Function lookup() did not find a value for the name 'api_key'
 ```
 
 The plan run fails because the lookup takes place outside of an apply block,
@@ -218,8 +215,9 @@ apply block.
 
 Interpolations are not well supported in the `plan_hierarchy` hierarchy.
 Target-level data such as facts are not available to lookups outside of apply blocks,
-so the normal hierarchy interpolation does not work. The `lookup()` function
-only interpolates based on the variables currently in scope.
+so the normal hierarchy interpolation does not work. 
+However, the `lookup()` function can perform lookups without error by using default 
+values provided by Puppet and Hiera when the necessary context is not available.
 
 The following example demonstrates interpolating the `$application` variable
 into a `plan_hierarchy` hierarchy:
