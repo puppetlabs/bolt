@@ -1,5 +1,46 @@
 # Changelog
 
+## Bolt 4.0.0 (2024-11-11)
+
+### New features
+
+* **Ship with Puppet 8**
+  ([#3353](https://github.com/puppetlabs/bolt/pull/3353))
+
+  The Bolt gem and Bolt packages now ship with Puppet 8.
+
+* **r10k: Allow >= 3.10 < 5**
+  ([#3312](https://github.com/puppetlabs/bolt/pull/3312))
+
+  Bolt will now allow for r10k 4.
+
+* **Update puppet modules shipped with bolt packages**
+
+  Modules shipped with bolt packages have been updated to latest.
+
+  _Contributed by [Tobi Lehman](https://github.com/tlehman)_
+
+* **Updated puppet-agent module version to 4.21.0**
+
+  Updated puppet-agent module in the Puppetfile from 4.20.1 to 4.21.0
+
+### Bug fixes
+
+* **Allow ssh transport protocol** ([#3237](https://github.com/puppetlabs/bolt/issues/3237))
+
+  Fix regression introduced by commit [0a09069](https://github.com/puppetlabs/bolt/commit/0a090696cb5807640e894fdbc0d6158edf70184f).
+  Allow install module from git private repository with SSH transport URI (e.g ssh://git@mygitlabserver:12345/namespace/myprivatemod.git)
+
+  _Contributed by [mcarrolle](https://github.com/mcarrolle)_
+
+* **Explicitly close Bolt::Shell::Bash file descriptors**
+
+  Ensure file descriptors in Bolt::Shell::Bash are explicitly
+  closed, helping to alleviate the chance of hitting file
+  descriptor limits on systems with low defaults (e.g. Mac OS).
+
+  _Contributed by [Sean Millichamp](https://github.com/seanmil)_
+
 ## Bolt 3.30.0 (2024-05-22)
 
 ### New features
