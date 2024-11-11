@@ -1,6 +1,6 @@
 # Changelog
 
-## Bolt 4.0.0 (2024-11-11)
+## Bolt 4.0.0 (2024-11-12)
 
 ### New features
 
