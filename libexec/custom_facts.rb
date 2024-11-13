@@ -1,4 +1,4 @@
-#! /usr/bin/ruby
+#! /opt/puppetlabs/puppet/bin/ruby
 # frozen_string_literal: true
 
 require 'json'
