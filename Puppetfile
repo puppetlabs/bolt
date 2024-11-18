@@ -8,6 +8,8 @@ moduledir File.join(File.dirname(__FILE__), 'modules')
 mod 'puppetlabs-service', '3.0.0'
 mod 'puppetlabs-puppet_agent', '4.21.0'
 mod 'puppetlabs-facts', '1.6.0'
+mod 'puppetlabs-apt', '9.4.0'
+mod 'puppetlabs-inifile', '6.1.1'
 
 # Core types and providers for Puppet 6
 mod 'puppetlabs-augeas_core', '1.5.0'
