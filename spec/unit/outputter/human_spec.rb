@@ -273,7 +273,7 @@ describe "Bolt::Outputter::Human" do
 
   it "prints empty results from a plan" do
     outputter.print_plan_result(Bolt::PlanResult.new([], 'success'))
-    expect(output.string).to eq("[\n\n]\n")
+    expect(output.string).to eq("[]\n")
   end
 
   it "formats unwrapped ExecutionResult from a plan" do
