@@ -26,7 +26,7 @@ jobs:
     name: Tests
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [ubuntu-22.04, windows-latest]
         ruby: [3.1]
     runs-on: ${{ matrix.os }}
     steps:
@@ -48,11 +48,11 @@ jobs:
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
-      - if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-22.04'
         uses: ./.github/actions/sudo_setup
       - if: matrix.os == 'windows-latest'
         uses: ./.github/actions/windows_agent_setup
-      - if: matrix.os == 'ubuntu-latest'
+      - if: matrix.os == 'ubuntu-22.04'
         name: Run tests
         run: bundle exec rake ci:local_transport:linux
       - if: matrix.os == 'windows-latest'
