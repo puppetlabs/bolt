@@ -457,7 +457,6 @@ describe "when loading bolt for CLI invocation" do
       # orchestrator client + dependencies
       'orchestrator_client',
       'faraday',
-      'multipart-post',
       # httpclient + dependencies
       'httpclient',
       # locale + dependencies
