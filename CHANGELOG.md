@@ -8,10 +8,6 @@
 
   Bolt packages are now available for Debian 12, Fedora 40, OSX 13 and OSX 14
 
-### Removals
-
-* **Removed support for Fedora 36, Debian 9, Debian 10 and RHEL 6**
-
 * **Ship with Puppet 8**
   ([#3353](https://github.com/puppetlabs/bolt/pull/3353))
 
@@ -31,6 +27,10 @@
 * **Updated puppet-agent module version to 4.21.0**
 
   Updated puppet-agent module in the Puppetfile from 4.20.1 to 4.21.0
+
+### Removals
+
+* **Removed support for Fedora 36, Debian 9, Debian 10 and RHEL 6**
 
 ### Bug fixes
 
