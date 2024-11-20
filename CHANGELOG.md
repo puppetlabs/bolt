@@ -1,8 +1,16 @@
 # Changelog
 
-## Bolt 4.0.0 (2024-11-12)
+## Bolt 4.0.0 (2024-11-20)
 
 ### New features
+
+* **Support for new platforms**
+
+  Bolt packages are now available for Debian 12, Fedora 40, OSX 13 and OSX 14
+
+### Removals
+
+* **Removed support for Fedora 36, Debian 9, Debian 10 and RHEL 6**
 
 * **Ship with Puppet 8**
   ([#3353](https://github.com/puppetlabs/bolt/pull/3353))
