@@ -82,6 +82,7 @@ PS
       on(bolt, 'gem install semantic_puppet -v 1.0.4')
       on(bolt, 'gem install puppet -v 7.24.0')
       on(bolt, 'gem install highline -v 2.1.0')
+      on(bolt, 'gem install faraday-net_http -v 3.0.2')
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
