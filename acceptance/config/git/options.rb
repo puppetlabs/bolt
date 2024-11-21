@@ -12,5 +12,8 @@
     'setup/common/pre-suite/071_install_modules.rb'
   ],
   load_path: './lib/acceptance',
-  ssh: { forward_agent: false }
+  ssh: { forward_agent: false,
+          keys: ["#{ENV.fetch('HOME', nil)}/.ssh/id_rsa-acceptance",
+                 "#{ENV.fetch('HOME', nil)}/.ssh/id_ecdsa_perforce_smallstep_abs"]
+       }
 }

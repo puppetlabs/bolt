@@ -15,9 +15,9 @@ extend Acceptance::BoltSetupHelper
 desc "Generate Beaker Host config"
 rototiller_task :host_config do |task|
   unless ENV['BEAKER_HOSTS']
-    task.add_env(name: 'BOLT_CONTROLLER', default: 'debian10-64')
+    task.add_env(name: 'BOLT_CONTROLLER', default: 'debian12-64')
     task.add_env(name: 'BOLT_NODES',
-                 default: 'centos7-64,osx1012-64,windows10ent-64')
+                 default: 'debian12-64,osx14-64,windows10ent-64')
     ns = [ENV['BOLT_CONTROLLER'], ENV['BOLT_NODES']].join(',')
     n  = ns.split(',')
     n_new = []
@@ -34,7 +34,7 @@ rototiller_task :host_config do |task|
       n_new << node
     end
     nodes_final = n_new.join('-')
-    generate = "bundle exec beaker-hostgenerator"
+    generate = "bundle exec beaker-hostgenerator --hypervisor abs"
     generate += " #{nodes_final}"
     generate += " > hosts.yaml"
     sh generate
@@ -141,7 +141,7 @@ def transform_floaty_to_beaker_abs(floaty_hash)
       arr << {
         'hostname' => hostname,
         'type' => host_type,
-        'engine' => 'vmpooler'
+        'engine' => 'abs'
       }
     end
   end
@@ -199,7 +199,11 @@ namespace :test do
       add_argument: { name: 'config/package/options.rb' }
     }
     beaker_env.each { |env| task.add_env(env) }
-    task.add_env(name: 'SHA')
+    if ENV['LOCAL_PKG']
+      task.add_env(name: 'LOCAL_PKG')
+    else
+      task.add_env(name: 'SHA')
+    end
     task.add_command do |cmd|
       # without 'bundle exec' testing in jenkins fails
       # with 'beaker not found'. We do not know why so

@@ -37,27 +37,29 @@ PS
       on(bolt, powershell('gem install highline -v 2.1.0'))
     when /debian|ubuntu/
       # install system ruby packages
-      install_package(bolt, 'ruby')
-      install_package(bolt, 'ruby-ffi')
-      on(bolt, 'gem install fast_gettext -v 2.4.0')
+      #install_package(bolt, 'ruby')
+      #install_package(bolt, 'ruby-ffi')
+      #on(bolt, 'gem install fast_gettext -v 2.4.0')
       # semantic puppet no longer supports ruby < 2.7
-      on(bolt, 'gem install semantic_puppet -v 1.0.4')
-      on(bolt, 'gem install puppet -v 7.24.0')
-      on(bolt, 'gem install highline -v 2.1.0')
-      on(bolt, 'gem install nori -v 2.6.0')
-      on(bolt, 'gem install CFPropertyList -v 3.0.6')
-      on(bolt, 'gem install winrm -v 2.3.6')
-      on(bolt, 'gem install public_suffix -v 5.1.1')
+      #on(bolt, 'gem install semantic_puppet -v 1.0.4')
+      #on(bolt, 'gem install puppet -v 7.24.0')
+      #on(bolt, 'gem install highline -v 2.1.0')
+      #on(bolt, 'gem install nori -v 2.6.0')
+      #on(bolt, 'gem install CFPropertyList -v 3.0.6')
+      #on(bolt, 'gem install winrm -v 2.3.6')
+      #on(bolt, 'gem install public_suffix -v 5.1.1')
     when /el-|centos/
       # install system ruby packages
       install_package(bolt, 'ruby')
+      install_package(bolt, 'ruby-devel')
       install_package(bolt, 'rubygem-json')
-      install_package(bolt, 'rubygem-ffi')
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
       on(bolt, 'gem install highline -v 2.1.0')
+      on(bolt, 'gem install ffi')
     when /fedora/
       # install system ruby packages
+      install_package(bolt, 'git')
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-devel')
       install_package(bolt, 'libffi')
@@ -70,6 +72,13 @@ PS
       on(bolt, 'gem install highline -v 2.1.0')
     when /osx/
       # System ruby for osx is 2.3. winrm-fs and its dependencies require > 2.3.
+      on(bolt, 'curl -fsSL https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-installer | bash')
+      on(bolt, "echo 'export PATH=\"$HOME/.rbenv/bin:$PATH\"' >> ~/.zshrc")
+      on(bolt, "echo 'eval \"$(rbenv init -)\"' >> ~/.zshrc")
+      on(bolt, 'source ~/.zshrc')
+      on(bolt, 'rbenv install 3.1.6')
+      on(bolt, 'rbenv global 3.1.6')
+
       on(bolt, 'gem install nori -v 2.6.0 --no-document')
       on(bolt, 'gem install winrm -v 2.3.6 --no-document')
       on(bolt, 'gem install winrm-fs -v 1.3.3 --no-document')
