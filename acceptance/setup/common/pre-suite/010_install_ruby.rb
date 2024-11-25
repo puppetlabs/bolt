@@ -48,7 +48,7 @@ PS
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
     when /osx/
-      # TODO: allow for tests to work or ruby3 on macOS 
+      # TODO: allow for tests to work on ruby3 on macOS 
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
