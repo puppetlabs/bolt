@@ -25,7 +25,7 @@ PS
       # Add the msys bins to PATH
       bolt.add_env_var('PATH', "/cygdrive/c/tools/msys64:PATH")
     when /debian|ubuntu/
-      # TODO: allow for tests to work or ruby3 on ubuntu 
+      # TODO: allow for tests to work or ruby3 on ubuntu
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-dev')
@@ -48,7 +48,7 @@ PS
       install_package(bolt, 'rubygem-bigdecimal')
       install_package(bolt, 'rubygem-io-console')
     when /osx/
-      # TODO: allow for tests to work on ruby3 on macOS 
+      # TODO: allow for tests to work on ruby3 on macOS
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
