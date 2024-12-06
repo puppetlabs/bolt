@@ -12,6 +12,7 @@ module Bolt
       def resolve(specs, config = {})
         require 'puppetfile-resolver'
 
+        # GAVIN
         # Build the document model from the specs.
         document   = PuppetfileResolver::Puppetfile::Document.new('')
         unresolved = []
@@ -39,6 +40,7 @@ module Bolt
         # version restrictions.
         resolver = PuppetfileResolver::Resolver.new(document, nil)
 
+        require 'pry-byebug'; binding.pry
         # Configure and resolve the dependency graph, catching any errors
         # raised by puppetfile-resolver and re-raising them as Bolt errors.
         begin
@@ -53,6 +55,7 @@ module Bolt
         end
 
         # Create the Puppetfile object.
+        # GAVIN
         generate_puppetfile(specs, result.specifications.values, unresolved)
       end
 
@@ -70,6 +73,7 @@ module Bolt
       # unresolved specs.
       #
       private def generate_puppetfile(specs, resolved, unresolved)
+        require 'pry-byebug'; binding.pry
         modules = []
 
         # Convert the resolved specs into Bolt module objects.

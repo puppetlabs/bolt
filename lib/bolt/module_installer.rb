@@ -160,6 +160,7 @@ module Bolt
 
           # This doesn't use the block as it's more testable to just mock *_spin
           @outputter.start_spin
+          require 'pry-byebug'; binding.pry
           puppetfile = Resolver.new.resolve(specs, config)
           @outputter.stop_spin
 
@@ -189,6 +190,7 @@ module Bolt
     # Installs the Puppetfile and generates types.
     #
     def install_puppetfile(path, moduledir, config = {})
+      require 'pry-byebug'; binding.pry
       @outputter.print_action_step("Syncing modules from #{path} to #{moduledir}")
       @outputter.start_spin
       ok = Installer.new(config).install(path, moduledir)

@@ -289,6 +289,7 @@ module Bolt
 
       installer = Bolt::ModuleInstaller.new(outputter, pal)
 
+      # GAVIN
       installer.install(config.project.modules,
                         config.project.puppetfile,
                         config.project.managed_moduledir,

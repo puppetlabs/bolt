@@ -465,7 +465,7 @@ module Bolt
           #
           # FINALIZING SETUP
           #
-
+          
           check_gem_install
           warn_inventory_overrides_cli(config, options)
           submit_screen_view(analytics, config, inventory, options)
@@ -518,6 +518,7 @@ module Bolt
             plugins:   plugins
           )
 
+          # GAVIN
           process_command(application, command, action, options)
         ensure
           analytics&.finish
@@ -533,6 +534,7 @@ module Bolt
     # @param options [Hash] The CLI options.
     #
     private def process_command(app, command, action, options)
+      # GAVIN
       case command
       when 'apply'
         results = outputter.spin do
@@ -615,6 +617,7 @@ module Bolt
           app.generate_types
           SUCCESS
         when 'install'
+          # GAVIN
           ok = outputter.spin { app.install_modules(outputter, **options.slice(:force, :resolve)) }
           ok ? SUCCESS : FAILURE
         when 'show'
