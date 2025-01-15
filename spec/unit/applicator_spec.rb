@@ -86,14 +86,18 @@ describe Bolt::Applicator do
       .with('ruby', /bolt_catalog/, 'compile', stdin_data: input.merge(target_hash).to_json)
       .and_return(['{}', logs.map(&:to_json).join("\n"), double(:status, success?: true)])
     expect(applicator.compile(target, input)).to eq({})
-    expect(@log_output.readlines).to eq(
-      [
-        "DEBUG  Bolt::Executor : Started with 1 max thread(s)\n",
-        "DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory\n",
-        "TRACE  Bolt::Applicator : #{target.uri}: A message\n",
-        "DEBUG  Bolt::Applicator : #{target.uri}: Stuff happened\n"
-      ]
-    )
+
+    # check that each expected line is in the actual output; sometimes different systems include other lines
+    expected_lines =       [
+      "DEBUG  Bolt::Executor : Started with 1 max thread(s)",
+      "DEBUG  Bolt::Inventory::Inventory : Did not find config for #{target.uri} in inventory",
+      "TRACE  Bolt::Applicator : #{target.uri}: A message",
+      "DEBUG  Bolt::Applicator : #{target.uri}: Stuff happened"
+    ]
+    actual_lines = @log_output.readlines.map(&:chomp) # Remove any newline characters 
+    expected_lines.each do |line| 
+      expect(actual_lines).to include(line) 
+    end
   end
 
   context 'with Puppet mocked' do
