@@ -26,6 +26,7 @@ require_relative '../bolt/puppetdb'
 require_relative '../bolt/rerun'
 require_relative '../bolt/target'
 require_relative '../bolt/version'
+require_relative '../bolt/forge/token'
 
 module Bolt
   class CLIExit < StandardError; end
@@ -384,6 +385,13 @@ module Bolt
       end
     end
 
+    private def validate_forge_token
+      forge_token = Bolt::Forge::Token.new
+      forge_token.validate!
+    rescue Bolt::Error => e
+      $stderr.puts e.message
+      exit 1
+    end
     # Execute a Bolt command. The +options+ hash includes the subcommand and
     # action to be run, as well as any additional arguments and options for the
     # command.
@@ -391,6 +399,9 @@ module Bolt
     # @param options [Hash] The CLI options.
     #
     def execute(options)
+      #TODO: Is this the right place to validate the forge token?
+      validate_forge_token
+
       with_signal_handling do
         with_error_handling do
           # TODO: Separate from options hash and pass as own args.

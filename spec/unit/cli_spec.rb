@@ -55,6 +55,58 @@ describe Bolt::CLI do
   let(:project)     { double('project').as_null_object }
   let(:rerun)       { double('rerun').as_null_object }
 
+    # spec/bolt/cli_spec.rb
+  require 'bolt/cli'
+  require 'bolt/forge/token'
+  
+  describe Bolt::CLI do
+    let(:cli) { Bolt::CLI.new([]) }
+  
+    before do
+      # Redirect stderr to capture error messages
+      $stderr = StringIO.new
+    end
+  
+    after do
+      # Reset stderr
+      $stderr = STDERR
+    end
+  
+    describe Bolt::CLI do
+      context 'when BOLT_FORGE_TOKEN is not set' do
+        before { ENV['BOLT_FORGE_TOKEN'] = nil }
+  
+        it 'raises an error' do
+          expect { cli.execute({})}.to raise_error(SystemExit) do |error|
+            expect(error.status).to eq(1)
+            expect($stderr.string).to match(/BOLT_FORGE_TOKEN is not set/)
+          end
+        end
+      end
+  
+      context 'when BOLT_FORGE_TOKEN is invalid' do
+        before { ENV['BOLT_FORGE_TOKEN'] = 'invalid token' }
+  
+        it 'raises an error' do
+          expect { cli.execute({}) }.to raise_error(SystemExit) do |error|
+            expect(error.status).to eq(1)
+            expect($stderr.string).to match(/BOLT_FORGE_TOKEN is invalid/)
+          end
+        end
+      end
+  
+      context 'when BOLT_FORGE_TOKEN is valid' do
+        before { ENV['BOLT_FORGE_TOKEN'] = 'validtoken123' }
+  
+        it 'executes without error' do
+          allow(cli).to receive(:validate_forge_token).and_call_original
+          allow(cli).to receive(:execute).and_return(true)
+          expect { cli.execute({}) }.not_to raise_error
+        end
+      end
+    end
+  end
+
   describe '#parse' do
     context 'arguments' do
       it 'parses commands and options' do
