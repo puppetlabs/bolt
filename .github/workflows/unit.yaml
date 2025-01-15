@@ -45,5 +45,14 @@ jobs:
       - name: Install modules
         if: steps.modules.outputs.cache-hit != 'true'
         run: bundle exec r10k puppetfile install
-      - name: Unit tests
-        run: bundle exec rake tests:unit
+      - name: Check installed modules for errors
+        run: |
+          set -e
+          output=$(bundle exec puppet module list --modulepath modules)
+          echo "$output"
+          if echo "$output" | grep -q "Warning: Missing dependency"; then
+            echo "Error: Missing dependencies found in installed modules."
+            exit 1
+              fi
+          - name: Unit tests
+            run: bundle exec rake tests:unit
