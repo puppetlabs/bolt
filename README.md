@@ -47,3 +47,12 @@ Thank you to [Marcin Bunsch](https://github.com/marcinbunsch) for allowing Puppe
 
 Bolt is available as open source under the terms of the [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) license.
 
+
+## Design Decisions
+
+<!-- adrlog -->
+
+* [ADR-0001](developer-docs/adr/0001-fail-bolt-execution-if-no-bolt-forge-token-present.md) - Fail bolt execution if no BOLT_FORGE_TOKEN present
+* [ADR-0002](developer-docs/adr/0002-verify-that-bolt-module-dependencies-are-valid.md) - Verify that bolt module dependencies are valid
+
+<!-- adrlogstop -->
