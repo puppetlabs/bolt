@@ -12,7 +12,7 @@ describe "when running over the local transport" do
 
   let(:modulepath) { fixtures_path('modules') }
   let(:uri) { 'localhost,local://foo' }
-  let(:user) { ENV['USER'] }
+  let(:user) { ENV.fetch('USER', nil) }
   let(:sudo_user) { 'root' }
   let(:sudo_password) { 'runner' }
   let(:stdin_task) { "sample::stdin" }
@@ -61,7 +61,7 @@ describe "when running over the local transport" do
         cmd = %W[task run env_var::ruby_env --project #{@project.path}]
         result = run_one_node(cmd + config_flags)
         env = Bundler.with_unbundled_env do
-          ENV['GEM_HOME']
+          ENV.fetch('GEM_HOME', nil)
         end
         expect(result['_output'].strip).to eq(env.to_s)
       end
@@ -227,7 +227,7 @@ describe "when running over the local transport" do
 
     it 'runs a task with complex parameters', :reset_puppet_settings do
       complex_input_file = fixtures_path('complex_params', 'input.json')
-      expected = File.open(fixtures_path('complex_params', 'output'), 'rb', &:read)
+      expected = File.binread(fixtures_path('complex_params', 'output'))
       result = run_one_node(%W[task run sample::complex_params --params @#{complex_input_file}] + config_flags)
       expect(result['_output']).to eq(expected)
     end

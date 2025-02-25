@@ -39,7 +39,7 @@ module Bolt
       end
 
       def resolve_reference(opts)
-        reference = ENV[opts['var']]
+        reference = ENV.fetch(opts['var'], nil)
         if opts['json'] && reference
           begin
             reference = JSON.parse(reference)

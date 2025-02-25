@@ -117,7 +117,7 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
       let(:password) { 'whoops wrong password' }
 
       it "raises Node::ConnectError" do
-        stub_winrm_to_raise(::WinRM::WinRMAuthorizationError, "")
+        stub_winrm_to_raise(WinRM::WinRMAuthorizationError, "")
 
         expect_node_error(
           Bolt::Node::ConnectError, 'AUTH_ERROR',
@@ -514,7 +514,7 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
       with_tempfile_containing('script-test-winrm', contents, '.ps1') do |file|
         result = winrm.run_script(target, file.path, [])
         expect(result).to be_success
-        expected_nulls = ("\0" * (1024 * 4 + 1)) + "\r\n"
+        expected_nulls = ("\0" * ((1024 * 4) + 1)) + "\r\n"
         expect(result['stderr']).to eq(expected_nulls)
       end
     end
@@ -551,7 +551,7 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
     it "can run a task remotely", winrm: true do
       contents = 'Write-Host "$env:PT_message_one ${env:PT_message two}"'
       arguments = { message_one: 'task is running',
-                    "message two": 'task has run' }
+                    'message two': 'task has run' }
       with_task_containing('task-test-winrm', contents, 'environment', '.ps1') do |task|
         expect(winrm.run_task(target, task, arguments).message)
           .to eq("task is running task has run\r\n")

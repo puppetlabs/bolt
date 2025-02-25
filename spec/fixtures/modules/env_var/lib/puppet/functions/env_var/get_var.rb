@@ -6,6 +6,6 @@ Puppet::Functions.create_function(:'env_var::get_var') do
   end
 
   def get(var)
-    ENV[var]
+    ENV.fetch(var, nil)
   end
 end

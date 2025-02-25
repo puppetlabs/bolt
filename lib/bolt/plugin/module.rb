@@ -187,7 +187,7 @@ module Bolt
           acc.merge!(schema)
         end
         # Convert Set to string
-        type_set.each do |_param, schema|
+        type_set.each_value do |schema|
           next unless schema['type']
           schema['type'] = if schema['type'].size > 1
                              "Optional[Variant[#{schema['type'].to_a.join(', ')}]]"

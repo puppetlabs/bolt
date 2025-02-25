@@ -178,7 +178,7 @@ module BoltSpec
           @data[:default] = clazz.new(data['msg'], data['kind'], data['details'], data['issue_code'])
         else
           $stderr.puts "In the future 'error_with()' might require msg and kind, and " \
-                      "optionally accept only details and issue_code."
+                       "optionally accept only details and issue_code."
           @data[:default] = data
         end
         @data_set = true

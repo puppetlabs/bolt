@@ -6,7 +6,7 @@ module BoltSpec
       new_vars.transform_keys!(&:to_s)
 
       begin
-        old_vars = new_vars.keys.collect { |var| [var, ENV[var]] }.to_h
+        old_vars = new_vars.keys.collect { |var| [var, ENV.fetch(var, nil)] }.to_h
         ENV.update(new_vars)
         yield
       ensure

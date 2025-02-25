@@ -93,9 +93,9 @@ module Bolt
           _plugin: true
         },
         "server_urls" => {
-          description: "An array containing the PuppetDB host to connect to. Include the protocol `https` "\
-                        "and the port, which is usually `8081`. For example, "\
-                        "`https://my-puppetdb-server.com:8081`.",
+          description: "An array containing the PuppetDB host to connect to. Include the protocol `https` " \
+                       "and the port, which is usually `8081`. For example, " \
+                       "`https://my-puppetdb-server.com:8081`.",
           type: Array,
           _example: ["https://puppet.example.com:8081"],
           _plugin: true
@@ -112,26 +112,26 @@ module Bolt
       # https://github.com/puppetlabs/bolt/blob/main/schemas/README.md
       OPTIONS = {
         "analytics" => {
-          description: "Whether to disable analytics. Setting this option to 'false' in the system-wide "\
-                       "or user-level configuration will disable analytics for all projects, even if this "\
+          description: "Whether to disable analytics. Setting this option to 'false' in the system-wide " \
+                       "or user-level configuration will disable analytics for all projects, even if this " \
                        "option is set to 'true' at the project level.",
           type: [TrueClass, FalseClass],
           _example: false
         },
         "apply-settings" => {
-          description: "A map of Puppet settings to use when applying Puppet code using the `apply` "\
+          description: "A map of Puppet settings to use when applying Puppet code using the `apply` " \
                        "plan function or the `bolt apply` command.",
           type: Hash,
           properties: {
             "evaltrace" => {
-              description: "Whether each resource should log when it is being evaluated. This allows "\
+              description: "Whether each resource should log when it is being evaluated. This allows " \
                            "you to interactively see exactly what is being done.",
               type: [TrueClass, FalseClass],
               _example: true,
               _default: false
             },
             "log_level" => {
-              description: "The log level for logs in apply reports from Puppet. These can be seen "\
+              description: "The log level for logs in apply reports from Puppet. These can be seen " \
                            "in ApplyResults.",
               type: String,
               enum: %w[debug info notice warning err alert emerg crit],
@@ -145,7 +145,7 @@ module Bolt
               _default: false
             },
             "trace" => {
-              description: "Whether to print stack traces on some errors. Will print internal Ruby "\
+              description: "Whether to print stack traces on some errors. Will print internal Ruby " \
                            "stack trace interleaved with Puppet function frames.",
               type: [TrueClass, FalseClass],
               _example: true,
@@ -178,8 +178,8 @@ module Bolt
           _default: "100 or 1/7 the ulimit, whichever is lower."
         },
         "disable-warnings" => {
-          description: "An array of IDs of warnings to suppress. Warnings with a matching ID will not be logged "\
-                       "by Bolt. If you are upgrading Bolt to a new major version, you should re-enable all warnings "\
+          description: "An array of IDs of warnings to suppress. Warnings with a matching ID will not be logged " \
+                       "by Bolt. If you are upgrading Bolt to a new major version, you should re-enable all warnings " \
                        "until you have finished upgrading.",
           type: Array,
           items: {
@@ -205,11 +205,11 @@ module Bolt
               type: [TrueClass, FalseClass],
               _example: true,
               _default: false,
-              _deprecation: "Bolt no longer honors this option and enables loading scripts from the scripts "\
+              _deprecation: "Bolt no longer honors this option and enables loading scripts from the scripts " \
                             "directory by default."
             },
             "script_interpreter" => {
-              description: "Use a target's [`interpreters` configuration](bolt_transports_reference.md#interpreters) "\
+              description: "Use a target's [`interpreters` configuration](bolt_transports_reference.md#interpreters) " \
                            "when running a script.",
               type: [TrueClass, FalseClass],
               _example: true,
@@ -227,8 +227,8 @@ module Bolt
           _default: "project/hiera.yaml"
         },
         "inventory-config" => {
-          description: "A map of default configuration options for the inventory. This includes options "\
-                       "for setting the default transport to use when connecting to targets, as well as "\
+          description: "A map of default configuration options for the inventory. This includes options " \
+                       "for setting the default transport to use when connecting to targets, as well as " \
                        "options for configuring the default behavior of each transport.",
           type: Hash,
           _plugin: false,
@@ -249,11 +249,11 @@ module Bolt
           _example: { "ttl" => 3600 }
         },
         "log" => {
-          description: "A map of configuration for the logfile output. Under `log`, you can configure log options "\
-                       "for `console` and add configuration for individual log files, such as "\
-                       "`~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log "\
-                       "file does not exist, then Bolt will create it before logging information. Set the value to "\
-                       "`disable` to remove a log file defined at an earlier level of the config hierarchy. By "\
+          description: "A map of configuration for the logfile output. Under `log`, you can configure log options " \
+                       "for `console` and add configuration for individual log files, such as " \
+                       "`~/.puppetlabs/bolt/debug.log`. Individual log files must be valid filepaths. If the log " \
+                       "file does not exist, then Bolt will create it before logging information. Set the value to " \
+                       "`disable` to remove a log file defined at an earlier level of the config hierarchy. By " \
                        "default, Bolt logs to a bolt-debug.log file in the Bolt project directory.",
           type: Hash,
           properties: {
@@ -294,7 +294,7 @@ module Bolt
                       "~/logs/debug.log" => { "append" => false, "level" => "debug" } }
         },
         "modulepath" => {
-          description: "An array of directories that Bolt loads content such as plans and tasks from. Read more "\
+          description: "An array of directories that Bolt loads content such as plans and tasks from. Read more " \
                        "about modules in [Module structure](module_structure.md).",
           type: [Array, String],
           items: {
@@ -305,8 +305,8 @@ module Bolt
           _default: ["project/modules"]
         },
         "module-install" => {
-          description: "Options that configure where Bolt downloads modules from. This option is only used when "\
-                       "installing modules using the `bolt module add|install` commands and "\
+          description: "Options that configure where Bolt downloads modules from. This option is only used when " \
+                       "installing modules using the `bolt module add|install` commands and " \
                        "`Add|Install-BoltModule` cmdlets.",
           type: Hash,
           properties: {
@@ -315,7 +315,7 @@ module Bolt
               type: Hash,
               properties: {
                 "authorization_token" => {
-                  description: "The token used to authorize requests to the Forge host. Must also specify "\
+                  description: "The token used to authorize requests to the Forge host. Must also specify " \
                                "`baseurl` when using this option.",
                   type: String,
                   _example: "Bearer eyJhbGciOiJIUzI1NiIsInR5c...",
@@ -350,9 +350,9 @@ module Bolt
           _plugin: false
         },
         "modules" => {
-          description: "A list of module dependencies for the project. Each dependency is a map of data specifying "\
-                       "the module to install. To install the project's module dependencies, run the `bolt module "\
-                       "install` command. For more information about specifying modules, see [the "\
+          description: "A list of module dependencies for the project. Each dependency is a map of data specifying " \
+                       "the module to install. To install the project's module dependencies, run the `bolt module " \
+                       "install` command. For more information about specifying modules, see [the " \
                        "documentation](https://pup.pt/bolt-module-specs).",
           type: Array,
           items: {
@@ -370,7 +370,7 @@ module Bolt
                     type: [TrueClass, FalseClass]
                   },
                   "version_requirement" => {
-                    description: "The version requirement for the module. Accepts a specific version (1.2.3), version "\
+                    description: "The version requirement for the module. Accepts specific version (1.2.3), version " \
                                  "shorthand (1.2.x), or a version range (>= 1.2.0).",
                     type: String
                   }
@@ -411,36 +411,36 @@ module Bolt
           ]
         },
         "name" => {
-          description: "The name of the Bolt project. When this option is configured, the project is considered a "\
-                       "[Bolt project](projects.md), allowing Bolt to load content from the project directory "\
+          description: "The name of the Bolt project. When this option is configured, the project is considered a " \
+                       "[Bolt project](projects.md), allowing Bolt to load content from the project directory " \
                        "as though it were a module.",
           type: String,
           _plugin: false,
           _example: "myproject"
         },
         "plans" => {
-          description: "A list of plan names and glob patterns to filter the project's plans by. This option is used "\
-                       "to limit the visibility of plans for users of the project. For example, project authors "\
-                       "might want to limit the visibility of plans that are bundled with Bolt or plans that should "\
-                       "only be run as part of another plan. When this option is not configured, all plans are "\
-                       "visible. This option does not prevent users from running plans that are not part of this "\
+          description: "A list of plan names and glob patterns to filter the project's plans by. This option is used " \
+                       "to limit the visibility of plans for users of the project. For example, project authors " \
+                       "might want to limit the visibility of plans that are bundled with Bolt or plans that should " \
+                       "only be run as part of another plan. When this option is not configured, all plans are " \
+                       "visible. This option does not prevent users from running plans that are not part of this " \
                        "list.",
           type: Array,
           _plugin: false,
           _example: ["myproject", "myproject::foo", "myproject::bar", "myproject::deploy::*"]
         },
         "plugin-hooks" => {
-          description: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. "\
-                       "The only configurable plugin hook is `puppet_library`, which can use two possible plugins: "\
-                       "[`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) "\
+          description: "A map of [plugin hooks](writing_plugins.md#hooks) and which plugins a hook should use. " \
+                       "The only configurable plugin hook is `puppet_library`, which can use two possible plugins: " \
+                       "[`puppet_agent`](https://github.com/puppetlabs/puppetlabs-puppet_agent#puppet_agentinstall) " \
                        "and [`task`](using_plugins.md#task).",
           type: Hash,
           _plugin: true,
           _example: { "puppet_library" => { "plugin" => "puppet_agent", "version" => "6.15.0", "_run_as" => "root" } }
         },
         "plugins" => {
-          description: "A map of plugins and their configuration data, where each key is the name of a plugin and "\
-                       "its value is a map of configuration data. Configurable options are specified by the plugin. "\
+          description: "A map of plugins and their configuration data, where each key is the name of a plugin and " \
+                       "its value is a map of configuration data. Configurable options are specified by the plugin. " \
                        "Read more about configuring plugins in [Using plugins](using_plugins.md#configuring-plugins).",
           type: Hash,
           additionalProperties: {
@@ -451,24 +451,24 @@ module Bolt
           _example: { "pkcs7" => { "keysize" => 1024 } }
         },
         "policies" => {
-          description: "A list of policy names and glob patterns to filter the project's policies by. This option "\
-                       "is used to specify which policies are available to a project and can be applied to targets. "\
-                       "When this option is not configured, policies are not available to the project and cannot "\
+          description: "A list of policy names and glob patterns to filter the project's policies by. This option " \
+                       "is used to specify which policies are available to a project and can be applied to targets. " \
+                       "When this option is not configured, policies are not available to the project and cannot " \
                        "be applied to targets.",
           type: Array,
           _plugin: false,
           _example: ["myproject::apache", "myproject::postgres"]
         },
         "puppetdb" => {
-          description: "A map containing options for [configuring the Bolt PuppetDB "\
+          description: "A map containing options for [configuring the Bolt PuppetDB " \
                        "client](bolt_connect_puppetdb.md).",
           type: Hash,
           properties: PUPPETDB_OPTIONS,
           _plugin: true
         },
         "puppetdb-instances" => {
-          description: "A map of named PuppetDB instances and their configuration, where keys are the name "\
-                       "of a PuppetDB instance and values are maps of configuration options. For more "\
+          description: "A map of named PuppetDB instances and their configuration, where keys are the name " \
+                       "of a PuppetDB instance and values are maps of configuration options. For more " \
                        "information, see [Connecting Bolt to PuppetDB](bolt_connect_puppetdb.md).",
           type: Hash,
           additionalProperties: {
@@ -478,15 +478,15 @@ module Bolt
           _plugin: true
         },
         "rerunfile" => {
-          description: "The path to the project's rerun file. The rerun file is used to store information "\
+          description: "The path to the project's rerun file. The rerun file is used to store information " \
                        "about targets from the most recent run. Expands relative to the project directory.",
           type: String,
           _example: "/Users/bolt/project/rerun.json",
           _plugin: true
         },
         "save-rerun" => {
-          description: "Whether to update `.rerun.json` in the Bolt project directory. If "\
-                       "your target names include passwords, set this value to `false` to avoid "\
+          description: "Whether to update `.rerun.json` in the Bolt project directory. If " \
+                       "your target names include passwords, set this value to `false` to avoid " \
                        "writing passwords to disk.",
           type: [TrueClass, FalseClass],
           _plugin: false,
@@ -501,7 +501,7 @@ module Bolt
           _default: true
         },
         "stream" => {
-          description: "Whether to stream output from scripts and commands to the console. "\
+          description: "Whether to stream output from scripts and commands to the console. " \
                        "**This option is experimental**.",
           type: [TrueClass, FalseClass],
           _plugin: false,
@@ -509,11 +509,11 @@ module Bolt
           _example: true
         },
         "tasks" => {
-          description: "A list of task names and glob patterns to filter the project's tasks by. This option is used "\
-                       "to limit the visibility of tasks for users of the project. For example, project authors "\
-                       "might want to limit the visibility of tasks that are bundled with Bolt or plans that should "\
-                       "only be run as part of a larger workflow. When this option is not configured, all tasks "\
-                       "are visible. This option does not prevent users from running tasks that are not part of "\
+          description: "A list of task names and glob patterns to filter the project's tasks by. This option is used " \
+                       "to limit the visibility of tasks for users of the project. For example, project authors " \
+                       "might want to limit the visibility of tasks that are bundled with Bolt or plans that should " \
+                       "only be run as part of a larger workflow. When this option is not configured, all tasks " \
+                       "are visible. This option does not prevent users from running tasks that are not part of " \
                        "this list.",
           type: Array,
           items: {
@@ -523,8 +523,8 @@ module Bolt
           _example: ["myproject", "myproject::foo", "myproject::bar", "myproject::deploy_*"]
         },
         "trusted-external-command" => {
-          description: "The path to an executable on the Bolt controller that can produce external trusted facts. "\
-                       "**External trusted facts are experimental in both Puppet and Bolt and this API might "\
+          description: "The path to an executable on the Bolt controller that can produce external trusted facts. " \
+                       "**External trusted facts are experimental in both Puppet and Bolt and this API might " \
                        "change or be removed.**",
           type: String,
           _plugin: false,
@@ -538,7 +538,7 @@ module Bolt
       # 'config'.
       INVENTORY_OPTIONS = {
         "transport" => {
-          description: "The default transport to use when the transport for a target is not "\
+          description: "The default transport to use when the transport for a target is not " \
                        "specified in the URI.",
           type: String,
           enum: TRANSPORT_CONFIG.keys,
@@ -559,14 +559,14 @@ module Bolt
           _example: { cleanup: false }
         },
         "local" => {
-          description: "A map of configuration options for the local transport. The set of available options is "\
+          description: "A map of configuration options for the local transport. The set of available options is " \
                        "platform dependent.",
           type: Hash,
           _plugin: true,
           _example: { "cleanup" => false, "tmpdir" => "/tmp/bolt" }
         },
         "lxd" => {
-          description: "A map of configuration options for the LXD transport. The LXD transport is "\
+          description: "A map of configuration options for the LXD transport. The LXD transport is " \
                        "experimental and might include breaking changes between minor versions.",
           type: Hash,
           _plugin: true,

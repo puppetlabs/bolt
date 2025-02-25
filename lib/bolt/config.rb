@@ -64,7 +64,7 @@ module Bolt
 
     def self.system_path
       if Bolt::Util.windows?
-        Pathname.new(File.join(ENV['ALLUSERSPROFILE'], 'PuppetLabs', 'bolt', 'etc'))
+        Pathname.new(File.join(ENV.fetch('ALLUSERSPROFILE', nil), 'PuppetLabs', 'bolt', 'etc'))
       else
         Pathname.new(File.join('/etc', 'puppetlabs', 'bolt'))
       end
@@ -101,7 +101,7 @@ module Bolt
 
         Bolt::Logger.warn(
           "unsupported_project_config",
-          "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. "\
+          "Unsupported project configuration detected in '#{filepath}': #{project_config.keys}. " \
           "Project configuration should be set in 'bolt-project.yaml'."
         )
       end
@@ -114,8 +114,8 @@ module Bolt
 
         Bolt::Logger.warn(
           "unsupported_inventory_config",
-          "Unsupported inventory configuration detected in '#{filepath}': #{transport_config.keys}. "\
-          "Transport configuration should be set under the 'inventory-config' option or "\
+          "Unsupported inventory configuration detected in '#{filepath}': #{transport_config.keys}. " \
+          "Transport configuration should be set under the 'inventory-config' option or " \
           "in 'inventory.yaml'."
         )
       end
@@ -126,13 +126,13 @@ module Bolt
       if data.key?('inventory-config')
         unless data['inventory-config'].is_a?(Hash)
           raise Bolt::ValidationError,
-                "Option 'inventory-config' must be of type Hash, received #{data['inventory-config']} "\
+                "Option 'inventory-config' must be of type Hash, received #{data['inventory-config']} " \
                 "#{data['inventory-config']} (file: #{filepath})"
         end
 
         if data['inventory-config'].key?('_plugin')
           raise Bolt::ValidationError,
-                "Found unsupported key '_plugin' for option 'inventory-config'; supported keys are "\
+                "Found unsupported key '_plugin' for option 'inventory-config'; supported keys are " \
                 "'#{INVENTORY_OPTIONS.keys.join("', '")}' (file: #{filepath})"
         end
 
@@ -334,7 +334,7 @@ module Bolt
     def validate
       if @data['modulepath']&.include?(@project.managed_moduledir.to_s)
         raise Bolt::ValidationError,
-              "Found invalid path in modulepath: #{@project.managed_moduledir}. This path "\
+              "Found invalid path in modulepath: #{@project.managed_moduledir}. This path " \
               "is automatically appended to the modulepath and cannot be configured."
       end
 

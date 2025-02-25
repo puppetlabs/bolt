@@ -7,7 +7,7 @@ require 'bolt'
 require 'bolt/cli'
 
 def suppress_outputs
-  null_io = !!File::ALT_SEPARATOR ? 'NUL' : '/dev/null'
+  null_io = !!File::ALT_SEPARATOR ? File::NULL : FILE::SEPARATOR
   out = $stdout.clone
   err = $stderr.clone
   $stderr.reopen(null_io, 'w')

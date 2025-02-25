@@ -192,7 +192,7 @@ module Bolt
             rescue Puppet::PreformattedError => e
               if e.issue_code == :UNKNOWN_VARIABLE &&
                  %w[facts trusted server_facts settings].include?(e.arguments[:name])
-                message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
+                message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope " \
                           "unless explicitly defined."
                 details = { file: e.file, line: e.line, column: e.pos }
                 PALError.new(message, details)
@@ -292,7 +292,7 @@ module Bolt
       # Delete the tmpdir if it still exists. This check is needed to
       # prevent Bolt from erroring if the tmpdir is somehow deleted
       # before reaching this point.
-      FileUtils.remove_entry_secure(dir) if File.exist?(dir)
+      FileUtils.rm_rf(dir)
     end
 
     # Parses a snippet of Puppet manifest code and returns the AST represented
@@ -666,7 +666,7 @@ module Bolt
           module_group = internal_module_groups[path]
 
           values = modules.map do |mod|
-            mod_info = { name: (mod.forge_name || mod.name),
+            mod_info = { name: mod.forge_name || mod.name,
                          version: mod.version }
             mod_info[:internal_module_group] = module_group unless module_group.nil?
 

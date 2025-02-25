@@ -3,5 +3,5 @@
 
 require 'json'
 
-result = { 'env' => ENV['PT_message'], 'stdin' => JSON.parse(gets)['message'] }
+result = { 'env' => ENV.fetch('PT_message', nil), 'stdin' => JSON.parse(gets)['message'] }
 puts result.to_json

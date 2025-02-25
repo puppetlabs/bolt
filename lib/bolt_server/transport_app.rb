@@ -47,9 +47,9 @@ module BoltServer
 
     def initialize(config)
       @config = config
-      @schemas = Hash[REQUEST_SCHEMAS.map do |basename|
+      @schemas = REQUEST_SCHEMAS.map do |basename|
         [basename, JSON.parse(File.read(File.join(__dir__, ['schemas', "#{basename}.json"])))]
-      end]
+      end.to_h
 
       PARTIAL_SCHEMAS.each do |basename|
         schema_content = JSON.parse(File.read(File.join(__dir__, ['schemas', 'partials', "#{basename}.json"])))
@@ -229,7 +229,7 @@ module BoltServer
       Dir.mktmpdir('pe-bolt') do |dir|
         cli = []
         Puppet::Settings::REQUIRED_APP_SETTINGS.each do |setting|
-          dir = setting == :codedir ? codedir : dir
+          dir = codedir if setting == :codedir
           cli << "--#{setting}" << dir
         end
         cli << "--environmentpath" << environmentpath

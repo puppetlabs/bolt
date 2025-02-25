@@ -425,7 +425,7 @@ describe "Bolt::Executor" do
 
   context 'waiting until targets are available' do
     it 'waits on all nodes' do
-      node_results.each do |target, _|
+      node_results.each_key do |target|
         expect(ssh)
           .to receive(:connected?)
           .with(target)

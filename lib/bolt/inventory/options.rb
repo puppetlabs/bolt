@@ -21,7 +21,7 @@ module Bolt
       # https://github.com/puppetlabs/bolt/blob/main/schemas/README.md
       DEFINITIONS = {
         "alias" => {
-          description: "A unique alias to refer to the target. Aliases cannot conflict "\
+          description: "A unique alias to refer to the target. Aliases cannot conflict " \
                        "with the name of a group, the name of a target, or another alias.",
           type: [String, Array],
           uniqueItems: true,
@@ -74,16 +74,16 @@ module Bolt
           _plugin: true
         },
         "name" => {
-          description: "A human-readable name to refer to the group or target. Names "\
-                       "cannot conflict with the name of a group, the name of a target, "\
-                       "or the alias of a target. A name is required for a group and is "\
+          description: "A human-readable name to refer to the group or target. Names " \
+                       "cannot conflict with the name of a group, the name of a target, " \
+                       "or the alias of a target. A name is required for a group and is " \
                        "required for a target unless the uri option is set.",
           type: String,
           _plugin: true
         },
         "plugin_hooks" => {
-          description: "Configuration for the Puppet library plugin used to install the "\
-                       "Puppet agent on the target. For more information, see "\
+          description: "Configuration for the Puppet library plugin used to install the " \
+                       "Puppet agent on the target. For more information, see " \
                        "https://pup.pt/bolt-plugin-hooks",
           type: Hash,
           properties: {
@@ -115,7 +115,7 @@ module Bolt
           _plugin: true
         },
         "uri" => {
-          description: "The URI of the target. This option is required unless the name "\
+          description: "The URI of the target. This option is required unless the name " \
                        "option is set.",
           type: String,
           format: "uri",

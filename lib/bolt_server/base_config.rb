@@ -45,7 +45,7 @@ module BoltServer
 
     def initialize(config = nil)
       @data = defaults
-      @data = @data.merge(config.select { |key, _| config_keys.include?(key) }) if config
+      @data = @data.merge(config.slice(*config_keys)) if config
       @config_path = nil
     end
 
@@ -63,7 +63,7 @@ module BoltServer
 
       raise "Could not find service config at #{path}" if parsed_hocon.nil?
 
-      parsed_hocon = parsed_hocon.select { |key, _| config_keys.include?(key) }
+      parsed_hocon = parsed_hocon.slice(*config_keys)
 
       @data = @data.merge(parsed_hocon)
     end

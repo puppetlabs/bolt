@@ -44,7 +44,6 @@ module Bolt
           data = result_set.map { |res| { target: res.target.name, status: res.status } }
           FileUtils.mkdir_p(File.dirname(@path))
           File.write(@path, data.to_json)
-        elsif File.exist?(@path)
           FileUtils.rm(@path)
         end
       end

@@ -31,7 +31,7 @@ Puppet::Functions.create_function(:custom_backend) do
   end
 
   def missing_path(_options, _context)
-    "one of 'path', 'paths' 'glob', 'globs' or 'mapped_paths' must be declared in hiera.yaml when "\
-    "using this data_hash function"
+    "one of 'path', 'paths' 'glob', 'globs' or 'mapped_paths' must be declared in hiera.yaml when " \
+      "using this data_hash function"
   end
 end

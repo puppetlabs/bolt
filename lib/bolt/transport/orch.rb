@@ -49,7 +49,7 @@ module Bolt
       end
 
       def process_run_results(targets, results, task_name, position = [])
-        targets_by_name = Hash[targets.map { |t| t.host || t.name }.zip(targets)]
+        targets_by_name = targets.map { |t| t.host || t.name }.zip(targets).to_h
         results.map do |node_result|
           target = targets_by_name[node_result['name']]
           state = node_result['state']
@@ -120,7 +120,7 @@ module Bolt
           raise NotImplementedError, "pcp transport does not support setting environment variables"
         end
 
-        content = File.open(script, &:read)
+        content = File.read(script)
         content = Base64.encode64(content)
         params = {
           'content' => content,
@@ -174,7 +174,7 @@ module Bolt
         content = if stat.directory?
                     pack(source)
                   else
-                    File.open(source, &:read)
+                    File.read(source)
                   end
         content = Base64.encode64(content)
         mode = File.stat(source).mode

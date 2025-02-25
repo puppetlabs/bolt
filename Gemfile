@@ -12,11 +12,16 @@ gemspec
 
 group(:bolt_server) do
   # Bolt server gems are managed here not in the gemspec
+  gem "bundler", ">= 2.5.15"
   gem "hocon", '>= 1.2.5'
   gem "json-schema", '>= 2.8.0'
+  gem "octokit", ">= 4.0", "< 9"
   gem "puma", '>= 3.12.0'
+  gem "puppetlabs_spec_helper", ">= 5.0", "< 8"
   gem "rack", '>= 2.0.5'
   gem "rails-auth", '>= 2.1.4'
+  gem "rake", ">= 12.0", "< 14"
+  gem "rspec", ">= 3.0", "< 4"
   gem "sinatra", '>= 2.0.4'
 end
 
@@ -27,7 +32,7 @@ group(:test) do
   gem "beaker-hostgenerator"
   gem "mocha", '~> 1.4.0'
   gem "rack-test", '~> 1.0'
-  gem "rubocop", '~> 1.9.0', require: false
+  gem "rubocop", '~> 1.72.0', require: false
   gem "rubocop-rake", require: false
 end
 

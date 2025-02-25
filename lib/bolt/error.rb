@@ -131,7 +131,7 @@ module Bolt
 
   class PlanFailure < Error
     def initialize(*args)
-      super(*args)
+      super
       @error_code = 2
     end
   end

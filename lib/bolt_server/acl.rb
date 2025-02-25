@@ -17,9 +17,8 @@ module BoltServer
     end
 
     def initialize(app, allowlist)
-      acls = []
-      allowlist.each do |entry|
-        acls << {
+      acls = allowlist.map do |entry|
+        {
           'resources' => [
             {
               'method' => 'ALL',

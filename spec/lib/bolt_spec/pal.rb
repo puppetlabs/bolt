@@ -41,7 +41,7 @@ module BoltSpec
         if cont.is_a? Hash
           mk_files(full_path, cont)
         else
-          File.open(full_path, 'w') { |f| f.write(cont) }
+          File.write(full_path, cont)
         end
       end
     end

@@ -194,7 +194,7 @@ module BoltServer
     def cache_project_file(versioned_project, file_name, data)
       file_dir = create_cache_dir(versioned_project)
       file_path = File.join(file_dir, file_name)
-      serial_execute { File.open(file_path, 'w') { |f| f.write(data) } }
+      serial_execute { File.write(file_path, data) }
     end
   end
 end

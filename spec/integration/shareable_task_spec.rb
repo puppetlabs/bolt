@@ -35,7 +35,7 @@ describe "Shareable tasks with files", bash: true do
   end
 
   it 'fails with an invalid path' do
-    msg = Regexp.new('Files must be saved in module directories that Puppet makes '\
+    msg = Regexp.new('Files must be saved in module directories that Puppet makes ' \
                      'available via mount points: files, lib, scripts, tasks')
     expect {
       run_cli_json(%w[task run shareable::invalid_path] + config_flags)
@@ -45,7 +45,7 @@ describe "Shareable tasks with files", bash: true do
   it 'fails with a file referenced as a directory' do
     msg = if Bolt::Util.windows?
             'Files specified in task metadata cannot include a trailing slash: ' \
-            'results/lib/puppet/functions/results/make_result.rb/'
+              'results/lib/puppet/functions/results/make_result.rb/'
           else
             %r{Could not find .*results/lib/puppet/functions/results/make_result.rb/ on disk}
           end

@@ -55,7 +55,7 @@ module Bolt
         rescue StandardError
           Bolt::Logger.warn(
             "non_writeable_project",
-            "Could not create default project at #{path}. Continuing without a writeable project. "\
+            "Could not create default project at #{path}. Continuing without a writeable project. " \
             "Log and rerun files will not be written."
           )
         end
@@ -67,7 +67,7 @@ module Bolt
 
       if !Bolt::Util.windows? && type != 'environment' && fullpath.world_writable?
         raise Bolt::Error.new(
-          "Project directory '#{fullpath}' is world-writable which poses a security risk. Set "\
+          "Project directory '#{fullpath}' is world-writable which poses a security risk. Set " \
           "BOLT_PROJECT='#{fullpath}' to force the use of this project directory.",
           "bolt/world-writable-error"
         )
@@ -203,8 +203,8 @@ module Bolt
           and can include lowercase letters, numbers, and underscores.
           ERROR_STRING
         elsif Dir.children(Bolt::Config::Modulepath::BOLTLIB_PATH).include?(name)
-          raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts "\
-            "with a built-in Bolt module of the same name."
+          raise Bolt::ValidationError, "The project '#{name}' will not be loaded. The project name conflicts " \
+                                       "with a built-in Bolt module of the same name."
         end
       elsif name.nil? &&
             (File.directory?(plans_path) ||
