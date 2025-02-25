@@ -394,7 +394,7 @@ describe 'apply', apply: true do
                     'plugin' => 'task',
                     'task' => 'puppet_agent::install',
                     'parameters' => {
-                      'version' => '7.0.0'
+                      'version' => '8.0.0'
                     }
                   }
                 }
