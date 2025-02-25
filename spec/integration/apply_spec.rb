@@ -418,7 +418,7 @@ describe 'apply', apply: true do
           result = results['items']
           expect(result.count).to eq(1)
           expect(result[0]).to include('status' => 'success')
-          expect(result[0]['value']['version']).to match(/^7\.0/)
+          expect(result[0]['value']['version']).to match(/^8\.0/)
         end
       end
     end
