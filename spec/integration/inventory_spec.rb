@@ -18,29 +18,29 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
   let(:inventory) do
     { targets: [
-      { uri: conn[:host],
-        config: {
-          transport: conn[:protocol],
-          conn[:protocol] => {
-            user: conn[:user],
-            port: conn[:port],
-            'connect-timeout': conn[:'connect-timeout'] || 120
-          }
-        } },
-      { name: 'uriless',
-        config: {
-          transport: conn[:protocol],
-          conn[:protocol] => {
-            host: conn[:host],
-            user: conn[:user],
-            port: conn[:port]
-          }
-        } },
-      { name: 'hostless',
-        config: {
-          transport: conn[:protocol]
-        } }
-    ],
+        { uri: conn[:host],
+          config: {
+            transport: conn[:protocol],
+            conn[:protocol] => {
+              user: conn[:user],
+              port: conn[:port],
+              'connect-timeout': conn[:'connect-timeout'] || 120
+            }
+          } },
+        { name: 'uriless',
+          config: {
+            transport: conn[:protocol],
+            conn[:protocol] => {
+              host: conn[:host],
+              user: conn[:user],
+              port: conn[:port]
+            }
+          } },
+        { name: 'hostless',
+          config: {
+            transport: conn[:protocol]
+          } }
+      ],
       groups: [{
         name: "group1",
         targets: [
