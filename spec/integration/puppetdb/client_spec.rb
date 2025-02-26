@@ -126,9 +126,9 @@ describe Bolt::PuppetDB::Client do
 
     def facts_hash
       { 'node1' => {
-        'foo' => 'bar',
-        'name' => 'node1'
-      },
+          'foo' => 'bar',
+          'name' => 'node1'
+        },
         'node2' => {
           'foo' => 'bar',
           '1' => 'the loneliest number',

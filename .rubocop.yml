@@ -1,5 +1,6 @@
-require:
-  - rubocop-rake
+inherit_from: .rubocop_todo.yml
+
+plugins: rubocop-rake
 
 AllCops:
   NewCops: enable
