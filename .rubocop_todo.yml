@@ -6,31 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 4
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: IndentationWidth.
-# SupportedStyles: special_inside_parentheses, consistent, align_brackets
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: special_inside_parentheses
-
-# Offense count: 6
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: IndentationWidth.
-# SupportedStyles: special_inside_parentheses, consistent, align_braces
-Layout/FirstHashElementIndentation:
-  EnforcedStyle: special_inside_parentheses
-
-# Offense count: 4
-# This cop supports safe autocorrection (--autocorrect).
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: leading, trailing
-Layout/LineContinuationLeadingSpace:
-  Exclude:
-    - 'lib/bolt/config/transport/options.rb'
-    - 'lib/bolt/pal/yaml_plan/parameter.rb'
-    - 'rakelib/docs.rake'
-    - 'spec/unit/pal/yaml_plan/step_spec.rb'
-
 # Offense count: 253
 # This cop supports safe autocorrection (--autocorrect).
 # Configuration parameters: EnforcedStyle.

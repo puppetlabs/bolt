@@ -300,8 +300,8 @@ begin
           },
           {
             "desc" => "Apply manifest code as another user, catching any errors.",
-            "exmp" => "$apply_results = apply($targets, '_catch_errors' => true, '_run_as' => 'bolt') {\n"\
-                      "  file { '/etc/puppetlabs':\n    ensure => present\n  }\n}"
+            "exmp" => "$apply_results = apply($targets, '_catch_errors' => true, '_run_as' => 'bolt') {\n  "\
+                      "file { '/etc/puppetlabs':\n    ensure => present\n  }\n}"
           }
         ],
         "signatures" => [

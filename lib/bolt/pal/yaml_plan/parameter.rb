@@ -26,8 +26,8 @@ module Bolt
           definition_keys = definition.keys.to_set
           unless PARAMETER_KEYS.superset?(definition_keys)
             invalid_keys = definition_keys - PARAMETER_KEYS
-            raise Bolt::Error.new("Plan parameter #{param.inspect} contains illegal key(s)" \
-                                  " #{invalid_keys.to_a.inspect}",
+            raise Bolt::Error.new("Plan parameter #{param.inspect} contains illegal key(s) " \
+                                  "#{invalid_keys.to_a.inspect}",
                                   "bolt/invalid-plan")
           end
         end
