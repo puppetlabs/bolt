@@ -86,7 +86,7 @@ Puppet::Functions.create_function(:puppetdb_command) do
     # Error if the PDB client does not implement :send_command
     unless puppetdb_client.respond_to?(:send_command)
       raise Bolt::Error.new(
-        "PuppetDB client #{puppetdb_client.class} does not implement :send_command, "\
+        "PuppetDB client #{puppetdb_client.class} does not implement :send_command, " \
         "unable to invoke command.",
         'bolt/pdb-command'
       )

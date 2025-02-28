@@ -23,7 +23,7 @@ module Bolt
       # Exit early if project config already includes a spec with this name.
       if project_specs.include?(name)
         @outputter.print_message(
-          "Project configuration file #{project_file} already includes specification "\
+          "Project configuration file #{project_file} already includes specification " \
           "with name #{name}. Nothing to do."
         )
         return true

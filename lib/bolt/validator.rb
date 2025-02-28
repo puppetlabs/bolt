@@ -172,7 +172,7 @@ module Bolt
     private def plugin_reference?(value, plugin_supported)
       if value.is_a?(Hash) && value.key?('_plugin')
         unless plugin_supported
-          @errors << "Value at '#{path}' is a plugin reference, which is unsupported at "\
+          @errors << "Value at '#{path}' is a plugin reference, which is unsupported at " \
                       "this location"
         end
 

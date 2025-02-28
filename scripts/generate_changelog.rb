@@ -27,7 +27,7 @@ class ChangelogGenerator
   def client
     unless @client
       unless ENV['GITHUB_TOKEN']
-        warn "Missing GitHub personal access token. Set $GITHUB_TOKEN with a "\
+        warn "Missing GitHub personal access token. Set $GITHUB_TOKEN with a " \
              "personal access token to use this script."
         exit 1
       end

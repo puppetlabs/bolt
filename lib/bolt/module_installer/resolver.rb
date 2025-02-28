@@ -98,8 +98,8 @@ module Bolt
         # names, but we error early here to provide a more helpful message.
         if (name_conflicts = modules.map(&:name) & unresolved.map(&:name)).any?
           raise Bolt::Error.new(
-            "Detected unresolved module specifications with the same name as a resolved module "\
-            "dependency: #{name_conflicts.join(', ')}. Either remove the unresolved module specification "\
+            "Detected unresolved module specifications with the same name as a resolved module " \
+            "dependency: #{name_conflicts.join(', ')}. Either remove the unresolved module specification " \
             "or set the module with the conflicting dependency to not resolve.",
             "bolt/module-name-conflict-error"
           )

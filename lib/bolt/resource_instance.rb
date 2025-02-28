@@ -14,7 +14,7 @@ module Bolt
 
     # Needed by Puppet to serialize with _pcore_init_hash instead of the object's attributes
     def self._pcore_init_from_hash(_init_hash)
-      raise "ResourceInstance shouldn't be instantiated from a pcore_init class method. "\
+      raise "ResourceInstance shouldn't be instantiated from a pcore_init class method. " \
             "How did this get called?"
     end
 

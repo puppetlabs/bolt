@@ -294,8 +294,8 @@ module Bolt
         end
 
         if options[:action] == 'apply' && options[:leftovers].any?
-          raise Bolt::CLIError, "Unknown argument(s) #{options[:leftovers].join(', ')}. "\
-                                "To apply multiple policies, provide a comma-separated list of "\
+          raise Bolt::CLIError, "Unknown argument(s) #{options[:leftovers].join(', ')}. " \
+                                "To apply multiple policies, provide a comma-separated list of " \
                                 "policy names."
         end
 
@@ -310,7 +310,7 @@ module Bolt
 
       if options[:subcommand] == 'module' && options[:action] == 'install' && options[:object]
         command = Bolt::Util.powershell? ? 'Add-BoltModule -Module' : 'bolt module add'
-        raise Bolt::CLIError, "Invalid argument '#{options[:object]}'. To add a new module to "\
+        raise Bolt::CLIError, "Invalid argument '#{options[:object]}'. To add a new module to " \
                               "the project, run '#{command} #{options[:object]}'."
       end
 
@@ -880,7 +880,7 @@ module Bolt
     #
     private def validate_ps_version
       if Bolt::Util.powershell?
-        command = "powershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy "\
+        command = "powershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy " \
                   "Bypass -Command $PSVersionTable.PSVersion.Major"
         stdout, _stderr, _status = Open3.capture3(command)
 
@@ -935,7 +935,7 @@ module Bolt
     private def with_signal_handling
       handler = Signal.trap :INT do |signo|
         Bolt::Logger.logger(self).info(
-          "Exiting after receiving SIG#{Signal.signame(signo)} signal. "\
+          "Exiting after receiving SIG#{Signal.signame(signo)} signal. " \
           "There might be processes left executing on some targets."
         )
         exit!

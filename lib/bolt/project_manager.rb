@@ -70,14 +70,14 @@ module Bolt
         if modules
           command = Bolt::Util.powershell? ? 'Add-BoltModule -Module' : 'bolt module add'
           raise Bolt::Error.new(
-            "Found existing project directory with #{config.basename} at #{project}, "\
-            "unable to initialize project with modules. To add modules to the project, "\
+            "Found existing project directory with #{config.basename} at #{project}, " \
+            "unable to initialize project with modules. To add modules to the project, " \
             "run '#{command} <module>' instead.",
             'bolt/existing-project-error'
           )
         else
           raise Bolt::Error.new(
-            "Found existing project directory with #{config.basename} at #{project}, "\
+            "Found existing project directory with #{config.basename} at #{project}, " \
             "unable to initialize project.",
             'bolt/existing-project-error'
           )
@@ -85,27 +85,27 @@ module Bolt
       elsif old_config.exist?
         command = Bolt::Util.powershell? ? 'Update-BoltProject' : 'bolt project migrate'
         raise Bolt::Error.new(
-          "Found existing project directory with #{old_config.basename} at #{project}, "\
-          "unable to initialize project. #{old_config.basename} is deprecated. To "\
+          "Found existing project directory with #{old_config.basename} at #{project}, " \
+          "unable to initialize project. #{old_config.basename} is deprecated. To " \
           "update the project to current best practices, run '#{command}'.",
           'bolt/existing-project-error'
         )
       elsif modules && puppetfile.exist?
         raise Bolt::Error.new(
-          "Found existing Puppetfile at #{puppetfile}, unable to initialize project "\
+          "Found existing Puppetfile at #{puppetfile}, unable to initialize project " \
           "with modules.",
           'bolt/existing-puppetfile-error'
         )
       elsif project_name !~ Bolt::Module::MODULE_NAME_REGEX
         if name
           raise Bolt::ValidationError,
-                "The provided project name '#{project_name}' is invalid; project name must "\
-                "begin with a lowercase letter and can include lowercase letters, "\
+                "The provided project name '#{project_name}' is invalid; project name must " \
+                "begin with a lowercase letter and can include lowercase letters, " \
                 "numbers, and underscores."
         else
           command = Bolt::Util.powershell? ? 'New-BoltProject -Name' : 'bolt project init'
           raise Bolt::ValidationError,
-                "The current directory name '#{project_name}' is an invalid project name. "\
+                "The current directory name '#{project_name}' is an invalid project name. " \
                 "Please specify a name using '#{command} <name>'."
         end
       end
@@ -162,8 +162,8 @@ module Bolt
       @outputter.print_message("Migrating project #{@config.project.path}\n\n")
 
       @outputter.print_action_step(
-        "Migrating a Bolt project might make irreversible changes to the project's "\
-        "configuration and inventory files. Before continuing, make sure the "\
+        "Migrating a Bolt project might make irreversible changes to the project's " \
+        "configuration and inventory files. Before continuing, make sure the " \
         "project has a backup or uses a version control system."
       )
 

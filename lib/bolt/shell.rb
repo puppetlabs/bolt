@@ -11,7 +11,7 @@ module Bolt
 
       if Bolt::Logger.stream
         Bolt::Logger.warn_once("stream_experimental",
-                               "The 'stream' option is experimental, and might "\
+                               "The 'stream' option is experimental, and might " \
                                "include breaking changes between minor versions.")
         @stream_logger = Bolt::Logger.logger(:stream)
         # Don't send stream messages to the parent logger

@@ -145,7 +145,7 @@ module Bolt
         # futures being waited on.
         until (futures = get_futures_for_plan(plan_id: plan_id)).map(&:alive?).none?
           if futures.map(&:fiber).include?(Fiber.current)
-            msg = "The wait() function cannot be called with no arguments inside a "\
+            msg = "The wait() function cannot be called with no arguments inside a " \
                   "background block in the same plan."
             raise Bolt::Error.new(msg, 'bolt/infinite-wait')
           end

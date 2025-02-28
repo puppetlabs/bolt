@@ -129,10 +129,10 @@ module Bolt
     def queue_execute(targets)
       if @warn_concurrency && targets.length > @concurrency
         @warn_concurrency = false
-        msg = "The ulimit is low, which might cause file limit issues. Default concurrency has been set to "\
-              "'#{@concurrency}' to mitigate those issues, which might cause Bolt to run slow. "\
-              "Disable this warning by configuring ulimit using 'ulimit -n <limit>' in your shell "\
-              "configuration, or by configuring Bolt's concurrency. "\
+        msg = "The ulimit is low, which might cause file limit issues. Default concurrency has been set to " \
+              "'#{@concurrency}' to mitigate those issues, which might cause Bolt to run slow. " \
+              "Disable this warning by configuring ulimit using 'ulimit -n <limit>' in your shell " \
+              "configuration, or by configuring Bolt's concurrency. " \
               "See https://puppet.com/docs/bolt/latest/bolt_known_issues.html for details."
         Bolt::Logger.warn("low_ulimit", msg)
       end

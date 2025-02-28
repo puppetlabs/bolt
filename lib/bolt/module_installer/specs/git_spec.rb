@@ -39,7 +39,7 @@ module Bolt
 
           if @name.nil? && @resolve == false
             raise Bolt::ValidationError,
-                  "Missing name for Git module specification: #{@git}. Git module specifications "\
+                  "Missing name for Git module specification: #{@git}. Git module specifications " \
                   "must include a 'name' key when 'resolve' is false."
           end
 
@@ -61,9 +61,9 @@ module Bolt
 
           unless (match = name.match(NAME_REGEX))
             raise Bolt::ValidationError,
-                  "Invalid name for Git module specification: #{name}. Name must match "\
-                  "'name' or 'owner/name'. Owner segment can only include letters or digits. "\
-                  "Name segment must start with a lowercase letter and can only include "\
+                  "Invalid name for Git module specification: #{name}. Name must match " \
+                  "'name' or 'owner/name'. Owner segment can only include letters or digits. " \
+                  "Name segment must start with a lowercase letter and can only include " \
                   "lowercase letters, digits, and underscores."
           end
 
@@ -123,8 +123,8 @@ module Bolt
 
             unless module_id
               raise Bolt::Error.new(
-                "Unable to locate metadata and calculate SHA for ref #{@ref} at #{@git}. This may "\
-                "not be a valid module. For more information about how Bolt attempted to locate "\
+                "Unable to locate metadata and calculate SHA for ref #{@ref} at #{@git}. This may " \
+                "not be a valid module. For more information about how Bolt attempted to locate " \
                 "this information, check the debugging logs.",
                 'bolt/missing-module-metadata-error'
               )

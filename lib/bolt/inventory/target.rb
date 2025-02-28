@@ -176,8 +176,8 @@ module Bolt
         if (dotted = facts.keys.select { |name| name.include?('.') }).any?
           Bolt::Logger.deprecate(
             'dotted_fact_name',
-            "Target '#{safe_name}' includes dotted fact names: '#{dotted.join("', '")}'. Dotted fact "\
-            "names are deprecated and Bolt does not automatically convert facts with dotted names to "\
+            "Target '#{safe_name}' includes dotted fact names: '#{dotted.join("', '")}'. Dotted fact " \
+            "names are deprecated and Bolt does not automatically convert facts with dotted names to " \
             "structured facts. For more information, see https://pup.pt/bolt-dotted-facts"
           )
         end

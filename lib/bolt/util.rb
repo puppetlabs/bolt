@@ -52,7 +52,7 @@ module Bolt
         content = File.open(path, "r:UTF-8") { |f| YAML.safe_load(f.read) } || {}
         unless content.is_a?(Hash)
           raise Bolt::FileError.new(
-            "Invalid content for #{file_name} file at #{path}\nContent should be a Hash or empty, "\
+            "Invalid content for #{file_name} file at #{path}\nContent should be a Hash or empty, " \
             "not #{content.class}",
             path
           )
@@ -62,11 +62,11 @@ module Bolt
       rescue Errno::ENOENT
         raise Bolt::FileError.new("Could not read #{file_name} file at #{path}", path)
       rescue Psych::SyntaxError => e
-        raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}, line #{e.line}, "\
+        raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}, line #{e.line}, " \
                                   "column #{e.column}\n#{e.problem}",
                                   path)
       rescue Psych::BadAlias => e
-        raise Bolt::FileError.new('Bolt does not support the use of aliases in YAML files. Alias '\
+        raise Bolt::FileError.new('Bolt does not support the use of aliases in YAML files. Alias ' \
                                   "detected in #{file_name} file at #{path}\n#{e.message}", path)
       rescue Psych::Exception => e
         raise Bolt::FileError.new("Could not parse #{file_name} file at #{path}\n#{e.message}",
@@ -147,7 +147,7 @@ module Bolt
 
         # Only accept paths with '/plans/' or '/tasks/'
         unless path.match?(regex)
-          msg = "Could not determine module from #{path}. "\
+          msg = "Could not determine module from #{path}. " \
             "The path must include 'plans' or 'tasks' directory"
           raise Bolt::Error.new(msg, 'bolt/modulepath-error')
         end

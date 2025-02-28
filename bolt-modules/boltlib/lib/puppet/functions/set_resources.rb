@@ -134,8 +134,8 @@ Puppet::Functions.create_function(:set_resources) do
 
       unless resource.target == target
         file, line = Puppet::Pops::PuppetStack.top_of_stack
-        raise Bolt::ValidationError, "Cannot set resource #{resource.reference} for target "\
-                                     "#{resource.target} on target #{target}. "\
+        raise Bolt::ValidationError, "Cannot set resource #{resource.reference} for target " \
+                                     "#{resource.target} on target #{target}. " \
                                      "#{Puppet::Util::Errors.error_location(file, line)}"
       end
 

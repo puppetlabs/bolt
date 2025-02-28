@@ -143,7 +143,7 @@ Puppet::Functions.create_function(:apply_prep) do
       if unsupported_puppet?(result['clientversion'])
         Bolt::Logger.deprecate(
           "unsupported_puppet",
-          "Detected unsupported Puppet agent version #{result['clientversion']} on target "\
+          "Detected unsupported Puppet agent version #{result['clientversion']} on target " \
           "#{result.target}. Bolt supports Puppet agent 6.0.0 and higher."
         )
       end

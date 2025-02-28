@@ -786,8 +786,8 @@ module Bolt
         info = +''
 
         # Add target count summary
-        count = "#{inventory_count + adhoc_count} total, "\
-                "#{inventory_count} from inventory, "\
+        count = "#{inventory_count + adhoc_count} total, " \
+                "#{inventory_count} from inventory, " \
                 "#{adhoc_count} adhoc"
         info << colorize(:cyan, "Target count\n")
         info << indent(2, count)

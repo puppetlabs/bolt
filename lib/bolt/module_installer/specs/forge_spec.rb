@@ -38,9 +38,9 @@ module Bolt
         private def parse_name(name)
           unless (match = name.match(NAME_REGEX))
             raise Bolt::ValidationError,
-                  "Invalid name for Forge module specification: #{name}. Name must match "\
-                  "'owner/name'. Owner segment can only include letters or digits. Name "\
-                  "segment must start with a lowercase letter and can only include lowercase "\
+                  "Invalid name for Forge module specification: #{name}. Name must match " \
+                  "'owner/name'. Owner segment can only include letters or digits. Name " \
+                  "segment must start with a lowercase letter and can only include lowercase " \
                   "letters, digits, and underscores."
           end
 
@@ -53,7 +53,7 @@ module Bolt
           [version_requirement, SemanticPuppet::VersionRange.parse(version_requirement || '>= 0')]
         rescue StandardError
           raise Bolt::ValidationError,
-                "Invalid version requirement for Forge module specification #{@full_name}: "\
+                "Invalid version requirement for Forge module specification #{@full_name}: " \
                 "#{version_requirement.inspect}"
         end
 

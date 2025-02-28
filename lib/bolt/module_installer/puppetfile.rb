@@ -56,7 +56,7 @@ module Bolt
           else
             unless skip_unsupported_modules
               raise Bolt::ValidationError,
-                    "Cannot parse Puppetfile at #{path}, module '#{mod.title}' is not a "\
+                    "Cannot parse Puppetfile at #{path}, module '#{mod.title}' is not a " \
                     "Puppet Forge or Git module."
             end
           end

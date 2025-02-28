@@ -192,7 +192,7 @@ module Bolt
             rescue Puppet::PreformattedError => e
               if e.issue_code == :UNKNOWN_VARIABLE &&
                  %w[facts trusted server_facts settings].include?(e.arguments[:name])
-                message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope "\
+                message = "Evaluation Error: Variable '#{e.arguments[:name]}' is not available in the current scope " \
                           "unless explicitly defined."
                 details = { file: e.file, line: e.line, column: e.pos }
                 PALError.new(message, details)
