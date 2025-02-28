@@ -35,7 +35,7 @@ describe "Shareable tasks with files", bash: true do
   end
 
   it 'fails with an invalid path' do
-    msg = Regexp.new('Files must be saved in module directories that Puppet makes '\
+    msg = Regexp.new('Files must be saved in module directories that Puppet makes ' \
                      'available via mount points: files, lib, scripts, tasks')
     expect {
       run_cli_json(%w[task run shareable::invalid_path] + config_flags)

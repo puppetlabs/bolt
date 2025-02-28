@@ -72,7 +72,7 @@ module Bolt
               message = "GitHub API rate limit exceeded, unable to calculate SHA."
 
               unless ENV['GITHUB_TOKEN']
-                message += " To increase your rate limit, set the GITHUB_TOKEN environment "\
+                message += " To increase your rate limit, set the GITHUB_TOKEN environment " \
                           "variable with a GitHub personal access token."
               end
 

@@ -41,7 +41,7 @@ module Bolt
 
           begin
             @outputter.print_action_step(
-              "Moving transportation configuration options '#{transport_data.keys.join(', ')}' "\
+              "Moving transportation configuration options '#{transport_data.keys.join(', ')}' " \
               "from bolt.yaml to inventory.yaml"
             )
 
@@ -57,8 +57,8 @@ module Bolt
 
         command = Bolt::Util.powershell? ? 'Get-Help about_bolt_project' : 'bolt guide project'
         @outputter.print_action_step(
-          "Successfully migrated config. Please add a 'name' key to bolt-project.yaml "\
-          "to use project-level tasks and plans. Learn more about projects by running "\
+          "Successfully migrated config. Please add a 'name' key to bolt-project.yaml " \
+          "to use project-level tasks and plans. Learn more about projects by running " \
           "'#{command}'."
         )
 

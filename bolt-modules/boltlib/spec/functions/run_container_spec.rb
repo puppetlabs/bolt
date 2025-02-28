@@ -69,8 +69,8 @@ describe 'run_container' do
       end
 
       let(:msg) {
-        "docker: Error response from daemon: OCI runtime create failed: "\
-                  "container_linux.go:367: starting container process caused: exec: "\
+        "docker: Error response from daemon: OCI runtime create failed: " \
+                  "container_linux.go:367: starting container process caused: exec: " \
                   "\"foo\": executable file not found in $PATH: unknown.\n"
       }
       let(:value) do

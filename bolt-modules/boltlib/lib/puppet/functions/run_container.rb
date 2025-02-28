@@ -127,7 +127,7 @@ Puppet::Functions.create_function(:run_container) do
       end
 
       if (bad_vs = volumes.reject { |k, v| k.is_a?(String) && v.is_a?(String) }).any?
-        msg = "Option 'volumes' only accepts strings for keys and values. "\
+        msg = "Option 'volumes' only accepts strings for keys and values. " \
           "Received: #{bad_vs.map(&:inspect).join(', ')}"
         raise Bolt::ValidationError, msg
       end
@@ -153,7 +153,7 @@ Puppet::Functions.create_function(:run_container) do
       end
 
       if (bad_ps = ports.reject { |k, v| k.is_a?(Integer) && v.is_a?(Integer) }).any?
-        msg = "Option 'ports' only accepts integers for keys and values. "\
+        msg = "Option 'ports' only accepts integers for keys and values. " \
           "Received: #{bad_ps.map(&:inspect).join(', ')}"
         raise Bolt::ValidationError, msg
       end

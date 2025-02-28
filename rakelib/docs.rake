@@ -284,14 +284,14 @@ begin
 
       apply = {
         "name"       => "apply",
-        "desc"       => "Applies a block of manifest code to the targets.\n\nApplying manifest "\
-                        "code requires facts to compile a catalog. Targets must also have "\
-                        "the Puppet agent package installed to apply manifest code. To prep "\
-                        "targets for an apply, call the [apply_prep](#apply-prep) function before "\
-                        "the apply function.\n\nTo learn more about applying manifest code from a plan, "\
-                        "see [Applying manifest blocks from a Puppet "\
-                        "plan](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan).\n\n"\
-                        "> **Note:** The `apply` function returns a `ResultSet` object containing `ApplyResult`\n"\
+        "desc"       => "Applies a block of manifest code to the targets.\n\nApplying manifest " \
+                        "code requires facts to compile a catalog. Targets must also have " \
+                        "the Puppet agent package installed to apply manifest code. To prep " \
+                        "targets for an apply, call the [apply_prep](#apply-prep) function before " \
+                        "the apply function.\n\nTo learn more about applying manifest code from a plan, " \
+                        "see [Applying manifest blocks from a Puppet " \
+                        "plan](applying_manifest_blocks.md#applying-manifest-blocks-from-a-puppet-plan).\n\n" \
+                        "> **Note:** The `apply` function returns a `ResultSet` object containing `ApplyResult`\n" \
                         "> objects.",
         "examples"   => [
           {
@@ -300,7 +300,7 @@ begin
           },
           {
             "desc" => "Apply manifest code as another user, catching any errors.",
-            "exmp" => "$apply_results = apply($targets, '_catch_errors' => true, '_run_as' => 'bolt') {\n  "\
+            "exmp" => "$apply_results = apply($targets, '_catch_errors' => true, '_run_as' => 'bolt') {\n  " \
                       "file { '/etc/puppetlabs':\n    ensure => present\n  }\n}"
           }
         ],
@@ -310,27 +310,27 @@ begin
             "return"    => "ResultSet",
             "options"   => {
               "_catch_errors" => {
-                "desc" => "When `true`, returns a `ResultSet` including failed results, rather "\
+                "desc" => "When `true`, returns a `ResultSet` including failed results, rather " \
                           "than failing the plan.",
                 "type" => "Boolean"
               },
               "_description" => {
-                "desc" => "Adds a description to the apply block, allowing you to distinguish "\
+                "desc" => "Adds a description to the apply block, allowing you to distinguish " \
                           "apply blocks.",
                 "type" => "String"
               },
               "_noop" => {
-                "desc" => "When `true`, applies the manifest block in Puppet no-operation mode, "\
+                "desc" => "When `true`, applies the manifest block in Puppet no-operation mode, " \
                           "returning a report of the changes it would make while taking no action.",
                 "type" => "Boolean"
               },
               "_puppetdb" => {
-                "desc" => "The named PuppetDB instance to connect to when making PuppetDB queries "\
+                "desc" => "The named PuppetDB instance to connect to when making PuppetDB queries " \
                           "during catalog compilation.",
                 "type" => "String"
               },
               "_run_as" => {
-                "desc" => "The user to apply the manifest block as. Only available for transports "\
+                "desc" => "The user to apply the manifest block as. Only available for transports " \
                           "that support the `run-as` option.",
                 "type" => "String"
               }

@@ -111,7 +111,7 @@ Puppet::Functions.create_function(:wait, Puppet::Functions::InternalFunction) do
     valid, unknown = options.partition { |k, _v| %w[_catch_errors].include?(k) }.map(&:to_h)
     if unknown.any?
       file, line = Puppet::Pops::PuppetStack.top_of_stack
-      msg = "The wait() function call in #{file}#L#{line} received unknown options "\
+      msg = "The wait() function call in #{file}#L#{line} received unknown options " \
         "#{unknown.keys}. Removing unknown options and continuing..."
       Bolt::Logger.warn("plan_function_options", msg)
     end

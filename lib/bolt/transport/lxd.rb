@@ -13,7 +13,7 @@ module Bolt
 
       def with_connection(target, options = {})
         Bolt::Logger.warn_once("lxd_experimental",
-                               "The LXD transport is experimental, and might "\
+                               "The LXD transport is experimental, and might " \
                                "include breaking changes between minor versions.")
         conn = Connection.new(target, options)
         conn.connect

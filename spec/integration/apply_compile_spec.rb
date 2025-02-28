@@ -64,7 +64,7 @@ describe "passes parsed AST to the apply_catalog task", apply: true do
       notify = get_notifies(result)
       expect(notify.count).to eq(1)
       expect(notify[0]['title']).to eq(
-        "trusted {authenticated => local, certname => #{uri}, extensions => {}, "\
+        "trusted {authenticated => local, certname => #{uri}, extensions => {}, " \
         "hostname => #{uri}, domain => , external => {}}"
       )
     end
@@ -76,7 +76,7 @@ describe "passes parsed AST to the apply_catalog task", apply: true do
         notify = get_notifies(result)
         expect(notify.count).to eq(1)
         expect(notify[0]['title']).to eq(
-          "trusted {authenticated => local, certname => #{uri}, extensions => {}, "\
+          "trusted {authenticated => local, certname => #{uri}, extensions => {}, " \
           "hostname => #{uri}, domain => , external => {hot => cocoa, pepper => mint}}"
         )
       end

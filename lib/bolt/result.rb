@@ -81,7 +81,7 @@ module Bolt
         unless value['_error'].is_a?(Hash) && value['_error'].key?('msg')
           details['original_error'] = value['_error']
           value['_error'] = {
-            'msg'     => "Invalid error returned from task #{task}: #{value['_error'].inspect}. Error "\
+            'msg'     => "Invalid error returned from task #{task}: #{value['_error'].inspect}. Error " \
                          "must be an object with a msg key.",
             'kind'    => 'bolt/invalid-task-error',
             'details' => details
