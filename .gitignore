@@ -21,7 +21,7 @@
 
 ## Environment normalization:
 /.bundle/
-/vendor/bundle
+/vendor/
 /lib/bundler/man/
 
 Gemfile.lock
