@@ -14,28 +14,28 @@ describe 'running with an inventory file', reset_puppet_settings: true, ssh: tru
   let(:conn) { conn_info('ssh') }
   let(:inventory) do
     { 'targets' => [
-      { 'uri' => conn[:host],
-        'config' => {
-          'transport' => conn[:protocol],
-          conn[:protocol] => {
-            'user' => conn[:user],
-            'port' => conn[:port],
-            'password' => conn[:password]
-          }
-        } },
-      { 'uri' => 'remote://simple.example.com',
-        'config' => {
-          'remote' => {
-            'run-on' => conn[:host],
-            'token' => 'token_val'
-          }
-        } },
-      { 'uri' => 'https://www.example.com',
-        'config' => {
-          'transport' => 'remote',
-          'remote' => { 'run-on': conn[:host] }
-        } }
-    ],
+        { 'uri' => conn[:host],
+          'config' => {
+            'transport' => conn[:protocol],
+            conn[:protocol] => {
+              'user' => conn[:user],
+              'port' => conn[:port],
+              'password' => conn[:password]
+            }
+          } },
+        { 'uri' => 'remote://simple.example.com',
+          'config' => {
+            'remote' => {
+              'run-on' => conn[:host],
+              'token' => 'token_val'
+            }
+          } },
+        { 'uri' => 'https://www.example.com',
+          'config' => {
+            'transport' => 'remote',
+            'remote' => { 'run-on': conn[:host] }
+          } }
+      ],
       'config' => {
         'ssh' => { 'host-key-check' => false },
         'winrm' => { 'ssl' => false, 'ssl-verify' => false }

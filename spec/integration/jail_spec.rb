@@ -85,8 +85,7 @@ describe "when runnning over the jail transport", jail: true do
     let(:default_inv) do
       {
         'config' => {
-          'jail' => {
-          }
+          'jail' => {}
         }
       }
     end
@@ -102,8 +101,7 @@ describe "when runnning over the jail transport", jail: true do
     let(:run_as_conf) do
       {
         'config' => {
-          'jail' => {
-          }
+          'jail' => {}
         }
       }
     end

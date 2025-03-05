@@ -53,8 +53,7 @@ describe Bolt::Logger do
   describe '::configure' do
     let(:appenders) {
       {
-        'file:/bolt.log' => {
-        },
+        'file:/bolt.log' => {},
         'file:/debug.log' => {
           level: :debug,
           append: false
