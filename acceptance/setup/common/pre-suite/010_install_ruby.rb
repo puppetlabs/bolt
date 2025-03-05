@@ -24,12 +24,32 @@ PS
       on(bolt, powershell('ridk install 2 3'))
       # Add the msys bins to PATH
       bolt.add_env_var('PATH', "/cygdrive/c/tools/msys64:PATH")
-    when /debian|ubuntu/
+    when /debian/
       # TODO: allow for tests to work or ruby3 on ubuntu
       # install system ruby packages
       install_package(bolt, 'ruby')
       install_package(bolt, 'ruby-dev')
       install_package(bolt, 'ruby-ffi')
+    when /ubuntu/
+      # install system ruby packages
+      install_package(bolt, 'ruby')
+      install_package(bolt, 'ruby-dev')
+      install_package(bolt, 'ruby-ffi')
+
+      # we are assuming ubuntu 2004 is the only version for now
+      # ubuntu 2004 has ruby 2.7.0 and is not natively compatible with Ruby 3+
+      # so we need to use a PPA to install Ruby 3+ (rbenv in this case)
+      on(bolt, 'apt-get update')
+      # basic rbenv from apt is not updated to for ubuntu and does not offer ruby 3+, therefore
+      # we need to install rbenv from source
+      on(bolt, 'apt install git -y')
+      on(bolt, 'curl -fsSL https://github.com/rbenv/rbenv-installer/raw/HEAD/bin/rbenv-installer | bash')
+      on(bolt, 'apt install rbenv -y')
+      # selecting our preferred ruby version and refreshing the shell source
+      on(bolt, 'rbenv install 3.1.6')
+      on(bolt, 'rbenv global 3.1.6')
+      on(bolt, 'source ~/.bashrc')
+      on(bolt, 'ruby --version')
     when /el-|centos/
       # install system ruby packages
       install_package(bolt, 'ruby')
