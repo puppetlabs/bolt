@@ -145,7 +145,7 @@ module Bolt
             options[:params_parsed] = true
           elsif params.any?
             options[:params_parsed] = false
-            options[:params] = Hash[params.map { |a| a.split('=', 2) }]
+            options[:params] = params.map { |a| a.split('=', 2) }.to_h
           else
             options[:params_parsed] = true
             options[:params] = {}
@@ -271,7 +271,7 @@ module Bolt
       end
 
       if options[:subcommand] == 'secret' &&
-         (options[:action] == 'decrypt' || options[:action] == 'encrypt') &&
+         %w[decrypt encrypt].include?(options[:action]) &&
          !options[:object]
         raise Bolt::CLIError, "Must specify a value to #{options[:action]}"
       end
@@ -294,8 +294,8 @@ module Bolt
         end
 
         if options[:action] == 'apply' && options[:leftovers].any?
-          raise Bolt::CLIError, "Unknown argument(s) #{options[:leftovers].join(', ')}. "\
-                                "To apply multiple policies, provide a comma-separated list of "\
+          raise Bolt::CLIError, "Unknown argument(s) #{options[:leftovers].join(', ')}. " \
+                                "To apply multiple policies, provide a comma-separated list of " \
                                 "policy names."
         end
 
@@ -310,7 +310,7 @@ module Bolt
 
       if options[:subcommand] == 'module' && options[:action] == 'install' && options[:object]
         command = Bolt::Util.powershell? ? 'Add-BoltModule -Module' : 'bolt module add'
-        raise Bolt::CLIError, "Invalid argument '#{options[:object]}'. To add a new module to "\
+        raise Bolt::CLIError, "Invalid argument '#{options[:object]}'. To add a new module to " \
                               "the project, run '#{command} #{options[:object]}'."
       end
 
@@ -475,9 +475,9 @@ module Bolt
           config.check_path_case('modulepath', config.modulepath)
 
           if options[:clear_cache]
-            FileUtils.rm(config.project.plugin_cache_file) if File.exist?(config.project.plugin_cache_file)
-            FileUtils.rm(config.project.task_cache_file) if File.exist?(config.project.task_cache_file)
-            FileUtils.rm(config.project.plan_cache_file) if File.exist?(config.project.plan_cache_file)
+            FileUtils.rm_f(config.project.plugin_cache_file)
+            FileUtils.rm_f(config.project.task_cache_file)
+            FileUtils.rm_f(config.project.plan_cache_file)
           end
 
           case command
@@ -827,7 +827,7 @@ module Bolt
     #
     private def parse_vars(vars)
       return unless vars
-      Hash[vars.map { |a| a.split('=', 2) }]
+      vars.map { |a| a.split('=', 2) }.to_h
     end
 
     # TODO: See if this can be moved to Bolt::Analytics.
@@ -880,7 +880,7 @@ module Bolt
     #
     private def validate_ps_version
       if Bolt::Util.powershell?
-        command = "powershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy "\
+        command = "powershell.exe -NoProfile -NonInteractive -NoLogo -ExecutionPolicy " \
                   "Bypass -Command $PSVersionTable.PSVersion.Major"
         stdout, _stderr, _status = Open3.capture3(command)
 
@@ -909,7 +909,7 @@ module Bolt
         acc.concat(Bolt::BoltOptionParser::OPTIONS[key])
       end
 
-      inventory_cli_opts.concat(%w[no-host-key-check no-ssl no-ssl-verify no-tty])
+      inventory_cli_opts.push("no-host-key-check", "no-ssl", "no-ssl-verify", "no-tty")
 
       conflicting_options = Set.new(opts.keys.map(&:to_s)).intersection(inventory_cli_opts)
 
@@ -935,7 +935,7 @@ module Bolt
     private def with_signal_handling
       handler = Signal.trap :INT do |signo|
         Bolt::Logger.logger(self).info(
-          "Exiting after receiving SIG#{Signal.signame(signo)} signal. "\
+          "Exiting after receiving SIG#{Signal.signame(signo)} signal. " \
           "There might be processes left executing on some targets."
         )
         exit!

@@ -156,7 +156,8 @@ describe Bolt::Transport::Local do
     it 'does not issue the warning' do
       expect(Bolt::Logger).not_to receive(:warn_once)
         .with(anything, /The local transport will default/)
-      subject.with_connection(get_target(inventory, uri)) do |conn|; end
+      subject.with_connection(get_target(inventory, uri)) do |conn|
+      end
     end
 
     it 'unbundles the env' do

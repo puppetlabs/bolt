@@ -92,8 +92,8 @@ describe Bolt::PAL::YamlPlan::Step do
           "parameters" => { "butter" => "crunchy peanut" } }
       end
       let(:output) {
-        "  run_task('jam::raspberry', $bread, 'delicious',"\
-                     " {'butter' => 'crunchy peanut'})\n"
+        "  run_task('jam::raspberry', $bread, 'delicious', " \
+          "{'butter' => 'crunchy peanut'})\n"
       }
 
       include_examples 'metaparameters'

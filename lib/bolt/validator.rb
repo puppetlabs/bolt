@@ -172,8 +172,8 @@ module Bolt
     private def plugin_reference?(value, plugin_supported)
       if value.is_a?(Hash) && value.key?('_plugin')
         unless plugin_supported
-          @errors << "Value at '#{path}' is a plugin reference, which is unsupported at "\
-                      "this location"
+          @errors << "Value at '#{path}' is a plugin reference, which is unsupported at " \
+                     "this location"
         end
 
         true
@@ -189,7 +189,7 @@ module Bolt
     # this will safeguard against any dev mistakes).
     #
     private def valid_type?(value, definition)
-      return unless definition.key?(:type)
+      return false unless definition.key?(:type)
 
       types = Array(definition[:type])
 

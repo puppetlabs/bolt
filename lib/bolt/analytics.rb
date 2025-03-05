@@ -59,7 +59,7 @@ module Bolt
 
       if File.exist?(path)
         if File.exist?(old_path)
-          message = "Detected analytics configuration files at '#{old_path}' and '#{path}'. Loading "\
+          message = "Detected analytics configuration files at '#{old_path}' and '#{path}'. Loading " \
                     "analytics configuration from '#{path}'."
           Bolt::Logger.warn_once('duplicate_analytics', message)
         end

@@ -44,7 +44,7 @@ module BoltServer
         @data[key] = if int_keys.include?(key)
                        ENV[transformed_key].to_i
                      else
-                       ENV[transformed_key]
+                       ENV.fetch(transformed_key, nil)
                      end
       end
     end

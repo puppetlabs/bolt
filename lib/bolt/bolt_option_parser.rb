@@ -1119,8 +1119,8 @@ module Bolt
         if File.exist?(path) || Pathname.new(path).absolute? ||
            !%w[scripts files].include?(path.split(File::SEPARATOR)[1])
           raise Bolt::CLIError, "The script must be a detailed Puppet file reference, " \
-            "for example 'mymodule/scripts/myscript.sh'. See http://pup.pt/bolt-scripts for " \
-            "more information on detailed Puppet file references."
+                                "for example 'mymodule/scripts/myscript.sh'. See http://pup.pt/bolt-scripts for " \
+                                "more information on detailed Puppet file references."
         end
 
         @options[:plan_script] = path
@@ -1129,8 +1129,8 @@ module Bolt
       separator "\n#{self.class.colorize(:cyan, 'Display options')}"
       define('--filter FILTER', 'Filter tasks and plans by a matching substring.') do |filter|
         unless /^[a-z0-9_:]+$/.match(filter)
-          msg = "Illegal characters in filter string '#{filter}'. Filters can "\
-          "only include lowercase letters, numbers, underscores, and colons."
+          msg = "Illegal characters in filter string '#{filter}'. Filters can " \
+                "only include lowercase letters, numbers, underscores, and colons."
           raise Bolt::CLIError, msg
         end
         @options[:filter] = filter
@@ -1214,7 +1214,7 @@ module Bolt
     end
 
     def permute(args)
-      super(args)
+      super
     rescue OptionParser::MissingArgument => e
       raise Bolt::CLIError, "Option '#{e.args.first}' needs a parameter"
     rescue OptionParser::InvalidArgument => e

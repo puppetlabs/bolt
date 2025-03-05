@@ -65,7 +65,7 @@ module Bolt
         def initialize(data = {}, project = nil)
           assert_hash_or_config(data)
           @native = true if data['native-ssh']
-          super(data, project)
+          super
         end
 
         # This method is used to filter CLI options in the Config class. This

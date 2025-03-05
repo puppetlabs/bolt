@@ -48,7 +48,7 @@ module BoltSpec
       end
 
       def error_with(data, clazz = Bolt::PlanFailure)
-        super(data, clazz)
+        super
       end
     end
   end

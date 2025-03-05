@@ -74,8 +74,8 @@ module Bolt
               message = "GitLab API rate limit exceeded, unable to calculate SHA."
 
               unless ENV['GITLAB_TOKEN']
-                message += " To increase your rate limit, set the GITLAB_TOKEN environment "\
-                          "variable with a GitLab personal access token."
+                message += " To increase your rate limit, set the GITLAB_TOKEN environment " \
+                           "variable with a GitLab personal access token."
               end
 
               Bolt::Logger.debug(message)

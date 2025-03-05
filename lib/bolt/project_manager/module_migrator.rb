@@ -21,8 +21,8 @@ module Bolt
         # Notify user to manually migrate modules if using non-default modulepath
         if configured_modulepath != new_modulepath && configured_modulepath != old_modulepath
           @outputter.print_action_step(
-            "Project has a non-default configured modulepath, unable to automatically "\
-            "migrate project modules. To migrate project modules manually, see "\
+            "Project has a non-default configured modulepath, unable to automatically " \
+            "migrate project modules. To migrate project modules manually, see " \
             "http://pup.pt/bolt-modules"
           )
           true
@@ -106,7 +106,7 @@ module Bolt
           Bolt::ModuleInstaller::Installer.new.install(puppetfile_path, managed_moduledir)
         else
           @outputter.print_action_step(
-            "Project does not include any managed modules, deleting Puppetfile "\
+            "Project does not include any managed modules, deleting Puppetfile " \
             "at #{puppetfile_path}"
           )
           FileUtils.rm(puppetfile_path)
@@ -118,9 +118,9 @@ module Bolt
       #
       private def select_modules(modules)
         @outputter.print_action_step(
-          "Select modules that are direct dependencies of your project. Bolt will "\
-          "automatically manage dependencies for each module selected, so do not "\
-          "select a module's dependencies unless you use content from it directly "\
+          "Select modules that are direct dependencies of your project. Bolt will " \
+          "automatically manage dependencies for each module selected, so do not " \
+          "select a module's dependencies unless you use content from it directly " \
           "in your project."
         )
 

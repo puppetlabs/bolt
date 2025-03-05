@@ -18,11 +18,11 @@ module Bolt
           },
           "batch-mode" => {
             type: [TrueClass, FalseClass],
-            description: "Whether to disable password querying. When set to `false`, SSH will fall back to "\
-                         "prompting for a password if key authentication fails. This might cause Bolt to hang. "\
-                         "To prevent Bolt from hanging, you can configure `ssh-command` to use an SSH utility "\
-                         "such as sshpass that supports providing a password non-interactively. For more "\
-                         "information, see [Providing a password non-interactively using "\
+            description: "Whether to disable password querying. When set to `false`, SSH will fall back to " \
+                         "prompting for a password if key authentication fails. This might cause Bolt to hang. " \
+                         "To prevent Bolt from hanging, you can configure `ssh-command` to use an SSH utility " \
+                         "such as sshpass that supports providing a password non-interactively. For more " \
+                         "information, see [Providing a password non-interactively using " \
                          "`native-ssh`](troubleshooting.md#providing-a-password-non-interactively-using-native-ssh).",
             _plugin: true,
             _default: true,
@@ -43,9 +43,9 @@ module Bolt
           },
           "cleanup" => {
             type: [TrueClass, FalseClass],
-            description: "Whether to clean up temporary files created on targets. When running commands on a target, "\
-                         "Bolt might create temporary files. After completing the command, these files are "\
-                         "automatically deleted. This value can be set to 'false' if you wish to leave these "\
+            description: "Whether to clean up temporary files created on targets. When running commands on a target, " \
+                         "Bolt might create temporary files. After completing the command, these files are " \
+                         "automatically deleted. This value can be set to 'false' if you wish to leave these " \
                          "temporary files on the target.",
             _plugin: true,
             _default: true,
@@ -53,7 +53,7 @@ module Bolt
           },
           "connect-timeout" => {
             type: Integer,
-            description: "How long to wait in seconds when establishing connections. Set this value higher if you "\
+            description: "How long to wait in seconds when establishing connections. Set this value higher if you " \
                          "frequently encounter connection timeout errors when running Bolt.",
             minimum: 1,
             _plugin: true,
@@ -62,9 +62,9 @@ module Bolt
           },
           "copy-command" => {
             type: [Array, String],
-            description: "The command to use when copying files using native SSH. Bolt runs `<copy-command> <src> "\
-                         "<dest>`. This option is used when you need support for features or algorithms that are not "\
-                         "supported by the net-ssh Ruby library. **This option is experimental.** You can read more "\
+            description: "The command to use when copying files using native SSH. Bolt runs `<copy-command> <src> " \
+                         "<dest>`. This option is used when you need support for features or algorithms that are not " \
+                         "supported by the net-ssh Ruby library. **This option is experimental.** You can read more " \
                          "about this option in [Native SSH transport](experimental_features.md#native-ssh-transport).",
             items: {
               type: String
@@ -83,11 +83,11 @@ module Bolt
           },
           "encryption-algorithms" => {
             type: Array,
-            description: "A list of encryption algorithms to use when establishing a connection "\
-                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be "\
-                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, "\
-                         "non-deprecated algorithms are available by default when this option is not used. To "\
-                         "reference all default algorithms using this option, add 'defaults' to the list of "\
+            description: "A list of encryption algorithms to use when establishing a connection " \
+                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be " \
+                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, " \
+                         "non-deprecated algorithms are available by default when this option is not used. To " \
+                         "reference all default algorithms using this option, add 'defaults' to the list of " \
                          "supported algorithms.",
             uniqueItems: true,
             items: {
@@ -98,11 +98,11 @@ module Bolt
           },
           "extensions" => {
             type: Array,
-            description: "A list of file extensions that are accepted for scripts or tasks on "\
-                         "Windows. Scripts with these file extensions rely on the target's file "\
-                         "type association to run. For example, if Python is installed on the "\
-                         "system, a `.py` script runs with `python.exe`. The extensions `.ps1`, "\
-                         "`.rb`, and `.pp` are always allowed and run via hard-coded "\
+            description: "A list of file extensions that are accepted for scripts or tasks on " \
+                         "Windows. Scripts with these file extensions rely on the target's file " \
+                         "type association to run. For example, if Python is installed on the " \
+                         "system, a `.py` script runs with `python.exe`. The extensions `.ps1`, " \
+                         "`.rb`, and `.pp` are always allowed and run via hard-coded " \
                          "executables.",
             uniqueItems: true,
             items: {
@@ -113,7 +113,7 @@ module Bolt
           },
           "file-protocol" => {
             type: String,
-            description: "Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is "\
+            description: "Which file transfer protocol to use. Either `winrm` or `smb`. Using `smb` is " \
                          "recommended for large file transfers.",
             enum: %w[smb winrm],
             _plugin: true,
@@ -128,11 +128,11 @@ module Bolt
           },
           "host-key-algorithms" => {
             type: Array,
-            description: "A list of host key algorithms to use when establishing a connection "\
-                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be "\
-                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, "\
-                         "non-deprecated algorithms are available by default when this option is not used. To "\
-                         "reference all default algorithms using this option, add 'defaults' to the list of "\
+            description: "A list of host key algorithms to use when establishing a connection " \
+                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be " \
+                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, " \
+                         "non-deprecated algorithms are available by default when this option is not used. To " \
+                         "reference all default algorithms using this option, add 'defaults' to the list of " \
                          "supported algorithms.",
             uniqueItems: true,
             items: {
@@ -149,10 +149,10 @@ module Bolt
           },
           "interpreters" => {
             type: Hash,
-            description: "A map of an extension name to the absolute path of an executable,  enabling you to "\
-                         "override the shebang defined in a task executable. The extension can optionally be "\
-                         "specified with the `.` character (`.py` and `py` both map to a task executable "\
-                         "`task.py`) and the extension is case sensitive. When a target's name is `localhost`, "\
+            description: "A map of an extension name to the absolute path of an executable,  enabling you to " \
+                         "override the shebang defined in a task executable. The extension can optionally be " \
+                         "specified with the `.` character (`.py` and `py` both map to a task executable " \
+                         "`task.py`) and the extension is case sensitive. When a target's name is `localhost`, " \
                          "Ruby tasks run with the Bolt Ruby interpreter by default.",
             additionalProperties: {
               type: [String, Array],
@@ -181,11 +181,11 @@ module Bolt
           },
           "kex-algorithms" => {
             type: Array,
-            description: "A list of key exchange algorithms to use when establishing a connection "\
-                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be "\
-                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, "\
-                         "non-deprecated algorithms are available by default when this option is not used. To "\
-                         "reference all default algorithms using this option, add 'defaults' to the list of "\
+            description: "A list of key exchange algorithms to use when establishing a connection " \
+                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be " \
+                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, " \
+                         "non-deprecated algorithms are available by default when this option is not used. To " \
+                         "reference all default algorithms using this option, add 'defaults' to the list of " \
                          "supported algorithms.",
             uniqueItems: true,
             items: {
@@ -212,11 +212,11 @@ module Bolt
           },
           "mac-algorithms" => {
             type: Array,
-            description: "List of message authentication code algorithms to use when establishing a connection "\
-                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be "\
-                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, "\
-                         "non-deprecated algorithms are available by default when this option is not used. To "\
-                         "reference all default algorithms using this option, add 'defaults' to the list of "\
+            description: "List of message authentication code algorithms to use when establishing a connection " \
+                         "to a target. Supported algorithms are defined by the Ruby net-ssh library and can be " \
+                         "viewed [here](https://github.com/net-ssh/net-ssh#supported-algorithms). All supported, " \
+                         "non-deprecated algorithms are available by default when this option is not used. To " \
+                         "reference all default algorithms using this option, add 'defaults' to the list of " \
                          "supported algorithms.",
             uniqueItems: true,
             items: {
@@ -227,7 +227,7 @@ module Bolt
           },
           "native-ssh" => {
             type: [TrueClass, FalseClass],
-            description: "This enables the native SSH transport, which shells out to SSH instead of using the "\
+            description: "This enables the native SSH transport, which shells out to SSH instead of using the " \
                          "net-ssh Ruby library",
             _default: false,
             _example: true
@@ -247,9 +247,9 @@ module Bolt
           },
           "private-key" => {
             type: [Hash, String],
-            description: "Either the path to the private key file to use for authentication, or "\
-            "a hash with the key `key-data` and the contents of the private key. Note that "\
-            "the key cannot be encrypted if using the `key-data` hash.",
+            description: "Either the path to the private key file to use for authentication, or " \
+                         "a hash with the key `key-data` and the contents of the private key. Note that " \
+                         "the key cannot be encrypted if using the `key-data` hash.",
             required: ["key-data"],
             properties: {
               "key-data" => {
@@ -289,16 +289,16 @@ module Bolt
           },
           "run-as" => {
             type: String,
-            description: "The user to run commands as after login. The run-as user must be different than the "\
+            description: "The user to run commands as after login. The run-as user must be different than the " \
                          "login user.",
             _plugin: true,
             _example: "root"
           },
           "run-as-command" => {
             type: Array,
-            description: "The command to elevate permissions. Bolt appends the user and command strings to the "\
-                         "configured `run-as-command` before running it on the target. This command must not require "\
-                         " aninteractive password prompt, and the `sudo-password` option is ignored when "\
+            description: "The command to elevate permissions. Bolt appends the user and command strings to the " \
+                         "configured `run-as-command` before running it on the target. This command must not require " \
+                         "aninteractive password prompt, and the `sudo-password` option is ignored when " \
                          "`run-as-command` is specified. The `run-as-command` must be specified as an array.",
             items: {
               type: String
@@ -316,9 +316,9 @@ module Bolt
           },
           "script-dir" => {
             type: String,
-            description: "The subdirectory of the tmpdir to use in place of a randomized "\
-                         "subdirectory for uploading and executing temporary files on the "\
-                         "target. It's expected that this directory already exists as a subdir "\
+            description: "The subdirectory of the tmpdir to use in place of a randomized " \
+                         "subdirectory for uploading and executing temporary files on the " \
+                         "target. It's expected that this directory already exists as a subdir " \
                          "of tmpdir, which is either configured or defaults to `/tmp`.",
             _plugin: true,
             _example: "bolt_scripts"
@@ -345,9 +345,9 @@ module Bolt
           },
           "ssh-command" => {
             type: [Array, String],
-            description: "The command and options to use when SSHing. This option is used when you need support for "\
-                         "features or algorithms that are not supported by the net-ssh Ruby library. **This option "\
-                         "is experimental.** You can read more about this  option in [Native SSH "\
+            description: "The command and options to use when SSHing. This option is used when you need support for " \
+                         "features or algorithms that are not supported by the net-ssh Ruby library. **This option " \
+                         "is experimental.** You can read more about this  option in [Native SSH " \
                          "transport](experimental_features.md#native-ssh-transport).",
             items: {
               type: String
@@ -372,10 +372,10 @@ module Bolt
           },
           "sudo-executable" => {
             type: String,
-            description: "The executable to use when escalating to the configured `run-as` user. This is useful "\
-                         "when you want to escalate using the configured `sudo-password`, since `run-as-command` "\
-                         "does not use `sudo-password` or support prompting. The command executed on the target "\
-                         "is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is "\
+            description: "The executable to use when escalating to the configured `run-as` user. This is useful " \
+                         "when you want to escalate using the configured `sudo-password`, since `run-as-command` " \
+                         "does not use `sudo-password` or support prompting. The command executed on the target " \
+                         "is `<sudo-executable> -S -u <user> -p custom_bolt_prompt <command>`. **This option is " \
                          "experimental.**",
             _plugin: true,
             _example: "dzdo"

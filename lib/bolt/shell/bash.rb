@@ -461,7 +461,7 @@ module Bolt
         end
         # Read any remaining data in the pipe. Do not wait for
         # EOF in case the pipe is inherited by a child process.
-        read_streams.each do |stream, _|
+        read_streams.each_key do |stream|
           stream_name = stream == out ? 'out' : 'err'
           loop {
             to_print = stream.read_nonblock(CHUNK_SIZE)
@@ -482,8 +482,8 @@ module Bolt
         when 0
           @logger.trace { "Command `#{command_str}` returned successfully" }
         when 126
-          msg = "\n\nThis might be caused by the default tmpdir being mounted "\
-            "using 'noexec'. See http://pup.pt/task-failure for details and workarounds."
+          msg = "\n\nThis might be caused by the default tmpdir being mounted " \
+                "using 'noexec'. See http://pup.pt/task-failure for details and workarounds."
           result_output.stderr        << msg
           result_output.merged_output << msg
           @logger.trace { "Command #{command_str} failed with exit code #{result_output.exit_code}" }

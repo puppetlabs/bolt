@@ -27,7 +27,7 @@ module Bolt
             # If we're trying to assign the result of a multi-line eval to a name
             # variable, we need to wrap it in `with()`.
             if body['name'] && code_body.lines.count > 1
-              indented = code_body.gsub(/\n/, "\n    ").chomp("  ")
+              indented = code_body.gsub("\n", "\n    ").chomp("  ")
               code << "with() || {\n    #{indented}}"
             else
               code << code_body

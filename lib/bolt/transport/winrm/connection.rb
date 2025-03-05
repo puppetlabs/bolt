@@ -81,8 +81,8 @@ module Bolt
             theres_your_problem = "\nAre you using SSL to connect to a non-SSL port?"
           end
           if target.options['ssl-verify'] && e.message.include?('certificate verify failed')
-            theres_your_problem = "\nIs the remote host using a self-signed SSL "\
-                                  "certificate? Use --no-ssl-verify to disable "\
+            theres_your_problem = "\nIs the remote host using a self-signed SSL " \
+                                  "certificate? Use --no-ssl-verify to disable " \
                                   "remote host SSL verification."
           end
           raise Bolt::Node::ConnectError.new(
@@ -137,8 +137,8 @@ module Bolt
 
           [inp, out_rd, err_rd, th]
         rescue Errno::EMFILE => e
-          msg = "#{e.message}. This might be resolved by increasing your user limit "\
-            "with 'ulimit -n 1024'. See https://puppet.com/docs/bolt/latest/bolt_known_issues.html for details."
+          msg = "#{e.message}. This might be resolved by increasing your user limit " \
+                "with 'ulimit -n 1024'. See https://puppet.com/docs/bolt/latest/bolt_known_issues.html for details."
           raise Bolt::Error.new(msg, 'bolt/too-many-files')
         rescue StandardError
           @logger.trace { "Command aborted" }
@@ -254,6 +254,8 @@ module Bolt
           nil
         end
 
+        SMB_PORT = 445
+
         private
 
         def smb_client_login
@@ -279,8 +281,6 @@ module Bolt
 
           @client
         end
-
-        SMB_PORT = 445
 
         def smb_socket_connect
           # It's lame that TCPSocket doesn't take a connect timeout

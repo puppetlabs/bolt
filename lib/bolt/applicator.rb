@@ -90,7 +90,7 @@ module Bolt
       catalog_request = scope.merge(target: target_data).merge(future: @executor.future || {})
 
       bolt_catalog_exe = File.join(libexec, 'bolt_catalog')
-      old_path = ENV['PATH']
+      old_path = ENV.fetch('PATH', nil)
       ENV['PATH'] = "#{RbConfig::CONFIG['bindir']}#{File::PATH_SEPARATOR}#{old_path}"
       out, err, stat = Open3.capture3('ruby', bolt_catalog_exe, 'compile', stdin_data: catalog_request.to_json)
       ENV['PATH'] = old_path

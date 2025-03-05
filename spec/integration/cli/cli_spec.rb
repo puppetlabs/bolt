@@ -308,7 +308,7 @@ describe 'commands' do
 
     context 'running in no-op mode' do
       before(:each) do
-        flags.concat(['--noop'])
+        flags.push('--noop')
       end
 
       it 'errors on a task that does not support noop' do

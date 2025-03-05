@@ -144,10 +144,10 @@ describe Bolt::ModuleInstaller do
     end
 
     it 'prints added modules' do
-      updated_modules.concat([
-                               mod,
-                               double('updated_module', full_name: 'puppetlabs/bar', version: '1.0.0', type: :forge)
-                             ])
+      updated_modules.push(
+        mod,
+        double('updated_module', full_name: 'puppetlabs/bar', version: '1.0.0', type: :forge)
+      )
 
       expect(outputter).to receive(:print_action_step).with(
         %r{Adding the following modules:\s*puppetlabs/bar 1.0.0}
@@ -165,9 +165,9 @@ describe Bolt::ModuleInstaller do
     end
 
     it 'prints upgraded modules' do
-      updated_modules.concat([
-                               double('updated_module', full_name: 'puppetlabs/foo', version: '2.0.0', type: :forge)
-                             ])
+      updated_modules.push(
+        double('updated_module', full_name: 'puppetlabs/foo', version: '2.0.0', type: :forge)
+      )
 
       expect(outputter).to receive(:print_action_step).with(
         %r{Upgrading the following modules:\s*puppetlabs/foo 1.0.0 to 2.0.0}
@@ -177,9 +177,9 @@ describe Bolt::ModuleInstaller do
     end
 
     it 'prints downgraded modules' do
-      updated_modules.concat([
-                               double('updated_module', full_name: 'puppetlabs/foo', version: '0.5.0', type: :forge)
-                             ])
+      updated_modules.push(
+        double('updated_module', full_name: 'puppetlabs/foo', version: '0.5.0', type: :forge)
+      )
 
       expect(outputter).to receive(:print_action_step).with(
         %r{Downgrading the following modules:\s*puppetlabs/foo 1.0.0 to 0.5.0}

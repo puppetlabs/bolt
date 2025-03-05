@@ -18,29 +18,29 @@ describe 'running with an inventory file', reset_puppet_settings: true do
 
   let(:inventory) do
     { targets: [
-      { uri: conn[:host],
-        config: {
-          transport: conn[:protocol],
-          conn[:protocol] => {
-            user: conn[:user],
-            port: conn[:port],
-            'connect-timeout': conn[:'connect-timeout'] || 120
-          }
-        } },
-      { name: 'uriless',
-        config: {
-          transport: conn[:protocol],
-          conn[:protocol] => {
-            host: conn[:host],
-            user: conn[:user],
-            port: conn[:port]
-          }
-        } },
-      { name: 'hostless',
-        config: {
-          transport: conn[:protocol]
-        } }
-    ],
+        { uri: conn[:host],
+          config: {
+            transport: conn[:protocol],
+            conn[:protocol] => {
+              user: conn[:user],
+              port: conn[:port],
+              'connect-timeout': conn[:'connect-timeout'] || 120
+            }
+          } },
+        { name: 'uriless',
+          config: {
+            transport: conn[:protocol],
+            conn[:protocol] => {
+              host: conn[:host],
+              user: conn[:user],
+              port: conn[:port]
+            }
+          } },
+        { name: 'hostless',
+          config: {
+            transport: conn[:protocol]
+          } }
+      ],
       groups: [{
         name: "group1",
         targets: [
@@ -161,7 +161,7 @@ describe 'running with an inventory file', reset_puppet_settings: true do
       # This also asserts the deep_merge works
       let(:output) {
         "Facts for localhost: {scooby => doo, cloud => {provider => AWS, " \
-        "foo => bar}, kernel => Linux}"
+          "foo => bar}, kernel => Linux}"
       }
 
       def fact_plan(name = 'facts_test')

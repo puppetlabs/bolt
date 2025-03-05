@@ -74,7 +74,7 @@ begin
     begin
       require 'puppet/resource_api/transport'
     rescue LoadError
-      msg = "Could not load 'puppet/resource_api/transport', puppet-resource_api "\
+      msg = "Could not load 'puppet/resource_api/transport', puppet-resource_api " \
             "gem version 1.8.0 or greater is required on the proxy target"
       puts msg
       exit 1

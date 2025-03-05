@@ -6,8 +6,8 @@ require_relative '../../bolt/util'
 module Bolt
   module PuppetDB
     class Config
-      if ENV['HOME'].nil?
-        DEFAULT_TOKEN = Bolt::Util.windows? ? 'nul' : '/dev/null'
+      if Dir.home.nil?
+        DEFAULT_TOKEN = Bolt::Util.windows? File::NULL
         DEFAULT_CONFIG = { user: '/etc/puppetlabs/puppet/puppetdb.conf',
                            global: '/etc/puppetlabs/puppet/puppetdb.conf' }.freeze
       else
@@ -32,7 +32,7 @@ module Bolt
       # @return [String]
       #
       def self.default_windows_config
-        File.expand_path(File.join(ENV['ALLUSERSPROFILE'], 'PuppetLabs/client-tools/puppetdb.conf'))
+        File.expand_path(File.join(ENV.fetch('ALLUSERSPROFILE', nil), 'PuppetLabs/client-tools/puppetdb.conf'))
       end
 
       # Loads default configuration from the puppetdb.conf file on system. If

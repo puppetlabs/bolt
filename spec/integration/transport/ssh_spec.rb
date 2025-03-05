@@ -211,7 +211,7 @@ describe Bolt::Transport::SSH, ssh: true do
   end
 
   context "when executing with private key data" do
-    let(:key_data) { File.open(key, 'r', &:read) }
+    let(:key_data) { File.read(key) }
     let(:transport_config) do
       {
         'host-key-check' => false,

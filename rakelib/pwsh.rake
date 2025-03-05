@@ -7,7 +7,7 @@ namespace :pwsh do
   desc "Generate the PowerShell module structure and supporting files"
   task generate_module: :generate_powershell_cmdlets do
     dest = File.expand_path(File.join(__dir__, '..', 'pwsh_module', 'PuppetBolt', 'en-US'))
-    FileUtils.mkdir_p(dest) unless File.exist?(dest)
+    FileUtils.mkdir_p(dest)
 
     begin
       source = File.expand_path(File.join(__dir__, '..', 'guides'))
@@ -355,7 +355,7 @@ namespace :pwsh do
         # verbose is a commonparameter and is already present in the
         # pwsh cmdlets, so it is omitted here to prevent it from being
         # added twice
-        help_text[:flags].reject { |o| o =~ /verbose|help|version/ }.map do |option|
+        help_text[:flags].grep_v(/verbose|help|version/).map do |option|
           ruby_param = parser.top.long[option]
           pwsh_name = option.split("-").map(&:capitalize).join
           case pwsh_name

@@ -22,9 +22,9 @@ module Bolt
         if !version.empty? && version.to_i < 3
           # This lets us know how many targets have Powershell 2, and lets the
           # user know how many targets they have with PS2
-          msg = "Detected PowerShell 2 on one or more targets.\nPowerShell 2 "\
-            "is unsupported. See bolt-debug.log or run with '--log-level debug' to see the full "\
-            "list of targets with PowerShell 2."
+          msg = "Detected PowerShell 2 on one or more targets.\nPowerShell 2 " \
+                "is unsupported. See bolt-debug.log or run with '--log-level debug' to see the full " \
+                "list of targets with PowerShell 2."
 
           Bolt::Logger.deprecate_once("powershell_2", msg)
           @logger.debug("Detected PowerShell 2 on #{target}.")
@@ -45,7 +45,7 @@ module Bolt
 
       def validate_extensions(ext)
         unless @extensions.include?(ext)
-          raise Bolt::Node::FileError.new("File extension #{ext} is not enabled, "\
+          raise Bolt::Node::FileError.new("File extension #{ext} is not enabled, " \
                                           "to run it please add to 'winrm: extensions'", 'FILETYPE_ERROR')
         end
       end

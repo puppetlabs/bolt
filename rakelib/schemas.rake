@@ -202,7 +202,7 @@ def to_schema(data, plugin = false)
   data[:type] = to_json_types(data[:type]) if data.key?(:type)
 
   # Add a plugin definition if supported by the option.
-  data = plugin ? add_plugin_reference(data) : data
+  data = add_plugin_reference(data) if plugin
 
   # Stringify keys
   data.transform_keys(&:to_s)

@@ -27,9 +27,9 @@ module Bolt
       # The algorithm is from lolcat (https://github.com/busyloop/lolcat)
       # lolcat is released with WTFPL
       def rainbow
-        red = Math.sin(0.3 * @color + 0) * 127 + 128
-        green = Math.sin(0.3 * @color + 2 * Math::PI / 3) * 127 + 128
-        blue  = Math.sin(0.3 * @color + 4 * Math::PI / 3) * 127 + 128
+        red = (Math.sin((0.3 * @color) + 0) * 127) + 128
+        green = (Math.sin((0.3 * @color) + (2 * Math::PI / 3)) * 127) + 128
+        blue  = (Math.sin((0.3 * @color) + (4 * Math::PI / 3)) * 127) + 128
         @color += 1 / 8.0
         format("%<red>02X%<green>02X%<blue>02X", red: red, green: green, blue: blue)
       end

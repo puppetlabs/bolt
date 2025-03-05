@@ -18,7 +18,7 @@ rototiller_task :host_config do |task|
     task.add_env(name: 'BOLT_CONTROLLER', default: 'debian12-64')
     task.add_env(name: 'BOLT_NODES',
                  default: 'redhat9-64,fedora40-64,windows10ent-64')
-    ns = [ENV['BOLT_CONTROLLER'], ENV['BOLT_NODES']].join(',')
+    ns = [ENV.fetch('BOLT_CONTROLLER', nil), ENV.fetch('BOLT_NODES', nil)].join(',')
     n  = ns.split(',')
     n_new = []
     n.each_with_index do |node, i|
@@ -109,7 +109,7 @@ def abs_targets
   end
   raw_targets = YAML.safe_load(output)
   abs_platforms = Hash.new(0)
-  raw_targets['HOSTS'].each do |_, raw_target|
+  raw_targets['HOSTS'].each_value do |raw_target|
     abs_platforms[raw_target['template']] += 1
   end
   abs_platforms.map { |platform, num| "#{platform}=#{num}" }.join(' ')

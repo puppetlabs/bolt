@@ -44,7 +44,6 @@ module Bolt
       raise InvalidFunctionCall, 'get_target'
     end
 
-    # rubocop:disable Naming/AccessorMethodName
     def set_var(*_params)
       raise InvalidFunctionCall, 'set_var'
     end
@@ -52,7 +51,6 @@ module Bolt
     def set_feature(*_params)
       raise InvalidFunctionCall, 'set_feature'
     end
-    # rubocop:enable Naming/AccessorMethodName
 
     def vars(target)
       @targets[target.name].vars

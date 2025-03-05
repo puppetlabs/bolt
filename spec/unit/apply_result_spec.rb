@@ -57,7 +57,7 @@ describe Bolt::ApplyResult do
       expect(error['kind']).to eq('bolt/apply-error')
       expect(error['msg'])
         .to eq('Found a Ruby without Puppet present, please install Puppet ' \
-              "or remove Ruby from $env:Path to enable 'apply'")
+               "or remove Ruby from $env:Path to enable 'apply'")
     end
   end
 
