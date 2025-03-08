@@ -429,7 +429,7 @@ describe 'commands' do
           ['sample::params', 'Task with parameters']
         )
 
-        expect(@log_output.readlines).to include(/unexpected token/)
+        expect(@log_output.readlines).to include(/expected object key/)
       end
     end
   end

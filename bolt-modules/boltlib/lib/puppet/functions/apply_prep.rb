@@ -2,6 +2,7 @@
 
 require 'bolt/logger'
 require 'bolt/task'
+require 'puppet/version'
 
 # Installs the `puppet-agent` package on targets if needed, then collects facts,
 # including any custom facts found in Bolt's module path. The package is
@@ -63,6 +64,19 @@ Puppet::Functions.create_function(:apply_prep) do
   # Runs a task. This method is called by the puppet_library hook.
   #
   def run_task(targets, task, args = {}, options = {})
+    # check if user specified a collection in options or args
+    if options['collection']
+      args['collection'] = options['collection']
+    elsif !args['collection']
+      begin
+        # Set collection to Puppet major version
+        major_version = Puppet.version.split('.').first
+        args['collection'] = "puppet#{major_version}"
+      rescue LoadError => e
+        # Default to unofficial release
+        args['collection'] = 'puppet'
+      end
+    end
     executor.run_task(targets, task, args, options)
   end
 
