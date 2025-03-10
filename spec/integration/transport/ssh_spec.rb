@@ -32,6 +32,7 @@ describe Bolt::Transport::SSH, ssh: true do
   let(:bash_user)         { 'test' }
   let(:bash_password)     { 'test' }
   let(:key)               { conn_info('ssh')[:key] }
+  let(:ed25519_key)       { File.expand_path(File.join(__dir__, '..', '..', 'fixtures/keys/id_ed25519')) }
   let(:command)           { "pwd" }
 
   let(:no_host_key_check) { { 'host-key-check' => false, user: user, password: password } }
@@ -206,6 +207,14 @@ describe Bolt::Transport::SSH, ssh: true do
         expect(
           File.exist?(File.expand_path('ssh_config', destination))
         ).to eq(true)
+      end
+    end
+
+    context "with ed25519 private key" do
+      let(:transport_config) { super().merge({ 'private-key' => ed25519_key }) }
+
+      it "executes a command on a host" do
+        expect(ssh.run_command(target, command).value['stdout']).to eq("/home/#{user}\n")
       end
     end
   end
