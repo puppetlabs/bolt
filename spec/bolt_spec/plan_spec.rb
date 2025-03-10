@@ -207,6 +207,7 @@ describe "BoltSpec::Plans" do
       with_tempfile_containing('prep', '') do |file|
         @source = file.path
         allow_upload(@source).with_targets(targets)
+        expect_upload('plans/resources/bar').with_destination('/o')
         example.run
       end
     end
