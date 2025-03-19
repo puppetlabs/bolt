@@ -429,7 +429,7 @@ describe 'commands' do
           ['sample::params', 'Task with parameters']
         )
 
-        expect(@log_output.readlines).to include(/expected object key/)
+        expect(@log_output.readlines).to include(/expected object key/) || include(/ WARN  Puppet : expected object key/) # rubocop:disable Layout/LineLength
       end
     end
   end
