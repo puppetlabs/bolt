@@ -49,6 +49,28 @@ PS
       install_package(bolt, 'rubygem-io-console')
     when /osx/
       # TODO: allow for tests to work on ruby3 on macOS
+      on(bolt, 'xcode-select --install', acceptable_exit_codes: [0, 1])
+
+      homebrew_installed = on(bolt, 'which brew', acceptable_exit_codes: [0, 1]).exit_code == 0
+      if !homebrew_installed
+        on(bolt, '/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"')
+      end
+      
+      install_package(bolt, 'openssl')
+      install_package(bolt, 'readline')
+      install_package(bolt, 'ruby')
+      install_package(bolt, 'libffi')
+
+      on(bolt, 'echo \'export PATH="/usr/local/opt/ruby/bin:$PATH"\' >> ~/.bash_profile')
+      on(bolt, 'echo \'export PKG_CONFIG_PATH="/usr/local/opt/ruby/lib/pkgconfig"\' >> ~/.bash_profile')
+      on(bolt, 'source ~/.bash_profile')
+
+      # Install required gems
+      on(bolt, 'gem install ffi')
+      on(bolt, 'gem install json')
+      on(bolt, 'gem install bigdecimal')
+      on(bolt, 'gem install io-console')
+
     else
       fail_test("#{bolt['platform']} not currently a supported bolt controller")
     end
