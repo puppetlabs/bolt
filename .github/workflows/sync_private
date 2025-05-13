@@ -1,0 +1,107 @@
+name: Forward PR to bolt-private
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+jobs:
+  forward:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout bolt
+      uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set up variables
+      id: vars
+      run: |
+        echo "pr_number=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+        echo "pr_title=${{ github.event.pull_request.title }}" >> $GITHUB_OUTPUT
+        echo "pr_branch=forward-pr-${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+
+    - name: Download PR patch
+      run: |
+        PATCH_URL="https://github.com/${{ github.repository }}/pull/${{ steps.vars.outputs.pr_number }}.patch"
+        echo "Downloading patch from $PATCH_URL"
+        status=$(curl -sSL -w "%{http_code}" -o pr.patch "$PATCH_URL")
+        if [ "$status" -ne 200 ]; then
+          echo "❌ Failed to download patch. HTTP status code: $status"
+          exit 1
+        fi
+
+    - name: Show patch summary
+      run: |
+        echo "---- PATCH START ----"
+        cat pr.patch
+        echo "\n---- PATCH END ----"
+
+    - name: Clone bolt-private
+      run: |
+        git clone https://x-access-token:${{ secrets.PRIVATE_REPO_PAT }}@github.com/puppetlabs/bolt-private.git ../bolt-private
+
+    - name: Configure Git identity
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "actions@github.com"
+
+    - name: Apply patch to private repo (force even with conflicts)
+      run: |
+        cd ../bolt-private
+        git checkout -b ${{ steps.vars.outputs.pr_branch }}
+
+        echo "🔁 Trying to apply patch using git am..."
+        if git am ../bolt/pr.patch; then
+          echo "✅ Patch applied cleanly using git am"
+        else
+          echo "⚠️ git am failed — falling back to manual apply"
+
+          patch_files=$(grep '^diff --git' ../bolt/pr.patch | awk '{print $3}' | cut -c3-)
+          for file in $patch_files; do
+            if [ ! -f "$file" ]; then
+              echo "📄 Creating placeholder for missing file: $file"
+              mkdir -p "$(dirname "$file")"
+              touch "$file"
+            fi
+          done
+
+          echo "📌 Applying patch with git apply --reject..."
+          git apply --reject --whitespace=fix ../bolt/pr.patch || echo "⚠️ Patch had partial conflicts"
+
+          echo "⚠️ This PR was generated automatically by forwarding PR #${{ steps.vars.outputs.pr_number }} from the public repository." > CONFLICT_NOTE.md
+          echo "" >> CONFLICT_NOTE.md
+          echo "One or more conflicts occurred when applying the patch. The patch has been added, but could not be cleanly applied." >> CONFLICT_NOTE.md
+          echo "" >> CONFLICT_NOTE.md
+          echo "Please manually review and implement the changes described in the patch." >> CONFLICT_NOTE.md
+          echo "" >> CONFLICT_NOTE.md
+          echo "⚠️ **Do NOT merge this PR as-is.** Once the patch is implemented manually, you may remove this notice." >> CONFLICT_NOTE.md
+
+          git add -A
+
+          if git diff --cached --quiet; then
+            echo "⚠️ Patch applied nothing — creating dummy commit to allow PR"
+            git commit --allow-empty -m "Forwarded PR #${{ steps.vars.outputs.pr_number }} (empty or conflict)"
+          else
+            git commit -m "Forwarded PR #${{ steps.vars.outputs.pr_number }} with manual conflict resolution required"
+          fi
+        fi
+
+    - name: Push and create PR
+      run: |
+        cd ../bolt-private
+        git push origin ${{ steps.vars.outputs.pr_branch }}
+        gh pr create \
+          --title "[Forwarded] ${{ steps.vars.outputs.pr_title }}" \
+          --body "This PR is an automated forward of https://github.com/${{ github.repository }}/pull/${{ steps.vars.outputs.pr_number }}.
+
+          If there were conflicts applying the patch, the patch has been partially or entirely rejected. A file named \`CONFLICT_NOTE.md\` has been added to this PR to guide you on resolving the issues.
+
+          ⚠️ **Do NOT merge this PR as-is if there are conflicts**. Instead, review and manually implement the patch changes, then remove the note when done." \
+          --head ${{ steps.vars.outputs.pr_branch }} \
+          --base main
+      env:
+        GH_TOKEN: ${{ secrets.PRIVATE_REPO_PAT }}
