@@ -1,4 +1,4 @@
-name: Apply
+name: Apply-Paula
 
 on:
   pull_request:
