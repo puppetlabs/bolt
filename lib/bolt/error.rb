@@ -20,8 +20,25 @@ module Bolt
 
     def to_h
       h = { 'kind' => kind,
-            'msg' => message,
-            'details' => details }
+            'msg' => message }
+      
+      # Process details with special handling for Error objects to prevent cycles
+      processed_details = {}
+      if details
+        details.each do |k, v|
+          if v.is_a?(Bolt::Error)
+            # For Error objects, only include basic properties to prevent recursion
+            processed_details[k] = {
+              'kind' => v.kind,
+              'msg' => v.message
+            }
+          else
+            processed_details[k] = v
+          end
+        end
+      end
+      
+      h['details'] = processed_details
       h['issue_code'] = issue_code if issue_code
       h
     end
@@ -35,7 +52,11 @@ module Bolt
     end
 
     def to_puppet_error
-      Puppet::DataTypes::Error.from_asserted_hash(to_h)
+      # Create a minimal hash for conversion
+      h = { 'kind' => kind, 'msg' => message }
+      h['issue_code'] = issue_code if issue_code
+      
+      Puppet::DataTypes::Error.from_asserted_hash(h)
     end
 
     def self.unknown_task(task)
@@ -130,8 +151,26 @@ module Bolt
   end
 
   class PlanFailure < Error
-    def initialize(*args)
-      super(*args)
+    def initialize(msg, kind = nil, details = nil, issue_code = nil)
+      # Process details to replace any Error objects with simple hashes
+      if details && details.is_a?(Hash)
+        safe_details = {}
+        details.each do |k, v|
+          if v.is_a?(Bolt::Error)
+            # Create a minimal representation of the error
+            safe_details[k] = {
+              'kind' => v.kind,
+              'msg' => v.message
+            }
+            safe_details[k]['issue_code'] = v.issue_code if v.issue_code
+          else
+            safe_details[k] = v
+          end
+        end
+        details = safe_details
+      end
+      
+      super(msg, kind || 'bolt/plan-failure', details, issue_code)
       @error_code = 2
     end
   end
