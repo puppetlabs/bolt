@@ -39,6 +39,7 @@ module Bolt
         end
 
         def run_cmd(cmd, env_vars)
+          @logger.trace { "Executing: #{cmd.join(' ')}" }
           Bolt::Util.exec_docker(cmd, env_vars)
         end
 
