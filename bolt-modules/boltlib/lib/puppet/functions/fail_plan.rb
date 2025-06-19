@@ -38,15 +38,47 @@ Puppet::Functions.create_function(:fail_plan) do
       raise Puppet::ParseErrorWithIssue
         .from_issue_and_stack(Bolt::PAL::Issues::PLAN_OPERATION_NOT_SUPPORTED_WHEN_COMPILING, action: 'fail_plan')
     end
-
+  
     executor = Puppet.lookup(:bolt_executor)
     # Send Analytics Report
     executor.report_function_call(self.class.name)
-
+  
+    # Process details to safely handle any Error objects within it
+    if details && details.is_a?(Hash)
+      sanitized_details = {}
+      details.each do |k, v|
+        # Handle both Bolt::Error and Puppet::DataTypes::Error objects
+        if v.is_a?(Puppet::DataTypes::Error) || v.is_a?(Bolt::Error)
+          # For Error objects, only include basic properties to prevent recursion
+          # Extract only essential information, avoiding any details hash
+          error_hash = {
+            'kind' => v.respond_to?(:kind) ? v.kind : nil,
+            'msg' => v.respond_to?(:msg) ? v.msg : v.message
+          }
+          # Add issue_code if it exists
+          error_hash['issue_code'] = v.issue_code if v.respond_to?(:issue_code) && v.issue_code
+          
+          # Clean up nil values
+          error_hash.compact!
+          
+          sanitized_details[k] = error_hash
+        else
+          sanitized_details[k] = v
+        end
+      end
+      details = sanitized_details
+    end
+  
     raise Bolt::PlanFailure.new(msg, kind || 'bolt/plan-failure', details, issue_code)
   end
 
   def from_error(err)
-    from_args(err.message, err.kind, err.details, err.issue_code)
+    # Extract just the basic properties
+    msg = err.message
+    kind = err.kind
+    issue_code = err.issue_code
+    
+    # Intentionally NOT passing err.details to avoid circular references
+    from_args(msg, kind, nil, issue_code)
   end
 end

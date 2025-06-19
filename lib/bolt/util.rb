@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'set'
+
 module Bolt
   module Util
     class << self
@@ -241,14 +243,22 @@ module Bolt
 
       # Accepts a Data object and returns a copy with all hash and array values
       # Arrays and hashes including the initial object are modified before
-      # their descendants are.
-      def walk_vals(data, skip_top = false, &block)
+      # their descendants are. Includes cycle detection to prevent infinite recursion.
+      def walk_vals(data, skip_top = false, visited = Set.new, &block)
+        # Check if we've already visited this object to prevent infinite recursion
+        return "[CIRCULAR REFERENCE]" if visited.include?(data.object_id)
+        
+        # Only track objects that could cause cycles (complex objects)
+        if data.is_a?(Hash) || data.is_a?(Array) || data.is_a?(Bolt::Error)
+          visited = visited.add(data.object_id)
+        end
+        
         data = yield(data) unless skip_top
         case data
         when Hash
-          data.transform_values { |v| walk_vals(v, &block) }
+          data.transform_values { |v| walk_vals(v, false, visited, &block) }
         when Array
-          data.map { |v| walk_vals(v, &block) }
+          data.map { |v| walk_vals(v, false, visited, &block) }
         else
           data
         end
@@ -256,20 +266,47 @@ module Bolt
 
       # Accepts a Data object and returns a copy with all hash and array values
       # modified by the given block. Descendants are modified before their
-      # parents.
-      def postwalk_vals(data, skip_top = false, &block)
+      # parents (post-order traversal). Includes cycle detection to prevent infinite recursion.
+      def postwalk_vals(data, skip_top = false, visited = Set.new, &block)
+        # Check if we've already visited this object to prevent infinite recursion
+        return "[CIRCULAR REFERENCE]" if visited.include?(data.object_id)
+        
+        # Only track objects that could cause cycles (complex objects)
+        if data.is_a?(Hash) || data.is_a?(Array) || data.is_a?(Bolt::Error)
+          visited = visited.add(data.object_id)
+        end
+        
         new_data = case data
-                   when Hash
-                     data.transform_values { |v| postwalk_vals(v, &block) }
-                   when Array
-                     data.map { |v| postwalk_vals(v, &block) }
-                   else
-                     data
-                   end
+                  when Hash
+                    data.transform_values { |v| postwalk_vals(v, false, visited, &block) }
+                  when Array
+                    data.map { |v| postwalk_vals(v, false, visited, &block) }
+                  else
+                    data
+                  end
+                  
         if skip_top
           new_data
         else
           yield(new_data)
+        end
+      end
+      
+      # Safely converts any Bolt::Error objects in a data structure to simplified hashes
+      # to prevent circular references during serialization and deserialization
+      def sanitize_for_puppet(data)
+        postwalk_vals(data) do |value|
+          if value.is_a?(Bolt::Error)
+            # Create a simplified hash without any error objects in details
+            {
+              '_bolt_error' => true,
+              'kind' => value.kind,
+              'msg' => value.message,
+              'issue_code' => value.issue_code
+            }.compact
+          else
+            value
+          end
         end
       end
 
