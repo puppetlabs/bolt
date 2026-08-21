@@ -469,7 +469,7 @@ module Bolt
             read_streams[stream]        << to_print
             result_output.merged_output << to_print
           }
-        rescue Errno::EAGAIN, EOFError
+        rescue Errno::EAGAIN, Errno::EWOULDBLOCK, EOFError
         ensure
           stream.close
         end
