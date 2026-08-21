@@ -10,7 +10,7 @@ module Bolt
       super(msg)
       @kind = kind
       @issue_code = issue_code
-      @details = details || {}
+      @details = flatten_errors(details || {})
       @error_code ||= 1
     end
 
@@ -37,6 +37,26 @@ module Bolt
     def to_puppet_error
       Puppet::DataTypes::Error.from_asserted_hash(to_h)
     end
+
+    private
+
+    # Recursively convert nested Error objects to plain hashes at
+    # construction time, preventing infinite recursion in Puppet's
+    # type inference and JSON serialization (see #3373).
+    def flatten_errors(obj)
+      case obj
+      when Bolt::Error
+        obj.to_h
+      when Hash
+        obj.transform_values { |v| flatten_errors(v) }
+      when Array
+        obj.map { |v| flatten_errors(v) }
+      else
+        obj
+      end
+    end
+
+    public
 
     def self.unknown_task(task)
       command = Bolt::Util.powershell? ? "Get-BoltTask" : "bolt task show"
