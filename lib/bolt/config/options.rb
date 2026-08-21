@@ -353,7 +353,7 @@ module Bolt
           description: "A list of module dependencies for the project. Each dependency is a map of data specifying "\
                        "the module to install. To install the project's module dependencies, run the `bolt module "\
                        "install` command. For more information about specifying modules, see [the "\
-                       "documentation](https://pup.pt/bolt-module-specs).",
+                       "documentation](https://help.puppet.com/bolt/current/topics/bolt_installing_modules.htm).",
           type: Array,
           items: {
             type: [Hash, String],

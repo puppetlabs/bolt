@@ -15,4 +15,4 @@ guide: |
     To learn how modules are loaded by Bolt, see the 'modulepath' guide.
 
 documentation:
-  - https://pup.pt/bolt-modules
+  - https://help.puppet.com/bolt/current/topics/modules.htm

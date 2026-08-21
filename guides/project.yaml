@@ -17,5 +17,5 @@ guide: |
     of a project.
 
 documentation:
-  - https://pup.pt/bolt-projects
-  - https://pup.pt/bolt-project-reference
+  - https://help.puppet.com/bolt/current/topics/projects.htm
+  - https://help.puppet.com/bolt/current/topics/bolt_project_reference.htm

@@ -640,7 +640,7 @@ module Bolt
         info << indent(2, "#{modulepath.join(File::PATH_SEPARATOR)}\n\n")
 
         info << colorize(:cyan, "Additional information\n")
-        info << indent(2, "For more information about using plugins see https://pup.pt/bolt-plugins")
+        info << indent(2, "For more information about using plugins see https://help.puppet.com/bolt/current/topics/using_plugins.htm")
 
         @stream.puts info.chomp
       end

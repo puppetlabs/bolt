@@ -35,7 +35,7 @@ module Bolt
         rescue StandardError => e
           raise Bolt::FileError.new(
             "Unable to write to #{inventory_file}: #{e.message}. See "\
-            "http://pup.pt/bolt-inventory to manually update.",
+            "https://help.puppet.com/bolt/current/topics/inventory_files.htm to manually update.",
             inventory_file
           )
         end

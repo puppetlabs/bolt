@@ -14,4 +14,4 @@ guide: |
     To learn more about projects, see the 'project' guide.
 
 documentation:
-  - https://pup.pt/bolt-logging
+  - https://help.puppet.com/bolt/current/topics/configuring_bolt.htm

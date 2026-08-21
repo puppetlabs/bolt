@@ -19,5 +19,5 @@ guide: |
     is different than expected.
 
 documentation:
-  - https://pup.pt/bolt-inventory
-  - https://pup.pt/bolt-inventory-reference
+  - https://help.puppet.com/bolt/current/topics/inventory_files.htm
+  - https://help.puppet.com/bolt/current/topics/inventory_file_v2.htm

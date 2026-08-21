@@ -8,7 +8,7 @@ module Bolt
   class ProjectManager
     INVENTORY_TEMPLATE = <<~INVENTORY
       # This is an example inventory.yaml
-      # To read more about inventory files, see https://pup.pt/bolt-inventory
+      # To read more about inventory files, see https://help.puppet.com/bolt/current/topics/inventory_files.htm
       #
       # groups:
       #   - name: linux

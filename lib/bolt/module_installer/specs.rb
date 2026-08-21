@@ -57,7 +57,7 @@ module Bolt
           Invalid module specification:
           #{hash.to_yaml.lines.drop(1).join.chomp}
 
-          To read more about specifying modules, see https://pup.pt/bolt-module-specs
+          To read more about specifying modules, see https://help.puppet.com/bolt/current/topics/bolt_installing_modules.htm
         MESSAGE
       end
 

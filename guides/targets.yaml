@@ -25,4 +25,4 @@ guide: |
     see 'bolt guide inventory'.
 
 documentation:
-  - https://pup.pt/bolt-commands
+  - https://help.puppet.com/bolt/current/topics/running_bolt_commands.htm

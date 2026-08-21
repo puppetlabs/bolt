@@ -23,7 +23,7 @@ module Bolt
           @outputter.print_action_step(
             "Project has a non-default configured modulepath, unable to automatically "\
             "migrate project modules. To migrate project modules manually, see "\
-            "http://pup.pt/bolt-modules"
+            "https://help.puppet.com/bolt/current/topics/modules.htm"
           )
           true
         # Migrate modules from Puppetfile

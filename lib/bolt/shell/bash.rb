@@ -483,7 +483,7 @@ module Bolt
           @logger.trace { "Command `#{command_str}` returned successfully" }
         when 126
           msg = "\n\nThis might be caused by the default tmpdir being mounted "\
-            "using 'noexec'. See http://pup.pt/task-failure for details and workarounds."
+            "using 'noexec'. See https://help.puppet.com/bolt/current/topics/bolt_tasks.htm for details and workarounds."
           result_output.stderr        << msg
           result_output.merged_output << msg
           @logger.trace { "Command #{command_str} failed with exit code #{result_output.exit_code}" }

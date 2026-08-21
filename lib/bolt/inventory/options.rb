@@ -84,7 +84,7 @@ module Bolt
         "plugin_hooks" => {
           description: "Configuration for the Puppet library plugin used to install the "\
                        "Puppet agent on the target. For more information, see "\
-                       "https://pup.pt/bolt-plugin-hooks",
+                       "https://help.puppet.com/bolt/current/topics/using_plugins.htm",
           type: Hash,
           properties: {
             "puppet_library" => {

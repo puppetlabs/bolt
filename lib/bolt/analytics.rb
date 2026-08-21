@@ -80,7 +80,7 @@ module Bolt
           msg = <<~ANALYTICS
             Bolt collects data about how you use it. You can opt out of providing this data.
             To learn how to disable data collection, or see what data Bolt collects and why,
-            see http://pup.pt/bolt-analytics
+            see https://help.puppet.com/bolt/current/topics/bolt_installing.htm
           ANALYTICS
           Bolt::Logger.warn_once('analytics_opt_out', msg)
         end

@@ -21,4 +21,4 @@ guide: |
     To learn more about modules, see the 'module' guide.
 
 documentation:
-  - https://pup.pt/bolt-project-reference#modulepath
+  - https://help.puppet.com/bolt/current/topics/projects.htm#modulepath

@@ -178,7 +178,7 @@ module Bolt
             'dotted_fact_name',
             "Target '#{safe_name}' includes dotted fact names: '#{dotted.join("', '")}'. Dotted fact "\
             "names are deprecated and Bolt does not automatically convert facts with dotted names to "\
-            "structured facts. For more information, see https://pup.pt/bolt-dotted-facts"
+            "structured facts. For more information, see https://help.puppet.com/bolt/current/topics/inventory_files.htm"
           )
         end
       end
