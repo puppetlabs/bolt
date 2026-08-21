@@ -42,7 +42,8 @@ module Bolt
                       # https://github.com/WinRb/WinRM/issues/270
                       user: target.options['realm'] ? 'dummy' : @user,
                       password: target.options['realm'] ? 'dummy' : target.password,
-                      retry_limit: 1,
+                      retry_limit: 3,
+                      retry_delay: 10,
                       transport: transport,
                       basic_auth_only: target.options['basic-auth-only'],
                       ca_trust_path: cacert,
