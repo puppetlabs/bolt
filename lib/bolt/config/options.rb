@@ -123,6 +123,14 @@ module Bolt
                        "plan function or the `bolt apply` command.",
           type: Hash,
           properties: {
+            "confdir" => {
+              description: "This feature is experimental. Use the bolt created temporary path "\
+                           "or the Puppet default confdir on the target.",
+              type: String,
+              enum: %w[bolt target],
+              _example: "target",
+              _default: "bolt"
+            },
             "evaltrace" => {
               description: "Whether each resource should log when it is being evaluated. This allows "\
                            "you to interactively see exactly what is being done.",

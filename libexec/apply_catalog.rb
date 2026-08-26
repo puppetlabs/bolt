@@ -18,7 +18,13 @@ puppet_root = Dir.mktmpdir
 moduledir = File.join(puppet_root, 'modules')
 Dir.mkdir(moduledir)
 cli = (Puppet::Settings::REQUIRED_APP_SETTINGS + [:rundir]).flat_map do |setting|
-  ["--#{setting}", File.join(puppet_root, setting.to_s.chomp('dir'))]
+  if setting == :confdir && args['apply_settings']['confdir'] == 'target'
+    # skip isolating confdir and override basemodulepath
+    # as we never want to load agent modules
+    ['--basemodulepath', Puppet.default_basemodulepath]
+  else
+    ["--#{setting}", File.join(puppet_root, setting.to_s.chomp('dir'))]
+  end
 end
 cli << '--modulepath' << moduledir
 Puppet.initialize_settings(cli)
@@ -28,6 +34,11 @@ Puppet[:report] = false
 
 # Make sure to apply the catalog
 Puppet[:noop] = args['_noop'] || false
+
+# delete because its not an actual path
+# and can't be changed after initialization
+delete(args['apply_settings']['confdir'])
+
 args['apply_settings'].each do |setting, value|
   Puppet[setting.to_sym] = value
 end
