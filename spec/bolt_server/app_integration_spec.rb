@@ -44,20 +44,31 @@ describe "BoltServer::TransportApp", puppetserver: true do
         expect(result['value']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
       end
 
-      it 'runs an echo task using a private key' do
-        private_key = ENV['BOLT_SSH_KEY'] || Dir["spec/fixtures/keys/id_rsa"][0]
-        private_key_content = File.read(private_key)
-        target = conn_target('ssh', options: { 'private-key' => { 'key-data' => private_key_content } })
-        body = build_task_request('sample::echo',
-                                  target,
-                                  message: "Hello!")
+      %w[env rsa ed25519].each do |key_type|
+        next if key_type == 'env' && ENV['BOLT_SSH_KEY'].nil?
 
-        post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
-        expect(last_response).to be_ok
-        expect(last_response.status).to eq(200)
-        result = JSON.parse(last_response.body)
-        expect(result).to include('status' => 'success')
-        expect(result['value']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
+        context "runs an echo task using an #{key_type} private key" do
+          let(:private_key) do
+            key_type == 'env' ? ENV['BOLT_SSH_KEY'] : Dir["spec/fixtures/keys/id_#{key_type}"][0]
+          end
+
+          it do
+            private_key_content = File.read(private_key)
+            target = conn_target('ssh', options: { 'private-key' => { 'key-data' => private_key_content } })
+            body = build_task_request('sample::echo',
+                                      target,
+                                      message: "Hello!")
+
+            post path, JSON.generate(body), 'CONTENT_TYPE' => 'text/json'
+            expect(last_response).to be_ok
+            expect(last_response.status).to eq(200)
+            result = JSON.parse(last_response.body)
+            expect(result).to include('status' => 'success')
+            expect(result['value']['_output'].chomp).to match(/\w+ got passed the message: Hello!/)
+          end
+        end
+
+        break if key_type == 'env'
       end
 
       it 'runs a shareable task' do

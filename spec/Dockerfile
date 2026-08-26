@@ -28,7 +28,8 @@ RUN adduser bolt sudo
 
 RUN mkdir -p /home/bolt/.ssh
 COPY fixtures/keys/id_rsa.pub /home/bolt/.ssh/id_rsa.pub
-COPY fixtures/keys/id_rsa.pub /home/bolt/.ssh/authorized_keys
+COPY fixtures/keys/id_ed25519.pub /home/bolt/.ssh/id_ed25519.pub
+RUN cat /home/bolt/.ssh/*.pub > /home/bolt/.ssh/authorized_keys
 RUN chmod 700 /home/bolt/.ssh
 RUN chmod 600 /home/bolt/.ssh/authorized_keys
 RUN chown -R bolt:sudo /home/bolt
@@ -41,7 +42,8 @@ RUN echo test | chsh -s /bin/bash test
 
 RUN mkdir -p /home/test/.ssh
 COPY fixtures/keys/id_rsa.pub /home/test/.ssh/id_rsa.pub
-COPY fixtures/keys/id_rsa.pub /home/test/.ssh/authorized_keys
+COPY fixtures/keys/id_ed25519.pub /home/test/.ssh/id_ed25519.pub
+RUN cat /home/test/.ssh/*.pub > /home/test/.ssh/authorized_keys
 RUN chmod 700 /home/test/.ssh
 RUN chmod 600 /home/test/.ssh/authorized_keys
 RUN chown -R test:sudo /home/test
