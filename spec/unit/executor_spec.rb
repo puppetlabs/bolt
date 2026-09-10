@@ -44,6 +44,43 @@ describe "Bolt::Executor" do
   let(:node_results) { mock_node_results }
   let(:ssh) { executor.transport('ssh') }
 
+  context '#unsubscribe' do
+    it 'removes subscriber when types is nil' do
+      sub = double('subscriber')
+      ex = Bolt::Executor.new(1, analytics)
+      ex.subscribe(sub)
+      ex.unsubscribe(sub)
+      expect(ex.instance_variable_get(:@subscribers)).not_to have_key(sub)
+    end
+
+    it 'removes subscriber when types match all subscribed types' do
+      sub = double('subscriber')
+      ex = Bolt::Executor.new(1, analytics)
+      ex.subscribe(sub, [:result, :start])
+      ex.unsubscribe(sub, [:result, :start])
+      expect(ex.instance_variable_get(:@subscribers)).not_to have_key(sub)
+    end
+
+    it 'removes specific types from subscriber when partially unsubscribing' do
+      sub = double('subscriber')
+      ex = Bolt::Executor.new(1, analytics)
+      ex.subscribe(sub, [:result, :start])
+      ex.unsubscribe(sub, [:result])
+      expect(ex.instance_variable_get(:@subscribers)[sub]).to eq([:start])
+    end
+  end
+
+  context '#download_file with EEXIST error' do
+    it 'raises Bolt::Error when destination already exists as a file' do
+      allow(FileUtils).to receive(:mkdir_p) do |path|
+        raise Errno::EEXIST, 'File exists' if path == '/tmp/dest'
+      end
+      expect do
+        executor.download_file(targets, source, '/tmp/dest')
+      end.to raise_error(Bolt::Error, /unable to create destination directory/)
+    end
+  end
+
   context 'running a command' do
     it 'executes on all nodes' do
       node_results.each do |target, result|

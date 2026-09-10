@@ -160,4 +160,65 @@ describe Bolt::ResourceInstance do
       expect(resource['foo']).to eq(nil)
     end
   end
+
+  context '.from_asserted_hash' do
+    it 'creates a ResourceInstance from a data hash' do
+      r = described_class.from_asserted_hash(resource_data)
+      expect(r).to be_a(described_class)
+      expect(r.type).to eq('File')
+    end
+  end
+
+  context '.from_asserted_args' do
+    it 'creates a ResourceInstance from positional arguments' do
+      r = described_class.from_asserted_args(target, 'Package', 'vim')
+      expect(r).to be_a(described_class)
+      expect(r.type).to eq('Package')
+      expect(r.title).to eq('vim')
+    end
+
+    it 'accepts optional state and events' do
+      r = described_class.from_asserted_args(target, 'Service', 'ssh',
+                                             { 'ensure' => 'running' }, nil, [])
+      expect(r.state).to eq('ensure' => 'running')
+    end
+  end
+
+  context '._pcore_type' do
+    it 'returns ResourceInstance constant' do
+      expect(described_class._pcore_type).to eq(Bolt::ResourceInstance)
+    end
+  end
+
+  context '.class._pcore_init_from_hash' do
+    it 'raises an error' do
+      expect { described_class._pcore_init_from_hash({}) }
+        .to raise_error(RuntimeError, /ResourceInstance shouldn't be instantiated/)
+    end
+  end
+
+  context '#_pcore_init_from_hash' do
+    it 'reinitializes from a hash' do
+      r = described_class.new(resource_data)
+      r._pcore_init_from_hash(resource_data)
+      expect(r.type).to eq('File')
+    end
+  end
+
+  context '#to_json' do
+    it 'returns a JSON string' do
+      allow(target).to receive(:to_json).and_return('"target1"')
+      json = resource.to_json
+      parsed = JSON.parse(json)
+      expect(parsed['type']).to eq('File')
+    end
+  end
+
+  context '#add_event' do
+    it 'appends an event to the events list' do
+      initial_count = resource.events.length
+      resource.add_event({ 'message' => 'new event' })
+      expect(resource.events.length).to eq(initial_count + 1)
+    end
+  end
 end

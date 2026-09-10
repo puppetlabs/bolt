@@ -84,6 +84,18 @@ describe "Bolt::Outputter::JSON" do
     expect(JSON.parse(output.string)).to eq(result)
   end
 
+  it "labels built-in plans as built-in module" do
+    plan = {
+      'name' => 'built_in_plan',
+      'module' => "#{Bolt::Config::Modulepath::MODULES_PATH}/built_in",
+      'files' => [],
+      'parameters' => []
+    }
+    outputter.print_plan_info(plan.dup)
+    parsed = JSON.parse(output.string)
+    expect(parsed['module_dir']).to eq('built-in module')
+  end
+
   it "formats a plan" do
     plan = {
       'name' => 'planity_plan',

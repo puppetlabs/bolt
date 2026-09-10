@@ -208,7 +208,7 @@ describe Bolt::Util do
   end
 
   describe '#prompt_yes_no' do
-    let(:outputter) { double('outputter', print_prompt: nil) }
+    let(:outputter) { double('outputter', print_prompt: nil, print_prompt_error: nil) }
 
     before(:each) do
       allow($stdin).to receive(:tty?).and_return(true)
@@ -226,6 +226,196 @@ describe Bolt::Util do
         allow($stdin).to receive(:gets).and_return(response)
         expect(Bolt::Util.prompt_yes_no('', outputter)).to be(false)
       end
+    end
+
+    it 'reprompts on invalid input then returns true on valid input' do
+      allow($stdin).to receive(:gets).and_return('maybe', 'yes')
+      expect(outputter).to receive(:print_prompt_error).once
+      expect(Bolt::Util.prompt_yes_no('proceed?', outputter)).to be(true)
+    end
+  end
+
+  describe '#search_module' do
+    it 'returns path under files/ if present' do
+      Dir.mktmpdir do |mod_path|
+        FileUtils.mkdir_p(File.join(mod_path, 'files'))
+        File.write(File.join(mod_path, 'files', 'myfile.sh'), '')
+        result = Bolt::Util.search_module(mod_path, 'myfile.sh')
+        expect(result).to eq(File.join(mod_path, 'files', 'myfile.sh'))
+      end
+    end
+
+    it 'falls back to module root if not under files/' do
+      Dir.mktmpdir do |mod_path|
+        File.write(File.join(mod_path, 'myfile.sh'), '')
+        result = Bolt::Util.search_module(mod_path, 'myfile.sh')
+        expect(result).to eq(File.join(mod_path, 'myfile.sh'))
+      end
+    end
+
+    it 'returns nil when file is not found' do
+      Dir.mktmpdir do |mod_path|
+        expect(Bolt::Util.search_module(mod_path, 'nonexistent.sh')).to be_nil
+      end
+    end
+  end
+
+  describe '#split_path' do
+    it 'splits a path into module and file components' do
+      result = Bolt::Util.split_path('mymod/myfile.sh')
+      expect(result).to eq(%w[mymod myfile.sh])
+    end
+  end
+
+  describe '#module_name' do
+    it 'raises an error when path does not contain plans or tasks' do
+      expect {
+        Bolt::Util.module_name('mymod/lib/something.rb')
+      }.to raise_error(Bolt::Error, /plans.*tasks/)
+    end
+  end
+
+  describe '#deep_merge!' do
+    it 'merges hashes in place' do
+      h1 = { 'a' => 1, 'b' => { 'x' => 1 } }
+      h2 = { 'b' => { 'y' => 2 }, 'c' => 3 }
+      result = Bolt::Util.deep_merge!(h1, h2)
+      expect(result).to eq('a' => 1, 'b' => { 'x' => 1, 'y' => 2 }, 'c' => 3)
+      expect(h1).to equal(result)
+    end
+
+    it 'overwrites non-hash values' do
+      h1 = { 'a' => 'old' }
+      h2 = { 'a' => 'new' }
+      Bolt::Util.deep_merge!(h1, h2)
+      expect(h1['a']).to eq('new')
+    end
+  end
+
+  describe '#postwalk_vals' do
+    it 'applies block to all values bottom-up' do
+      data = { 'a' => [1, 2] }
+      result = Bolt::Util.postwalk_vals(data) do |val|
+        val.is_a?(Integer) ? val * 2 : val
+      end
+      expect(result).to eq('a' => [2, 4])
+    end
+
+    it 'skips the top value when skip_top is true' do
+      called_with = []
+      Bolt::Util.postwalk_vals([1, 2], true) { |v| called_with << v; v }
+      expect(called_with).not_to include([1, 2])
+    end
+  end
+
+  describe '#deep_clone' do
+    it 'clones nested arrays' do
+      arr = [[1, 2], [3, 4]]
+      cloned = Bolt::Util.deep_clone(arr)
+      expect(cloned).to eq(arr)
+      expect(cloned).not_to equal(arr)
+      expect(cloned[0]).not_to equal(arr[0])
+    end
+
+    it 'handles objects with instance variables' do
+      obj = Object.new
+      obj.instance_variable_set(:@data, 'hello')
+      cloned = Bolt::Util.deep_clone(obj)
+      expect(cloned.instance_variable_get(:@data)).to eq('hello')
+    end
+
+    it 'handles true/false (unclonable)' do
+      expect(Bolt::Util.deep_clone(true)).to be true
+      expect(Bolt::Util.deep_clone(false)).to be false
+    end
+
+    it 'returns the same object when already cloned (circular ref protection)' do
+      arr = [1, 2]
+      cloned = {}
+      cloned[arr.object_id] = arr
+      result = Bolt::Util.deep_clone(arr, cloned)
+      expect(result).to equal(arr)
+    end
+
+    it 'clones structs with pair iteration' do
+      s = Struct.new(:x, :y).new('hello', 'world')
+      cloned = Bolt::Util.deep_clone(s)
+      expect(cloned.x).to eq('hello')
+      expect(cloned.y).to eq('world')
+      expect(cloned).not_to equal(s)
+    end
+  end
+
+  describe '#exec_podman' do
+    it 'calls Open3.capture3 with podman and the given command' do
+      allow(Open3).to receive(:capture3).and_return(['stdout', 'stderr', double(exitstatus: 0)])
+      stdout, _stderr, _status = Bolt::Util.exec_podman(['ps'])
+      expect(stdout).to eq('stdout')
+    end
+  end
+
+  describe '#class_name_to_file_name' do
+    it 'converts a class name to a file path' do
+      expect(Bolt::Util.class_name_to_file_name('Bolt::ApplyResult')).to eq('bolt/apply_result')
+    end
+
+    it 'handles CLI abbreviation correctly' do
+      expect(Bolt::Util.class_name_to_file_name('Bolt::CLI')).to eq('bolt/cli')
+    end
+  end
+
+  describe '#format_env_vars_for_cli' do
+    it 'formats env vars as repeated --env flags' do
+      result = Bolt::Util.format_env_vars_for_cli('FOO' => 'bar', 'BAZ' => 'qux')
+      expect(result).to include('--env', 'FOO=bar', '--env', 'BAZ=qux')
+    end
+
+    it 'returns an empty array for empty input' do
+      expect(Bolt::Util.format_env_vars_for_cli({})).to eq([])
+    end
+  end
+
+  describe '#unix_basename' do
+    it 'returns the last component of a unix path' do
+      expect(Bolt::Util.unix_basename('/foo/bar/baz.rb')).to eq('baz.rb')
+    end
+
+    it 'raises an error for non-string input' do
+      expect { Bolt::Util.unix_basename(42) }
+        .to raise_error(Bolt::ValidationError, /must be a String/)
+    end
+  end
+
+  describe '#windows_basename' do
+    it 'returns the last component of a windows path' do
+      expect(Bolt::Util.windows_basename('C:\\foo\\bar\\baz.rb')).to eq('baz.rb')
+    end
+
+    it 'returns the last component of a forward-slash path' do
+      expect(Bolt::Util.windows_basename('C:/foo/bar/baz.rb')).to eq('baz.rb')
+    end
+
+    it 'raises an error for non-string input' do
+      expect { Bolt::Util.windows_basename(nil) }
+        .to raise_error(Bolt::ValidationError, /must be a String/)
+    end
+  end
+
+  describe '#read_json_file with IOError' do
+    it 'raises FileError on IOError' do
+      allow(File).to receive(:read).and_raise(IOError, 'stream closed')
+      expect {
+        Bolt::Util.read_json_file('/some/path.json', 'testfile')
+      }.to raise_error(Bolt::FileError, /Could not read testfile/)
+    end
+  end
+
+  describe '#read_yaml_hash with IOError' do
+    it 'raises FileError on IOError' do
+      allow(File).to receive(:open).and_raise(IOError, 'stream closed')
+      expect {
+        Bolt::Util.read_yaml_hash('/some/path.yaml', 'testfile')
+      }.to raise_error(Bolt::FileError, /Could not read testfile/)
     end
   end
 end

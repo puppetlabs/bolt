@@ -23,7 +23,10 @@ end
 # Optional paint gem for rainbow outputter
 gem "paint", "~> 2.2"
 
+gem "bindata", "~> 2.4"
+
 group(:test) do
+  gem "simplecov", require: false
   gem "beaker-hostgenerator"
   gem "mocha", '~> 1.4.0'
   gem "rack-test", '~> 1.0'
