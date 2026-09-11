@@ -22,7 +22,7 @@ module Bolt
 
           plan_object = parse_plan
           param_descriptions = plan_object.parameters.map do |param|
-            str = String.new("# @param #{param.name}")
+            str = "# @param #{param.name}"
             str << " #{param.description}" if param.description
             str
           end.join("\n")

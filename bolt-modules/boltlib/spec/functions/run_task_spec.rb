@@ -24,6 +24,7 @@ end
 
 describe 'run_task' do
   include PuppetlabsSpec::Fixtures
+
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { Bolt::Inventory.empty }
   let(:tasks_enabled) { true }

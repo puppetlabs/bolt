@@ -95,8 +95,8 @@ module Bolt
         @logger.debug("Querying certnames")
         result = make_query(name_query, 'inventory', instance)
 
-        result&.each_with_object({}) do |node, coll|
-          coll[node['certname']] = node['facts']
+        result&.to_h do |node|
+          [node['certname'], node['facts']]
         end
       end
 

@@ -8,9 +8,8 @@ require 'fileutils'
 require 'securerandom'
 require_relative 'lib/acceptance/bolt_setup_helper'
 
-# rubocop:disable Style/MixinUsage
+# rubocop:disable-next Style/MixinUsage
 extend Acceptance::BoltSetupHelper
-# rubocop:enable Style/MixinUsage
 
 desc "Generate Beaker Host config"
 rototiller_task :host_config do |task|

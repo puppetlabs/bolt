@@ -21,8 +21,8 @@ describe Bolt::Transport::WinRM, winrm_transport: true do
   let(:project)     { Bolt::Project.new({}, '.') }
   let(:host)        { conn_info('winrm')[:host] }
   let(:port)        { conn_info('winrm')[:port] }
-  let(:ssl_port)    { ENV['BOLT_WINRM_SSL_PORT'].to_i || 25986 }
-  let(:smb_port)    { ENV['BOLT_WINRM_SMB_PORT'].to_i || 2445 }
+  let(:ssl_port)    { ENV['BOLT_WINRM_SSL_PORT'].to_i }
+  let(:smb_port)    { ENV['BOLT_WINRM_SMB_PORT'].to_i }
   let(:user)        { conn_info('winrm')[:user] }
   let(:password)    { conn_info('winrm')[:password] }
   let(:command)     { "[Environment]::UserName" }

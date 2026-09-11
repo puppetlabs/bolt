@@ -377,7 +377,7 @@ module Bolt
           param_spec = compiler.task_signature(object_name)&.task_hash&.dig('parameters')
         when 'plan'
           plan = compiler.plan_signature(object_name)
-          param_spec = plan.params_type.elements&.each_with_object({}) { |t, h| h[t.name] = t.value_type } if plan
+          param_spec = plan.params_type.elements&.to_h { |t| [t.name, t.value_type] } if plan
         end
         param_spec ||= {}
 

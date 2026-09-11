@@ -141,8 +141,8 @@ module Bolt
         transport = transport(protocol)
         report_transport(transport, protocol_targets.count)
         transport.batches(protocol_targets).flat_map do |batch|
-          batch_promises = Array(batch).each_with_object({}) do |target, h|
-            h[target] = Concurrent::Promise.new(executor: :immediate)
+          batch_promises = Array(batch).to_h do |target|
+            [target, Concurrent::Promise.new(executor: :immediate)]
           end
           # Pass this argument through to avoid retaining a reference to a
           # local variable that will change on the next iteration of the loop.

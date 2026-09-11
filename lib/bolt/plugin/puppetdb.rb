@@ -5,7 +5,7 @@ module Bolt
     class Puppetdb
       class FactLookupError < Bolt::Error
         def initialize(fact, err = nil)
-          m = String.new("Fact lookup '#{fact}' contains an invalid factname")
+          m = "Fact lookup '#{fact}' contains an invalid factname"
           m << ": #{err}" unless err.nil?
           super(m, 'bolt.plugin/fact-lookup-error')
         end

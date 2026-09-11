@@ -92,7 +92,7 @@ Puppet::Functions.create_function(:run_script, Puppet::Functions::InternalFuncti
         raise Bolt::ValidationError, "Option 'env_vars' must be a hash"
       end
 
-      if (bad_keys = options[:env_vars].keys.reject { |k| k.is_a?(String) }).any?
+      if (bad_keys = options[:env_vars].keys.grep_v(String)).any?
         raise Bolt::ValidationError,
               "Keys for option 'env_vars' must be strings: #{bad_keys.map(&:inspect).join(', ')}"
       end

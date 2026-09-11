@@ -8,6 +8,7 @@ require 'bolt/result_set'
 
 describe 'run_script' do
   include PuppetlabsSpec::Fixtures
+
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }

@@ -71,8 +71,8 @@ Puppet::Functions.create_function(:apply_prep) do
   #
   private def agent?(target)
     inventory.features(target).include?('puppet-agent') ||
-    executor.transport(target.transport).provided_features.include?('puppet-agent') ||
-    target.remote?
+      executor.transport(target.transport).provided_features.include?('puppet-agent') ||
+      target.remote?
   end
 
   # Generate the plugin tarball.

@@ -18,7 +18,7 @@ module Bolt
           return
         end
 
-        date = Time.new.strftime("%Y%m%d_%H%M%S%L")
+        date = Time.now.strftime("%Y%m%d_%H%M%S%L")
         FileUtils.mkdir_p(backup_dir)
 
         filename = File.basename(origin_path)

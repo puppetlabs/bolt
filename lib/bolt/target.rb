@@ -22,7 +22,7 @@ module Bolt
     # TODO: Disallow any positional argument other than URI.
     # Target.new from a plan with just a uri. Puppet requires the arguments to
     # this method to match (by name) the attributes defined on the datatype.
-    # rubocop:disable Lint/UnusedMethodArgument
+    # rubocop:disable-next Lint/UnusedMethodArgument
     def self.from_asserted_args(uri = nil,
                                 name = nil,
                                 safe_name = nil,
@@ -35,7 +35,6 @@ module Bolt
                                 resources = nil)
       from_asserted_hash('uri' => uri)
     end
-    # rubocop:enable Lint/UnusedMethodArgument
 
     def initialize(name, inventory = nil)
       @name = name
@@ -80,11 +79,10 @@ module Bolt
       inventory_target.resources
     end
 
-    # rubocop:disable Naming/AccessorMethodName
+    # rubocop:disable-next Naming/AccessorMethodName
     def set_resource(resource)
       inventory_target.set_resource(resource)
     end
-    # rubocop:enable Naming/AccessorMethodName
 
     def to_h
       options.to_h.merge(

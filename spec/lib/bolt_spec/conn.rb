@@ -28,7 +28,7 @@ module BoltSpec
         default_password = ''
         default_host     = 'ubuntu_node'
       when 'lxd'
-        default_host     = 'testlxd'
+        default_host = 'testlxd'
       when 'jail'
         default_user     = 'root'
         default_host     = 'bolt'

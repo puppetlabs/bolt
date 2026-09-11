@@ -71,7 +71,8 @@ module Bolt
         if defined?(Puppet)
           begin
             compiler = Puppet.lookup(:pal_compiler)
-          rescue Puppet::Context::UndefinedBindingError; end # rubocop:disable Lint/SuppressedException
+          rescue Puppet::Context::UndefinedBindingError
+          end
         end
 
         if compiler

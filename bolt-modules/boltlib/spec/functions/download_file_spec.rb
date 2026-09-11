@@ -9,6 +9,7 @@ require 'bolt/project'
 
 describe 'download_file' do
   include PuppetlabsSpec::Fixtures
+
   let(:executor)      { Bolt::Executor.new }
   let(:inventory)     { mock('inventory') }
   let(:project)       { Bolt::Project.default_project }

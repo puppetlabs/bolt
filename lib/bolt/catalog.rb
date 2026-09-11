@@ -131,7 +131,7 @@ module Bolt
         # contain NodeDefinitions, or c) doesn't contain NodeDefinitions.
         definitions = case ast
                       when Puppet::Pops::Model::BlockExpression
-                        ast.statements.select { |st| st.is_a?(Puppet::Pops::Model::NodeDefinition) }
+                        ast.statements.grep(Puppet::Pops::Model::NodeDefinition)
                       when Puppet::Pops::Model::NodeDefinition
                         [ast]
                       else

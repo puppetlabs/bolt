@@ -100,24 +100,22 @@ module Bolt
       @events << event
     end
 
-    # rubocop:disable Naming/AccessorMethodName
+    # rubocop:disable-next Naming/AccessorMethodName
     def set_state(state)
       assert_hash('state', state)
       @state.merge!(state)
     end
-    # rubocop:enable Naming/AccessorMethodName
 
     def overwrite_state(state)
       assert_hash('state', state)
       @state = state
     end
 
-    # rubocop:disable Naming/AccessorMethodName
+    # rubocop:disable-next Naming/AccessorMethodName
     def set_desired_state(desired_state)
       assert_hash('desired_state', desired_state)
       @desired_state.merge!(desired_state)
     end
-    # rubocop:enable Naming/AccessorMethodName
 
     def overwrite_desired_state(desired_state)
       assert_hash('desired_state', desired_state)

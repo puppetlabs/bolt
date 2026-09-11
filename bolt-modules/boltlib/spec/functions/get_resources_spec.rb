@@ -10,6 +10,7 @@ require 'bolt/task'
 
 describe 'get_resources' do
   include PuppetlabsSpec::Fixtures
+
   let(:applicator) { mock('Bolt::Applicator') }
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { Bolt::Inventory.empty }

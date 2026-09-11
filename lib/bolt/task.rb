@@ -68,7 +68,7 @@ module Bolt
     end
 
     def file_map
-      @file_map ||= files.each_with_object({}) { |file, hsh| hsh[file['name']] = file }
+      @file_map ||= files.to_h { |file| [file['name'], file] }
     end
     private :file_map
 

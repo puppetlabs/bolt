@@ -82,8 +82,8 @@ describe Bolt::Transport::Local do
         with_tempfile_containing('tasks test upload as root', contents) do |file|
           expect(runner.upload(target, file.path, dest, run_as: user).message).to match(/Uploaded/)
           expect(runner.run_command(target, "cat #{dest}", run_as: user)['stdout']).to eq(contents)
-          expect(runner.run_command(target, "stat -c %U #{dest}", run_as:  user)['stdout'].chomp).to eq(user)
-          expect(runner.run_command(target, "stat -c %G #{dest}", run_as:  user)['stdout'].chomp).to eq('docker')
+          expect(runner.run_command(target, "stat -c %U #{dest}", run_as: user)['stdout'].chomp).to eq(user)
+          expect(runner.run_command(target, "stat -c %G #{dest}", run_as: user)['stdout'].chomp).to eq('docker')
         end
 
         runner.run_command(target, "rm #{dest}", sudoable: true, run_as: user)

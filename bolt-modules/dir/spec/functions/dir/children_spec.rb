@@ -5,6 +5,7 @@ require 'fileutils'
 
 describe 'dir::children' do
   include PuppetlabsSpec::Fixtures
+
   let(:path) { fixtures('modules', 'test') }
 
   around(:each) do |example|

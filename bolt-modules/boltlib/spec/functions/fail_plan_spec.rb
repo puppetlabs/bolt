@@ -6,6 +6,7 @@ require 'bolt/error'
 
 describe 'fail_plan' do
   include PuppetlabsSpec::Fixtures
+
   let(:tasks_enabled) { true }
   let(:executor) { Bolt::Executor.new }
 

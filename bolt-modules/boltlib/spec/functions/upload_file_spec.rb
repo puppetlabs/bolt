@@ -8,6 +8,7 @@ require 'bolt/target'
 
 describe 'upload_file' do
   include PuppetlabsSpec::Fixtures
+
   let(:executor) { Bolt::Executor.new }
   let(:inventory) { mock('inventory') }
   let(:tasks_enabled) { true }

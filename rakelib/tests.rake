@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# rubocop:disable Lint/SuppressedException
+# rubocop:disable-next Lint/SuppressedException
 begin
   require 'rspec/core/rake_task'
 
@@ -182,4 +182,3 @@ begin
   end
 rescue LoadError
 end
-# rubocop:enable Lint/SuppressedException

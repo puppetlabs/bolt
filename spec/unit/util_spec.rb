@@ -7,6 +7,7 @@ require 'bolt_spec/files'
 
 describe Bolt::Util do
   include BoltSpec::Files
+
   context "when creating a typed name from a modulepath" do
     it "removes init from the typed name" do
       expect(Bolt::Util.module_name('mymod/plans/init.pp')).to eq('mymod')

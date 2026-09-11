@@ -33,6 +33,7 @@ module BoltSpec
     end
 
     include BoltSpec::Files
+
     def with_task_containing(name, contents, input_method, extension = nil)
       with_tempfile_containing(name, contents, extension) do |file|
         yield mock_task(name, file.path, input_method)
