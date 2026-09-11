@@ -335,7 +335,7 @@ describe Bolt::Util do
     it 'returns the same object when already cloned (circular ref protection)' do
       arr = [1, 2]
       cloned = {}
-      cloned[arr.object_id] = arr
+      cloned[arr.object_id] = arr # rubocop:disable Lint/HashCompareByIdentity
       result = Bolt::Util.deep_clone(arr, cloned)
       expect(result).to equal(arr)
     end

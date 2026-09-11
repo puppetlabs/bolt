@@ -21,7 +21,7 @@ describe Bolt::Outputter::Logger do
     results = (1..successes).map { double('result', error_hash: nil) }
     results += (1..failures).map { double('result', error_hash: { 'msg' => 'err' }) } if failures > 0
     mock_rs = double('result_set')
-    error_results = results.select { |r| r.error_hash }
+    error_results = results.select(&:error_hash)
     allow(mock_rs).to receive(:error_set).and_return(double('error_set', length: error_results.length))
     mock_rs
   end

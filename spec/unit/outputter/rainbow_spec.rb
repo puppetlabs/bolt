@@ -96,7 +96,7 @@ describe "Bolt::Outputter::Rainbow" do
       spin_outputter.start_spin
       expect(spin_outputter.instance_variable_get(:@spinning)).to be true
       thread = spin_outputter.instance_variable_get(:@spin_thread)
-      thread.kill if thread
+      thread&.kill
     end
 
     it 'does not spin when stream is not a tty' do
