@@ -268,7 +268,7 @@ describe "Bolt::Executor" do
 
   context 'running a task with per-target params' do
     let(:target_mapping) do
-      targets.each_with_object({}) { |target, map| map[target] = { 'name' => target.name } }
+      targets.to_h { |target| [target, { 'name' => target.name }] }
     end
 
     it "executes on all targets" do
@@ -681,9 +681,9 @@ describe "Bolt::Executor" do
         'exit_code'     => 0
       }
 
-      state = targets.each_with_object({}) do |target, acc|
-        acc[target] = { promise: Concurrent::Promise.new { Bolt::Result.for_command(target, value) },
-                        running: false }
+      state = targets.to_h do |target|
+        [target, { promise: Concurrent::Promise.new { Bolt::Result.for_command(target, value) },
+                   running: false }]
       end
 
       # calling promise.value will block the thread from completing
@@ -896,7 +896,7 @@ describe "Bolt::Executor" do
           .and_return(result)
       end
 
-      target_mapping = targets.each_with_object({}) { |target, map| map[target] = task_arguments }
+      target_mapping = targets.to_h { |target| [target, task_arguments] }
 
       executor.start_plan(plan_context)
       executor.run_task_with(target_mapping, mock_task(task), task_options)

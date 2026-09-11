@@ -38,6 +38,7 @@ end
 RSpec.configure do |config|
   Bolt::Logger.initialize_logging
   include RSpec::LoggingHelper
+
   config.capture_log_messages
 
   # rspec-expectations config
