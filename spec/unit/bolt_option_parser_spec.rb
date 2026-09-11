@@ -229,4 +229,212 @@ describe 'parser' do
       end
     end
   end
+
+  describe '#get_help_text' do
+    it 'returns help for apply' do
+      result = parser.get_help_text('apply')
+      expect(result[:flags]).to include('noop')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for command run' do
+      result = parser.get_help_text('command', 'run')
+      expect(result[:flags]).to include('env-var')
+    end
+
+    it 'returns help for command (no action)' do
+      result = parser.get_help_text('command')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for file upload' do
+      result = parser.get_help_text('file', 'upload')
+      expect(result[:flags]).to include('tmpdir')
+    end
+
+    it 'returns help for file download' do
+      result = parser.get_help_text('file', 'download')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for file (no action)' do
+      result = parser.get_help_text('file')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for inventory show' do
+      result = parser.get_help_text('inventory', 'show')
+      expect(result[:flags]).to include('detail')
+    end
+
+    it 'returns help for inventory (no action)' do
+      result = parser.get_help_text('inventory')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for group show' do
+      result = parser.get_help_text('group', 'show')
+      expect(result[:flags]).to include('inventoryfile')
+    end
+
+    it 'returns help for group (no action)' do
+      result = parser.get_help_text('group')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for guide' do
+      result = parser.get_help_text('guide')
+      expect(result[:flags]).to include('format')
+    end
+
+    it 'returns help for lookup' do
+      result = parser.get_help_text('lookup')
+      expect(result[:flags]).to include('hiera-config')
+    end
+
+    it 'returns help for module add' do
+      result = parser.get_help_text('module', 'add')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for module generate-types' do
+      result = parser.get_help_text('module', 'generate-types')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for module install' do
+      result = parser.get_help_text('module', 'install')
+      expect(result[:flags]).to include('force')
+    end
+
+    it 'returns help for module show' do
+      result = parser.get_help_text('module', 'show')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for module (no action)' do
+      result = parser.get_help_text('module')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for plan convert' do
+      result = parser.get_help_text('plan', 'convert')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for plan new' do
+      result = parser.get_help_text('plan', 'new')
+      expect(result[:flags]).to include('pp')
+    end
+
+    it 'returns help for plan run' do
+      result = parser.get_help_text('plan', 'run')
+      expect(result[:flags]).to include('params')
+    end
+
+    it 'returns help for plan show' do
+      result = parser.get_help_text('plan', 'show')
+      expect(result[:flags]).to include('filter')
+    end
+
+    it 'returns help for plan (no action)' do
+      result = parser.get_help_text('plan')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for plugin show' do
+      result = parser.get_help_text('plugin', 'show')
+      expect(result[:flags]).to include('modulepath')
+    end
+
+    it 'returns help for plugin (no action)' do
+      result = parser.get_help_text('plugin')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for policy apply' do
+      result = parser.get_help_text('policy', 'apply')
+      expect(result[:flags]).to include('noop')
+    end
+
+    it 'returns help for policy new' do
+      result = parser.get_help_text('policy', 'new')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for policy show' do
+      result = parser.get_help_text('policy', 'show')
+      expect(result[:banner]).to be_a(String)
+    end
+
+    it 'returns help for policy (no action)' do
+      result = parser.get_help_text('policy')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for project init' do
+      result = parser.get_help_text('project', 'init')
+      expect(result[:flags]).to include('modules')
+    end
+
+    it 'returns help for project migrate' do
+      result = parser.get_help_text('project', 'migrate')
+      expect(result[:flags]).to include('inventoryfile')
+    end
+
+    it 'returns help for project (no action)' do
+      result = parser.get_help_text('project')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for script run' do
+      result = parser.get_help_text('script', 'run')
+      expect(result[:flags]).to include('env-var')
+    end
+
+    it 'returns help for script (no action)' do
+      result = parser.get_help_text('script')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for secret createkeys' do
+      result = parser.get_help_text('secret', 'createkeys')
+      expect(result[:flags]).to include('force')
+    end
+
+    it 'returns help for secret decrypt' do
+      result = parser.get_help_text('secret', 'decrypt')
+      expect(result[:flags]).to include('plugin')
+    end
+
+    it 'returns help for secret encrypt' do
+      result = parser.get_help_text('secret', 'encrypt')
+      expect(result[:flags]).to include('plugin')
+    end
+
+    it 'returns help for secret (no action)' do
+      result = parser.get_help_text('secret')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns help for task run' do
+      result = parser.get_help_text('task', 'run')
+      expect(result[:flags]).to include('noop')
+    end
+
+    it 'returns help for task show' do
+      result = parser.get_help_text('task', 'show')
+      expect(result[:flags]).to include('filter')
+    end
+
+    it 'returns help for task (no action)' do
+      result = parser.get_help_text('task')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+
+    it 'returns top-level banner for unknown subcommand' do
+      result = parser.get_help_text('unknown')
+      expect(result[:flags]).to eq(Bolt::BoltOptionParser::OPTIONS[:global])
+    end
+  end
 end

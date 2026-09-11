@@ -57,6 +57,81 @@ describe Bolt::PuppetDB::Client do
     end
   end
 
+  context 'with a named default instance' do
+    let(:client) { described_class.new(config: config, instances: instances, default: instance_name) }
+
+    it 'uses the named instance as the default' do
+      expect(client.instance).to eq(named_instance)
+    end
+
+    it 'errors when the default name is not configured' do
+      expect { described_class.new(config: config, instances: {}, default: 'missing') }
+        .to raise_error(Bolt::PuppetDBError, /has not been configured/)
+    end
+  end
+
+  context '#query_certnames' do
+    it 'returns an empty array when query is nil' do
+      expect(client.query_certnames(nil)).to eq([])
+    end
+
+    it 'returns certnames from query results' do
+      allow(default_instance).to receive(:make_query)
+        .and_return([{ 'certname' => 'host1' }, { 'certname' => 'host2' }, { 'certname' => 'host1' }])
+      expect(client.query_certnames('nodes {}'))
+        .to contain_exactly('host1', 'host2')
+    end
+
+    it 'errors when results do not contain a certname field' do
+      allow(default_instance).to receive(:make_query).and_return([{ 'name' => 'host1' }])
+      expect { client.query_certnames('nodes {}') }
+        .to raise_error(Bolt::PuppetDBError, /certname/)
+    end
+  end
+
+  context '#facts_for_node' do
+    it 'returns an empty hash when certnames is empty' do
+      expect(client.facts_for_node([])).to eq({})
+    end
+
+    it 'returns a hash of certname to facts' do
+      allow(default_instance).to receive(:make_query).and_return(
+        [{ 'certname' => 'host1', 'facts' => { 'os' => 'linux' } }]
+      )
+      expect(client.facts_for_node(['host1'])).to eq('host1' => { 'os' => 'linux' })
+    end
+  end
+
+  context '#fact_values' do
+    it 'returns an empty hash when certnames is empty' do
+      expect(client.fact_values([], ['os'])).to eq({})
+    end
+
+    it 'returns an empty hash when facts list is empty' do
+      expect(client.fact_values(['host1'], [])).to eq({})
+    end
+
+    it 'returns results grouped by certname' do
+      allow(default_instance).to receive(:make_query).and_return(
+        [{ 'certname' => 'host1', 'path' => 'os', 'value' => 'linux', 'environment' => 'prod', 'name' => 'os' }]
+      )
+      result = client.fact_values(['host1'], ['os'])
+      expect(result.keys).to contain_exactly('host1')
+    end
+  end
+
+  context '#make_query' do
+    it 'delegates to the default instance' do
+      expect(default_instance).to receive(:make_query).with('nodes {}', nil).and_return([])
+      client.make_query('nodes {}')
+    end
+
+    it 'delegates to the named instance' do
+      expect(named_instance).to receive(:make_query).with('nodes {}', 'path').and_return([])
+      client.make_query('nodes {}', 'path', instance_name)
+    end
+  end
+
   context '#send_command' do
     let(:command) { 'implode' }
     let(:version) { 5 }

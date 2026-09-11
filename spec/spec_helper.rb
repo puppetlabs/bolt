@@ -2,6 +2,9 @@
 
 # See http://rubydoc.info/gems/rspec-core/RSpec/Core/Configuration
 
+require 'simplecov'
+SimpleCov.start
+
 require 'bolt'
 require 'bolt/logger'
 require 'bolt/util'
@@ -35,6 +38,7 @@ end
 RSpec.configure do |config|
   Bolt::Logger.initialize_logging
   include RSpec::LoggingHelper
+
   config.capture_log_messages
 
   # rspec-expectations config

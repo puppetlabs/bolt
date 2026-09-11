@@ -226,6 +226,37 @@ describe Bolt::Analytics::Client do
 
       subject.event('run', 'task', value: 12)
     end
+
+    it 'sets custom dimensions from keyword args' do
+      params = base_params.merge(t: 'event', ec: 'run', ea: 'task', cd1: 'Linux')
+
+      expect(subject).to receive(:submit).with params
+
+      subject.event('run', 'task', operating_system: 'Linux')
+    end
+  end
+
+  describe '#submit' do
+    it 'posts data via HTTP asynchronously' do
+      http = double('http')
+      allow(http).to receive(:post)
+      subject.instance_variable_set(:@http, http)
+      allow(Concurrent::Future).to receive(:execute) { |**_kwargs, &block| block.call }
+      expect(http).to receive(:post).with(Bolt::Analytics::TRACKING_URL, anything)
+      subject.submit(v: 1)
+    end
+  end
+
+  describe '#finish' do
+    it 'shuts down the executor and waits for termination' do
+      executor = double('executor')
+      allow(executor).to receive(:shutdown)
+      allow(executor).to receive(:wait_for_termination)
+      subject.instance_variable_set(:@executor, executor)
+      expect(executor).to receive(:shutdown)
+      expect(executor).to receive(:wait_for_termination).with(0.25)
+      subject.finish
+    end
   end
 end
 

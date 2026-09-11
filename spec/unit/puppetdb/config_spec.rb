@@ -231,6 +231,62 @@ describe Bolt::PuppetDB::Config do
     end
   end
 
+  context "#server_urls" do
+    let(:config) { Bolt::PuppetDB::Config.new(config: { 'server_urls' => 'https://pdb:8081' }) }
+
+    it 'wraps a string in an array' do
+      expect(config.server_urls).to eq(['https://pdb:8081'])
+    end
+
+    it 'returns an array as-is' do
+      cfg = Bolt::PuppetDB::Config.new(config: { 'server_urls' => ['https://pdb:8081'] })
+      expect(cfg.server_urls).to eq(['https://pdb:8081'])
+    end
+
+    it 'raises when server_urls is nil' do
+      cfg = Bolt::PuppetDB::Config.new(config: {})
+      expect { cfg.server_urls }.to raise_error(Bolt::PuppetDBError, /must be specified/)
+    end
+
+    it 'raises when server_urls is an invalid type' do
+      cfg = Bolt::PuppetDB::Config.new(config: { 'server_urls' => 123 })
+      expect { cfg.server_urls }.to raise_error(Bolt::PuppetDBError, /must be a string or array/)
+    end
+  end
+
+  context "#uri with string server_urls" do
+    it 'parses a string server_url' do
+      cfg = Bolt::PuppetDB::Config.new(config: { 'server_urls' => 'https://pdb:8081' })
+      expect(cfg.uri.host).to eq('pdb')
+    end
+
+    it 'raises when server_urls is nil' do
+      cfg = Bolt::PuppetDB::Config.new(config: {})
+      expect { cfg.uri }.to raise_error(Bolt::PuppetDBError, /must be specified/)
+    end
+
+    it 'raises when server_urls is an invalid type' do
+      cfg = Bolt::PuppetDB::Config.new(config: { 'server_urls' => 123 })
+      expect { cfg.uri }.to raise_error(Bolt::PuppetDBError, /must be a string or array/)
+    end
+  end
+
+  context "#token with explicit nil" do
+    it 'returns nil when token is explicitly set to nil in config' do
+      cfg = Bolt::PuppetDB::Config.new(config: { 'token' => nil })
+      expect(cfg.token).to be_nil
+    end
+  end
+
+  context "#to_hash" do
+    it 'returns a copy of settings' do
+      opts = { 'server_urls' => ['https://pdb:8081'], 'cacert' => '/path/to/ca.pem' }
+      cfg = Bolt::PuppetDB::Config.new(config: opts)
+      expect(cfg.to_hash).to eq(opts)
+      expect(cfg.to_hash).not_to equal(cfg.instance_variable_get(:@settings))
+    end
+  end
+
   context "load_defaults" do
     it "on non-windows OS loads from default location" do
       allow(Bolt::Util).to receive(:windows?).and_return(false)

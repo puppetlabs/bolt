@@ -98,6 +98,118 @@ describe Bolt::Result do
     end
   end
 
+  describe :for_upload do
+    it 'creates a result with an upload message' do
+      t = Bolt::Inventory.empty.get_target('myhost')
+      result = Bolt::Result.for_upload(t, '/local/file', '/remote/path')
+      expect(result.action).to eq('upload')
+      expect(result.message).to match(/Uploaded/)
+    end
+  end
+
+  describe :for_download do
+    it 'creates a result with a download message and path value' do
+      t = Bolt::Inventory.empty.get_target('myhost')
+      result = Bolt::Result.for_download(t, '/remote/file', '/local/dir', '/local/dir/file')
+      expect(result.action).to eq('download')
+      expect(result.value['path']).to eq('/local/dir/file')
+      expect(result.message).to match(/Downloaded/)
+    end
+  end
+
+  describe :for_lookup do
+    it 'creates a lookup result with value and key' do
+      result = Bolt::Result.for_lookup(target, 'mykey', 'myvalue')
+      expect(result.action).to eq('lookup')
+      expect(result.object).to eq('mykey')
+      expect(result.value).to eq('value' => 'myvalue')
+    end
+  end
+
+  describe :from_asserted_args do
+    it 'creates a result from a target and value' do
+      result = Bolt::Result.from_asserted_args(target, { 'key' => 'val' })
+      expect(result.value).to eq('key' => 'val')
+    end
+  end
+
+  describe :class_pcore_init_from_hash do
+    it 'raises when called on the class' do
+      expect { Bolt::Result._pcore_init_from_hash }
+        .to raise_error(RuntimeError, /Result shouldn't be instantiated/)
+    end
+  end
+
+  describe :_pcore_init_from_hash do
+    it 'initializes from a hash with string keys' do
+      result = Bolt::Result.new(target)
+      result._pcore_init_from_hash('target' => 'bar', 'message' => 'hello')
+      expect(result.message).to eq('hello')
+    end
+  end
+
+  describe :_pcore_init_hash do
+    it 'returns a hash representation' do
+      result = Bolt::Result.new(target, message: 'hi', action: 'task', object: 'obj')
+      h = result._pcore_init_hash
+      expect(h['target']).to eq(target)
+      expect(h['message']).to eq('hi')
+    end
+  end
+
+  describe '#message?' do
+    it 'returns a falsey value when message is nil' do
+      expect(Bolt::Result.new(target).message?).to be_falsey
+    end
+
+    it 'returns false when message is only whitespace' do
+      expect(Bolt::Result.new(target, message: "  \n").message?).to be false
+    end
+
+    it 'returns true when message has content' do
+      expect(Bolt::Result.new(target, message: 'hello').message?).to be true
+    end
+  end
+
+  describe '#eql?' do
+    it 'returns true for results with equal target and value' do
+      a = Bolt::Result.new(target, message: 'hi')
+      b = Bolt::Result.new(target, message: 'hi')
+      expect(a).to eq(b)
+    end
+
+    it 'returns false for results with different values' do
+      a = Bolt::Result.new(target, message: 'hi')
+      b = Bolt::Result.new(target, message: 'bye')
+      expect(a).not_to eq(b)
+    end
+  end
+
+  describe '#[]' do
+    it 'provides hash-style access to the value' do
+      result = Bolt::Result.new(target, message: 'hello')
+      expect(result['_output']).to eq('hello')
+    end
+  end
+
+  describe '#error' do
+    it 'returns a Puppet error when error_hash is present' do
+      puppet_error = double('puppet_error')
+      error_klass = double('Puppet::DataTypes::Error', from_asserted_hash: puppet_error)
+      stub_const('Puppet::DataTypes::Error', error_klass)
+      result = Bolt::Result.new(target, error: { 'kind' => 'bolt/test', 'msg' => 'fail', 'details' => {} })
+      expect(result.error).to be(puppet_error)
+    end
+  end
+
+  describe '#to_s' do
+    it 'returns a JSON string' do
+      t = Bolt::Target.new('myhost')
+      result = Bolt::Result.new(t, message: 'hi', action: 'task')
+      expect(JSON.parse(result.to_s)['status']).to eq('success')
+    end
+  end
+
   describe :for_task do
     it 'parses json objects' do
       obj = { "key" => "val" }
@@ -184,6 +296,21 @@ describe Bolt::Result do
       result = Bolt::Result.for_task(target, stdout, '', 0, 'atask', [])
       expect(result.value.keys).to eq(['_error'])
       expect(result.error_hash['msg']).to match(/The task result contained invalid UTF-8/)
+    end
+
+    it 'creates an error message for non-zero exit with empty stdout and stderr' do
+      result = Bolt::Result.for_task(target, '', '', 1, 'atask', [])
+      expect(result.error_hash['msg']).to match(/no output/)
+    end
+
+    it 'creates an error message for non-zero exit with empty stdout but non-empty stderr' do
+      result = Bolt::Result.for_task(target, '', 'error on stderr', 1, 'atask', [])
+      expect(result.error_hash['msg']).to match(/no stdout.*stderr/)
+    end
+
+    it 'creates an error message for non-zero exit with non-empty stdout' do
+      result = Bolt::Result.for_task(target, '{"status":"bad"}', '', 1, 'atask', [])
+      expect(result.error_hash['msg']).to match(/exit code 1/)
     end
   end
 end
