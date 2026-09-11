@@ -23,8 +23,8 @@ namespace :schemas do
     transports        = Bolt::Config::TRANSPORT_CONFIG
     definitions       = Bolt::Config::OPTIONS.slice(*options)
 
-    properties = options.to_h do |option|
-      [option, { "$ref" => "#/definitions/#{option}" }]
+    properties = options.each_with_object({}) do |option, acc|
+      acc[option] = { "$ref" => "#/definitions/#{option}" }
     end
 
     # Add inventory option definition references to the 'inventory-config' option
@@ -37,8 +37,8 @@ namespace :schemas do
 
     # Add transport option definition references to each transport definition
     transports.each do |option, transport|
-      definitions[option][:properties] = transport.options.to_h do |opt|
-        [opt, { "$ref" => "#/transport_definitions/#{opt}" }]
+      definitions[option][:properties] = transport.options.each_with_object({}) do |opt, acc|
+        acc[opt] = { "$ref" => "#/transport_definitions/#{opt}" }
       end
     end
 
@@ -103,8 +103,8 @@ namespace :schemas do
     options     = Bolt::Config::PROJECT_OPTIONS
     definitions = Bolt::Config::OPTIONS.slice(*options)
 
-    properties = options.to_h do |option|
-      [option, { "$ref" => "#/definitions/#{option}" }]
+    properties = options.each_with_object({}) do |option, acc|
+      acc[option] = { "$ref" => "#/definitions/#{option}" }
     end
 
     definitions = definitions.transform_values do |data|

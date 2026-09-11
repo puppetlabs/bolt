@@ -11,7 +11,6 @@ require 'bolt_spec/files'
 
 describe Bolt::Catalog do
   include BoltSpec::Files
-
   let(:uri) { 'catalog' }
   let(:target) { inventory.get_target(uri) }
   let(:inventory) { Bolt::Inventory.empty }

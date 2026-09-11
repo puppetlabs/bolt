@@ -7,7 +7,6 @@ require 'bolt/plan_future'
 
 describe 'wait' do
   include PuppetlabsSpec::Fixtures
-
   let(:name)      { "Pluralize" }
   let(:future)    { Bolt::PlanFuture.new('foo', name, plan_id: 1234) }
   let(:executor)  { Bolt::Executor.new }

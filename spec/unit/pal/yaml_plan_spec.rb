@@ -335,7 +335,7 @@ describe Bolt::PAL::YamlPlan do
 
       it "evaluates nested variable lookups" do
         str = described_class.new("$foo[0][$bar]")
-        scope.with_local_scope('foo' => [{ 'testkey' => 'hello world' }], 'bar' => 'testkey') do |local_scope|
+        scope.with_local_scope('foo' => ['testkey' => 'hello world'], 'bar' => 'testkey') do |local_scope|
           expect(str.evaluate(local_scope, evaluator)).to eq("hello world")
         end
       end

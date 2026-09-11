@@ -53,8 +53,9 @@ module Bolt
 
       unless missing_keys.empty?
         if result['_output']
-          # rubocop:disable-next Layout/LineLength
+          # rubocop:disable Layout/LineLength
           msg = "Report result contains an '_output' key. Catalog application might have printed extraneous output to stdout: #{result['_output']}"
+          # rubocop:enable Layout/LineLength
         else
           msg = "Report did not contain all expected keys missing: #{missing_keys.join(', ')}"
         end
@@ -114,7 +115,7 @@ module Bolt
 
     def event_metrics
       if (events = value.dig('report', 'metrics', 'resources', 'values'))
-        events.to_h { |ev| [ev[0], ev[2]] }
+        events.each_with_object({}) { |ev, h| h[ev[0]] = ev[2] }
       end
     end
 

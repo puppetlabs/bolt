@@ -153,7 +153,6 @@ Lint/RedundantCopDisableDirective:
 # Configuration parameters: AllowComments, AllowNil.
 Lint/SuppressedException:
   Exclude:
-    - 'lib/bolt/plugin.rb'
     - 'lib/bolt/shell/bash.rb'
 
 # Offense count: 1
@@ -605,27 +604,3 @@ Style/SuperArguments:
 Style/YAMLFileRead:
   Exclude:
     - 'spec/unit/module_installer_spec.rb'
-
-# Offense count: 2
-Style/FileOpen:
-  Exclude:
-    - 'dev-resources/bump_mods.rb'
-
-# Offense count: 15
-Naming/PredicateMethod:
-  Exclude:
-    - 'bolt-modules/file/lib/puppet/functions/file/exists.rb'
-    - 'bolt-modules/file/lib/puppet/functions/file/readable.rb'
-    - 'lib/bolt/module_installer/specs/id/gitclone.rb'
-    - 'lib/bolt/pal/yaml_plan/parameter.rb'
-    - 'lib/bolt/project_manager/config_migrator.rb'
-    - 'lib/bolt/puppetdb/config.rb'
-    - 'lib/bolt/result_set.rb'
-    - 'lib/bolt_server/file_cache.rb'
-    - 'lib/bolt_spec/plans/action_stubs/command_stub.rb'
-    - 'lib/bolt_spec/plans/action_stubs/download_stub.rb'
-    - 'lib/bolt_spec/plans/action_stubs/plan_stub.rb'
-    - 'lib/bolt_spec/plans/action_stubs/script_stub.rb'
-    - 'lib/bolt_spec/plans/action_stubs/task_stub.rb'
-    - 'lib/bolt_spec/plans/action_stubs/upload_stub.rb'
-    - 'lib/bolt_spec/plans/publish_stub.rb'

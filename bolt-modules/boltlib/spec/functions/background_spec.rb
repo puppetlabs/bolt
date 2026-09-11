@@ -7,7 +7,6 @@ require 'bolt/plan_future'
 
 describe 'background' do
   include PuppetlabsSpec::Fixtures
-
   let(:name)      { "Pluralize" }
   let(:object)    { "noodle" }
   let(:future)    { Bolt::PlanFuture.new('foo', name, plan_id: 1234) }

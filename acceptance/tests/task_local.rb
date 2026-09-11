@@ -6,7 +6,6 @@ require 'bolt_setup_helper'
 test_name "bolt task run should execute tasks on localhost via local transport" do
   extend Acceptance::BoltCommandHelper
   extend Acceptance::BoltSetupHelper
-
   dir = bolt.tmpdir('local_task')
 
   if bolt['platform'] =~ /windows/

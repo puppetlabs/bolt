@@ -69,7 +69,7 @@ module Bolt
         @set_local_default = true
       end
 
-      # rubocop:disable-next Naming/AccessorMethodName
+      # rubocop:disable Naming/AccessorMethodName
       def set_resource(resource)
         if (existing_resource = resources[resource.reference])
           existing_resource.overwrite_state(resource.state)
@@ -80,6 +80,7 @@ module Bolt
           @resources[resource.reference] = resource
         end
       end
+      # rubocop:enable Naming/AccessorMethodName
 
       def vars
         group_cache['vars'].merge(@vars)
@@ -87,10 +88,11 @@ module Bolt
 
       # This method isn't actually an accessor and we want the name to
       # correspond to the Puppet function
-      # rubocop:disable-next Naming/AccessorMethodName
+      # rubocop:disable Naming/AccessorMethodName
       def set_var(var_hash)
         @vars.merge!(var_hash)
       end
+      # rubocop:enable Naming/AccessorMethodName
 
       def facts
         Bolt::Util.deep_merge(group_cache['facts'], @facts)

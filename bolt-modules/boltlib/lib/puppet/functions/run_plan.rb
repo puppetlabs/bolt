@@ -100,8 +100,8 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
     # If a TargetSpec parameter is passed, ensure it is in inventory
     inventory = Puppet.lookup(:bolt_inventory)
 
-    param_types = closure.parameters.to_h do |param|
-      [param.name, extract_parameter_types(param.type_expr)&.flatten]
+    param_types = closure.parameters.each_with_object({}) do |param, param_acc|
+      param_acc[param.name] = extract_parameter_types(param.type_expr)&.flatten
     end
 
     targets_to_param(targets, params, param_types) if targets
@@ -202,7 +202,7 @@ Puppet::Functions.create_function(:run_plan, Puppet::Functions::InternalFunction
   # wrapped as Sensitive. This will also raise a helpful warning if the type expression
   # is a complex data type using Sensitive, as we don't handle those cases.
   def wrap_sensitive_parameters(params, param_models)
-    models = param_models.to_h { |param| [param.name, param] }
+    models = param_models.each_with_object({}) { |param, acc| acc[param.name] = param }
 
     params.each_with_object({}) do |(name, value), acc|
       model = models[name]

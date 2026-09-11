@@ -49,8 +49,8 @@ module Bolt
     end
 
     def result_hash
-      @result_hash ||= @results.to_h do |result|
-        [result.target.name, result]
+      @result_hash ||= @results.each_with_object({}) do |result, acc|
+        acc[result.target.name] = result
       end
     end
 

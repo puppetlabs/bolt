@@ -48,7 +48,7 @@ def make_request(url)
   end
 end
 
-# rubocop:disable-next Lint/SuppressedException
+# rubocop:disable Lint/SuppressedException
 begin
   require 'puppet-strings'
 
@@ -518,6 +518,7 @@ begin
   end
 rescue LoadError
 end
+# rubocop:enable Lint/SuppressedException
 
 def generate_yaml_file(data)
   data.each_with_object({}) do |(option, definition), acc|

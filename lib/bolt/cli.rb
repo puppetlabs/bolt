@@ -254,11 +254,11 @@ module Bolt
         end
       end
 
-      if options[:subcommand] == 'apply' && options[:object] && options[:code]
+      if options[:subcommand] == 'apply' && (options[:object] && options[:code])
         raise Bolt::CLIError, "--execute is unsupported when specifying a manifest file"
       end
 
-      if options[:subcommand] == 'apply' && !options[:object] && !options[:code]
+      if options[:subcommand] == 'apply' && (!options[:object] && !options[:code])
         raise Bolt::CLIError, "a manifest file or --execute is required"
       end
 

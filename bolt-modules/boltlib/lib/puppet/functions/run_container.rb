@@ -113,7 +113,7 @@ Puppet::Functions.create_function(:run_container) do
         raise Bolt::ValidationError, msg
       end
 
-      if (bad_keys = ev.keys.grep_v(String)).any?
+      if (bad_keys = ev.keys.reject { |k| k.is_a?(String) }).any?
         msg = "Keys for option 'env_vars' must be strings: #{bad_keys.map(&:inspect).join(', ')}"
         raise Bolt::ValidationError, msg
       end

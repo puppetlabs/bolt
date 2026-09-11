@@ -12,7 +12,6 @@ require 'bolt/task'
 
 describe 'apply_prep' do
   include PuppetlabsSpec::Fixtures
-
   let(:applicator)    { mock('Bolt::Applicator') }
   let(:config)        { Bolt::Config.default }
   let(:executor)      { Bolt::Executor.new }

@@ -8,7 +8,6 @@ require 'bolt/plan_result'
 
 describe 'parallelize' do
   include PuppetlabsSpec::Fixtures
-
   let(:array) { %w[a b c d a b a] }
   let(:future) { Bolt::PlanFuture.new(nil, 1, name: 'name', plan_id: 1234) }
   let(:executor) { Bolt::Executor.new }
