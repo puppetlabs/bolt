@@ -61,7 +61,7 @@ describe Bolt::Shell::Powershell::Snippets do
     end
 
     it 'includes arguments in the script' do
-      result = subject.run_script(['arg1', 'arg2'], 'C:\\scripts\\myscript.ps1')
+      result = subject.run_script(%w[arg1 arg2], 'C:\\scripts\\myscript.ps1')
       expect(result).to include('arg1')
       expect(result).to include('arg2')
     end

@@ -16,7 +16,7 @@ describe Bolt::R10KLogProxy do
       # Test the logic directly by checking what happens with a known debug-named level
       # Index 1 in standard log4r is 'DEBUG'
       level = proxy.to_bolt_level(1)
-      expect([:debug, :info, :warn, :all]).to include(level)
+      expect(%i[debug info warn all]).to include(level)
     end
 
     it 'maps level names to symbols' do

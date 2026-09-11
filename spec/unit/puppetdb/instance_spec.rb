@@ -65,20 +65,20 @@ describe Bolt::PuppetDB::Instance do
   describe '#make_query' do
     it 'returns parsed JSON on a 200 response' do
       allow(http_client).to receive(:post).and_return(ok_response)
-      result = instance.make_query(['from', 'nodes'])
+      result = instance.make_query(%w[from nodes])
       expect(result).to eq([{ 'certname' => 'host1' }])
     end
 
     it 'raises PuppetDBError on a 400 response' do
       allow(http_client).to receive(:post).and_return(bad_response)
-      expect { instance.make_query(['from', 'nodes']) }
+      expect { instance.make_query(%w[from nodes]) }
         .to raise_error(Bolt::PuppetDBError, /Failed to query/)
     end
 
     it 'raises PuppetDBError when JSON cannot be parsed' do
       bad_json = double('response', code: 200, body: 'not json{{{')
       allow(http_client).to receive(:post).and_return(bad_json)
-      expect { instance.make_query(['from', 'nodes']) }
+      expect { instance.make_query(%w[from nodes]) }
         .to raise_error(Bolt::PuppetDBError, /Unable to parse/)
     end
 
@@ -92,7 +92,7 @@ describe Bolt::PuppetDB::Instance do
         raise Bolt::PuppetDBError, 'no URLs' if call_count > 1
         double('uri', to_s: 'https://puppet.example.com:8081')
       end
-      expect { instance.make_query(['from', 'nodes']) }
+      expect { instance.make_query(%w[from nodes]) }
         .to raise_error(Bolt::PuppetDBError)
     end
   end

@@ -56,15 +56,15 @@ describe "Bolt::Executor" do
     it 'removes subscriber when types match all subscribed types' do
       sub = double('subscriber')
       ex = Bolt::Executor.new(1, analytics)
-      ex.subscribe(sub, [:result, :start])
-      ex.unsubscribe(sub, [:result, :start])
+      ex.subscribe(sub, %i[result start])
+      ex.unsubscribe(sub, %i[result start])
       expect(ex.instance_variable_get(:@subscribers)).not_to have_key(sub)
     end
 
     it 'removes specific types from subscriber when partially unsubscribing' do
       sub = double('subscriber')
       ex = Bolt::Executor.new(1, analytics)
-      ex.subscribe(sub, [:result, :start])
+      ex.subscribe(sub, %i[result start])
       ex.unsubscribe(sub, [:result])
       expect(ex.instance_variable_get(:@subscribers)[sub]).to eq([:start])
     end

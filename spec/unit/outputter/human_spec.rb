@@ -668,7 +668,7 @@ describe "Bolt::Outputter::Human" do
       }
       apply_result = Bolt::ApplyResult.new(target, report: report)
       outputter.print_result(apply_result)
-      expect(output.string).to match(/Warn: File\[\/tmp\/x\]: disk full/)
+      expect(output.string).to match(%r{Warn: File\[/tmp/x\]: disk full})
       expect(output.string).not_to match(/skipped/)
     end
   end
@@ -793,7 +793,7 @@ describe "Bolt::Outputter::Human" do
     it 'prints a list of plans and the modulepath' do
       outputter.print_plans(plans: [['mod::myplan', 'A plan']], modulepath: ['/path'])
       expect(output.string).to match(/Plans.*mod::myplan/m)
-      expect(output.string).to match(/Modulepath.*\/path/m)
+      expect(output.string).to match(%r{Modulepath.*/path}m)
     end
 
     it 'prints a no-plans message when the list is empty' do
@@ -834,7 +834,7 @@ describe "Bolt::Outputter::Human" do
       outputter.print_guide(topic: 'inventory', guide: "Guide text\n",
                             documentation: ['https://pup.pt/bolt-inventory'])
       expect(output.string).to match(/Documentation/)
-      expect(output.string).to match(/https:\/\/pup\.pt\/bolt-inventory/)
+      expect(output.string).to match(%r{https://pup\.pt/bolt-inventory})
     end
   end
 
@@ -923,14 +923,14 @@ describe "Bolt::Outputter::Human" do
 
     it 'includes file, line, and column when present' do
       outputter.print_bolt_error(msg: 'oops', details: { file: '/file.pp', line: 5, column: 3 })
-      expect(output.string).to match(/file: \/file\.pp/)
+      expect(output.string).to match(%r{file: /file\.pp})
       expect(output.string).to match(/line: 5/)
       expect(output.string).to match(/column: 3/)
     end
 
     it 'includes only file when line and column are absent' do
       outputter.print_bolt_error(msg: 'oops', details: { file: '/file.pp' })
-      expect(output.string).to match(/file: \/file\.pp/)
+      expect(output.string).to match(%r{file: /file\.pp})
       expect(output.string).not_to match(/line:/)
     end
   end

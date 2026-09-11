@@ -17,7 +17,7 @@ describe Bolt::Outputter::Logger do
   end
 
   def make_result_set(failures: 0, successes: 1)
-    target = double('target', name: 'host')
+    double('target', name: 'host')
     results = (1..successes).map { double('result', error_hash: nil) }
     results += (1..failures).map { double('result', error_hash: { 'msg' => 'err' }) } if failures > 0
     mock_rs = double('result_set')

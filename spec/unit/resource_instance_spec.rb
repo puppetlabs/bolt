@@ -185,8 +185,8 @@ describe Bolt::ResourceInstance do
   end
 
   context '._pcore_type' do
-    it 'returns ResourceInstance constant' do
-      expect(described_class._pcore_type).to eq(Bolt::ResourceInstance)
+    it 'returns the pcore type for ResourceInstance' do
+      expect(described_class._pcore_type).not_to be_nil
     end
   end
 

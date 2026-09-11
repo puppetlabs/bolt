@@ -155,7 +155,9 @@ end
 
 describe Bolt::ApplyFailure do
   let(:target) { Bolt::Inventory.empty.get_target('host1') }
-  let(:failed_result) { Bolt::Result.new(target, error: { 'msg' => 'compile error', 'kind' => 'bolt/err', 'details' => {} }) }
+  let(:failed_result) {
+    Bolt::Result.new(target, error: { 'msg' => 'compile error', 'kind' => 'bolt/err', 'details' => {} })
+  }
   let(:result_set) { Bolt::ResultSet.new([failed_result]) }
 
   it 'creates an apply failure' do
@@ -181,14 +183,14 @@ end
 
 describe Bolt::ParallelFailure do
   it 'creates an error with failed indices' do
-    err = described_class.new(['r1', 'r2'], [0, 1])
+    err = described_class.new(%w[r1 r2], [0, 1])
     expect(err.kind).to eq('bolt/parallel-failure')
     expect(err.error_code).to eq(2)
     expect(err.details['failed_indices']).to eq([0, 1])
   end
 
   it 'pluralizes for multiple failures' do
-    err = described_class.new(['r1', 'r2'], [0, 1])
+    err = described_class.new(%w[r1 r2], [0, 1])
     expect(err.message).to match(/targets/)
   end
 

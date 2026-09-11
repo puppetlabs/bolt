@@ -31,7 +31,10 @@ describe Bolt::ApplyInventory do
   end
 
   describe '#create_apply_target and accessors' do
-    let(:target) { double('target', name: 'myhost', vars: { 'x' => 1 }, facts: { 'os' => 'linux' }, features: ['shell'], plugin_hooks: {}, config: {}) }
+    let(:target) {
+      double('target', name: 'myhost', vars: { 'x' => 1 }, facts: { 'os' => 'linux' }, features: ['shell'],
+     plugin_hooks: {}, config: {})
+    }
 
     before(:each) { inventory.create_apply_target(target) }
 

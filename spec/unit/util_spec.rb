@@ -303,7 +303,10 @@ describe Bolt::Util do
 
     it 'skips the top value when skip_top is true' do
       called_with = []
-      Bolt::Util.postwalk_vals([1, 2], true) { |v| called_with << v; v }
+      Bolt::Util.postwalk_vals([1, 2], true) { |v|
+        called_with << v
+        v
+      }
       expect(called_with).not_to include([1, 2])
     end
   end

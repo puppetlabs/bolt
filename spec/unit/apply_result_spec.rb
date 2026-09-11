@@ -136,8 +136,8 @@ describe Bolt::ApplyResult do
     it 'creates a successful ApplyResult from a valid task result' do
       value = {
         'metrics' => { 'resources' => { 'values' => [['changed', nil, 0], ['failed', nil, 0],
-                                                      ['skipped', nil, 0], ['total', nil, 0],
-                                                      ['out_of_sync', nil, 0]] } },
+                                                     ['skipped', nil, 0], ['total', nil, 0],
+                                                     ['out_of_sync', nil, 0]] } },
         'resource_statuses' => {},
         'status' => 'unchanged',
         'logs' => []
