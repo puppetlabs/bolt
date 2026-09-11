@@ -120,6 +120,7 @@ describe BoltServer::FileCache do
       allow(cache).to receive(:request_file) do |_path, _params, file|
         file.write(content)
         file.flush
+        file.close
       end
       result = cache.download_file(file_path, sha, uri)
       expect(result).to eq(file_path)

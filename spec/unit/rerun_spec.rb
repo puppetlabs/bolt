@@ -106,11 +106,11 @@ describe Bolt::Rerun do
     end
 
     it 'logs warning on write failure' do
-      rerun_obj = described_class.new('/nonexistent/path/.rerun.json', true)
       result = Bolt::Result.new(target1, message: 'ok', action: 'run')
       rs = Bolt::ResultSet.new([result])
+      allow(File).to receive(:write).and_raise(Errno::EACCES, 'permission denied')
       expect(Bolt::Logger).to receive(:warn_once)
-      rerun_obj.update(rs)
+      rerun.update(rs)
     end
   end
 end
